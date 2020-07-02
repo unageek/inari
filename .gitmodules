@@ -1,0 +1,3 @@
+[submodule "ITF1788"]
+	path = ITF1788
+	url = https://github.com/mizuno-gsinet/ITF1788.git
