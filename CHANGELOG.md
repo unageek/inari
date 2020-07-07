@@ -2,7 +2,7 @@
 
 ❗ indicates an breaking change.
 
-## [Unreleased]
+## Unreleased
 
 ## Added
 
@@ -19,6 +19,6 @@
 - ❗ Changed discriminants of enum `OverlappingState`.
 - ❗ Changed method `IntervalError<T>::value` to consume and return the value.
 
-## [v0.1.0] - 2020-07-03
+## v0.1.0 - 2020-07-03
 
 Initial release.
