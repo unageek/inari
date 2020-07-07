@@ -97,7 +97,7 @@ impl PartialEq for Interval {
 impl Eq for Interval {}
 
 impl TryFrom<(f64, f64)> for Interval {
-    type Error = IntervalError<Interval>;
+    type Error = IntervalError<Self>;
 
     fn try_from((a, b): (f64, f64)) -> Result<Self, Self::Error> {
         if a <= b && a != f64::INFINITY && b != f64::NEG_INFINITY {
@@ -105,7 +105,7 @@ impl TryFrom<(f64, f64)> for Interval {
         } else {
             Err(Self::Error {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Interval::empty(),
+                value: Self::empty(),
             })
         }
     }

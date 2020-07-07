@@ -58,3 +58,19 @@ impl Interval {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    type I = Interval;
+
+    #[test]
+    fn empty() {
+        assert!(I::empty().ceil().is_empty());
+        assert!(I::empty().floor().is_empty());
+        assert!(I::empty().round_ties_to_away().is_empty());
+        assert!(I::empty().round_ties_to_even().is_empty());
+        assert!(I::empty().sign().is_empty());
+        assert!(I::empty().trunc().is_empty());
+    }
+}

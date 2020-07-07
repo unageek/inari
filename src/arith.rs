@@ -267,7 +267,9 @@ impl_op_assign!(DivAssign, div_assign, div);
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::interval;
+    type I = Interval;
 
     #[test]
     fn add_assign() {
@@ -295,5 +297,22 @@ mod tests {
         let mut i = interval!(3.0, 4.0).unwrap();
         i /= interval!(1.0, 2.0).unwrap();
         assert_eq!(i, interval!(1.5, 4.0).unwrap());
+    }
+
+    #[test]
+    fn empty() {
+        assert!((-I::empty()).is_empty());
+
+        assert!((I::empty() + I::PI).is_empty());
+        assert!((I::PI + I::empty()).is_empty());
+
+        assert!((I::empty() - I::PI).is_empty());
+        assert!((I::PI - I::empty()).is_empty());
+
+        assert!((I::empty() * I::PI).is_empty());
+        assert!((I::PI * I::empty()).is_empty());
+
+        assert!((I::empty() / I::PI).is_empty());
+        assert!((I::PI / I::empty()).is_empty());
     }
 }

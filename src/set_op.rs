@@ -37,32 +37,14 @@ impl Interval {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interval;
     type I = Interval;
 
     #[test]
-    fn convex_hull() {
-        assert_eq!(
-            I::empty().convex_hull(interval!(1.0, 2.0).unwrap()),
-            interval!(1.0, 2.0).unwrap()
-        );
+    fn empty() {
+        assert_eq!(I::empty().convex_hull(I::PI), I::PI);
+        assert_eq!(I::PI.convex_hull(I::empty()), I::PI);
 
-        assert_eq!(
-            interval!(1.0, 2.0).unwrap().convex_hull(I::empty()),
-            interval!(1.0, 2.0).unwrap()
-        );
-    }
-
-    #[test]
-    fn intersection() {
-        assert_eq!(
-            I::empty().intersection(interval!(1.0, 2.0).unwrap()),
-            I::empty()
-        );
-
-        assert_eq!(
-            interval!(1.0, 2.0).unwrap().intersection(I::empty()),
-            I::empty()
-        );
+        assert!(I::empty().intersection(I::PI).is_empty());
+        assert!(I::PI.intersection(I::empty()).is_empty());
     }
 }
