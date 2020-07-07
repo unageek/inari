@@ -625,11 +625,12 @@ impl FromStr for DecoratedInterval {
 mod tests {
     use super::*;
     use crate::interval;
+    type DI = DecoratedInterval;
     type I = Interval;
 
     #[test]
     fn parse() {
-        // Test cases not covered by ITF1788.
+        // Integer significands without a dot are not covered by ITF1788.
         assert_eq!(
             "[123]".parse::<I>().unwrap(),
             interval!(123.0, 123.0).unwrap()
@@ -638,13 +639,34 @@ mod tests {
             "[0x123p0]".parse::<I>().unwrap(),
             interval!(291.0, 291.0).unwrap()
         );
+
+        // Exponent == i32::MAX + 1.
         assert_eq!(
-            "[123e10000000000]".parse::<I>().unwrap_err().value(),
+            "[123e2147483648]".parse::<I>().unwrap_err().value(),
             I::entire()
         );
         assert_eq!(
-            "[0x123p10000000000]".parse::<I>().unwrap_err().value(),
+            "[0x123p2147483648]".parse::<I>().unwrap_err().value(),
             I::entire()
+        );
+
+        // Exponent == i32::MIN - 1.
+        assert_eq!(
+            "[123e-2147483649]".parse::<I>().unwrap_err().value(),
+            I::entire()
+        );
+        assert_eq!(
+            "[0x123p-2147483649]".parse::<I>().unwrap_err().value(),
+            I::entire()
+        );
+
+        assert_eq!(
+            "[123e2147483648]".parse::<DI>().unwrap_err().value(),
+            DI::entire()
+        );
+        assert_eq!(
+            "[123e2147483648]_com".parse::<DI>().unwrap_err().value(),
+            DI::entire()
         );
     }
 }
