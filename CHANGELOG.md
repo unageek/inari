@@ -4,7 +4,7 @@
 
 ## Unreleased
 
-## Added
+### Added
 
 - Added decoration system.
   - Added struct `DecoratedInterval`.
