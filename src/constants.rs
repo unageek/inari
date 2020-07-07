@@ -16,80 +16,80 @@ macro_rules! interval_unchecked {
 }
 
 impl Interval {
-    pub const E: Interval = interval_unchecked!(
+    pub const E: Self = interval_unchecked!(
         hexf64!("0x2.b7e151628aed2p0"),
         hexf64!("0x2.b7e151628aed4p0")
     );
-    pub const FRAC_1_PI: Interval = interval_unchecked!(
+    pub const FRAC_1_PI: Self = interval_unchecked!(
         hexf64!("0x5.17cc1b7272208p-4"),
         hexf64!("0x5.17cc1b727220cp-4")
     );
-    pub const FRAC_1_SQRT_2: Interval = interval_unchecked!(
+    pub const FRAC_1_SQRT_2: Self = interval_unchecked!(
         hexf64!("0xb.504f333f9de60p-4"),
         hexf64!("0xb.504f333f9de68p-4")
     );
-    pub const FRAC_2_PI: Interval = interval_unchecked!(
+    pub const FRAC_2_PI: Self = interval_unchecked!(
         hexf64!("0xa.2f9836e4e4410p-4"),
         hexf64!("0xa.2f9836e4e4418p-4")
     );
-    pub const FRAC_2_SQRT_PI: Interval = interval_unchecked!(
+    pub const FRAC_2_SQRT_PI: Self = interval_unchecked!(
         hexf64!("0x1.20dd750429b6dp0"),
         hexf64!("0x1.20dd750429b6ep0")
     );
-    pub const FRAC_PI_2: Interval = interval_unchecked!(
+    pub const FRAC_PI_2: Self = interval_unchecked!(
         hexf64!("0x1.921fb54442d18p0"),
         hexf64!("0x1.921fb54442d19p0")
     );
-    pub const FRAC_PI_3: Interval = interval_unchecked!(
+    pub const FRAC_PI_3: Self = interval_unchecked!(
         hexf64!("0x1.0c152382d7365p0"),
         hexf64!("0x1.0c152382d7366p0")
     );
-    pub const FRAC_PI_4: Interval = interval_unchecked!(
+    pub const FRAC_PI_4: Self = interval_unchecked!(
         hexf64!("0xc.90fdaa22168c0p-4"),
         hexf64!("0xc.90fdaa22168c8p-4")
     );
-    pub const FRAC_PI_6: Interval = interval_unchecked!(
+    pub const FRAC_PI_6: Self = interval_unchecked!(
         hexf64!("0x8.60a91c16b9b28p-4"),
         hexf64!("0x8.60a91c16b9b30p-4")
     );
-    pub const FRAC_PI_8: Interval = interval_unchecked!(
+    pub const FRAC_PI_8: Self = interval_unchecked!(
         hexf64!("0x6.487ed5110b460p-4"),
         hexf64!("0x6.487ed5110b464p-4")
     );
-    pub const LN_10: Interval = interval_unchecked!(
+    pub const LN_10: Self = interval_unchecked!(
         hexf64!("0x2.4d763776aaa2ap0"),
         hexf64!("0x2.4d763776aaa2cp0")
     );
-    pub const LN_2: Interval = interval_unchecked!(
+    pub const LN_2: Self = interval_unchecked!(
         hexf64!("0xb.17217f7d1cf78p-4"),
         hexf64!("0xb.17217f7d1cf80p-4")
     );
-    pub const LOG10_2: Interval = interval_unchecked!(
+    pub const LOG10_2: Self = interval_unchecked!(
         hexf64!("0x4.d104d427de7f8p-4"),
         hexf64!("0x4.d104d427de7fcp-4")
     );
-    pub const LOG10_E: Interval = interval_unchecked!(
+    pub const LOG10_E: Self = interval_unchecked!(
         hexf64!("0x6.f2dec549b9438p-4"),
         hexf64!("0x6.f2dec549b943cp-4")
     );
-    pub const LOG2_10: Interval = interval_unchecked!(
+    pub const LOG2_10: Self = interval_unchecked!(
         hexf64!("0x3.5269e12f346e2p0"),
         hexf64!("0x3.5269e12f346e4p0")
     );
-    pub const LOG2_E: Interval = interval_unchecked!(
+    pub const LOG2_E: Self = interval_unchecked!(
         hexf64!("0x1.71547652b82fep0"),
         hexf64!("0x1.71547652b82ffp0")
     );
-    pub const PI: Interval = interval_unchecked!(
+    pub const PI: Self = interval_unchecked!(
         hexf64!("0x3.243f6a8885a30p0"),
         hexf64!("0x3.243f6a8885a32p0")
     );
-    pub const SQRT_2: Interval = interval_unchecked!(
+    pub const SQRT_2: Self = interval_unchecked!(
         hexf64!("0x1.6a09e667f3bccp0"),
         hexf64!("0x1.6a09e667f3bcdp0")
     );
     #[cfg(feature = "tau_constant")]
-    pub const TAU: Interval = interval_unchecked!(
+    pub const TAU: Self = interval_unchecked!(
         hexf64!("0x6.487ed5110b460p0"),
         hexf64!("0x6.487ed5110b464p0")
     );

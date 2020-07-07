@@ -27,7 +27,7 @@ jobs:
     - name: Run tests (All features)
       run: cargo test --release --all-features
     - name: Clippy
-      run: cargo clippy --lib --examples --all-features -- -Dwarnings
+      run: cargo clippy --all-targets --all-features -- -Dwarnings
     - name: Check format
       run: cargo fmt -- --check
     - name: Coverage

@@ -24,21 +24,9 @@ impl Interval {
         }
     }
 
-    pub fn min(self, rhs: Self) -> Self {
-        // https://www.agner.org/optimize/blog/read.php?i=1012
-        if self.is_empty() || rhs.is_empty() {
-            return Self::empty();
-        }
-
-        unsafe {
-            let min = _mm_min_pd(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
-            let max = _mm_max_pd(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
-            let r = _mm_move_sd(min, max); // [max(-a, -c); min(b, d)]
-            Self { rep: r }
-        }
-    }
-
     pub fn max(self, rhs: Self) -> Self {
+        // IEEE 754's min/max do not propagate nan.
+        // https://www.agner.org/optimize/blog/read.php?i=1012
         if self.is_empty() || rhs.is_empty() {
             return Self::empty();
         }
@@ -47,6 +35,19 @@ impl Interval {
             let max = _mm_max_pd(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
             let min = _mm_min_pd(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
             let r = _mm_move_sd(max, min); // [min(-a, -c); max(b, d)]
+            Self { rep: r }
+        }
+    }
+
+    pub fn min(self, rhs: Self) -> Self {
+        if self.is_empty() || rhs.is_empty() {
+            return Self::empty();
+        }
+
+        unsafe {
+            let min = _mm_min_pd(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
+            let max = _mm_max_pd(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
+            let r = _mm_move_sd(min, max); // [max(-a, -c); min(b, d)]
             Self { rep: r }
         }
     }

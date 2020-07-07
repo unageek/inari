@@ -37,7 +37,6 @@ impl Interval {
         f.is_finite() && rhs.inf_raw() <= f && f <= rhs.sup_raw()
     }
 
-    #[allow(clippy::float_cmp)]
     pub fn is_singleton(self) -> bool {
         self.inf_raw() == self.sup_raw()
     }

@@ -21,7 +21,6 @@ pub enum OverlappingState {
 }
 
 impl Interval {
-    #[allow(clippy::collapsible_if, clippy::float_cmp)]
     pub fn overlap(self, rhs: Self) -> OverlappingState {
         use OverlappingState::*;
 
@@ -58,6 +57,7 @@ impl Interval {
         //  MB |     x |   x   |     x |     x
         //   A |     x |     x |     x |     x
 
+        #[allow(clippy::collapsible_if)]
         if b < d {
             if a < c {
                 if b < c {

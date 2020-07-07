@@ -1,3 +1,5 @@
+#![allow(clippy::approx_constant, clippy::float_cmp)]
+
 mod itf1788_tests {
     //mod abs_rev;
     //mod atan2;

@@ -1,5 +1,6 @@
 //! A Rust implementation of set-based interval arithmetic.
 #![feature(asm)]
+#![allow(clippy::float_cmp)]
 
 pub use self::interval::{Interval, IntervalError, IntervalErrorKind};
 pub use self::overlap::OverlappingState;

@@ -1,6 +1,41 @@
 use core::arch::x86_64::*;
 use std::{convert::TryFrom, error::Error, fmt};
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum IntervalErrorKind {
+    PossiblyUndefinedOperation,
+    UndefinedOperation,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct IntervalError<T: Copy + fmt::Debug> {
+    pub(crate) kind: IntervalErrorKind,
+    pub(crate) value: T,
+}
+
+impl<T: Copy + fmt::Debug> IntervalError<T> {
+    pub fn kind(&self) -> IntervalErrorKind {
+        self.kind
+    }
+
+    pub fn value(&self) -> T {
+        self.value
+    }
+}
+
+impl<T: Copy + fmt::Debug> fmt::Display for IntervalError<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self.kind {
+            IntervalErrorKind::PossiblyUndefinedOperation => {
+                write!(f, "possibly undefined operation")
+            }
+            IntervalErrorKind::UndefinedOperation => write!(f, "undefined operation"),
+        }
+    }
+}
+
+impl<T: Copy + fmt::Debug> Error for IntervalError<T> {}
+
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct Interval {
@@ -60,47 +95,6 @@ impl PartialEq for Interval {
 }
 
 impl Eq for Interval {}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum IntervalErrorKind {
-    PossiblyUndefinedOperation,
-    UndefinedOperation,
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct IntervalError<T: Copy + fmt::Debug> {
-    pub(crate) kind: IntervalErrorKind,
-    pub(crate) value: T,
-}
-
-impl<T> IntervalError<T>
-where
-    T: Copy + fmt::Debug,
-{
-    pub fn kind(&self) -> IntervalErrorKind {
-        self.kind
-    }
-
-    pub fn value(&self) -> T {
-        self.value
-    }
-}
-
-impl<T> fmt::Display for IntervalError<T>
-where
-    T: Copy + fmt::Debug,
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.kind {
-            IntervalErrorKind::PossiblyUndefinedOperation => {
-                write!(f, "possibly undefined operation")
-            }
-            IntervalErrorKind::UndefinedOperation => write!(f, "undefined operation"),
-        }
-    }
-}
-
-impl<T> Error for IntervalError<T> where T: Copy + fmt::Debug {}
 
 impl TryFrom<(f64, f64)> for Interval {
     type Error = IntervalError<Interval>;
