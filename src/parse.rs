@@ -10,7 +10,8 @@ use nom::{
     IResult,
 };
 use rug::{float::Round, Float, Integer, Rational};
-use std::{convert::TryInto, str::FromStr};
+use std::convert::TryFrom;
+use std::str::FromStr;
 
 #[derive(Clone, Debug)]
 struct ParseNumberError;
@@ -21,24 +22,13 @@ impl From<std::num::ParseIntError> for ParseNumberError {
     }
 }
 
-type IntervalResult = Result<Interval, IntervalError<Interval>>;
-
-impl From<ParseNumberError> for IntervalError<Interval> {
-    fn from(_: ParseNumberError) -> Self {
-        Self {
-            kind: IntervalErrorKind::PossiblyUndefinedOperation,
-            value: Interval::entire(),
-        }
-    }
-}
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum InfSup {
     Inf,
     Sup,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 enum Number {
     NegInfinity,
     Rational(Rational),
@@ -78,6 +68,84 @@ impl std::ops::Neg for Number {
             NegInfinity => Infinity,
             Rational(r) => Rational(-r),
             Infinity => NegInfinity,
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+struct NInterval(Number, Number);
+
+impl NInterval {
+    fn empty() -> Self {
+        Self(Number::Infinity, Number::NegInfinity)
+    }
+
+    fn entire() -> Self {
+        Self(Number::NegInfinity, Number::Infinity)
+    }
+}
+
+type NIntervalResult = Result<NInterval, IntervalError<NInterval>>;
+
+#[derive(Debug, Eq, PartialEq)]
+struct DNInterval {
+    x: NInterval,
+    d: Decoration,
+}
+
+impl DNInterval {
+    fn new(x: NInterval) -> Self {
+        use Decoration::*;
+
+        let d = if x == NInterval::empty() {
+            Trv
+        } else if x.0 == Number::NegInfinity || x.1 == Number::Infinity {
+            Dac
+        } else {
+            Com
+        };
+
+        Self { x, d }
+    }
+
+    fn empty() -> Self {
+        Self {
+            x: NInterval::empty(),
+            d: Decoration::Trv,
+        }
+    }
+
+    fn nai() -> Self {
+        Self {
+            x: NInterval::empty(),
+            d: Decoration::Ill,
+        }
+    }
+
+    fn set_dec(x: NInterval, d: Decoration) -> Self {
+        use Decoration::*;
+
+        if d == Ill {
+            return Self::nai();
+        }
+        if x == NInterval::empty() {
+            return Self::empty();
+        }
+        if d == Com && x.0 < Number::Infinity && x.1 > Number::NegInfinity {
+            return Self { x, d: Dac };
+        }
+
+        Self { x, d }
+    }
+}
+
+type DNIntervalResult = Result<DNInterval, IntervalError<DNInterval>>;
+
+impl From<ParseNumberError> for IntervalError<NInterval> {
+    fn from(_: ParseNumberError) -> Self {
+        Self {
+            kind: IntervalErrorKind::PossiblyUndefinedOperation,
+            value: NInterval::entire(),
         }
     }
 }
@@ -277,11 +345,13 @@ fn to_round(infsup: InfSup) -> Round {
 }
 
 fn parse_unsigned_number(n: UnsignedNumberLiteral) -> Result<Number, ParseNumberError> {
+    use UnsignedNumberLiteral::*;
+
     Ok(match n {
-        UnsignedNumberLiteral::DecFloat(m, e) => Number::Rational(parse_dec_float(m, e)?),
-        UnsignedNumberLiteral::HexFloat(m, e) => Number::Rational(parse_hex_float(m, e)?),
-        UnsignedNumberLiteral::Infinity => Number::Infinity,
-        UnsignedNumberLiteral::Rational(s) => Number::Rational(parse_rational(s)?),
+        DecFloat(m, e) => Number::Rational(parse_dec_float(m, e)?),
+        HexFloat(m, e) => Number::Rational(parse_hex_float(m, e)?),
+        Infinity => Number::Infinity,
+        Rational(s) => Number::Rational(parse_rational(s)?),
     })
 }
 
@@ -300,25 +370,7 @@ fn parse_opt_number(n: Option<NumberLiteral>, infsup: InfSup) -> Result<Number, 
     }
 }
 
-fn rational_to_f64(r: &Rational, infsup: InfSup) -> f64 {
-    let mut f = Float::new(f64::MANTISSA_DIGITS);
-    unsafe { mpfr::set_q(f.as_raw_mut(), r.as_raw(), to_rnd_t(infsup)) };
-    let rnd = to_round(infsup);
-    f.subnormalize_ieee_round(Ordering::Equal, rnd);
-    f.to_f64_round(rnd)
-}
-
-fn number_to_f64(n: &Number, infsup: InfSup) -> f64 {
-    use Number::*;
-
-    match n {
-        NegInfinity => f64::NEG_INFINITY,
-        Rational(r) => rational_to_f64(r, infsup),
-        Infinity => f64::INFINITY,
-    }
-}
-
-fn infsup(s: &str) -> IResult<&str, IntervalResult> {
+fn infsup(s: &str) -> IResult<&str, NIntervalResult> {
     map(
         separated_pair(
             opt(number),
@@ -329,82 +381,76 @@ fn infsup(s: &str) -> IResult<&str, IntervalResult> {
             let a = parse_opt_number(na, InfSup::Inf)?;
             let b = parse_opt_number(nb, InfSup::Sup)?;
             if a <= b && a != Number::Infinity && b != Number::NegInfinity {
-                let fa = number_to_f64(&a, InfSup::Inf);
-                let fb = number_to_f64(&b, InfSup::Sup);
-                Ok((fa, fb).try_into().unwrap())
+                Ok(NInterval(a, b))
             } else {
                 Err(IntervalError {
                     kind: IntervalErrorKind::UndefinedOperation,
-                    value: Interval::empty(),
+                    value: NInterval::empty(),
                 })
             }
         },
     )(s)
 }
 
-fn point(s: &str) -> IResult<&str, IntervalResult> {
+fn point(s: &str) -> IResult<&str, NIntervalResult> {
     map(number, |n| {
         let a = parse_number(n)?;
         match a {
             Number::Rational(_) => {
-                let fa = number_to_f64(&a, InfSup::Inf);
-                let fb = number_to_f64(&a, InfSup::Sup);
-                Ok((fa, fb).try_into().unwrap())
+                let b = a.clone();
+                Ok(NInterval(a, b))
             }
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Interval::empty(),
+                value: NInterval::empty(),
             }),
         }
     })(s)
 }
 
-fn bracket(s: &str) -> IResult<&str, IntervalResult> {
+fn bracket(s: &str) -> IResult<&str, NIntervalResult> {
     delimited(
         pair(char('['), space0),
         map(
             opt(alt((
-                value(Ok(Interval::empty()), tag_no_case("empty")),
-                value(Ok(Interval::entire()), tag_no_case("entire")),
+                map(tag_no_case("empty"), |_| Ok(NInterval::empty())),
+                map(tag_no_case("entire"), |_| Ok(NInterval::entire())),
                 infsup,
                 point,
             ))),
-            |x| x.unwrap_or_else(|| Ok(Interval::empty())),
+            |x| x.unwrap_or_else(|| Ok(NInterval::empty())),
         ),
         pair(space0, char(']')),
     )(s)
 }
 
-fn uncertain_to_f64(
+fn uncertain_bound(
     center: &Rational,
     radius_or_unbounded: &Option<Rational>,
     dir: UncertainDirection,
     infsup: InfSup,
-) -> f64 {
+) -> Number {
     let directions_match = dir == UncertainDirection::Both
         || dir == UncertainDirection::Down && infsup == InfSup::Inf
         || dir == UncertainDirection::Up && infsup == InfSup::Sup;
 
     if directions_match {
         match radius_or_unbounded {
-            Some(radius) => {
-                let r = match infsup {
-                    InfSup::Inf => Rational::from(center - radius),
-                    InfSup::Sup => Rational::from(center + radius),
-                };
-                rational_to_f64(&r, infsup)
-            }
+            Some(radius) => match infsup {
+                InfSup::Inf => Number::Rational(Rational::from(center - radius)),
+                InfSup::Sup => Number::Rational(Rational::from(center + radius)),
+            },
             None => match infsup {
-                InfSup::Inf => f64::NEG_INFINITY,
-                InfSup::Sup => f64::INFINITY,
+                InfSup::Inf => Number::NegInfinity,
+                InfSup::Sup => Number::Infinity,
             },
         }
     } else {
-        rational_to_f64(center, infsup)
+        Number::Rational(center.clone())
     }
 }
 
-fn uncertain(s: &str) -> IResult<&str, IntervalResult> {
+fn uncertain(s: &str) -> IResult<&str, NIntervalResult> {
     map(
         separated_pair(
             recognize(pair(sign, dec_significand)),
@@ -421,22 +467,164 @@ fn uncertain(s: &str) -> IResult<&str, IntervalResult> {
                 }
                 UncertainRadius::Unbounded => None,
             };
-            let fa = uncertain_to_f64(&center, &radius_or_unbounded, dir, InfSup::Inf);
-            let fb = uncertain_to_f64(&center, &radius_or_unbounded, dir, InfSup::Sup);
-            Ok((fa, fb).try_into().unwrap())
+            let a = uncertain_bound(&center, &radius_or_unbounded, dir, InfSup::Inf);
+            let b = uncertain_bound(&center, &radius_or_unbounded, dir, InfSup::Sup);
+            Ok(NInterval(a, b))
         },
     )(s)
+}
+
+fn interval(s: &str) -> IResult<&str, NIntervalResult> {
+    alt((bracket, uncertain))(s)
+}
+
+fn decoration(s: &str) -> IResult<&str, Decoration> {
+    use Decoration::*;
+
+    alt((
+        value(Com, tag_no_case("com")),
+        value(Dac, tag_no_case("dac")),
+        value(Def, tag_no_case("def")),
+        value(Trv, tag_no_case("trv")),
+    ))(s)
+}
+
+fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
+    alt((
+        map(
+            tuple((char('['), space0, tag_no_case("nai"), space0, char(']'))),
+            |_| Ok(DNInterval::nai()),
+        ),
+        map(
+            pair(interval, opt(preceded(char('_'), decoration))),
+            |pair| match pair {
+                (Ok(x), None) => {
+                    println!("Ok({:?}), None", x);
+                    Ok(DNInterval::new(x))
+                }
+                (Ok(x), Some(d)) => {
+                    println!("Ok({:?}), Some({:?})", x, d);
+                    let dec_x = DNInterval::new(x);
+                    if d <= dec_x.d {
+                        Ok(DNInterval::set_dec(dec_x.x, d))
+                    } else {
+                        Err(IntervalError::<_> {
+                            kind: IntervalErrorKind::UndefinedOperation,
+                            value: DNInterval::nai(),
+                        })
+                    }
+                }
+                (Err(e), None) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
+                    println!("Err({}), None", e);
+                    Err(IntervalError::<_> {
+                        kind: e.kind,
+                        value: DNInterval::new(e.value),
+                    })
+                }
+                (Err(e), Some(d)) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
+                    println!("Err({}), Some({:?})", e, d);
+                    Err(IntervalError::<_> {
+                        kind: e.kind,
+                        value: DNInterval::set_dec(e.value, d),
+                    })
+                }
+                _ => {
+                    println!("UO");
+                    Err(IntervalError::<_> {
+                        kind: IntervalErrorKind::UndefinedOperation,
+                        value: DNInterval::nai(),
+                    })
+                }
+            },
+        ),
+    ))(s)
+}
+
+#[derive(Debug)]
+struct F64 {
+    f: f64,
+    overflow: bool,
+}
+
+fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
+    let mut f = Float::new(f64::MANTISSA_DIGITS);
+    unsafe { mpfr::set_q(f.as_raw_mut(), r.as_raw(), to_rnd_t(infsup)) };
+    let rnd = to_round(infsup);
+    f.subnormalize_ieee_round(Ordering::Equal, rnd);
+    let f = f.to_f64_round(rnd);
+    let overflow = f.is_infinite();
+    F64 { f, overflow }
+}
+
+fn number_to_f64(n: &Number, infsup: InfSup) -> F64 {
+    match n {
+        Number::NegInfinity => F64 {
+            f: f64::NEG_INFINITY,
+            overflow: false,
+        },
+        Number::Rational(r) => rational_to_f64(r, infsup),
+        Number::Infinity => F64 {
+            f: f64::INFINITY,
+            overflow: false,
+        },
+    }
+}
+
+impl From<NInterval> for Interval {
+    fn from(x: NInterval) -> Self {
+        DecoratedInterval::from(DNInterval::set_dec(x, Decoration::Trv)).x
+    }
+}
+
+impl From<DNInterval> for DecoratedInterval {
+    fn from(DNInterval { x, d }: DNInterval) -> Self {
+        let a = number_to_f64(&x.0, InfSup::Inf);
+        let b = number_to_f64(&x.1, InfSup::Sup);
+        let x = Interval::try_from((a.f, b.f)).unwrap_or_else(|_| Interval::empty());
+        let d = if a.overflow || b.overflow {
+            d.min(Decoration::Dac)
+        } else {
+            d
+        };
+        Self::set_dec(x, d)
+    }
 }
 
 impl FromStr for Interval {
     type Err = IntervalError<Interval>;
 
-    fn from_str(s: &str) -> IntervalResult {
-        match alt((bracket, uncertain))(s) {
-            Ok(("", x)) => x,
+    fn from_str(s: &str) -> Result<Interval, IntervalError<Interval>> {
+        match interval(s) {
+            Ok(("", x)) => match x {
+                Ok(x) => Ok(Self::from(x)),
+                Err(e) => Err(IntervalError {
+                    kind: e.kind,
+                    value: Self::from(e.value),
+                }),
+            },
             _ => Err(Self::Err {
                 kind: IntervalErrorKind::UndefinedOperation,
                 value: Interval::empty(),
+            }),
+        }
+    }
+}
+
+impl FromStr for DecoratedInterval {
+    type Err = IntervalError<DecoratedInterval>;
+
+    fn from_str(s: &str) -> Result<DecoratedInterval, IntervalError<DecoratedInterval>> {
+        match decorated_interval(s) {
+            Ok(("", x)) => match x {
+                Ok(x) => Ok(Self::from(x)),
+                Err(e) => Err(IntervalError {
+                    kind: e.kind,
+                    value: Self::from(e.value),
+                }),
+            },
+            _ => Err(Self::Err {
+                kind: IntervalErrorKind::UndefinedOperation,
+                value: DecoratedInterval::nai(),
             }),
         }
     }

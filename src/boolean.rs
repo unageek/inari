@@ -69,3 +69,52 @@ impl Interval {
         self.is_empty() || rhs.inf_raw() <= self.inf_raw() && self.sup_raw() <= rhs.sup_raw()
     }
 }
+
+macro_rules! impl_dec {
+    ($f:ident, 1) => {
+        pub fn $f(self) -> bool {
+            if self.is_nai() {
+                return false;
+            }
+
+            self.x.$f()
+        }
+    };
+
+    ($f:ident, 2) => {
+        pub fn $f(self, rhs: Self) -> bool {
+            if self.is_nai() || rhs.is_nai() {
+                return false;
+            }
+
+            self.x.$f(rhs.x)
+        }
+    };
+}
+
+impl DecoratedInterval {
+    impl_dec!(disjoint, 2);
+    impl_dec!(interior, 2);
+    impl_dec!(is_common_interval, 1);
+    impl_dec!(is_empty, 1);
+    impl_dec!(is_entire, 1);
+
+    pub fn is_member(f: f64, rhs: Self) -> bool {
+        if rhs.is_nai() {
+            return false;
+        }
+
+        Interval::is_member(f, rhs.x)
+    }
+
+    pub fn is_nai(self) -> bool {
+        self.d == Decoration::Ill
+    }
+
+    impl_dec!(is_singleton, 1);
+    impl_dec!(less, 2);
+    impl_dec!(precedes, 2);
+    impl_dec!(strict_less, 2);
+    impl_dec!(strict_precedes, 2);
+    impl_dec!(subset, 2);
+}

@@ -53,9 +53,36 @@ impl Interval {
     }
 }
 
+impl DecoratedInterval {
+    pub fn abs(self) -> Self {
+        if self.is_nai() {
+            return self;
+        }
+
+        Self::set_dec(self.x.abs(), self.d)
+    }
+
+    pub fn max(self, rhs: Self) -> Self {
+        if self.is_nai() {
+            return self;
+        }
+
+        Self::set_dec(self.x.max(rhs.x), self.d.min(rhs.d))
+    }
+
+    pub fn min(self, rhs: Self) -> Self {
+        if self.is_nai() {
+            return self;
+        }
+
+        Self::set_dec(self.x.min(rhs.x), self.d.min(rhs.d))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    type DI = DecoratedInterval;
     type I = Interval;
 
     #[test]
@@ -67,5 +94,24 @@ mod tests {
 
         assert!(I::empty().min(I::PI).is_empty());
         assert!(I::PI.min(I::empty()).is_empty());
+
+        assert!(DI::empty().abs().is_empty());
+
+        assert!(DI::empty().max(DI::PI).is_empty());
+        assert!(DI::PI.max(DI::empty()).is_empty());
+
+        assert!(DI::empty().min(DI::PI).is_empty());
+        assert!(DI::PI.min(DI::empty()).is_empty());
+    }
+
+    #[test]
+    fn nai() {
+        assert!(DI::nai().abs().is_nai());
+
+        assert!(DI::nai().max(DI::PI).is_nai());
+        assert!(DI::PI.max(DI::nai()).is_nai());
+
+        assert!(DI::nai().min(DI::PI).is_nai());
+        assert!(DI::PI.min(DI::nai()).is_nai());
     }
 }

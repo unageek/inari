@@ -95,10 +95,43 @@ impl Interval {
     );
 }
 
+macro_rules! def_com {
+    ($c:ident) => {
+        pub const $c: Self = Self {
+            x: Interval::$c,
+            d: Decoration::Com,
+        };
+    };
+}
+
+impl DecoratedInterval {
+    def_com!(E);
+    def_com!(FRAC_1_PI);
+    def_com!(FRAC_1_SQRT_2);
+    def_com!(FRAC_2_PI);
+    def_com!(FRAC_2_SQRT_PI);
+    def_com!(FRAC_PI_2);
+    def_com!(FRAC_PI_3);
+    def_com!(FRAC_PI_4);
+    def_com!(FRAC_PI_6);
+    def_com!(FRAC_PI_8);
+    def_com!(LN_10);
+    def_com!(LN_2);
+    def_com!(LOG10_2);
+    def_com!(LOG10_E);
+    def_com!(LOG2_10);
+    def_com!(LOG2_E);
+    def_com!(PI);
+    def_com!(SQRT_2);
+    #[cfg(feature = "tau_constant")]
+    def_com!(TAU);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     type I = Interval;
+    type DI = DecoratedInterval;
 
     // Only works with positive numbers.
     fn succ(x: f64) -> f64 {
@@ -116,6 +149,7 @@ mod tests {
                 let b = I::$c.sup();
                 b == succ(a) && (a == $f || $f == b)
             });
+            assert_eq!(DI::$c, DI::new(I::$c));
         };
     }
 
