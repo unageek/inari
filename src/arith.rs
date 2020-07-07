@@ -438,21 +438,4 @@ mod tests {
         assert!((DI::nai() / DI::PI).is_nai());
         assert!((DI::PI / DI::nai()).is_nai());
     }
-
-    #[test]
-    fn empty() {
-        assert!((-I::empty()).is_empty());
-
-        assert!((I::empty() + I::PI).is_empty());
-        assert!((I::PI + I::empty()).is_empty());
-
-        assert!((I::empty() - I::PI).is_empty());
-        assert!((I::PI - I::empty()).is_empty());
-
-        assert!((I::empty() * I::PI).is_empty());
-        assert!((I::PI * I::empty()).is_empty());
-
-        assert!((I::empty() / I::PI).is_empty());
-        assert!((I::PI / I::empty()).is_empty());
-    }
 }
