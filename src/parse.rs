@@ -498,43 +498,34 @@ fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
         map(
             pair(interval, opt(preceded(char('_'), decoration))),
             |pair| match pair {
-                (Ok(x), None) => {
-                    println!("Ok({:?}), None", x);
-                    Ok(DNInterval::new(x))
-                }
+                (Ok(x), None) => Ok(DNInterval::new(x)),
                 (Ok(x), Some(d)) => {
-                    println!("Ok({:?}), Some({:?})", x, d);
                     let dec_x = DNInterval::new(x);
                     if d <= dec_x.d {
                         Ok(DNInterval::set_dec(dec_x.x, d))
                     } else {
-                        Err(IntervalError::<_> {
+                        Err(IntervalError {
                             kind: IntervalErrorKind::UndefinedOperation,
                             value: DNInterval::nai(),
                         })
                     }
                 }
                 (Err(e), None) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
-                    println!("Err({}), None", e);
-                    Err(IntervalError::<_> {
+                    Err(IntervalError {
                         kind: e.kind,
                         value: DNInterval::new(e.value),
                     })
                 }
                 (Err(e), Some(d)) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
-                    println!("Err({}), Some({:?})", e, d);
-                    Err(IntervalError::<_> {
+                    Err(IntervalError {
                         kind: e.kind,
                         value: DNInterval::set_dec(e.value, d),
                     })
                 }
-                _ => {
-                    println!("UO");
-                    Err(IntervalError::<_> {
-                        kind: IntervalErrorKind::UndefinedOperation,
-                        value: DNInterval::nai(),
-                    })
-                }
+                _ => Err(IntervalError {
+                    kind: IntervalErrorKind::UndefinedOperation,
+                    value: DNInterval::nai(),
+                }),
             },
         ),
     ))(s)
