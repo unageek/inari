@@ -83,6 +83,28 @@ impl Interval {
     }
 }
 
+macro_rules! impl_dec {
+    ($f:ident) => {
+        pub fn $f(self) -> f64 {
+            if self.is_nai() {
+                return f64::NAN;
+            }
+
+            self.x.$f()
+        }
+    };
+}
+
+impl DecoratedInterval {
+    impl_dec!(inf);
+    impl_dec!(mag);
+    impl_dec!(mid);
+    impl_dec!(mig);
+    impl_dec!(rad);
+    impl_dec!(sup);
+    impl_dec!(wid);
+}
+
 #[cfg(test)]
 mod tests {
     use crate::interval;

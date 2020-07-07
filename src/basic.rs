@@ -190,9 +190,57 @@ impl Interval {
     }
 }
 
+impl DecoratedInterval {
+    pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
+        if self.is_nai() || rhs.is_nai() || addend.is_nai() {
+            return Self::nai();
+        }
+
+        Self::set_dec(
+            self.x.mul_add(rhs.x, addend.x),
+            self.d.min(rhs.d.min(addend.d)),
+        )
+    }
+
+    pub fn recip(self) -> Self {
+        if self.is_nai() {
+            return self;
+        }
+
+        let d = if Interval::is_member(0.0, self.x) {
+            Decoration::Trv
+        } else {
+            self.d
+        };
+        Self::set_dec(self.x.recip(), d)
+    }
+
+    pub fn sqr(self) -> Self {
+        if self.is_nai() {
+            return self;
+        }
+
+        Self::set_dec(self.x.sqr(), self.d)
+    }
+
+    pub fn sqrt(self) -> Self {
+        if self.is_nai() {
+            return self;
+        }
+
+        let d = if self.x.inf_raw() < 0.0 {
+            Decoration::Trv
+        } else {
+            self.d
+        };
+        Self::set_dec(self.x.sqrt(), d)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    type DI = DecoratedInterval;
     type I = Interval;
 
     #[test]
@@ -204,5 +252,24 @@ mod tests {
         assert!(I::empty().recip().is_empty());
         assert!(I::empty().sqrt().is_empty());
         assert!(I::empty().sqr().is_empty());
+
+        assert!((DI::empty().mul_add(DI::PI, DI::PI)).is_empty());
+        assert!((DI::PI.mul_add(DI::empty(), DI::PI)).is_empty());
+        assert!((DI::PI.mul_add(DI::PI, DI::empty())).is_empty());
+
+        assert!(DI::empty().recip().is_empty());
+        assert!(DI::empty().sqrt().is_empty());
+        assert!(DI::empty().sqr().is_empty());
+    }
+
+    #[test]
+    fn nai() {
+        assert!((DI::nai().mul_add(DI::PI, DI::PI)).is_nai());
+        assert!((DI::PI.mul_add(DI::nai(), DI::PI)).is_nai());
+        assert!((DI::PI.mul_add(DI::PI, DI::nai())).is_nai());
+
+        assert!(DI::nai().recip().is_nai());
+        assert!(DI::nai().sqrt().is_nai());
+        assert!(DI::nai().sqr().is_nai());
     }
 }

@@ -34,9 +34,30 @@ impl Interval {
     }
 }
 
+macro_rules! impl_dec {
+    ($f:ident) => {
+        pub fn $f(self, rhs: Self) -> Self {
+            if self.is_nai() || rhs.is_nai() {
+                return Self::nai();
+            }
+
+            DecoratedInterval {
+                x: self.x.$f(rhs.x),
+                d: Decoration::Trv,
+            }
+        }
+    };
+}
+
+impl DecoratedInterval {
+    impl_dec!(convex_hull);
+    impl_dec!(intersection);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    type DI = DecoratedInterval;
     type I = Interval;
 
     #[test]
@@ -46,5 +67,20 @@ mod tests {
 
         assert!(I::empty().intersection(I::PI).is_empty());
         assert!(I::PI.intersection(I::empty()).is_empty());
+
+        assert_eq!(DI::empty().convex_hull(DI::PI), DI::PI);
+        assert_eq!(DI::PI.convex_hull(DI::empty()), DI::PI);
+
+        assert!(DI::empty().intersection(DI::PI).is_empty());
+        assert!(DI::PI.intersection(DI::empty()).is_empty());
+    }
+
+    #[test]
+    fn nai() {
+        assert!(DI::nai().convex_hull(DI::PI).is_nai());
+        assert!(DI::PI.convex_hull(DI::nai()).is_nai());
+
+        assert!(DI::nai().intersection(DI::PI).is_nai());
+        assert!(DI::PI.intersection(DI::nai()).is_nai());
     }
 }

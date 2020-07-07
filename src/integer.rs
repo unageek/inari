@@ -59,9 +59,70 @@ impl Interval {
     }
 }
 
+macro_rules! impl_dec {
+    // is_not_com(x, y) tests if f is not continuous at some point of x,
+    // provided that x and y := f(x) are bounded and p_dac(f, x) holds,
+    // in which case y is a singleton.
+    // The boundedness of x and y are checked by the last statement.
+    // In rounding functions, you can effectively check if an endpoint of x
+    // is an integer by x.inf == y.inf or x.sup == y.sup.
+    ($f:ident, $x:ident, $y:ident, $is_not_com:expr) => {
+        pub fn $f(self) -> Self {
+            if self.is_nai() {
+                return self;
+            }
+
+            let $x = self.x;
+            let $y = $x.$f();
+            let d = if $y.is_empty() {
+                Decoration::Trv
+            } else if !$y.is_singleton() {
+                Decoration::Def
+            } else if $is_not_com {
+                Decoration::Dac
+            } else {
+                Decoration::Com
+            };
+            Self::set_dec($y, d.min(self.d))
+        }
+    };
+}
+
+// https://www.ocf.berkeley.edu/~horie/rounding.html
+impl DecoratedInterval {
+    // Discontinuous at x iff x ∊ ℤ.
+    impl_dec!(ceil, x, y, x.sup_raw() == y.sup_raw()); // No need to check inf.
+    impl_dec!(floor, x, y, x.inf_raw() == y.inf_raw()); // No need to check sup.
+
+    // Discontinuous at x iff x ∊ {x′ + 0.5 | x′ ∊ ℤ}.
+    impl_dec!(round_ties_to_away, x, y, {
+        let abs_a = x.inf_raw().abs();
+        let abs_b = x.sup_raw().abs();
+        (abs_a - abs_a.trunc() == 0.5) || (abs_b - abs_b.trunc() == 0.5)
+    });
+    impl_dec!(round_ties_to_even, x, y, {
+        let abs_a = x.inf_raw().abs();
+        let abs_b = x.sup_raw().abs();
+        (abs_a - abs_a.trunc() == 0.5) || (abs_b - abs_b.trunc() == 0.5)
+    });
+
+    // Discontinuous at 0.
+    impl_dec!(sign, x, y, x.inf_raw() == 0.0); // No need to check sup.
+
+    // Discontinuous at x iff x ∊ ℤ ∖ {0}.
+    impl_dec!(
+        trunc,
+        x,
+        y,
+        (x.inf_raw() != 0.0 && x.inf_raw() == y.inf_raw())
+            || (x.sup_raw() != 0.0 && x.sup_raw() == y.sup_raw())
+    );
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    type DI = DecoratedInterval;
     type I = Interval;
 
     #[test]
@@ -72,5 +133,22 @@ mod tests {
         assert!(I::empty().round_ties_to_even().is_empty());
         assert!(I::empty().sign().is_empty());
         assert!(I::empty().trunc().is_empty());
+
+        assert!(DI::empty().ceil().is_empty());
+        assert!(DI::empty().floor().is_empty());
+        assert!(DI::empty().round_ties_to_away().is_empty());
+        assert!(DI::empty().round_ties_to_even().is_empty());
+        assert!(DI::empty().sign().is_empty());
+        assert!(DI::empty().trunc().is_empty());
+    }
+
+    #[test]
+    fn nai() {
+        assert!(DI::nai().ceil().is_nai());
+        assert!(DI::nai().floor().is_nai());
+        assert!(DI::nai().round_ties_to_away().is_nai());
+        assert!(DI::nai().round_ties_to_even().is_nai());
+        assert!(DI::nai().sign().is_nai());
+        assert!(DI::nai().trunc().is_nai());
     }
 }

@@ -2,6 +2,7 @@ use crate::interval::*;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum OverlappingState {
+    Undefined,
     BothEmpty,
     FirstEmpty,
     SecondEmpty,
@@ -99,5 +100,27 @@ impl Interval {
                 }
             }
         }
+    }
+}
+
+impl DecoratedInterval {
+    pub fn overlap(self, rhs: Self) -> OverlappingState {
+        if self.is_nai() || rhs.is_nai() {
+            return OverlappingState::Undefined;
+        }
+
+        self.x.overlap(rhs.x)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    type DI = DecoratedInterval;
+
+    #[test]
+    fn nai() {
+        assert_eq!(DI::nai().overlap(DI::PI), OverlappingState::Undefined);
+        assert_eq!(DI::PI.overlap(DI::nai()), OverlappingState::Undefined);
     }
 }
