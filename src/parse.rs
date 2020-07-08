@@ -1,6 +1,6 @@
 use crate::interval::*;
 use core::cmp::Ordering;
-use gmp_mpfr_sys::gmp;
+use gmp_mpfr_sys::{gmp, mpfr};
 use nom::{
     branch::alt,
     bytes::complete::{tag_no_case, take_while},
@@ -9,7 +9,7 @@ use nom::{
     sequence::{delimited, pair, preceded, separated_pair, tuple},
     IResult,
 };
-use rug::{float::Round, ops::AssignRound, Float, Integer, Rational};
+use rug::{Float, Integer, Rational};
 use std::convert::TryFrom;
 use std::str::FromStr;
 
@@ -524,35 +524,37 @@ struct F64 {
     overflow: bool,
 }
 
+fn infsup_to_rnd_t(infsup: InfSup) -> mpfr::rnd_t {
+    match infsup {
+        InfSup::Inf => mpfr::rnd_t::RNDD,
+        InfSup::Sup => mpfr::rnd_t::RNDU,
+    }
+}
+
+fn ternary_to_ordering(t: i32) -> Ordering {
+    t.cmp(&0)
+}
+
 #[allow(clippy::nonminimal_bool)]
 fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
-    let rnd = match infsup {
-        InfSup::Inf => Round::Down,
-        InfSup::Sup => Round::Up,
-    };
+    let rnd = infsup_to_rnd_t(infsup);
     let mut f = Float::new(f64::MANTISSA_DIGITS);
-    // https://gitlab.com/tspiteri/rug/-/blob/v1.9.0/src/float/traits.rs#L257
-    let inexact = f.assign_round(r, rnd) != Ordering::Equal;
-    let inexact = inexact || f.subnormalize_ieee_round(Ordering::Equal, rnd) != Ordering::Equal;
-    let inexact = inexact
-        || match f.get_exp() {
-            Some(e) => {
-                // https://gforge.inria.fr/scm/viewvc.php/mpfr/tags/4.0.2/src/get_d.c?view=markup#l62
-                // https://gforge.inria.fr/scm/viewvc.php/mpfr/tags/4.0.2/src/get_d.c?view=markup#l80
-                // f has already been subnormalized.
-                #[allow(clippy::nonminimal_bool)]
-                assert!(e >= -1073);
-                e > 1024
-            }
-            // f is nan, +/-infinity or zero.
-            _ => false,
-        };
-    let f = f.to_f64_round(rnd);
-    let overflow = f.is_infinite();
-    F64 {
-        f,
-        inexact,
-        overflow,
+
+    unsafe {
+        let orig_emin = mpfr::get_emin();
+        let orig_emax = mpfr::get_emax();
+        mpfr::set_emin((f64::MIN_EXP - (f64::MANTISSA_DIGITS as i32) + 1) as i64);
+        mpfr::set_emax(f64::MAX_EXP as i64);
+        let t = mpfr::set_q(f.as_raw_mut(), r.as_raw(), rnd);
+        let t = mpfr::subnormalize(f.as_raw_mut(), t, rnd);
+        let f = mpfr::get_d(f.as_raw(), rnd);
+        mpfr::set_emin(orig_emin);
+        mpfr::set_emax(orig_emax);
+        F64 {
+            f,
+            inexact: ternary_to_ordering(t) != Ordering::Equal,
+            overflow: f.is_infinite(),
+        }
     }
 }
 
@@ -668,6 +670,7 @@ impl FromStr for DecoratedInterval {
 mod tests {
     use super::*;
     use crate::interval;
+    use hexf::*;
     type DI = DecoratedInterval;
     type I = Interval;
 
@@ -729,6 +732,57 @@ mod tests {
             I::try_from_str_exact("[0.1, 1.0]").unwrap_err().value(),
             I::empty()
         );
+
+        // The smallest positive subnormal number.
+        let f = hexf64!("0x0.0000000000001p-1022");
+        assert_eq!(
+            I::try_from_str_exact("[0x0.0000000000001p-1022]").unwrap(),
+            interval!(f, f).unwrap()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[0x0.0000000000000ffffp-1022]")
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[0x0.00000000000010001p-1022]")
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[0x0.0000000000001p-1023]")
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+
+        // The largest normal number.
+        let f = hexf64!("0x1.fffffffffffffp+1023");
+        assert_eq!(
+            I::try_from_str_exact("[0x1.fffffffffffffp+1023]").unwrap(),
+            interval!(f, f).unwrap()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[0x1.ffffffffffffeffffp+1023]")
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[0x1.fffffffffffff0001p+1023]")
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[0x1.fffffffffffffp+1024]")
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+
         assert_eq!(
             I::try_from_str_exact("[123e2147483648]")
                 .unwrap_err()
