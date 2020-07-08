@@ -4,6 +4,10 @@ use core::arch::x86_64::*;
 // NOTE: `eq` is implemented in interval.rs
 
 impl Interval {
+    pub fn contains(self, rhs: f64) -> bool {
+        rhs.is_finite() && self.inf_raw() <= rhs && rhs <= self.sup_raw()
+    }
+
     pub fn disjoint(self, rhs: Self) -> bool {
         self.is_empty()
             || rhs.is_empty()
@@ -31,10 +35,6 @@ impl Interval {
 
     pub fn is_entire(self) -> bool {
         unsafe { _mm_movemask_pd(_mm_cmpeq_pd(self.rep, _mm_set1_pd(f64::INFINITY))) == 3 }
-    }
-
-    pub fn is_member(f: f64, rhs: Self) -> bool {
-        f.is_finite() && rhs.inf_raw() <= f && f <= rhs.sup_raw()
     }
 
     pub fn is_singleton(self) -> bool {
@@ -93,19 +93,19 @@ macro_rules! impl_dec {
 }
 
 impl DecoratedInterval {
+    pub fn contains(self, rhs: f64) -> bool {
+        if self.is_nai() {
+            return false;
+        }
+
+        Interval::contains(self.x, rhs)
+    }
+
     impl_dec!(disjoint, 2);
     impl_dec!(interior, 2);
     impl_dec!(is_common_interval, 1);
     impl_dec!(is_empty, 1);
     impl_dec!(is_entire, 1);
-
-    pub fn is_member(f: f64, rhs: Self) -> bool {
-        if rhs.is_nai() {
-            return false;
-        }
-
-        Interval::is_member(f, rhs.x)
-    }
 
     pub fn is_nai(self) -> bool {
         self.d == Decoration::Ill
