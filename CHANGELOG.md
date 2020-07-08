@@ -15,6 +15,7 @@
 
 ### Changed
 
+- ❗ Renamed `Interval::isMember` to `contains` and swapped the order of the parameters.
 - ❗ Changed discriminants of enum `IntervalErrorKind`.
 - ❗ Changed discriminants of enum `OverlappingState`.
 - ❗ Changed method `IntervalError<T>::value` to consume and return the value.

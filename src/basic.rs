@@ -207,7 +207,7 @@ impl DecoratedInterval {
             return self;
         }
 
-        let d = if Interval::is_member(0.0, self.x) {
+        let d = if self.x.contains(0.0) {
             Decoration::Trv
         } else {
             self.d

@@ -310,7 +310,7 @@ impl Div for DecoratedInterval {
             return Self::nai();
         }
 
-        let d = if Interval::is_member(0.0, rhs.x) {
+        let d = if rhs.x.contains(0.0) {
             Decoration::Trv
         } else {
             self.d.min(rhs.d)
