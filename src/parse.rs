@@ -544,7 +544,8 @@ fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
                 assert!(e >= -1073);
                 e > 1024
             }
-            _ => true,
+            // f is nan, +/-infinity or zero.
+            _ => false,
         };
     let f = f.to_f64_round(rnd);
     let overflow = f.is_infinite();
@@ -591,10 +592,42 @@ impl From<DNInterval> for DecoratedInterval {
     }
 }
 
-impl FromStr for Interval {
-    type Err = IntervalError<Interval>;
+impl Interval {
+    fn try_from_ninterval_exact(x: NInterval) -> Result<Self, IntervalError<Self>> {
+        let a = number_to_f64(&x.0, InfSup::Inf);
+        let b = number_to_f64(&x.1, InfSup::Sup);
+        let x = Self::try_from((a.f, b.f)).unwrap_or_else(|_| Self::empty());
+        if a.inexact || b.inexact {
+            Err(IntervalError {
+                kind: IntervalErrorKind::UndefinedOperation,
+                value: Self::empty(),
+            })
+        } else {
+            Ok(x)
+        }
+    }
 
-    fn from_str(s: &str) -> Result<Interval, IntervalError<Interval>> {
+    pub fn try_from_str_exact(s: &str) -> Result<Self, IntervalError<Self>> {
+        match interval(s) {
+            Ok(("", x)) => match x {
+                Ok(x) => Self::try_from_ninterval_exact(x),
+                Err(e) => Err(IntervalError {
+                    kind: e.kind,
+                    value: Self::empty(),
+                }),
+            },
+            _ => Err(IntervalError {
+                kind: IntervalErrorKind::UndefinedOperation,
+                value: Self::empty(),
+            }),
+        }
+    }
+}
+
+impl FromStr for Interval {
+    type Err = IntervalError<Self>;
+
+    fn from_str(s: &str) -> Result<Self, IntervalError<Self>> {
         match interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Ok(Self::from(x)),
@@ -603,18 +636,18 @@ impl FromStr for Interval {
                     value: Self::from(e.value),
                 }),
             },
-            _ => Err(Self::Err {
+            _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Interval::empty(),
+                value: Self::empty(),
             }),
         }
     }
 }
 
 impl FromStr for DecoratedInterval {
-    type Err = IntervalError<DecoratedInterval>;
+    type Err = IntervalError<Self>;
 
-    fn from_str(s: &str) -> Result<DecoratedInterval, IntervalError<DecoratedInterval>> {
+    fn from_str(s: &str) -> Result<Self, IntervalError<Self>> {
         match decorated_interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Ok(Self::from(x)),
@@ -623,9 +656,9 @@ impl FromStr for DecoratedInterval {
                     value: Self::from(e.value),
                 }),
             },
-            _ => Err(Self::Err {
+            _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: DecoratedInterval::nai(),
+                value: Self::nai(),
             }),
         }
     }
@@ -677,6 +710,30 @@ mod tests {
         assert_eq!(
             "[123e2147483648]_com".parse::<DI>().unwrap_err().value(),
             DI::entire()
+        );
+    }
+
+    #[test]
+    fn try_from_str_exact() {
+        assert_eq!(I::try_from_str_exact("[Empty]").unwrap(), I::empty());
+        assert_eq!(I::try_from_str_exact("[Entire]").unwrap(), I::entire());
+        assert_eq!(
+            I::try_from_str_exact("[0.0, 1.0]").unwrap(),
+            interval!(0.0, 1.0).unwrap()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[0.0, 0.1]").unwrap_err().value(),
+            I::empty()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[0.1, 1.0]").unwrap_err().value(),
+            I::empty()
+        );
+        assert_eq!(
+            I::try_from_str_exact("[123e2147483648]")
+                .unwrap_err()
+                .value(),
+            I::empty()
         );
     }
 }
