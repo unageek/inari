@@ -1,6 +1,6 @@
 use crate::interval::*;
 use core::cmp::Ordering;
-use gmp_mpfr_sys::{gmp, mpfr};
+use gmp_mpfr_sys::gmp;
 use nom::{
     branch::alt,
     bytes::complete::{tag_no_case, take_while},
@@ -9,7 +9,7 @@ use nom::{
     sequence::{delimited, pair, preceded, separated_pair, tuple},
     IResult,
 };
-use rug::{float::Round, Float, Integer, Rational};
+use rug::{float::Round, ops::AssignRound, Float, Integer, Rational};
 use std::convert::TryFrom;
 use std::str::FromStr;
 
@@ -330,20 +330,6 @@ fn parse_rational(s: &str) -> Result<Rational, ParseNumberError> {
     }
 }
 
-fn to_rnd_t(infsup: InfSup) -> mpfr::rnd_t {
-    match infsup {
-        InfSup::Inf => mpfr::rnd_t::RNDD,
-        InfSup::Sup => mpfr::rnd_t::RNDU,
-    }
-}
-
-fn to_round(infsup: InfSup) -> Round {
-    match infsup {
-        InfSup::Inf => Round::Down,
-        InfSup::Sup => Round::Up,
-    }
-}
-
 fn parse_unsigned_number(n: UnsignedNumberLiteral) -> Result<Number, ParseNumberError> {
     use UnsignedNumberLiteral::*;
 
@@ -534,28 +520,52 @@ fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
 #[derive(Debug)]
 struct F64 {
     f: f64,
+    inexact: bool,
     overflow: bool,
 }
 
+#[allow(clippy::nonminimal_bool)]
 fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
+    let rnd = match infsup {
+        InfSup::Inf => Round::Down,
+        InfSup::Sup => Round::Up,
+    };
     let mut f = Float::new(f64::MANTISSA_DIGITS);
-    unsafe { mpfr::set_q(f.as_raw_mut(), r.as_raw(), to_rnd_t(infsup)) };
-    let rnd = to_round(infsup);
-    f.subnormalize_ieee_round(Ordering::Equal, rnd);
+    // https://gitlab.com/tspiteri/rug/-/blob/v1.9.0/src/float/traits.rs#L257
+    let inexact = f.assign_round(r, rnd) != Ordering::Equal;
+    let inexact = inexact || f.subnormalize_ieee_round(Ordering::Equal, rnd) != Ordering::Equal;
+    let inexact = inexact
+        || match f.get_exp() {
+            Some(e) => {
+                // https://gforge.inria.fr/scm/viewvc.php/mpfr/tags/4.0.2/src/get_d.c?view=markup#l62
+                // https://gforge.inria.fr/scm/viewvc.php/mpfr/tags/4.0.2/src/get_d.c?view=markup#l80
+                // f has already been subnormalized.
+                #[allow(clippy::nonminimal_bool)]
+                assert!(e >= -1073);
+                e > 1024
+            }
+            _ => true,
+        };
     let f = f.to_f64_round(rnd);
     let overflow = f.is_infinite();
-    F64 { f, overflow }
+    F64 {
+        f,
+        inexact,
+        overflow,
+    }
 }
 
 fn number_to_f64(n: &Number, infsup: InfSup) -> F64 {
     match n {
         Number::NegInfinity => F64 {
             f: f64::NEG_INFINITY,
+            inexact: false,
             overflow: false,
         },
         Number::Rational(r) => rational_to_f64(r, infsup),
         Number::Infinity => F64 {
             f: f64::INFINITY,
+            inexact: false,
             overflow: false,
         },
     }
