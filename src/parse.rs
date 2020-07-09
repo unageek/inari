@@ -535,7 +535,6 @@ fn ternary_to_ordering(t: i32) -> Ordering {
     t.cmp(&0)
 }
 
-#[allow(clippy::nonminimal_bool)]
 fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
     let rnd = infsup_to_rnd_t(infsup);
     let mut f = Float::new(f64::MANTISSA_DIGITS);
@@ -584,6 +583,7 @@ impl From<DNInterval> for DecoratedInterval {
     fn from(DNInterval { x, d }: DNInterval) -> Self {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
+        // Fails on the empty interval.
         let x = Interval::try_from((a.f, b.f)).unwrap_or_else(|_| Interval::empty());
         let d = if a.overflow || b.overflow {
             d.min(Decoration::Dac)
@@ -591,38 +591,6 @@ impl From<DNInterval> for DecoratedInterval {
             d
         };
         Self::set_dec(x, d)
-    }
-}
-
-impl Interval {
-    fn try_from_ninterval_exact(x: NInterval) -> Result<Self, IntervalError<Self>> {
-        let a = number_to_f64(&x.0, InfSup::Inf);
-        let b = number_to_f64(&x.1, InfSup::Sup);
-        let x = Self::try_from((a.f, b.f)).unwrap_or_else(|_| Self::empty());
-        if a.inexact || b.inexact {
-            Err(IntervalError {
-                kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::empty(),
-            })
-        } else {
-            Ok(x)
-        }
-    }
-
-    pub fn try_from_str_exact(s: &str) -> Result<Self, IntervalError<Self>> {
-        match interval(s) {
-            Ok(("", x)) => match x {
-                Ok(x) => Self::try_from_ninterval_exact(x),
-                Err(e) => Err(IntervalError {
-                    kind: e.kind,
-                    value: Self::empty(),
-                }),
-            },
-            _ => Err(IntervalError {
-                kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::empty(),
-            }),
-        }
     }
 }
 
@@ -638,6 +606,7 @@ impl FromStr for Interval {
                     value: Self::from(e.value),
                 }),
             },
+            // Invalid syntax.
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
                 value: Self::empty(),
@@ -666,10 +635,43 @@ impl FromStr for DecoratedInterval {
     }
 }
 
+impl Interval {
+    fn try_from_ninterval_exact(x: NInterval) -> Result<Self, IntervalError<Self>> {
+        let a = number_to_f64(&x.0, InfSup::Inf);
+        let b = number_to_f64(&x.1, InfSup::Sup);
+        let x = Self::try_from((a.f, b.f)).unwrap_or_else(|_| Self::empty());
+        if a.inexact || b.inexact {
+            Err(IntervalError {
+                kind: IntervalErrorKind::UndefinedOperation,
+                value: Self::empty(),
+            })
+        } else {
+            Ok(x)
+        }
+    }
+
+    #[doc(hidden)]
+    pub fn _try_from_str_exact(s: &str) -> Result<Self, IntervalError<Self>> {
+        match interval(s) {
+            Ok(("", x)) => match x {
+                Ok(x) => Self::try_from_ninterval_exact(x),
+                Err(e) => Err(IntervalError {
+                    kind: e.kind,
+                    value: Self::empty(),
+                }),
+            },
+            _ => Err(IntervalError {
+                kind: IntervalErrorKind::UndefinedOperation,
+                value: Self::empty(),
+            }),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interval;
+    use crate::{dec_interval, interval};
     use hexf::*;
     type DI = DecoratedInterval;
     type I = Interval;
@@ -678,81 +680,81 @@ mod tests {
     fn parse() {
         // Integer significands without a dot are not covered by ITF1788.
         assert_eq!(
-            "[123]".parse::<I>().unwrap(),
+            interval!("[123]").unwrap(),
             interval!(123.0, 123.0).unwrap()
         );
         assert_eq!(
-            "[0x123p0]".parse::<I>().unwrap(),
+            interval!("[0x123p0]").unwrap(),
             interval!(291.0, 291.0).unwrap()
         );
 
         // Exponent == i32::MAX + 1.
         assert_eq!(
-            "[123e2147483648]".parse::<I>().unwrap_err().value(),
+            interval!("[123e2147483648]").unwrap_err().value(),
             I::entire()
         );
         assert_eq!(
-            "[0x123p2147483648]".parse::<I>().unwrap_err().value(),
+            interval!("[0x123p2147483648]").unwrap_err().value(),
             I::entire()
         );
 
         // Exponent == i32::MIN - 1.
         assert_eq!(
-            "[123e-2147483649]".parse::<I>().unwrap_err().value(),
+            interval!("[123e-2147483649]").unwrap_err().value(),
             I::entire()
         );
         assert_eq!(
-            "[0x123p-2147483649]".parse::<I>().unwrap_err().value(),
+            interval!("[0x123p-2147483649]").unwrap_err().value(),
             I::entire()
         );
 
         assert_eq!(
-            "[123e2147483648]".parse::<DI>().unwrap_err().value(),
+            dec_interval!("[123e2147483648]").unwrap_err().value(),
             DI::entire()
         );
         assert_eq!(
-            "[123e2147483648]_com".parse::<DI>().unwrap_err().value(),
+            dec_interval!("[123e2147483648]_com").unwrap_err().value(),
             DI::entire()
         );
     }
 
     #[test]
     fn try_from_str_exact() {
-        assert_eq!(I::try_from_str_exact("[Empty]").unwrap(), I::empty());
-        assert_eq!(I::try_from_str_exact("[Entire]").unwrap(), I::entire());
+        assert_eq!(interval!("[Empty]", exact).unwrap(), I::empty());
+        assert_eq!(interval!("[Entire]", exact).unwrap(), I::entire());
         assert_eq!(
-            I::try_from_str_exact("[0.0, 1.0]").unwrap(),
+            interval!("[0.0, 1.0]", exact).unwrap(),
             interval!(0.0, 1.0).unwrap()
         );
         assert_eq!(
-            I::try_from_str_exact("[0.0, 0.1]").unwrap_err().value(),
+            interval!("[0.0, 0.1]", exact).unwrap_err().value(),
             I::empty()
         );
         assert_eq!(
-            I::try_from_str_exact("[0.1, 1.0]").unwrap_err().value(),
+            interval!("[0.1, 1.0]", exact).unwrap_err().value(),
             I::empty()
         );
 
         // The smallest positive subnormal number.
         let f = hexf64!("0x0.0000000000001p-1022");
         assert_eq!(
-            I::try_from_str_exact("[0x0.0000000000001p-1022]").unwrap(),
+            interval!("[0x0.0000000000001p-1022]", exact).unwrap(),
             interval!(f, f).unwrap()
         );
         assert_eq!(
-            I::try_from_str_exact("[0x0.0000000000000ffffp-1022]")
+            interval!("[0x0.0000000000000ffffp-1022]", exact)
                 .unwrap_err()
                 .value(),
             I::empty()
         );
         assert_eq!(
-            I::try_from_str_exact("[0x0.00000000000010001p-1022]")
+            interval!("[0x0.00000000000010001p-1022]", exact)
                 .unwrap_err()
                 .value(),
             I::empty()
         );
         assert_eq!(
-            I::try_from_str_exact("[0x0.0000000000001p-1023]")
+            interval!("[0x0.0000000000001p-1023]", exact)
                 .unwrap_err()
                 .value(),
             I::empty()
@@ -761,32 +763,30 @@ mod tests {
         // The largest normal number.
         let f = hexf64!("0x1.fffffffffffffp+1023");
         assert_eq!(
-            I::try_from_str_exact("[0x1.fffffffffffffp+1023]").unwrap(),
+            interval!("[0x1.fffffffffffffp+1023]", exact).unwrap(),
             interval!(f, f).unwrap()
         );
         assert_eq!(
-            I::try_from_str_exact("[0x1.ffffffffffffeffffp+1023]")
+            interval!("[0x1.ffffffffffffeffffp+1023]", exact)
                 .unwrap_err()
                 .value(),
             I::empty()
         );
         assert_eq!(
-            I::try_from_str_exact("[0x1.fffffffffffff0001p+1023]")
+            interval!("[0x1.fffffffffffff0001p+1023]", exact)
                 .unwrap_err()
                 .value(),
             I::empty()
         );
         assert_eq!(
-            I::try_from_str_exact("[0x1.fffffffffffffp+1024]")
+            interval!("[0x1.fffffffffffffp+1024]", exact)
                 .unwrap_err()
                 .value(),
             I::empty()
         );
 
         assert_eq!(
-            I::try_from_str_exact("[123e2147483648]")
-                .unwrap_err()
-                .value(),
+            interval!("[123e2147483648]", exact).unwrap_err().value(),
             I::empty()
         );
     }
