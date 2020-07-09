@@ -20,6 +20,7 @@ The nightly Rust toolchain is required, until the new `asm!` macro is stabilized
 - Improve conformance to the standard
 - More formatting options
   - https://octave.sourceforge.io/interval/function/intervaltotext.html
+  - https://en.cppreference.com/w/cpp/utility/format/formatter
 
 ## References
 
