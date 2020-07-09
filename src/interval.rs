@@ -259,15 +259,21 @@ macro_rules! interval {
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! interval {
-    ($a:expr, $b:expr) => {
-        $crate::_interval!($a, $b)
-    };
-
     ($text:expr) => {{
         fn is_str(_: &str) {}
         is_str($text);
         $text.parse::<$crate::Interval>()
     }};
+
+    ($text:expr, exact) => {{
+        fn is_str(_: &str) {}
+        is_str($text);
+        $crate::Interval::_try_from_str_exact($text)
+    }};
+
+    ($a:expr, $b:expr) => {
+        $crate::_interval!($a, $b)
+    };
 }
 
 #[doc(hidden)]
@@ -293,13 +299,13 @@ macro_rules! dec_interval {
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! dec_interval {
-    ($a:expr, $b:expr) => {
-        $crate::_dec_interval!($a, $b)
-    };
-
     ($text:expr) => {{
         fn is_str(_: &str) {}
         is_str($text);
         $text.parse::<$crate::DecoratedInterval>()
     }};
+
+    ($a:expr, $b:expr) => {
+        $crate::_dec_interval!($a, $b)
+    };
 }

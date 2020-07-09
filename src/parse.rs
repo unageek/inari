@@ -9,7 +9,7 @@ use nom::{
     sequence::{delimited, pair, preceded, separated_pair, tuple},
     IResult,
 };
-use rug::{float::Round, Float, Integer, Rational};
+use rug::{Float, Integer, Rational};
 use std::convert::TryFrom;
 use std::str::FromStr;
 
@@ -330,20 +330,6 @@ fn parse_rational(s: &str) -> Result<Rational, ParseNumberError> {
     }
 }
 
-fn to_rnd_t(infsup: InfSup) -> mpfr::rnd_t {
-    match infsup {
-        InfSup::Inf => mpfr::rnd_t::RNDD,
-        InfSup::Sup => mpfr::rnd_t::RNDU,
-    }
-}
-
-fn to_round(infsup: InfSup) -> Round {
-    match infsup {
-        InfSup::Inf => Round::Down,
-        InfSup::Sup => Round::Up,
-    }
-}
-
 fn parse_unsigned_number(n: UnsignedNumberLiteral) -> Result<Number, ParseNumberError> {
     use UnsignedNumberLiteral::*;
 
@@ -534,28 +520,54 @@ fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
 #[derive(Debug)]
 struct F64 {
     f: f64,
+    inexact: bool,
     overflow: bool,
 }
 
+fn infsup_to_rnd_t(infsup: InfSup) -> mpfr::rnd_t {
+    match infsup {
+        InfSup::Inf => mpfr::rnd_t::RNDD,
+        InfSup::Sup => mpfr::rnd_t::RNDU,
+    }
+}
+
+fn ternary_to_ordering(t: i32) -> Ordering {
+    t.cmp(&0)
+}
+
 fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
+    let rnd = infsup_to_rnd_t(infsup);
     let mut f = Float::new(f64::MANTISSA_DIGITS);
-    unsafe { mpfr::set_q(f.as_raw_mut(), r.as_raw(), to_rnd_t(infsup)) };
-    let rnd = to_round(infsup);
-    f.subnormalize_ieee_round(Ordering::Equal, rnd);
-    let f = f.to_f64_round(rnd);
-    let overflow = f.is_infinite();
-    F64 { f, overflow }
+
+    unsafe {
+        let orig_emin = mpfr::get_emin();
+        let orig_emax = mpfr::get_emax();
+        mpfr::set_emin((f64::MIN_EXP - (f64::MANTISSA_DIGITS as i32) + 1) as i64);
+        mpfr::set_emax(f64::MAX_EXP as i64);
+        let t = mpfr::set_q(f.as_raw_mut(), r.as_raw(), rnd);
+        let t = mpfr::subnormalize(f.as_raw_mut(), t, rnd);
+        let f = mpfr::get_d(f.as_raw(), rnd);
+        mpfr::set_emin(orig_emin);
+        mpfr::set_emax(orig_emax);
+        F64 {
+            f,
+            inexact: ternary_to_ordering(t) != Ordering::Equal,
+            overflow: f.is_infinite(),
+        }
+    }
 }
 
 fn number_to_f64(n: &Number, infsup: InfSup) -> F64 {
     match n {
         Number::NegInfinity => F64 {
             f: f64::NEG_INFINITY,
+            inexact: false,
             overflow: false,
         },
         Number::Rational(r) => rational_to_f64(r, infsup),
         Number::Infinity => F64 {
             f: f64::INFINITY,
+            inexact: false,
             overflow: false,
         },
     }
@@ -571,6 +583,7 @@ impl From<DNInterval> for DecoratedInterval {
     fn from(DNInterval { x, d }: DNInterval) -> Self {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
+        // Fails on the empty interval.
         let x = Interval::try_from((a.f, b.f)).unwrap_or_else(|_| Interval::empty());
         let d = if a.overflow || b.overflow {
             d.min(Decoration::Dac)
@@ -582,9 +595,9 @@ impl From<DNInterval> for DecoratedInterval {
 }
 
 impl FromStr for Interval {
-    type Err = IntervalError<Interval>;
+    type Err = IntervalError<Self>;
 
-    fn from_str(s: &str) -> Result<Interval, IntervalError<Interval>> {
+    fn from_str(s: &str) -> Result<Self, IntervalError<Self>> {
         match interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Ok(Self::from(x)),
@@ -593,18 +606,19 @@ impl FromStr for Interval {
                     value: Self::from(e.value),
                 }),
             },
-            _ => Err(Self::Err {
+            // Invalid syntax.
+            _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Interval::empty(),
+                value: Self::empty(),
             }),
         }
     }
 }
 
 impl FromStr for DecoratedInterval {
-    type Err = IntervalError<DecoratedInterval>;
+    type Err = IntervalError<Self>;
 
-    fn from_str(s: &str) -> Result<DecoratedInterval, IntervalError<DecoratedInterval>> {
+    fn from_str(s: &str) -> Result<Self, IntervalError<Self>> {
         match decorated_interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Ok(Self::from(x)),
@@ -613,9 +627,42 @@ impl FromStr for DecoratedInterval {
                     value: Self::from(e.value),
                 }),
             },
-            _ => Err(Self::Err {
+            _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: DecoratedInterval::nai(),
+                value: Self::nai(),
+            }),
+        }
+    }
+}
+
+impl Interval {
+    fn try_from_ninterval_exact(x: NInterval) -> Result<Self, IntervalError<Self>> {
+        let a = number_to_f64(&x.0, InfSup::Inf);
+        let b = number_to_f64(&x.1, InfSup::Sup);
+        let x = Self::try_from((a.f, b.f)).unwrap_or_else(|_| Self::empty());
+        if a.inexact || b.inexact {
+            Err(IntervalError {
+                kind: IntervalErrorKind::UndefinedOperation,
+                value: Self::empty(),
+            })
+        } else {
+            Ok(x)
+        }
+    }
+
+    #[doc(hidden)]
+    pub fn _try_from_str_exact(s: &str) -> Result<Self, IntervalError<Self>> {
+        match interval(s) {
+            Ok(("", x)) => match x {
+                Ok(x) => Self::try_from_ninterval_exact(x),
+                Err(e) => Err(IntervalError {
+                    kind: e.kind,
+                    value: Self::empty(),
+                }),
+            },
+            _ => Err(IntervalError {
+                kind: IntervalErrorKind::UndefinedOperation,
+                value: Self::empty(),
             }),
         }
     }
@@ -624,7 +671,8 @@ impl FromStr for DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interval;
+    use crate::{dec_interval, interval};
+    use hexf::*;
     type DI = DecoratedInterval;
     type I = Interval;
 
@@ -632,41 +680,114 @@ mod tests {
     fn parse() {
         // Integer significands without a dot are not covered by ITF1788.
         assert_eq!(
-            "[123]".parse::<I>().unwrap(),
+            interval!("[123]").unwrap(),
             interval!(123.0, 123.0).unwrap()
         );
         assert_eq!(
-            "[0x123p0]".parse::<I>().unwrap(),
+            interval!("[0x123p0]").unwrap(),
             interval!(291.0, 291.0).unwrap()
         );
 
         // Exponent == i32::MAX + 1.
         assert_eq!(
-            "[123e2147483648]".parse::<I>().unwrap_err().value(),
+            interval!("[123e2147483648]").unwrap_err().value(),
             I::entire()
         );
         assert_eq!(
-            "[0x123p2147483648]".parse::<I>().unwrap_err().value(),
+            interval!("[0x123p2147483648]").unwrap_err().value(),
             I::entire()
         );
 
         // Exponent == i32::MIN - 1.
         assert_eq!(
-            "[123e-2147483649]".parse::<I>().unwrap_err().value(),
+            interval!("[123e-2147483649]").unwrap_err().value(),
             I::entire()
         );
         assert_eq!(
-            "[0x123p-2147483649]".parse::<I>().unwrap_err().value(),
+            interval!("[0x123p-2147483649]").unwrap_err().value(),
             I::entire()
         );
 
         assert_eq!(
-            "[123e2147483648]".parse::<DI>().unwrap_err().value(),
+            dec_interval!("[123e2147483648]").unwrap_err().value(),
             DI::entire()
         );
         assert_eq!(
-            "[123e2147483648]_com".parse::<DI>().unwrap_err().value(),
+            dec_interval!("[123e2147483648]_com").unwrap_err().value(),
             DI::entire()
+        );
+    }
+
+    #[test]
+    fn try_from_str_exact() {
+        assert_eq!(interval!("[Empty]", exact).unwrap(), I::empty());
+        assert_eq!(interval!("[Entire]", exact).unwrap(), I::entire());
+        assert_eq!(
+            interval!("[0.0, 1.0]", exact).unwrap(),
+            interval!(0.0, 1.0).unwrap()
+        );
+        assert_eq!(
+            interval!("[0.0, 0.1]", exact).unwrap_err().value(),
+            I::empty()
+        );
+        assert_eq!(
+            interval!("[0.1, 1.0]", exact).unwrap_err().value(),
+            I::empty()
+        );
+
+        // The smallest positive subnormal number.
+        let f = hexf64!("0x0.0000000000001p-1022");
+        assert_eq!(
+            interval!("[0x0.0000000000001p-1022]", exact).unwrap(),
+            interval!(f, f).unwrap()
+        );
+        assert_eq!(
+            interval!("[0x0.0000000000000ffffp-1022]", exact)
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+        assert_eq!(
+            interval!("[0x0.00000000000010001p-1022]", exact)
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+        assert_eq!(
+            interval!("[0x0.0000000000001p-1023]", exact)
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+
+        // The largest normal number.
+        let f = hexf64!("0x1.fffffffffffffp+1023");
+        assert_eq!(
+            interval!("[0x1.fffffffffffffp+1023]", exact).unwrap(),
+            interval!(f, f).unwrap()
+        );
+        assert_eq!(
+            interval!("[0x1.ffffffffffffeffffp+1023]", exact)
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+        assert_eq!(
+            interval!("[0x1.fffffffffffff0001p+1023]", exact)
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+        assert_eq!(
+            interval!("[0x1.fffffffffffffp+1024]", exact)
+                .unwrap_err()
+                .value(),
+            I::empty()
+        );
+
+        assert_eq!(
+            interval!("[123e2147483648]", exact).unwrap_err().value(),
+            I::empty()
         );
     }
 }

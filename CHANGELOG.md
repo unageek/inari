@@ -7,11 +7,12 @@
 ### Added
 
 - Added decoration system.
-  - Added struct `DecoratedInterval`.
-  - Added macro `dec_interval` for constructing a decorated interval.
-  - Added enum `Decoration`.
-  - Added enum variant `IntervalErrorKind::IntvlPartOfNaI`.
-  - Added enum variant `OverlappingState::Undefined`.
+  - Added a struct `DecoratedInterval`.
+  - Added a macro `dec_interval` for constructing a decorated interval.
+  - Added an enum `Decoration`.
+  - Added an enum variant `IntervalErrorKind::IntvlPartOfNaI`.
+  - Added an enum variant `OverlappingState::Undefined`.
+- Added a macro rule `interval!("...", exact)` that constructs an interval from an exact interval literal (`exacttointerval` in the standard).
 
 ### Changed
 
