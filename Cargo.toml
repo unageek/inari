@@ -19,6 +19,9 @@ include = [
   "/README.md",
 ]
 
+[package.metadata.docs.rs]
+all-features = true
+
 [profile.release]
 lto = true
 
@@ -35,6 +38,10 @@ rug = { version = "1.9", default-features = false, features = ["float", "integer
 
 [[example]]
 name = "cancellation"
+required-features = ["gmp"]
+
+[[example]]
+name = "exact"
 required-features = ["gmp"]
 
 [[example]]
