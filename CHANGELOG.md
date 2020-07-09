@@ -2,7 +2,7 @@
 
 ❗ indicates an breaking change.
 
-## Unreleased
+## v0.2.0 - 2020-07-09
 
 ### Added
 
@@ -10,8 +10,8 @@
   - Added a struct `DecoratedInterval`.
   - Added a macro `dec_interval` for constructing a decorated interval.
   - Added an enum `Decoration`.
-  - Added an enum variant `IntervalErrorKind::IntvlPartOfNaI`.
-  - Added an enum variant `OverlappingState::Undefined`.
+  - ❗ Added an enum variant `IntervalErrorKind::IntvlPartOfNaI`.
+  - ❗ Added an enum variant `OverlappingState::Undefined`.
 - Added a macro rule `interval!("...", exact)` that constructs an interval from an exact interval literal (`exacttointerval` in the standard).
 
 ### Changed

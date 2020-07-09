@@ -1,4 +1,4 @@
-# :fox_face: inari
+# 🦊 inari
 
 [![Crate](https://img.shields.io/crates/v/inari.svg)](https://crates.io/crates/inari)
 [![Documentation](https://docs.rs/inari/badge.svg)](https://docs.rs/inari)
