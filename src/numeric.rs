@@ -28,12 +28,9 @@ impl Interval {
         match (a == f64::NEG_INFINITY, b == f64::INFINITY) {
             (false, false) => {
                 let mid = 0.5 * (a + b);
-                let mid = if mid.is_infinite() {
+                if mid.is_infinite() {
                     0.5 * a + 0.5 * b
-                } else {
-                    mid
-                };
-                if mid == 0.0 {
+                } else if mid == 0.0 {
                     0.0
                 } else {
                     mid
