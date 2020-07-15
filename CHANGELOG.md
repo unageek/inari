@@ -2,6 +2,12 @@
 
 ❗ indicates an breaking change.
 
+## Unreleased
+
+### Fixed
+
+- Fix `rad` and `wid` methods that were not rounding the result up.
+
 ## v0.2.0 - 2020-07-09
 
 ### Added
