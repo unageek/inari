@@ -79,9 +79,11 @@ impl RoundUpContext {
     #[inline]
     pub fn new() -> Self {
         unsafe {
-            let orig_mode = _MM_GET_ROUNDING_MODE();
-            _MM_SET_ROUNDING_MODE(_MM_ROUND_UP);
-            RoundUpContext { orig_mode }
+            let cs = _mm_getcsr();
+            _mm_setcsr((cs & !_MM_ROUND_MASK) | _MM_ROUND_UP);
+            RoundUpContext {
+                orig_mode: cs & _MM_ROUND_MASK,
+            }
         }
     }
 }
