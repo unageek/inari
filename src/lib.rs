@@ -23,3 +23,5 @@ mod overlap;
 mod parse;
 mod set_op;
 mod simd;
+#[cfg(feature = "gmp")]
+mod trigonometric;
