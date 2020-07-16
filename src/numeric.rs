@@ -55,7 +55,11 @@ impl Interval {
 
     pub fn rad(self) -> f64 {
         let m = self.mid();
-        f64::max(m - self.inf_raw(), self.sup_raw() - m)
+        let _r = RoundUpContext::new();
+        f64::max(
+            secure(secure(m) - secure(self.inf_raw())),
+            secure((self.sup_raw()) - secure(m)),
+        )
     }
 
     pub fn sup(self) -> f64 {
@@ -71,7 +75,8 @@ impl Interval {
     }
 
     pub fn wid(self) -> f64 {
-        let wid = self.sup_raw() - self.inf_raw();
+        let _r = RoundUpContext::new();
+        let wid = secure(secure(self.sup_raw()) - secure(self.inf_raw()));
         if wid == 0.0 {
             0.0
         } else {
@@ -160,5 +165,11 @@ mod tests {
         assert!(interval!(0.0, -0.0).unwrap().wid().is_sign_positive());
         assert!(interval!(-0.0, 0.0).unwrap().wid().is_sign_positive());
         assert!(interval!(-0.0, -0.0).unwrap().wid().is_sign_positive());
+
+        // Check if the result is rounded up.
+        assert_eq!(
+            interval!(-f64::MIN_POSITIVE, f64::MAX).unwrap().wid(),
+            f64::INFINITY
+        );
     }
 }
