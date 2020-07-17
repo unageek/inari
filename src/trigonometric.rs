@@ -14,6 +14,30 @@ fn mpfr_fn(
     }
 }
 
+fn acos_rd(x: f64) -> f64 {
+    mpfr_fn(mpfr::acos, x, mpfr::rnd_t::RNDD)
+}
+
+fn acos_ru(x: f64) -> f64 {
+    mpfr_fn(mpfr::acos, x, mpfr::rnd_t::RNDU)
+}
+
+fn asin_rd(x: f64) -> f64 {
+    mpfr_fn(mpfr::asin, x, mpfr::rnd_t::RNDD)
+}
+
+fn asin_ru(x: f64) -> f64 {
+    mpfr_fn(mpfr::asin, x, mpfr::rnd_t::RNDU)
+}
+
+fn atan_rd(x: f64) -> f64 {
+    mpfr_fn(mpfr::atan, x, mpfr::rnd_t::RNDD)
+}
+
+fn atan_ru(x: f64) -> f64 {
+    mpfr_fn(mpfr::atan, x, mpfr::rnd_t::RNDU)
+}
+
 fn cos_rd(x: f64) -> f64 {
     mpfr_fn(mpfr::cos, x, mpfr::rnd_t::RNDD)
 }
@@ -47,23 +71,79 @@ fn rem_euclid_2(x: f64) -> f64 {
 }
 
 impl Interval {
+    pub fn acos(self) -> Self {
+        self.acos_impl().0
+    }
+
+    pub(crate) fn acos_impl(self) -> (Self, Decoration) {
+        let dom = Self::with_infsup_raw(-1.0, 1.0);
+        let x = self.intersection(dom);
+
+        if x.is_empty() {
+            return (x, Decoration::Trv);
+        }
+
+        let y = Self::with_infsup_raw(acos_rd(x.sup_raw()), acos_ru(x.inf_raw()));
+        let d = if x.interior(dom) {
+            Decoration::Com
+        } else if x.subset(dom) {
+            Decoration::Def
+        } else {
+            Decoration::Trv
+        };
+        (y, d)
+    }
+
+    pub fn asin(self) -> Self {
+        self.asin_impl().0
+    }
+
+    pub(crate) fn asin_impl(self) -> (Self, Decoration) {
+        let dom = Self::with_infsup_raw(-1.0, 1.0);
+        let x = self.intersection(dom);
+
+        if x.is_empty() {
+            return (x, Decoration::Trv);
+        }
+
+        let y = Self::with_infsup_raw(asin_rd(x.inf_raw()), asin_ru(x.sup_raw()));
+        let d = if x.interior(dom) {
+            Decoration::Com
+        } else if x.subset(dom) {
+            Decoration::Def
+        } else {
+            Decoration::Trv
+        };
+        (y, d)
+    }
+
+    pub fn atan(self) -> Self {
+        if self.is_empty() {
+            return self;
+        }
+
+        Self::with_infsup_raw(atan_rd(self.inf_raw()), atan_ru(self.sup_raw()))
+    }
+
     pub fn cos(self) -> Self {
         if self.is_empty() {
             return self;
         }
 
-        let a = self.inf();
-        let b = self.sup();
+        let a = self.inf_raw();
+        let b = self.sup_raw();
         let q_nowrap = (self / Interval::PI).floor();
+        let qa = q_nowrap.inf_raw();
+        let qb = q_nowrap.sup_raw();
         // n and p are valid for small values.
         let n = if a == b {
             // Ad-hoc treatment for a huge value.
             0.0
         } else {
-            q_nowrap.sup() - q_nowrap.inf()
+            qb - qa
         };
         // "Quadrant" (polarity?) of a.
-        let q = rem_euclid_2(q_nowrap.inf());
+        let q = rem_euclid_2(qa);
 
         // Overestimation is fine.
         if n == 0.0 {
@@ -92,17 +172,15 @@ impl Interval {
             return self;
         }
 
-        let a = self.inf();
-        let b = self.sup();
+        let a = self.inf_raw();
+        let b = self.sup_raw();
         let q_nowrap = (self / Interval::FRAC_PI_2).floor();
+        let qa = q_nowrap.inf_raw();
+        let qb = q_nowrap.sup_raw();
         // n and q are valid for small values.
-        let n = if a == b {
-            0.0
-        } else {
-            q_nowrap.sup() - q_nowrap.inf()
-        };
+        let n = if a == b { 0.0 } else { qb - qa };
         // Quadrant of a.
-        let q = q_nowrap.inf().rem_euclid(4.0);
+        let q = qa.rem_euclid(4.0);
 
         if q == 0.0 && n < 1.0 || q == 3.0 && n < 2.0 {
             // monotonically increasing
@@ -121,36 +199,35 @@ impl Interval {
         }
     }
 
-    pub(crate) fn tan_impl(self) -> (Self, bool) {
+    pub fn tan(self) -> Self {
+        self.tan_impl().0
+    }
+
+    pub(crate) fn tan_impl(self) -> (Self, Decoration) {
         if self.is_empty() {
-            return (self, true);
+            return (self, Decoration::Trv);
         }
 
-        let a = self.inf();
-        let b = self.sup();
+        let a = self.inf_raw();
+        let b = self.sup_raw();
         let mut q_nowrap = (self / Interval::FRAC_PI_2).floor();
-        if self.sup_raw() == Interval::FRAC_PI_2.inf() {
+        if b == Interval::FRAC_PI_2.inf_raw() {
             // For a strict test case.
             q_nowrap = Self::with_infsup_raw(q_nowrap.inf_raw(), 0.0);
         }
+        let qa = q_nowrap.inf_raw();
+        let qb = q_nowrap.sup_raw();
         // n and q are valid for small values.
-        let n = if a == b {
-            0.0
-        } else {
-            q_nowrap.sup() - q_nowrap.inf()
-        };
-        let q = rem_euclid_2(q_nowrap.inf());
+        let n = if a == b { 0.0 } else { qb - qa };
+        let q = rem_euclid_2(qa);
 
         println!("x: {}, q_nowrap: {}, n: {}, q: {}", self, q_nowrap, n, q);
         if q == 0.0 && n < 1.0 || q == 1.0 && n < 2.0 {
-            (Self::with_infsup_raw(tan_rd(a), tan_ru(b)), true)
+            // In case of overflow, the decoration must be corrected by the caller.
+            (Self::with_infsup_raw(tan_rd(a), tan_ru(b)), Decoration::Com)
         } else {
-            (Self::entire(), false)
+            (Self::entire(), Decoration::Trv)
         }
-    }
-
-    pub fn tan(self) -> Self {
-        self.tan_impl().0
     }
 }
 
@@ -160,21 +237,22 @@ macro_rules! impl_dec {
             Self::set_dec(self.x.$f(), self.d)
         }
     };
+
+    ($f:ident, $f_impl:ident) => {
+        pub fn $f(self) -> Self {
+            let (y, d) = self.x.$f_impl();
+            Self::set_dec(y, self.d.min(d))
+        }
+    };
 }
 
 impl DecoratedInterval {
+    impl_dec!(acos, acos_impl);
+    impl_dec!(asin, asin_impl);
+    impl_dec!(atan);
     impl_dec!(cos);
     impl_dec!(sin);
-
-    pub fn tan(self) -> Self {
-        let (y, def) = self.x.tan_impl();
-        let d = if def {
-            self.d
-        } else {
-            self.d.min(Decoration::Trv)
-        };
-        Self::set_dec(y, d)
-    }
+    impl_dec!(tan, tan_impl);
 }
 
 #[cfg(test)]
@@ -184,6 +262,9 @@ mod tests {
 
     #[test]
     fn nai() {
+        assert!(DI::nai().acos().is_nai());
+        assert!(DI::nai().asin().is_nai());
+        assert!(DI::nai().atan().is_nai());
         assert!(DI::nai().cos().is_nai());
         assert!(DI::nai().sin().is_nai());
         assert!(DI::nai().tan().is_nai());

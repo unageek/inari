@@ -1509,6 +1509,97 @@ fn minimal_tan_dec_test() {
     assert_eq!(nd2di(hexf64!("0x1.fae147ae147aep-1"), hexf64!("0x1.028f5c28f5c29p+0"), D::Trv).tan(), nd2di(hexf64!("0x1.860fadcc59064p+0"), hexf64!("0x1.979ad0628469dp+0"), D::Trv));
 }
 
+#[cfg(feature = "gmp")]
+#[test]
+fn minimal_asin_test() {
+    assert_eq!(I::empty().asin(), I::empty());
+    assert_eq!(n2i(0.0, f64::INFINITY).asin(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(-0.0, f64::INFINITY).asin(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(f64::NEG_INFINITY, 0.0).asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), 0.0));
+    assert_eq!(n2i(f64::NEG_INFINITY, -0.0).asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), 0.0));
+    assert_eq!(I::entire().asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(-1.0, 1.0).asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(f64::NEG_INFINITY, -1.0).asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("-0x1.921fb54442d18p+0")));
+    assert_eq!(n2i(1.0, f64::INFINITY).asin(), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(-1.0, -1.0).asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("-0x1.921fb54442d18p+0")));
+    assert_eq!(n2i(1.0, 1.0).asin(), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(0.0, 0.0).asin(), n2i(0.0, 0.0));
+    assert_eq!(n2i(-0.0, -0.0).asin(), n2i(0.0, 0.0));
+    assert_eq!(n2i(f64::NEG_INFINITY, hexf64!("-0x1.0000000000001p+0")).asin(), I::empty());
+    assert_eq!(n2i(hexf64!("0x1.0000000000001p+0"), f64::INFINITY).asin(), I::empty());
+    assert_eq!(n2i(hexf64!("-0x1.999999999999ap-4"), hexf64!("0x1.999999999999ap-4")).asin(), n2i(hexf64!("-0x1.9a49276037885p-4"), hexf64!("0x1.9a49276037885p-4")));
+    assert_eq!(n2i(hexf64!("-0x1.51eb851eb851fp-2"), hexf64!("0x1.fffffffffffffp-1")).asin(), n2i(hexf64!("-0x1.585ff6e341c3fp-2"), hexf64!("0x1.921fb50442d19p+0")));
+    assert_eq!(n2i(hexf64!("-0x1.fffffffffffffp-1"), hexf64!("0x1.fffffffffffffp-1")).asin(), n2i(hexf64!("-0x1.921fb50442d19p+0"), hexf64!("0x1.921fb50442d19p+0")));
+}
+
+#[cfg(feature = "gmp")]
+#[test]
+fn minimal_asin_dec_test() {
+    assert_eq!(nd2di(0.0, f64::INFINITY, D::Dac).asin(), nd2di(0.0, hexf64!("0x1.921fb54442d19p+0"), D::Trv));
+    assert_eq!(nd2di(f64::NEG_INFINITY, 0.0, D::Def).asin(), nd2di(hexf64!("-0x1.921fb54442d19p+0"), 0.0, D::Trv));
+    assert_eq!(nd2di(-1.0, 1.0, D::Com).asin(), nd2di(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Com));
+    assert_eq!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).asin(), nd2di(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Trv));
+    assert_eq!(nd2di(hexf64!("-0x1.51eb851eb851fp-2"), hexf64!("0x1.fffffffffffffp-1"), D::Def).asin(), nd2di(hexf64!("-0x1.585ff6e341c3fp-2"), hexf64!("0x1.921fb50442d19p+0"), D::Def));
+}
+
+#[cfg(feature = "gmp")]
+#[test]
+fn minimal_acos_test() {
+    assert_eq!(I::empty().acos(), I::empty());
+    assert_eq!(n2i(0.0, f64::INFINITY).acos(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(-0.0, f64::INFINITY).acos(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(f64::NEG_INFINITY, 0.0).acos(), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(f64::NEG_INFINITY, -0.0).acos(), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(I::entire().acos(), n2i(0.0, hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(-1.0, 1.0).acos(), n2i(0.0, hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(f64::NEG_INFINITY, -1.0).acos(), n2i(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(1.0, f64::INFINITY).acos(), n2i(0.0, 0.0));
+    assert_eq!(n2i(-1.0, -1.0).acos(), n2i(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(1.0, 1.0).acos(), n2i(0.0, 0.0));
+    assert_eq!(n2i(0.0, 0.0).acos(), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(-0.0, -0.0).acos(), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(f64::NEG_INFINITY, hexf64!("-0x1.0000000000001p+0")).acos(), I::empty());
+    assert_eq!(n2i(hexf64!("0x1.0000000000001p+0"), f64::INFINITY).acos(), I::empty());
+    assert_eq!(n2i(hexf64!("-0x1.999999999999ap-4"), hexf64!("0x1.999999999999ap-4")).acos(), n2i(hexf64!("0x1.787b22ce3f590p+0"), hexf64!("0x1.abc447ba464a1p+0")));
+    assert_eq!(n2i(hexf64!("-0x1.51eb851eb851fp-2"), hexf64!("0x1.fffffffffffffp-1")).acos(), n2i(hexf64!("0x1.0000000000000p-26"), hexf64!("0x1.e837b2fd13428p+0")));
+    assert_eq!(n2i(hexf64!("-0x1.fffffffffffffp-1"), hexf64!("0x1.fffffffffffffp-1")).acos(), n2i(hexf64!("0x1.0000000000000p-26"), hexf64!("0x1.921fb52442d19p+1")));
+}
+
+#[cfg(feature = "gmp")]
+#[test]
+fn minimal_acos_dec_test() {
+    assert_eq!(nd2di(0.0, f64::INFINITY, D::Dac).acos(), nd2di(0.0, hexf64!("0x1.921fb54442d19p+0"), D::Trv));
+    assert_eq!(nd2di(f64::NEG_INFINITY, 0.0, D::Def).acos(), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
+    assert_eq!(nd2di(-1.0, 1.0, D::Com).acos(), nd2di(0.0, hexf64!("0x1.921fb54442d19p+1"), D::Com));
+    assert_eq!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).acos(), nd2di(0.0, hexf64!("0x1.921fb54442d19p+1"), D::Trv));
+    assert_eq!(nd2di(hexf64!("-0x1.51eb851eb851fp-2"), hexf64!("0x1.fffffffffffffp-1"), D::Def).acos(), nd2di(hexf64!("0x1.0000000000000p-26"), hexf64!("0x1.e837b2fd13428p+0"), D::Def));
+}
+
+#[cfg(feature = "gmp")]
+#[test]
+fn minimal_atan_test() {
+    assert_eq!(I::empty().atan(), I::empty());
+    assert_eq!(n2i(0.0, f64::INFINITY).atan(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(-0.0, f64::INFINITY).atan(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(f64::NEG_INFINITY, 0.0).atan(), n2i(hexf64!("-0x1.921fb54442d19p+0"), 0.0));
+    assert_eq!(n2i(f64::NEG_INFINITY, -0.0).atan(), n2i(hexf64!("-0x1.921fb54442d19p+0"), 0.0));
+    assert_eq!(I::entire().atan(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(0.0, 0.0).atan(), n2i(0.0, 0.0));
+    assert_eq!(n2i(-0.0, -0.0).atan(), n2i(0.0, 0.0));
+    assert_eq!(n2i(1.0, hexf64!("0x1.4c2463567c5acp+25")).atan(), n2i(hexf64!("0x1.921fb54442d18p-1"), hexf64!("0x1.921fb4e19abd7p+0")));
+    assert_eq!(n2i(hexf64!("-0x1.fd219490eaac1p+38"), hexf64!("-0x1.1af1c9d74f06dp+9")).atan(), n2i(hexf64!("-0x1.921fb54440cebp+0"), hexf64!("-0x1.91abe5c1e4c6dp+0")));
+}
+
+#[cfg(feature = "gmp")]
+#[test]
+fn minimal_atan_dec_test() {
+    assert_eq!(nd2di(0.0, f64::INFINITY, D::Dac).atan(), nd2di(0.0, hexf64!("0x1.921fb54442d19p+0"), D::Dac));
+    assert_eq!(nd2di(f64::NEG_INFINITY, 0.0, D::Def).atan(), nd2di(hexf64!("-0x1.921fb54442d19p+0"), 0.0, D::Def));
+    assert_eq!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).atan(), nd2di(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Dac));
+    assert_eq!(nd2di(1.0, hexf64!("0x1.4c2463567c5acp+25"), D::Trv).atan(), nd2di(hexf64!("0x1.921fb54442d18p-1"), hexf64!("0x1.921fb4e19abd7p+0"), D::Trv));
+    assert_eq!(nd2di(hexf64!("-0x1.fd219490eaac1p+38"), hexf64!("-0x1.1af1c9d74f06dp+9"), D::Com).atan(), nd2di(hexf64!("-0x1.921fb54440cebp+0"), hexf64!("-0x1.91abe5c1e4c6dp+0"), D::Com));
+}
+
 #[test]
 fn minimal_sign_test() {
     assert_eq!(I::empty().sign(), I::empty());

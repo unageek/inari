@@ -56,6 +56,21 @@ fn mpfi_abs() {
     assert_eq!(n2i(hexf64!("-0x1.2345678900000p+16"), hexf64!("0x1.2345679900000p+16")).abs(), n2i(0.0, hexf64!("0x1.2345679900000p+16")));
 }
 
+#[cfg(feature = "gmp")]
+#[test]
+fn mpfi_acos() {
+    // special values
+    assert_eq!(n2i(-1.0, 0.0).acos(), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(0.0, 0.0).acos(), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(0.0, 1.0).acos(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    // regular values
+    assert_eq!(n2i(-1.0, -0.5).acos(), n2i(hexf64!("0x1.0c152382d7365p+1"), hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(-0.75, -0.25).acos(), n2i(hexf64!("0x1.d2cf5c7c70f0bp+0"), hexf64!("0x1.359d26f93b6c4p+1")));
+    assert_eq!(n2i(-0.5, 0.5).acos(), n2i(hexf64!("0x1.0c152382d7365p+0"), hexf64!("0x1.0c152382d7366p+1")));
+    assert_eq!(n2i(0.25, 0.625).acos(), n2i(hexf64!("0x1.ca94936b98a21p-1"), hexf64!("0x1.51700e0c14b25p+0")));
+    assert_eq!(n2i(-1.0, 1.0).acos(), n2i(0.0, hexf64!("0x1.921fb54442d19p+1")));
+}
+
 #[test]
 fn mpfi_add() {
     // special values
@@ -118,6 +133,47 @@ fn mpfi_add_d() {
     assert_eq!(n2i(hexf64!("0x1.23456789abcdfp-4"), hexf64!("0x1.23456789abcdfp+48")) + n2i(-3.5, -3.5), n2i(hexf64!("-0x1.b6e5d4c3b2a1ap+1"), hexf64!("0x1.23456789abca7p+48")));
     assert_eq!(n2i(hexf64!("-0x1.fe00000000000p+7"), hexf64!("0x1.23456789abcdfp+0")) + n2i(-256.5, -256.5), n2i(hexf64!("-0x1.ff80000000000p+8"), hexf64!("-0x1.feb97530eca86p+7")));
     assert_eq!(n2i(hexf64!("-0x1.fffffffffffffp+0"), hexf64!("-0x1.0000000000000p-550")) + n2i(-4097.5, -4097.5), n2i(hexf64!("-0x1.0038000000000p+12"), hexf64!("-0x1.0018000000000p+12")));
+}
+
+#[cfg(feature = "gmp")]
+#[test]
+fn mpfi_asin() {
+    // special values
+    assert_eq!(n2i(-1.0, 0.0).asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), 0.0));
+    assert_eq!(n2i(0.0, 0.0).asin(), n2i(0.0, 0.0));
+    assert_eq!(n2i(0.0, 1.0).asin(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    // regular values
+    assert_eq!(n2i(-1.0, -0.5).asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("-0x1.0c152382d7365p-1")));
+    assert_eq!(n2i(-0.75, -0.25).asin(), n2i(hexf64!("-0x1.b235315c680ddp-1"), hexf64!("-0x1.02be9ce0b87cdp-2")));
+    assert_eq!(n2i(-0.5, 0.5).asin(), n2i(hexf64!("-0x1.0c152382d7366p-1"), hexf64!("0x1.0c152382d7366p-1")));
+    assert_eq!(n2i(0.25, 0.625).asin(), n2i(hexf64!("0x1.02be9ce0b87cdp-2"), hexf64!("0x1.59aad71ced00fp-1")));
+    assert_eq!(n2i(-1.0, 1.0).asin(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0")));
+}
+
+#[cfg(feature = "gmp")]
+#[test]
+fn mpfi_atan() {
+    // special values
+    assert_eq!(n2i(f64::NEG_INFINITY, -7.0).atan(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("-0x1.6dcc57bb565fcp+0")));
+    assert_eq!(n2i(f64::NEG_INFINITY, 0.0).atan(), n2i(hexf64!("-0x1.921fb54442d19p+0"), 0.0));
+    assert_eq!(n2i(f64::NEG_INFINITY, 8.0).atan(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.7249faa996a22p+0")));
+    assert_eq!(I::entire().atan(), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(-1.0, 0.0).atan(), n2i(hexf64!("-0x1.921fb54442d19p-1"), 0.0));
+    assert_eq!(n2i(0.0, 0.0).atan(), n2i(0.0, 0.0));
+    assert_eq!(n2i(0.0, 1.0).atan(), n2i(0.0, hexf64!("0x1.921fb54442d19p-1")));
+    assert_eq!(n2i(0.0, 8.0).atan(), n2i(0.0, hexf64!("0x1.7249faa996a22p+0")));
+    assert_eq!(n2i(0.0, f64::INFINITY).atan(), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    // regular values
+    assert_eq!(n2i(-6.0, -4.0).atan(), n2i(hexf64!("-0x1.67d8863bc99bdp+0"), hexf64!("-0x1.5368c951e9cfcp+0")));
+    assert_eq!(n2i(-2.0, -0.5).atan(), n2i(hexf64!("-0x1.1b6e192ebbe45p+0"), hexf64!("-0x1.dac670561bb4fp-2")));
+    assert_eq!(n2i(-1.0, -0.5).atan(), n2i(hexf64!("-0x1.921fb54442d19p-1"), hexf64!("-0x1.dac670561bb4fp-2")));
+    assert_eq!(n2i(-0.75, -0.25).atan(), n2i(hexf64!("-0x1.4978fa3269ee2p-1"), hexf64!("-0x1.f5b75f92c80ddp-3")));
+    assert_eq!(n2i(-0.5, 0.5).atan(), n2i(hexf64!("-0x1.dac670561bb50p-2"), hexf64!("0x1.dac670561bb50p-2")));
+    assert_eq!(n2i(0.25, 0.625).atan(), n2i(hexf64!("0x1.f5b75f92c80ddp-3"), hexf64!("0x1.1e00babdefeb4p-1")));
+    assert_eq!(n2i(-1.0, 1.0).atan(), n2i(hexf64!("-0x1.921fb54442d19p-1"), hexf64!("0x1.921fb54442d19p-1")));
+    assert_eq!(n2i(0.125, 17.0).atan(), n2i(hexf64!("0x1.fd5ba9aac2f6dp-4"), hexf64!("0x1.831516233f561p+0")));
+    assert_eq!(n2i(17.0, 42.0).atan(), n2i(hexf64!("0x1.831516233f560p+0"), hexf64!("0x1.8c079f3350d27p+0")));
+    assert_eq!(n2i(-42.0, 17.0).atan(), n2i(hexf64!("-0x1.8c079f3350d27p+0"), hexf64!("0x1.831516233f561p+0")));
 }
 
 #[test]
