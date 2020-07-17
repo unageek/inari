@@ -86,10 +86,8 @@ impl Interval {
         let y = Self::with_infsup_raw(acos_rd(x.sup_raw()), acos_ru(x.inf_raw()));
         let d = if x.interior(dom) {
             Decoration::Com
-        } else if x.subset(dom) {
-            Decoration::Def
         } else {
-            Decoration::Trv
+            Decoration::Def
         };
         (y, d)
     }
@@ -109,10 +107,8 @@ impl Interval {
         let y = Self::with_infsup_raw(asin_rd(x.inf_raw()), asin_ru(x.sup_raw()));
         let d = if x.interior(dom) {
             Decoration::Com
-        } else if x.subset(dom) {
-            Decoration::Def
         } else {
-            Decoration::Trv
+            Decoration::Def
         };
         (y, d)
     }
@@ -135,14 +131,13 @@ impl Interval {
         let q_nowrap = (self / Interval::PI).floor();
         let qa = q_nowrap.inf_raw();
         let qb = q_nowrap.sup_raw();
-        // n and p are valid for small values.
+        // n and q are valid for small values.
         let n = if a == b {
-            // Ad-hoc treatment for a huge value.
+            // For strict test cases on huge values.
             0.0
         } else {
             qb - qa
         };
-        // "Quadrant" (polarity?) of a.
         let q = rem_euclid_2(qa);
 
         // Overestimation is fine.
@@ -177,9 +172,7 @@ impl Interval {
         let q_nowrap = (self / Interval::FRAC_PI_2).floor();
         let qa = q_nowrap.inf_raw();
         let qb = q_nowrap.sup_raw();
-        // n and q are valid for small values.
         let n = if a == b { 0.0 } else { qb - qa };
-        // Quadrant of a.
         let q = qa.rem_euclid(4.0);
 
         if q == 0.0 && n < 1.0 || q == 3.0 && n < 2.0 {
@@ -212,12 +205,11 @@ impl Interval {
         let b = self.sup_raw();
         let mut q_nowrap = (self / Interval::FRAC_PI_2).floor();
         if b == Interval::FRAC_PI_2.inf_raw() {
-            // For a strict test case.
+            // For strict test cases.
             q_nowrap = Self::with_infsup_raw(q_nowrap.inf_raw(), 0.0);
         }
         let qa = q_nowrap.inf_raw();
         let qb = q_nowrap.sup_raw();
-        // n and q are valid for small values.
         let n = if a == b { 0.0 } else { qb - qa };
         let q = rem_euclid_2(qa);
 
