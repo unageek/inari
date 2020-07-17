@@ -3,7 +3,7 @@ use crate::interval::*;
 use crate::simd::*;
 use core::arch::x86_64::*;
 
-// NOTE: `add`, `sub`, `mul` and `div` are implemented in arith.rs
+// NOTE: `neg`, `add`, `sub`, `mul` and `div` are implemented in arith.rs
 
 impl Interval {
     // Almost a copy-paste of mul. Additions/modifications are indicated with "// *".
