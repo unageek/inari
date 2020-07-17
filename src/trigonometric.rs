@@ -203,18 +203,15 @@ impl Interval {
 
         let a = self.inf_raw();
         let b = self.sup_raw();
-        let mut q_nowrap = (self / Interval::FRAC_PI_2).floor();
-        if b == Interval::FRAC_PI_2.inf_raw() {
-            // For strict test cases.
-            q_nowrap = Self::with_infsup_raw(q_nowrap.inf_raw(), 0.0);
-        }
+        let q_nowrap = (self / Interval::FRAC_PI_2).floor();
         let qa = q_nowrap.inf_raw();
         let qb = q_nowrap.sup_raw();
         let n = if a == b { 0.0 } else { qb - qa };
         let q = rem_euclid_2(qa);
 
-        println!("x: {}, q_nowrap: {}, n: {}, q: {}", self, q_nowrap, n, q);
-        if q == 0.0 && n < 1.0 || q == 1.0 && n < 2.0 {
+        let cont = self.sup()
+            <= (Self::with_infsup_raw(q_nowrap.sup(), q_nowrap.sup()) * Interval::FRAC_PI_2).inf();
+        if q == 0.0 && (n < 1.0 || n == 1.0 && cont) || q == 1.0 && (n < 2.0 || n == 2.0 && cont) {
             // In case of overflow, the decoration must be corrected by the caller.
             (Self::with_infsup_raw(tan_rd(a), tan_ru(b)), Decoration::Com)
         } else {
@@ -250,7 +247,9 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::interval;
     type DI = DecoratedInterval;
+    type I = Interval;
 
     #[test]
     fn nai() {
@@ -260,5 +259,32 @@ mod tests {
         assert!(DI::nai().cos().is_nai());
         assert!(DI::nai().sin().is_nai());
         assert!(DI::nai().tan().is_nai());
+    }
+
+    #[test]
+    fn tan() {
+        // a, b ∊ (-π/2, π/2)
+        assert!(interval!(std::f64::consts::FRAC_PI_4, I::FRAC_PI_2.inf())
+            .unwrap()
+            .tan()
+            .is_common_interval());
+        assert!(interval!(-std::f64::consts::FRAC_PI_4, I::FRAC_PI_2.inf())
+            .unwrap()
+            .tan()
+            .is_common_interval());
+
+        // a, b ∊ (-3π/2, -π/2)
+        assert!(
+            interval!(-3.0 * std::f64::consts::FRAC_PI_4, -I::FRAC_PI_2.sup())
+                .unwrap()
+                .tan()
+                .is_common_interval()
+        );
+        assert!(
+            interval!(-5.0 * std::f64::consts::FRAC_PI_4, -I::FRAC_PI_2.sup())
+                .unwrap()
+                .tan()
+                .is_common_interval()
+        );
     }
 }
