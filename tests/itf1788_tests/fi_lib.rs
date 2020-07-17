@@ -161,8 +161,9 @@ fn fi_lib_divii() {
     assert_eq!(n2i(hexf64!("0x0.0p+0"), hexf64!("0x1.8000000000000p+1")) / n2i(hexf64!("0x1.0000000000000p+1"), hexf64!("0x1.8000000000000p+1")), n2i(hexf64!("0x0.0p+0"), hexf64!("0x1.8000000000000p+0")));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
-fn fi_lib_unary_functions() {
+fn fi_lib_unary_functions_gmp() {
     assert_eq!(n2i(hexf64!("-0x1.4c8993b11d519p-149"), hexf64!("-0x1.b1d8f24f24de3p-941")).sin(), n2i(hexf64!("-0x1.4c8993b11d519p-149"), hexf64!("-0x1.b1d8f24f24de2p-941")));
     assert_eq!(n2i(hexf64!("-0x1.9ee1a9db994f5p-436"), hexf64!("-0x1.b6451c0720bfbp-622")).sin(), n2i(hexf64!("-0x1.9ee1a9db994f5p-436"), hexf64!("-0x1.b6451c0720bfap-622")));
     assert_eq!(n2i(hexf64!("-0x1.59415fcfbff18p+6"), hexf64!("-0x1.1b0be7ac0af65p-959")).sin(), n2i(hexf64!("-0x1.0000000000000p+0"), hexf64!("0x1.0000000000000p+0")));
@@ -253,6 +254,10 @@ fn fi_lib_unary_functions() {
     assert_eq!(n2i(hexf64!("0x1.7bcc5d9a9b348p+17"), hexf64!("0x1.7bcd1b1984619p+17")).tan(), n2i(hexf64!("-0x1.7c60d60ad4e67p+17"), hexf64!("-0x1.731b7acf94603p-4")));
     assert_eq!(n2i(hexf64!("0x1.78fdb9f143616p+4"), hexf64!("0x1.78fdb9f143616p+4")).tan(), n2i(hexf64!("-0x1.939fac71fc143p+27"), hexf64!("-0x1.939fac71fc142p+27")));
     assert_eq!(n2i(hexf64!("0x1.78fdb9f143616p+4"), hexf64!("0x1.79367e02d4eaap+4")).tan(), n2i(hexf64!("-0x1.939fac71fc143p+27"), hexf64!("-0x1.209afe017139ap+6")));
+}
+
+#[test]
+fn fi_lib_unary_functions() {
     assert_eq!(n2i(hexf64!("0x1.89694dd6d675ep-261"), hexf64!("0x1.5ba589837c966p+95")).sqrt(), n2i(hexf64!("0x1.c0ce46227e574p-131"), hexf64!("0x1.a5e5061f52645p+47")));
     assert_eq!(n2i(hexf64!("0x1.3109f10d8a44ap-515"), hexf64!("0x1.9981bc265797dp-222")).sqrt(), n2i(hexf64!("0x1.8b322d746dd92p-258"), hexf64!("0x1.43c7c708713a9p-111")));
     assert_eq!(n2i(hexf64!("0x1.21fe595436609p-237"), hexf64!("0x1.95f14b9ba7449p+236")).sqrt(), n2i(hexf64!("0x1.8153a5585df9bp-119"), hexf64!("0x1.425e465111a84p+118")));

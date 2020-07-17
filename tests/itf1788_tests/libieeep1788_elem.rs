@@ -1303,6 +1303,7 @@ fn minimal_fma_dec_test() {
     assert_eq!(nd2di(1.0, 2.0, D::Com).mul_add(nd2di(1.0, 2.0, D::Com), nd2di(2.0, 5.0, D::Com)), nd2di(3.0, 9.0, D::Com));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn minimal_sin_test() {
     assert_eq!(I::empty().sin(), I::empty());
@@ -1359,6 +1360,7 @@ fn minimal_sin_test() {
     assert_eq!(n2i(2.0, 3.0).sin(), n2i(hexf64!("0x1.210386db6d55bp-3"), hexf64!("0x1.d18f6ead1b446p-1")));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn minimal_sin_dec_test() {
     assert_eq!(nd2di(hexf64!("-0x1.921fb54442d18p+1"), hexf64!("-0x1.921fb54442d18p+0"), D::Def).sin(), nd2di(hexf64!("-0x1.0000000000000p+0"), hexf64!("-0x1.1a62633145c06p-53"), D::Def));
@@ -1366,6 +1368,7 @@ fn minimal_sin_dec_test() {
     assert_eq!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).sin(), nd2di(-1.0, 1.0, D::Dac));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn minimal_cos_test() {
     assert_eq!(I::empty().cos(), I::empty());
@@ -1422,6 +1425,7 @@ fn minimal_cos_test() {
     assert_eq!(n2i(2.0, 3.0).cos(), n2i(hexf64!("-0x1.fae04be85e5d3p-1"), hexf64!("-0x1.aa22657537204p-2")));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn minimal_cos_dec_test() {
     assert_eq!(nd2di(hexf64!("-0x1.921fb54442d18p+0"), hexf64!("-0x1.921fb54442d18p+0"), D::Trv).cos(), nd2di(hexf64!("0x1.1a62633145c06p-54"), hexf64!("0x1.1a62633145c07p-54"), D::Trv));
@@ -1429,6 +1433,7 @@ fn minimal_cos_dec_test() {
     assert_eq!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).cos(), nd2di(-1.0, 1.0, D::Dac));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn minimal_tan_test() {
     assert_eq!(I::empty().tan(), I::empty());
@@ -1466,6 +1471,7 @@ fn minimal_tan_test() {
     assert_eq!(n2i(hexf64!("0x1.fae147ae147aep-1"), hexf64!("0x1.028f5c28f5c29p+0")).tan(), n2i(hexf64!("0x1.860fadcc59064p+0"), hexf64!("0x1.979ad0628469dp+0")));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn minimal_tan_dec_test() {
     assert_eq!(DI::empty().tan(), DI::empty());

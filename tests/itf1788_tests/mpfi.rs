@@ -142,6 +142,7 @@ fn mpfi_bounded_p() {
     assert!(n2i(hexf64!("0x1.fffffffffffffp-1"), 2.0).is_common_interval());
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn mpfi_cos() {
     // special values
@@ -730,6 +731,7 @@ fn mpfi_put_d() {
     assert_eq!(n2i(5.0, 5.0).convex_hull(n2i(0.0, 0.0)), n2i(0.0, 5.0));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn mpfi_sin() {
     // special values
@@ -957,6 +959,7 @@ fn mpfi_sub_d() {
     assert_eq!(n2i(hexf64!("-0x1.fffffffffffffp+0"), hexf64!("-0x1.0000000000000p-550")) - n2i(4097.5, 4097.5), n2i(hexf64!("-0x1.0038000000000p+12"), hexf64!("-0x1.0018000000000p+12")));
 }
 
+#[cfg(feature = "gmp")]
 #[test]
 fn mpfi_tan() {
     // special values
