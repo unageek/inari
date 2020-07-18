@@ -34,6 +34,12 @@ mpfr_fn!(atan, atan_rd, atan_ru);
 mpfr_fn!(atanh, atanh_rd, atanh_ru);
 mpfr_fn!(cos, cos_rd, cos_ru);
 mpfr_fn!(cosh, cosh_rd, cosh_ru);
+mpfr_fn!(exp, exp_rd, exp_ru);
+mpfr_fn!(exp10, exp10_rd, exp10_ru);
+mpfr_fn!(exp2, exp2_rd, exp2_ru);
+mpfr_fn!(log, log_rd, log_ru);
+mpfr_fn!(log10, log10_rd, log10_ru);
+mpfr_fn!(log2, log2_rd, log2_ru);
 mpfr_fn!(sin, sin_rd, sin_ru);
 mpfr_fn!(sinh, sinh_rd, sinh_ru);
 mpfr_fn!(tan, tan_rd, tan_ru);
@@ -45,6 +51,35 @@ fn rem_euclid_2(x: f64) -> f64 {
     } else {
         1.0
     }
+}
+
+macro_rules! impl_log {
+    ($f:ident, $f_impl:ident, $f_rd:ident, $f_ru:ident) => {
+        pub fn $f(self) -> Self {
+            self.$f_impl().0
+        }
+
+        #[allow(clippy::many_single_char_names)]
+        pub(crate) fn $f_impl(self) -> (Self, Decoration) {
+            // See the comment in atanh_impl.
+            let dom = Self::with_infsup_raw(0.0, f64::INFINITY);
+            let x = self.intersection(dom);
+
+            let a = x.inf_raw();
+            let b = x.sup_raw();
+            if x.is_empty() || b <= -0.0 {
+                return (Self::empty(), Decoration::Trv);
+            }
+
+            let y = Self::with_infsup_raw($f_rd(a), $f_ru(b));
+            let d = if a > 0.0 {
+                Decoration::Com
+            } else {
+                Decoration::Trv
+            };
+            (y, d)
+        }
+    };
 }
 
 impl Interval {
@@ -145,7 +180,7 @@ impl Interval {
             return (Self::empty(), Decoration::Trv);
         }
 
-        let y = Self::with_infsup_raw(atanh_rd(x.inf_raw()), atanh_ru(x.sup_raw()));
+        let y = Self::with_infsup_raw(atanh_rd(a), atanh_ru(b));
         let d = if a > -1.0 && b < 1.0 {
             Decoration::Com
         } else {
@@ -210,6 +245,34 @@ impl Interval {
             Self::with_infsup_raw(1.0, cosh_ru((-a).max(b)))
         }
     }
+
+    pub fn exp(self) -> Self {
+        if self.is_empty() {
+            return self;
+        }
+
+        Self::with_infsup_raw(exp_rd(self.inf_raw()), exp_ru(self.sup_raw()))
+    }
+
+    pub fn exp10(self) -> Self {
+        if self.is_empty() {
+            return self;
+        }
+
+        Self::with_infsup_raw(exp10_rd(self.inf_raw()), exp10_ru(self.sup_raw()))
+    }
+
+    pub fn exp2(self) -> Self {
+        if self.is_empty() {
+            return self;
+        }
+
+        Self::with_infsup_raw(exp2_rd(self.inf_raw()), exp2_ru(self.sup_raw()))
+    }
+
+    impl_log!(log, log_impl, log_rd, log_ru);
+    impl_log!(log10, log10_impl, log10_rd, log10_ru);
+    impl_log!(log2, log2_impl, log2_rd, log2_ru);
 
     pub fn sin(self) -> Self {
         if self.is_empty() {
@@ -309,6 +372,12 @@ impl DecoratedInterval {
     impl_dec!(atanh, atanh_impl);
     impl_dec!(cos);
     impl_dec!(cosh);
+    impl_dec!(exp);
+    impl_dec!(exp10);
+    impl_dec!(exp2);
+    impl_dec!(log, log_impl);
+    impl_dec!(log10, log10_impl);
+    impl_dec!(log2, log2_impl);
     impl_dec!(sin);
     impl_dec!(sinh);
     impl_dec!(tan, tan_impl);
@@ -332,6 +401,12 @@ mod tests {
         assert!(DI::nai().atanh().is_nai());
         assert!(DI::nai().cos().is_nai());
         assert!(DI::nai().cosh().is_nai());
+        assert!(DI::nai().exp().is_nai());
+        assert!(DI::nai().exp10().is_nai());
+        assert!(DI::nai().exp2().is_nai());
+        assert!(DI::nai().log().is_nai());
+        assert!(DI::nai().log10().is_nai());
+        assert!(DI::nai().log2().is_nai());
         assert!(DI::nai().sin().is_nai());
         assert!(DI::nai().sinh().is_nai());
         assert!(DI::nai().tan().is_nai());
