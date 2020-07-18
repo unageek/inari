@@ -82,6 +82,18 @@ macro_rules! impl_log {
     };
 }
 
+macro_rules! impl_mono_inc {
+    ($f:ident, $f_rd:ident, $f_ru:ident) => {
+        pub fn $f(self) -> Self {
+            if self.is_empty() {
+                return self;
+            }
+
+            Self::with_infsup_raw($f_rd(self.inf_raw()), $f_ru(self.sup_raw()))
+        }
+    };
+}
+
 impl Interval {
     pub fn acos(self) -> Self {
         self.acos_impl().0
@@ -146,21 +158,8 @@ impl Interval {
         (y, d)
     }
 
-    pub fn asinh(self) -> Self {
-        if self.is_empty() {
-            return self;
-        }
-
-        Self::with_infsup_raw(asinh_rd(self.inf_raw()), asinh_ru(self.sup_raw()))
-    }
-
-    pub fn atan(self) -> Self {
-        if self.is_empty() {
-            return self;
-        }
-
-        Self::with_infsup_raw(atan_rd(self.inf_raw()), atan_ru(self.sup_raw()))
-    }
+    impl_mono_inc!(asinh, asinh_rd, asinh_ru);
+    impl_mono_inc!(atan, atan_rd, atan_ru);
 
     pub fn atanh(self) -> Self {
         self.atanh_impl().0
@@ -246,29 +245,9 @@ impl Interval {
         }
     }
 
-    pub fn exp(self) -> Self {
-        if self.is_empty() {
-            return self;
-        }
-
-        Self::with_infsup_raw(exp_rd(self.inf_raw()), exp_ru(self.sup_raw()))
-    }
-
-    pub fn exp10(self) -> Self {
-        if self.is_empty() {
-            return self;
-        }
-
-        Self::with_infsup_raw(exp10_rd(self.inf_raw()), exp10_ru(self.sup_raw()))
-    }
-
-    pub fn exp2(self) -> Self {
-        if self.is_empty() {
-            return self;
-        }
-
-        Self::with_infsup_raw(exp2_rd(self.inf_raw()), exp2_ru(self.sup_raw()))
-    }
+    impl_mono_inc!(exp, exp_rd, exp_ru);
+    impl_mono_inc!(exp10, exp10_rd, exp10_ru);
+    impl_mono_inc!(exp2, exp2_rd, exp2_ru);
 
     impl_log!(log, log_impl, log_rd, log_ru);
     impl_log!(log10, log10_impl, log10_rd, log10_ru);
@@ -304,13 +283,7 @@ impl Interval {
         }
     }
 
-    pub fn sinh(self) -> Self {
-        if self.is_empty() {
-            return self;
-        }
-
-        Self::with_infsup_raw(sinh_rd(self.inf_raw()), sinh_ru(self.sup_raw()))
-    }
+    impl_mono_inc!(sinh, sinh_rd, sinh_ru);
 
     pub fn tan(self) -> Self {
         self.tan_impl().0
@@ -339,13 +312,7 @@ impl Interval {
         }
     }
 
-    pub fn tanh(self) -> Self {
-        if self.is_empty() {
-            return self;
-        }
-
-        Self::with_infsup_raw(tanh_rd(self.inf_raw()), tanh_ru(self.sup_raw()))
-    }
+    impl_mono_inc!(tanh, tanh_rd, tanh_ru);
 }
 
 macro_rules! impl_dec {
