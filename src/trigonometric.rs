@@ -14,53 +14,30 @@ fn mpfr_fn(
     }
 }
 
-fn acos_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::acos, x, mpfr::rnd_t::RNDD)
+macro_rules! mpfr_fn {
+    ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
+        fn $f_rd(x: f64) -> f64 {
+            mpfr_fn(mpfr::$mpfr_f, x, mpfr::rnd_t::RNDD)
+        }
+
+        fn $f_ru(x: f64) -> f64 {
+            mpfr_fn(mpfr::$mpfr_f, x, mpfr::rnd_t::RNDU)
+        }
+    };
 }
 
-fn acos_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::acos, x, mpfr::rnd_t::RNDU)
-}
-
-fn asin_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::asin, x, mpfr::rnd_t::RNDD)
-}
-
-fn asin_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::asin, x, mpfr::rnd_t::RNDU)
-}
-
-fn atan_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::atan, x, mpfr::rnd_t::RNDD)
-}
-
-fn atan_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::atan, x, mpfr::rnd_t::RNDU)
-}
-
-fn cos_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::cos, x, mpfr::rnd_t::RNDD)
-}
-
-fn cos_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::cos, x, mpfr::rnd_t::RNDU)
-}
-
-fn sin_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::sin, x, mpfr::rnd_t::RNDD)
-}
-
-fn sin_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::sin, x, mpfr::rnd_t::RNDU)
-}
-
-fn tan_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::tan, x, mpfr::rnd_t::RNDD)
-}
-
-fn tan_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::tan, x, mpfr::rnd_t::RNDU)
-}
+mpfr_fn!(acos, acos_rd, acos_ru);
+mpfr_fn!(acosh, acosh_rd, acosh_ru);
+mpfr_fn!(asin, asin_rd, asin_ru);
+mpfr_fn!(asinh, asinh_rd, asinh_ru);
+mpfr_fn!(atan, atan_rd, atan_ru);
+mpfr_fn!(atanh, atanh_rd, atanh_ru);
+mpfr_fn!(cos, cos_rd, cos_ru);
+mpfr_fn!(cosh, cosh_rd, cosh_ru);
+mpfr_fn!(sin, sin_rd, sin_ru);
+mpfr_fn!(sinh, sinh_rd, sinh_ru);
+mpfr_fn!(tan, tan_rd, tan_ru);
+mpfr_fn!(tanh, tanh_rd, tanh_ru);
 
 fn rem_euclid_2(x: f64) -> f64 {
     if 2.0 * (x / 2.0).floor() == x {
@@ -92,6 +69,27 @@ impl Interval {
         (y, d)
     }
 
+    pub fn acosh(self) -> Self {
+        self.acosh_impl().0
+    }
+
+    pub(crate) fn acosh_impl(self) -> (Self, Decoration) {
+        let dom = Self::with_infsup_raw(1.0, f64::INFINITY);
+        let x = self.intersection(dom);
+
+        if x.is_empty() {
+            return (x, Decoration::Trv);
+        }
+
+        let y = Self::with_infsup_raw(acosh_rd(x.inf_raw()), acosh_ru(x.sup_raw()));
+        let d = if x.interior(dom) {
+            Decoration::Com
+        } else {
+            Decoration::Def
+        };
+        (y, d)
+    }
+
     pub fn asin(self) -> Self {
         self.asin_impl().0
     }
@@ -113,12 +111,47 @@ impl Interval {
         (y, d)
     }
 
+    pub fn asinh(self) -> Self {
+        if self.is_empty() {
+            return self;
+        }
+
+        Self::with_infsup_raw(asinh_rd(self.inf_raw()), asinh_ru(self.sup_raw()))
+    }
+
     pub fn atan(self) -> Self {
         if self.is_empty() {
             return self;
         }
 
         Self::with_infsup_raw(atan_rd(self.inf_raw()), atan_ru(self.sup_raw()))
+    }
+
+    pub fn atanh(self) -> Self {
+        self.atanh_impl().0
+    }
+
+    #[allow(clippy::many_single_char_names)]
+    pub(crate) fn atanh_impl(self) -> (Self, Decoration) {
+        // Mathematically, the domain of atanh is (-1.0, 1.0), not [-1.0, 1.0].
+        // However, IEEE 754 and thus MPFR define atanh to return ±infinity for ±1.0
+        // (and signal the divideByZero exception), so we will make use of that.
+        let dom = Self::with_infsup_raw(-1.0, 1.0);
+        let x = self.intersection(dom);
+
+        let a = x.inf_raw();
+        let b = x.sup_raw();
+        if x.is_empty() || b <= -1.0 || a >= 1.0 {
+            return (Self::empty(), Decoration::Trv);
+        }
+
+        let y = Self::with_infsup_raw(atanh_rd(x.inf_raw()), atanh_ru(x.sup_raw()));
+        let d = if a > -1.0 && b < 1.0 {
+            Decoration::Com
+        } else {
+            Decoration::Trv
+        };
+        (y, d)
     }
 
     pub fn cos(self) -> Self {
@@ -162,6 +195,22 @@ impl Interval {
         }
     }
 
+    pub fn cosh(self) -> Self {
+        if self.is_empty() {
+            return self;
+        }
+
+        let a = self.inf_raw();
+        let b = self.sup_raw();
+        if b < 0.0 {
+            Self::with_infsup_raw(cosh_rd(b), cosh_ru(a))
+        } else if a > 0.0 {
+            Self::with_infsup_raw(cosh_rd(a), cosh_ru(b))
+        } else {
+            Self::with_infsup_raw(1.0, cosh_ru((-a).max(b)))
+        }
+    }
+
     pub fn sin(self) -> Self {
         if self.is_empty() {
             return self;
@@ -192,6 +241,14 @@ impl Interval {
         }
     }
 
+    pub fn sinh(self) -> Self {
+        if self.is_empty() {
+            return self;
+        }
+
+        Self::with_infsup_raw(sinh_rd(self.inf_raw()), sinh_ru(self.sup_raw()))
+    }
+
     pub fn tan(self) -> Self {
         self.tan_impl().0
     }
@@ -218,6 +275,14 @@ impl Interval {
             (Self::entire(), Decoration::Trv)
         }
     }
+
+    pub fn tanh(self) -> Self {
+        if self.is_empty() {
+            return self;
+        }
+
+        Self::with_infsup_raw(tanh_rd(self.inf_raw()), tanh_ru(self.sup_raw()))
+    }
 }
 
 macro_rules! impl_dec {
@@ -237,11 +302,17 @@ macro_rules! impl_dec {
 
 impl DecoratedInterval {
     impl_dec!(acos, acos_impl);
+    impl_dec!(acosh, acosh_impl);
     impl_dec!(asin, asin_impl);
+    impl_dec!(asinh);
     impl_dec!(atan);
+    impl_dec!(atanh, atanh_impl);
     impl_dec!(cos);
+    impl_dec!(cosh);
     impl_dec!(sin);
+    impl_dec!(sinh);
     impl_dec!(tan, tan_impl);
+    impl_dec!(tanh);
 }
 
 #[cfg(test)]
@@ -254,11 +325,17 @@ mod tests {
     #[test]
     fn nai() {
         assert!(DI::nai().acos().is_nai());
+        assert!(DI::nai().acosh().is_nai());
         assert!(DI::nai().asin().is_nai());
+        assert!(DI::nai().asinh().is_nai());
         assert!(DI::nai().atan().is_nai());
+        assert!(DI::nai().atanh().is_nai());
         assert!(DI::nai().cos().is_nai());
+        assert!(DI::nai().cosh().is_nai());
         assert!(DI::nai().sin().is_nai());
+        assert!(DI::nai().sinh().is_nai());
         assert!(DI::nai().tan().is_nai());
+        assert!(DI::nai().tanh().is_nai());
     }
 
     #[test]
