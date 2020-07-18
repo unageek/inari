@@ -14,6 +14,8 @@ mod boolean;
 mod classify;
 mod constants;
 #[cfg(feature = "gmp")]
+mod elementary;
+#[cfg(feature = "gmp")]
 mod format;
 mod integer;
 mod interval;
@@ -23,5 +25,3 @@ mod overlap;
 mod parse;
 mod set_op;
 mod simd;
-#[cfg(feature = "gmp")]
-mod trigonometric;
