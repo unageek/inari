@@ -133,8 +133,9 @@ impl Interval {
 
     #[allow(clippy::many_single_char_names)]
     pub(crate) fn atanh_impl(self) -> (Self, Decoration) {
-        // The actual domain is (-1.0, 1.0), not [-1.0, 1.0].
-        // However, atanh returns ±infinity for ±1.0.
+        // Mathematically, the domain of atanh is (-1.0, 1.0), not [-1.0, 1.0].
+        // However, IEEE 754 and thus MPFR define atanh to return ±infinity for ±1.0
+        // (and signal the divideByZero exception), so we will make use of that.
         let dom = Self::with_infsup_raw(-1.0, 1.0);
         let x = self.intersection(dom);
 
