@@ -14,101 +14,30 @@ fn mpfr_fn(
     }
 }
 
-fn acos_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::acos, x, mpfr::rnd_t::RNDD)
+macro_rules! mpfr_fn {
+    ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
+        fn $f_rd(x: f64) -> f64 {
+            mpfr_fn(mpfr::$mpfr_f, x, mpfr::rnd_t::RNDD)
+        }
+
+        fn $f_ru(x: f64) -> f64 {
+            mpfr_fn(mpfr::$mpfr_f, x, mpfr::rnd_t::RNDU)
+        }
+    };
 }
 
-fn acos_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::acos, x, mpfr::rnd_t::RNDU)
-}
-
-fn acosh_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::acosh, x, mpfr::rnd_t::RNDD)
-}
-
-fn acosh_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::acosh, x, mpfr::rnd_t::RNDU)
-}
-
-fn asin_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::asin, x, mpfr::rnd_t::RNDD)
-}
-
-fn asin_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::asin, x, mpfr::rnd_t::RNDU)
-}
-
-fn asinh_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::asinh, x, mpfr::rnd_t::RNDD)
-}
-
-fn asinh_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::asinh, x, mpfr::rnd_t::RNDU)
-}
-
-fn atan_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::atan, x, mpfr::rnd_t::RNDD)
-}
-
-fn atan_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::atan, x, mpfr::rnd_t::RNDU)
-}
-
-fn atanh_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::atanh, x, mpfr::rnd_t::RNDD)
-}
-
-fn atanh_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::atanh, x, mpfr::rnd_t::RNDU)
-}
-
-fn cos_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::cos, x, mpfr::rnd_t::RNDD)
-}
-
-fn cos_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::cos, x, mpfr::rnd_t::RNDU)
-}
-
-fn cosh_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::cosh, x, mpfr::rnd_t::RNDD)
-}
-
-fn cosh_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::cosh, x, mpfr::rnd_t::RNDU)
-}
-
-fn sin_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::sin, x, mpfr::rnd_t::RNDD)
-}
-
-fn sin_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::sin, x, mpfr::rnd_t::RNDU)
-}
-
-fn sinh_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::sinh, x, mpfr::rnd_t::RNDD)
-}
-
-fn sinh_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::sinh, x, mpfr::rnd_t::RNDU)
-}
-
-fn tan_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::tan, x, mpfr::rnd_t::RNDD)
-}
-
-fn tan_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::tan, x, mpfr::rnd_t::RNDU)
-}
-
-fn tanh_rd(x: f64) -> f64 {
-    mpfr_fn(mpfr::tanh, x, mpfr::rnd_t::RNDD)
-}
-
-fn tanh_ru(x: f64) -> f64 {
-    mpfr_fn(mpfr::tanh, x, mpfr::rnd_t::RNDU)
-}
+mpfr_fn!(acos, acos_rd, acos_ru);
+mpfr_fn!(acosh, acosh_rd, acosh_ru);
+mpfr_fn!(asin, asin_rd, asin_ru);
+mpfr_fn!(asinh, asinh_rd, asinh_ru);
+mpfr_fn!(atan, atan_rd, atan_ru);
+mpfr_fn!(atanh, atanh_rd, atanh_ru);
+mpfr_fn!(cos, cos_rd, cos_ru);
+mpfr_fn!(cosh, cosh_rd, cosh_ru);
+mpfr_fn!(sin, sin_rd, sin_ru);
+mpfr_fn!(sinh, sinh_rd, sinh_ru);
+mpfr_fn!(tan, tan_rd, tan_ru);
+mpfr_fn!(tanh, tanh_rd, tanh_ru);
 
 fn rem_euclid_2(x: f64) -> f64 {
     if 2.0 * (x / 2.0).floor() == x {
@@ -202,6 +131,7 @@ impl Interval {
         self.atanh_impl().0
     }
 
+    #[allow(clippy::many_single_char_names)]
     pub(crate) fn atanh_impl(self) -> (Self, Decoration) {
         // The actual domain is (-1.0, 1.0), not [-1.0, 1.0].
         // However, atanh returns ±infinity for ±1.0.
