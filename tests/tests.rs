@@ -23,3 +23,15 @@ mod itf1788_tests {
 }
 
 mod util;
+
+// Just for checking that build succeeds.
+#[test]
+fn macros() {
+    use inari::{const_dec_interval, const_interval, dec_interval, interval};
+
+    assert_eq!(interval!(1.0, 2.0).unwrap(), const_interval!(1.0, 2.0));
+    assert_eq!(
+        dec_interval!(1.0, 2.0).unwrap(),
+        const_dec_interval!(1.0, 2.0)
+    );
+}

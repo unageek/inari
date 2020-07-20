@@ -8,6 +8,10 @@
 
 - Add macros `const_interval!` and `const_dec_interval!` for making constant intervals evaluated at compile time.
 
+### Changed
+
+- ❗ Change the representation of struct `DecoratedInterval` from the default one to `#[repr(C)]`.
+
 ## v0.2.1 - 2020-07-17
 
 ### Fixed
