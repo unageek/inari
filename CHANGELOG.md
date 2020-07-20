@@ -2,6 +2,12 @@
 
 ❗ indicates an breaking change.
 
+## Unreleased
+
+### Added
+
+- Add macros `const_interval!` and `const_dec_interval!` for making constant intervals evaluated at compile time.
+
 ## v0.2.1 - 2020-07-17
 
 ### Fixed
