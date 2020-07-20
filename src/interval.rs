@@ -309,3 +309,68 @@ macro_rules! dec_interval {
         $crate::_dec_interval!($a, $b)
     };
 }
+
+#[doc(hidden)]
+#[repr(C)]
+pub union _interval_rep {
+    pub f: [f64; 2],
+    pub i: Interval,
+}
+
+#[macro_export]
+macro_rules! const_interval {
+    ($a:expr, $b:expr) => {{
+        const_assert!($a <= $b && $a != f64::INFINITY && $b != f64::NEG_INFINITY);
+        unsafe { $crate::_interval_rep { f: [-$a, $b] }.i }
+    }};
+}
+
+#[macro_export]
+macro_rules! const_dec_interval {
+    ($a:expr, $b:expr) => {{
+        DecoratedInterval {
+            x: const_interval!($a, $b),
+            d: if $a == f64::NEG_INFINITY || $b == f64::INFINITY {
+                Decoration::Dac
+            } else {
+                Decoration::Com
+            },
+        }
+    }};
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn macros() {
+        assert_eq!(interval!(1.0, 1.0).unwrap(), const_interval!(1.0, 1.0));
+        assert_eq!(interval!(1.0, 2.0).unwrap(), const_interval!(1.0, 2.0));
+        assert_eq!(
+            interval!(f64::NEG_INFINITY, 1.0).unwrap(),
+            const_interval!(f64::NEG_INFINITY, 1.0)
+        );
+        assert_eq!(
+            interval!(1.0, f64::INFINITY).unwrap(),
+            const_interval!(1.0, f64::INFINITY)
+        );
+
+        assert_eq!(
+            dec_interval!(1.0, 1.0).unwrap(),
+            const_dec_interval!(1.0, 1.0)
+        );
+        assert_eq!(
+            dec_interval!(1.0, 2.0).unwrap(),
+            const_dec_interval!(1.0, 2.0)
+        );
+        assert_eq!(
+            dec_interval!(f64::NEG_INFINITY, 1.0).unwrap(),
+            const_dec_interval!(f64::NEG_INFINITY, 1.0)
+        );
+        assert_eq!(
+            dec_interval!(1.0, f64::INFINITY).unwrap(),
+            const_dec_interval!(1.0, f64::INFINITY)
+        );
+    }
+}
