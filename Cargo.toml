@@ -36,6 +36,7 @@ gmp-mpfr-sys = { version = "1.2", default-features = false, features = ["mpfr"],
 hexf = "0.1.0"
 nom = { version = "5", optional = true }
 rug = { version = "1.9", default-features = false, features = ["float", "integer", "rational"], optional = true }
+static_assertions = "1.1"
 
 [[example]]
 name = "cancellation"
