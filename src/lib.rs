@@ -2,11 +2,8 @@
 #![feature(asm)]
 #![allow(clippy::float_cmp)]
 
-#[macro_use]
-extern crate static_assertions;
-
 pub use self::interval::{
-    DecoratedInterval, Decoration, Interval, IntervalError, IntervalErrorKind, _interval_rep,
+    DecoratedInterval, Decoration, Interval, IntervalError, IntervalErrorKind,
 };
 pub use self::overlap::OverlappingState;
 
