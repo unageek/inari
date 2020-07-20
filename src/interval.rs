@@ -366,8 +366,14 @@ macro_rules! const_dec_interval {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn macros() {
+        // Check that these macros are usable in const contexts.
+        const _I: Interval = const_interval!(1.0, 2.0);
+        const _DI: DecoratedInterval = const_dec_interval!(1.0, 2.0);
+
         assert_eq!(interval!(1.0, 1.0).unwrap(), const_interval!(1.0, 1.0));
         assert_eq!(interval!(1.0, 2.0).unwrap(), const_interval!(1.0, 2.0));
         assert_eq!(
