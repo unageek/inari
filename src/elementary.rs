@@ -67,7 +67,7 @@ macro_rules! impl_log {
 
             let a = x.inf_raw();
             let b = x.sup_raw();
-            if x.is_empty() || b <= -0.0 {
+            if x.is_empty() || b <= 0.0 {
                 return (Self::empty(), Decoration::Trv);
             }
 
