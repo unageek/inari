@@ -313,7 +313,7 @@ macro_rules! dec_interval {
 #[doc(hidden)]
 #[repr(C)]
 pub union _interval_rep {
-    pub d: [f64; 2],
+    pub f: [f64; 2],
     pub i: Interval,
 }
 
@@ -321,7 +321,7 @@ pub union _interval_rep {
 macro_rules! const_interval {
     ($a:expr, $b:expr) => {{
         const_assert!($a <= $b && $a != f64::INFINITY && $b != f64::NEG_INFINITY);
-        unsafe { $crate::_interval_rep { d: [-$a, $b] }.i }
+        unsafe { $crate::_interval_rep { f: [-$a, $b] }.i }
     }};
 }
 
