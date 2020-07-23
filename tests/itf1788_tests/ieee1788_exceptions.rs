@@ -24,6 +24,7 @@ use hexf::*;
 type DI = inari::DecoratedInterval;
 type I = inari::Interval;
 
+#[cfg(feature = "gmp")]
 #[test]
 fn exceptions() {
     assert_eq!(t2i("[+infinity]"), I::EMPTY);
