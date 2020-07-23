@@ -30,6 +30,7 @@ lto = true
 default = ["gmp"]
 gmp = ["gmp-mpfr-sys", "nom", "rug"]
 tau_constant = []
+_reserve_u64_in_dec_interval = []
 
 [dependencies]
 gmp-mpfr-sys = { version = "1.2", default-features = false, features = ["mpfr"], optional = true }
