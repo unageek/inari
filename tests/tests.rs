@@ -1,4 +1,4 @@
-#![allow(clippy::approx_constant, clippy::float_cmp)]
+#![allow(clippy::approx_constant, clippy::eq_op, clippy::float_cmp)]
 
 mod itf1788_tests {
     //mod abs_rev;
