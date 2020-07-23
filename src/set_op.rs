@@ -41,10 +41,7 @@ macro_rules! impl_dec {
                 return Self::NAI;
             }
 
-            DecoratedInterval {
-                x: self.x.$f(rhs.x),
-                d: Decoration::Trv,
-            }
+            Self::new_unchecked(self.x.$f(rhs.x), Decoration::Trv)
         }
     };
 }

@@ -102,26 +102,14 @@ impl Interval {
 
 macro_rules! def_com {
     ($c:ident) => {
-        pub const $c: Self = Self {
-            x: Interval::$c,
-            d: Decoration::Com,
-        };
+        pub const $c: Self = Self::new_unchecked(Interval::$c, Decoration::Com);
     };
 }
 
 impl DecoratedInterval {
-    pub const EMPTY: Self = Self {
-        x: Interval::EMPTY,
-        d: Decoration::Trv,
-    };
-    pub const ENTIRE: Self = Self {
-        x: Interval::ENTIRE,
-        d: Decoration::Dac,
-    };
-    pub const NAI: Self = Self {
-        x: Interval::EMPTY,
-        d: Decoration::Ill,
-    };
+    pub const EMPTY: Self = Self::new_unchecked(Interval::EMPTY, Decoration::Trv);
+    pub const ENTIRE: Self = Self::new_unchecked(Interval::ENTIRE, Decoration::Dac);
+    pub const NAI: Self = Self::new_unchecked(Interval::EMPTY, Decoration::Ill);
 
     def_com!(E);
     def_com!(FRAC_1_PI);
