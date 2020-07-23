@@ -57,18 +57,6 @@ pub struct Interval {
 }
 
 impl Interval {
-    pub fn empty() -> Self {
-        Self {
-            rep: unsafe { _mm_set1_pd(f64::NAN) },
-        }
-    }
-
-    pub fn entire() -> Self {
-        Self {
-            rep: unsafe { _mm_set1_pd(f64::INFINITY) },
-        }
-    }
-
     pub(crate) fn inf_raw(self) -> f64 {
         unsafe { -_mm_cvtsd_f64(self.rep) }
     }
@@ -108,7 +96,7 @@ impl TryFrom<(f64, f64)> for Interval {
         } else {
             Err(Self::Error {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::empty(),
+                value: Self::EMPTY,
             })
         }
     }
@@ -162,46 +150,25 @@ impl DecoratedInterval {
         self.d
     }
 
-    pub fn empty() -> Self {
-        Self {
-            x: Interval::empty(),
-            d: Decoration::Trv,
-        }
-    }
-
-    pub fn entire() -> Self {
-        Self {
-            x: Interval::entire(),
-            d: Decoration::Dac,
-        }
-    }
-
     pub fn interval_part(self) -> Result<Interval, IntervalError<Interval>> {
         if self.is_nai() {
             return Err(IntervalError {
                 kind: IntervalErrorKind::IntvlPartOfNaI,
-                value: Interval::empty(),
+                value: Interval::EMPTY,
             });
         }
 
         Ok(self.x)
     }
 
-    pub fn nai() -> Self {
-        Self {
-            x: Interval::empty(),
-            d: Decoration::Ill,
-        }
-    }
-
     pub fn set_dec(x: Interval, d: Decoration) -> Self {
         use Decoration::*;
 
         if d == Ill {
-            return Self::nai();
+            return Self::NAI;
         }
         if x.is_empty() {
-            return Self::empty();
+            return Self::EMPTY;
         }
         if d == Com && !x.is_common_interval() {
             return Self { x, d: Dac };
@@ -231,7 +198,7 @@ impl TryFrom<(f64, f64)> for DecoratedInterval {
             Ok(x) => Ok(Self::new(x)),
             _ => Err(Self::Error {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::nai(),
+                value: Self::NAI,
             }),
         }
     }

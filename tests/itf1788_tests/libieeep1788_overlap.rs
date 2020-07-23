@@ -37,9 +37,9 @@ type O = inari::OverlappingState;
 
 #[test]
 fn minimal_overlap_test() {
-    assert_eq!(I::empty().overlap(I::empty()), O::BothEmpty);
-    assert_eq!(I::empty().overlap(n2i(1.0, 2.0)), O::FirstEmpty);
-    assert_eq!(n2i(1.0, 2.0).overlap(I::empty()), O::SecondEmpty);
+    assert_eq!(I::EMPTY.overlap(I::EMPTY), O::BothEmpty);
+    assert_eq!(I::EMPTY.overlap(n2i(1.0, 2.0)), O::FirstEmpty);
+    assert_eq!(n2i(1.0, 2.0).overlap(I::EMPTY), O::SecondEmpty);
     assert_eq!(n2i(f64::NEG_INFINITY, 2.0).overlap(n2i(3.0, f64::INFINITY)), O::Before);
     assert_eq!(n2i(f64::NEG_INFINITY, 2.0).overlap(n2i(3.0, 4.0)), O::Before);
     assert_eq!(n2i(2.0, 2.0).overlap(n2i(3.0, 4.0)), O::Before);
@@ -54,7 +54,7 @@ fn minimal_overlap_test() {
     assert_eq!(n2i(1.0, 2.0).overlap(n2i(1.0, f64::INFINITY)), O::Starts);
     assert_eq!(n2i(1.0, 2.0).overlap(n2i(1.0, 3.0)), O::Starts);
     assert_eq!(n2i(1.0, 1.0).overlap(n2i(1.0, 3.0)), O::Starts);
-    assert_eq!(n2i(1.0, 2.0).overlap(I::entire()), O::ContainedBy);
+    assert_eq!(n2i(1.0, 2.0).overlap(I::ENTIRE), O::ContainedBy);
     assert_eq!(n2i(1.0, 2.0).overlap(n2i(f64::NEG_INFINITY, 3.0)), O::ContainedBy);
     assert_eq!(n2i(1.0, 2.0).overlap(n2i(0.0, 3.0)), O::ContainedBy);
     assert_eq!(n2i(2.0, 2.0).overlap(n2i(0.0, 3.0)), O::ContainedBy);
@@ -65,7 +65,7 @@ fn minimal_overlap_test() {
     assert_eq!(n2i(1.0, 2.0).overlap(n2i(1.0, 2.0)), O::Equal);
     assert_eq!(n2i(1.0, 1.0).overlap(n2i(1.0, 1.0)), O::Equal);
     assert_eq!(n2i(f64::NEG_INFINITY, 1.0).overlap(n2i(f64::NEG_INFINITY, 1.0)), O::Equal);
-    assert_eq!(I::entire().overlap(I::entire()), O::Equal);
+    assert_eq!(I::ENTIRE.overlap(I::ENTIRE), O::Equal);
     assert_eq!(n2i(3.0, 4.0).overlap(n2i(2.0, 2.0)), O::After);
     assert_eq!(n2i(3.0, 4.0).overlap(n2i(1.0, 2.0)), O::After);
     assert_eq!(n2i(3.0, 3.0).overlap(n2i(1.0, 2.0)), O::After);
@@ -79,7 +79,7 @@ fn minimal_overlap_test() {
     assert_eq!(n2i(1.0, 3.0).overlap(n2i(1.0, 2.0)), O::StartedBy);
     assert_eq!(n2i(1.0, 3.0).overlap(n2i(1.0, 1.0)), O::StartedBy);
     assert_eq!(n2i(f64::NEG_INFINITY, 3.0).overlap(n2i(1.0, 2.0)), O::Contains);
-    assert_eq!(I::entire().overlap(n2i(1.0, 2.0)), O::Contains);
+    assert_eq!(I::ENTIRE.overlap(n2i(1.0, 2.0)), O::Contains);
     assert_eq!(n2i(0.0, 3.0).overlap(n2i(1.0, 2.0)), O::Contains);
     assert_eq!(n2i(0.0, 3.0).overlap(n2i(2.0, 2.0)), O::Contains);
     assert_eq!(n2i(f64::NEG_INFINITY, 2.0).overlap(n2i(1.0, 2.0)), O::FinishedBy);
@@ -89,9 +89,9 @@ fn minimal_overlap_test() {
 
 #[test]
 fn minimal_overlap_dec_test() {
-    assert_eq!(DI::empty().overlap(DI::empty()), O::BothEmpty);
-    assert_eq!(DI::empty().overlap(nd2di(1.0, 2.0, D::Com)), O::FirstEmpty);
-    assert_eq!(nd2di(1.0, 2.0, D::Def).overlap(DI::empty()), O::SecondEmpty);
+    assert_eq!(DI::EMPTY.overlap(DI::EMPTY), O::BothEmpty);
+    assert_eq!(DI::EMPTY.overlap(nd2di(1.0, 2.0, D::Com)), O::FirstEmpty);
+    assert_eq!(nd2di(1.0, 2.0, D::Def).overlap(DI::EMPTY), O::SecondEmpty);
     assert_eq!(nd2di(2.0, 2.0, D::Def).overlap(nd2di(3.0, 4.0, D::Def)), O::Before);
     assert_eq!(nd2di(1.0, 2.0, D::Dac).overlap(nd2di(3.0, 4.0, D::Com)), O::Before);
     assert_eq!(nd2di(1.0, 2.0, D::Com).overlap(nd2di(3.0, 3.0, D::Trv)), O::Before);

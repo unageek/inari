@@ -96,8 +96,8 @@ mod tests {
 
     #[test]
     fn classify() {
-        assert!(I::empty().classify() == C_E);
-        assert!(I::entire().classify() == C_M);
+        assert!(I::EMPTY.classify() == C_E);
+        assert!(I::ENTIRE.classify() == C_M);
         assert!(interval!(-1.0, 1.0).unwrap().classify() == C_M);
         assert!(interval!(-1.0, 0.0).unwrap().classify() == C_N0);
         assert!(interval!(-1.0, -1.0).unwrap().classify() == C_N1);

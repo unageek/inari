@@ -4,6 +4,23 @@ use crate::{const_interval, interval::*};
 use hexf::*;
 
 impl Interval {
+    pub const EMPTY: Self = {
+        #[repr(C)]
+        union Rep {
+            f: [f64; 2],
+            i: Interval,
+        }
+
+        unsafe {
+            Rep {
+                f: [f64::NAN, f64::NAN],
+            }
+            .i
+        }
+    };
+
+    pub const ENTIRE: Self = const_interval!(f64::NEG_INFINITY, f64::INFINITY);
+
     pub const E: Self = const_interval!(
         hexf64!("0x2.b7e151628aed2p0"),
         hexf64!("0x2.b7e151628aed4p0")
@@ -93,6 +110,19 @@ macro_rules! def_com {
 }
 
 impl DecoratedInterval {
+    pub const EMPTY: Self = Self {
+        x: Interval::EMPTY,
+        d: Decoration::Trv,
+    };
+    pub const ENTIRE: Self = Self {
+        x: Interval::ENTIRE,
+        d: Decoration::Dac,
+    };
+    pub const NAI: Self = Self {
+        x: Interval::EMPTY,
+        d: Decoration::Ill,
+    };
+
     def_com!(E);
     def_com!(FRAC_1_PI);
     def_com!(FRAC_1_SQRT_2);

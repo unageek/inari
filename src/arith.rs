@@ -56,7 +56,7 @@ impl Mul for Interval {
 
         match (self.classify() << 4) | rhs.classify() {
             C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_N0_E | C_N1_E
-            | C_P0_E | C_P1_E | C_Z_E => Self::empty(),
+            | C_P0_E | C_P1_E | C_Z_E => Self::EMPTY,
             C_M_Z | C_N0_Z | C_N1_Z | C_P0_Z | C_P1_Z | C_Z_M | C_Z_N0 | C_Z_N1 | C_Z_P0
             | C_Z_P1 | C_Z_Z => Self::zero(),
             C_M_M => {
@@ -156,9 +156,9 @@ impl Div for Interval {
         match (self.classify() << 4) | rhs.classify() {
             C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_M_Z | C_N0_E
             | C_N0_Z | C_N1_E | C_N1_Z | C_P0_E | C_P0_Z | C_P1_E | C_P1_Z | C_Z_E | C_Z_Z => {
-                Self::empty()
+                Self::EMPTY
             }
-            C_M_M | C_M_N0 | C_M_P0 | C_N0_M | C_N1_M | C_P0_M | C_P1_M => Self::entire(),
+            C_M_M | C_M_N0 | C_M_P0 | C_N0_M | C_N1_M | C_P0_M | C_P1_M => Self::ENTIRE,
             C_Z_M | C_Z_N0 | C_Z_N1 | C_Z_P0 | C_Z_P1 => Self::zero(),
             C_M_N1 => {
                 // M / N1 => [b/d, a/d] = [a/d; -b/d] = [a; -b] / [d; d] = [-a; b] / [-d; -d]
@@ -268,7 +268,7 @@ impl Add for DecoratedInterval {
     fn add(self, rhs: Self) -> Self {
         #[allow(clippy::suspicious_arithmetic_impl)]
         if self.is_nai() || rhs.is_nai() {
-            return Self::nai();
+            return Self::NAI;
         }
 
         Self::set_dec(self.x + rhs.x, self.d.min(rhs.d))
@@ -281,7 +281,7 @@ impl Sub for DecoratedInterval {
     fn sub(self, rhs: Self) -> Self {
         #[allow(clippy::suspicious_arithmetic_impl)]
         if self.is_nai() || rhs.is_nai() {
-            return Self::nai();
+            return Self::NAI;
         }
 
         Self::set_dec(self.x - rhs.x, self.d.min(rhs.d))
@@ -294,7 +294,7 @@ impl Mul for DecoratedInterval {
     fn mul(self, rhs: Self) -> Self {
         #[allow(clippy::suspicious_arithmetic_impl)]
         if self.is_nai() || rhs.is_nai() {
-            return Self::nai();
+            return Self::NAI;
         }
 
         Self::set_dec(self.x * rhs.x, self.d.min(rhs.d))
@@ -307,7 +307,7 @@ impl Div for DecoratedInterval {
     fn div(self, rhs: Self) -> Self {
         #[allow(clippy::suspicious_arithmetic_impl)]
         if self.is_nai() || rhs.is_nai() {
-            return Self::nai();
+            return Self::NAI;
         }
 
         let d = if rhs.x.contains(0.0) {
@@ -393,49 +393,49 @@ mod tests {
 
     #[test]
     fn empty() {
-        assert!((-I::empty()).is_empty());
+        assert!((-I::EMPTY).is_empty());
 
-        assert!((I::empty() + I::PI).is_empty());
-        assert!((I::PI + I::empty()).is_empty());
+        assert!((I::EMPTY + I::PI).is_empty());
+        assert!((I::PI + I::EMPTY).is_empty());
 
-        assert!((I::empty() - I::PI).is_empty());
-        assert!((I::PI - I::empty()).is_empty());
+        assert!((I::EMPTY - I::PI).is_empty());
+        assert!((I::PI - I::EMPTY).is_empty());
 
-        assert!((I::empty() * I::PI).is_empty());
-        assert!((I::PI * I::empty()).is_empty());
+        assert!((I::EMPTY * I::PI).is_empty());
+        assert!((I::PI * I::EMPTY).is_empty());
 
-        assert!((I::empty() / I::PI).is_empty());
-        assert!((I::PI / I::empty()).is_empty());
+        assert!((I::EMPTY / I::PI).is_empty());
+        assert!((I::PI / I::EMPTY).is_empty());
 
-        assert!((-DI::empty()).is_empty());
+        assert!((-DI::EMPTY).is_empty());
 
-        assert!((DI::empty() + DI::PI).is_empty());
-        assert!((DI::PI + DI::empty()).is_empty());
+        assert!((DI::EMPTY + DI::PI).is_empty());
+        assert!((DI::PI + DI::EMPTY).is_empty());
 
-        assert!((DI::empty() - DI::PI).is_empty());
-        assert!((DI::PI - DI::empty()).is_empty());
+        assert!((DI::EMPTY - DI::PI).is_empty());
+        assert!((DI::PI - DI::EMPTY).is_empty());
 
-        assert!((DI::empty() * DI::PI).is_empty());
-        assert!((DI::PI * DI::empty()).is_empty());
+        assert!((DI::EMPTY * DI::PI).is_empty());
+        assert!((DI::PI * DI::EMPTY).is_empty());
 
-        assert!((DI::empty() / DI::PI).is_empty());
-        assert!((DI::PI / DI::empty()).is_empty());
+        assert!((DI::EMPTY / DI::PI).is_empty());
+        assert!((DI::PI / DI::EMPTY).is_empty());
     }
 
     #[test]
     fn nai() {
-        assert!((-DI::nai()).is_nai());
+        assert!((-DI::NAI).is_nai());
 
-        assert!((DI::nai() + DI::PI).is_nai());
-        assert!((DI::PI + DI::nai()).is_nai());
+        assert!((DI::NAI + DI::PI).is_nai());
+        assert!((DI::PI + DI::NAI).is_nai());
 
-        assert!((DI::nai() - DI::PI).is_nai());
-        assert!((DI::PI - DI::nai()).is_nai());
+        assert!((DI::NAI - DI::PI).is_nai());
+        assert!((DI::PI - DI::NAI).is_nai());
 
-        assert!((DI::nai() * DI::PI).is_nai());
-        assert!((DI::PI * DI::nai()).is_nai());
+        assert!((DI::NAI * DI::PI).is_nai());
+        assert!((DI::PI * DI::NAI).is_nai());
 
-        assert!((DI::nai() / DI::PI).is_nai());
-        assert!((DI::PI / DI::nai()).is_nai());
+        assert!((DI::NAI / DI::PI).is_nai());
+        assert!((DI::PI / DI::NAI).is_nai());
     }
 }

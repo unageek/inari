@@ -10,12 +10,12 @@ impl Interval {
     #[allow(clippy::many_single_char_names)]
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
         if addend.is_empty() {
-            return Self::empty(); // *
+            return Self::EMPTY; // *
         }
 
         match (self.classify() << 4) | rhs.classify() {
             C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_N0_E | C_N1_E
-            | C_P0_E | C_P1_E | C_Z_E => Self::empty(),
+            | C_P0_E | C_P1_E | C_Z_E => Self::EMPTY,
             C_M_Z | C_N0_Z | C_N1_Z | C_P0_Z | C_P1_Z | C_Z_M | C_Z_N0 | C_Z_N1 | C_Z_P0
             | C_Z_P1 | C_Z_Z => addend, // *
             C_M_M => {
@@ -102,8 +102,8 @@ impl Interval {
 
     pub fn recip(self) -> Self {
         match self.classify() {
-            C_E | C_Z => Self::empty(),
-            C_M => Self::entire(),
+            C_E | C_Z => Self::EMPTY,
+            C_M => Self::ENTIRE,
             C_N0 => {
                 // 1 / N0 => [-inf, 1/a] = [-1/-a; inf]
                 let _r = RoundUpContext::new();
@@ -138,7 +138,7 @@ impl Interval {
 
     pub fn sqr(self) -> Self {
         match self.classify() {
-            C_E => Self::empty(),
+            C_E => Self::EMPTY,
             C_Z => Self::zero(),
             C_M => {
                 // [0, max(a^2, b^2)] = [max(a^2, b^2); 0]
@@ -169,14 +169,14 @@ impl Interval {
 
     pub fn sqrt(self) -> Self {
         if self.is_empty() {
-            return Self::empty();
+            return Self::EMPTY;
         }
 
         let a = self.inf_raw();
         let b = self.sup_raw();
 
         if b < 0.0 {
-            Self::empty()
+            Self::EMPTY
         } else if a <= 0.0 {
             let _r = RoundUpContext::new();
             Self::with_infsup_raw(0.0, secure(f64::sqrt(secure(b))))
@@ -193,7 +193,7 @@ impl Interval {
 impl DecoratedInterval {
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
         if self.is_nai() || rhs.is_nai() || addend.is_nai() {
-            return Self::nai();
+            return Self::NAI;
         }
 
         Self::set_dec(
@@ -245,31 +245,31 @@ mod tests {
 
     #[test]
     fn empty() {
-        assert!((I::empty().mul_add(I::PI, I::PI)).is_empty());
-        assert!((I::PI.mul_add(I::empty(), I::PI)).is_empty());
-        assert!((I::PI.mul_add(I::PI, I::empty())).is_empty());
+        assert!((I::EMPTY.mul_add(I::PI, I::PI)).is_empty());
+        assert!((I::PI.mul_add(I::EMPTY, I::PI)).is_empty());
+        assert!((I::PI.mul_add(I::PI, I::EMPTY)).is_empty());
 
-        assert!(I::empty().recip().is_empty());
-        assert!(I::empty().sqrt().is_empty());
-        assert!(I::empty().sqr().is_empty());
+        assert!(I::EMPTY.recip().is_empty());
+        assert!(I::EMPTY.sqrt().is_empty());
+        assert!(I::EMPTY.sqr().is_empty());
 
-        assert!((DI::empty().mul_add(DI::PI, DI::PI)).is_empty());
-        assert!((DI::PI.mul_add(DI::empty(), DI::PI)).is_empty());
-        assert!((DI::PI.mul_add(DI::PI, DI::empty())).is_empty());
+        assert!((DI::EMPTY.mul_add(DI::PI, DI::PI)).is_empty());
+        assert!((DI::PI.mul_add(DI::EMPTY, DI::PI)).is_empty());
+        assert!((DI::PI.mul_add(DI::PI, DI::EMPTY)).is_empty());
 
-        assert!(DI::empty().recip().is_empty());
-        assert!(DI::empty().sqrt().is_empty());
-        assert!(DI::empty().sqr().is_empty());
+        assert!(DI::EMPTY.recip().is_empty());
+        assert!(DI::EMPTY.sqrt().is_empty());
+        assert!(DI::EMPTY.sqr().is_empty());
     }
 
     #[test]
     fn nai() {
-        assert!((DI::nai().mul_add(DI::PI, DI::PI)).is_nai());
-        assert!((DI::PI.mul_add(DI::nai(), DI::PI)).is_nai());
-        assert!((DI::PI.mul_add(DI::PI, DI::nai())).is_nai());
+        assert!((DI::NAI.mul_add(DI::PI, DI::PI)).is_nai());
+        assert!((DI::PI.mul_add(DI::NAI, DI::PI)).is_nai());
+        assert!((DI::PI.mul_add(DI::PI, DI::NAI)).is_nai());
 
-        assert!(DI::nai().recip().is_nai());
-        assert!(DI::nai().sqrt().is_nai());
-        assert!(DI::nai().sqr().is_nai());
+        assert!(DI::NAI.recip().is_nai());
+        assert!(DI::NAI.sqrt().is_nai());
+        assert!(DI::NAI.sqr().is_nai());
     }
 }

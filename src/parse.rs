@@ -76,13 +76,8 @@ impl std::ops::Neg for Number {
 struct NInterval(Number, Number);
 
 impl NInterval {
-    fn empty() -> Self {
-        Self(Number::Infinity, Number::NegInfinity)
-    }
-
-    fn entire() -> Self {
-        Self(Number::NegInfinity, Number::Infinity)
-    }
+    const EMPTY: Self = Self(Number::Infinity, Number::NegInfinity);
+    const ENTIRE: Self = Self(Number::NegInfinity, Number::Infinity);
 }
 
 type NIntervalResult = Result<NInterval, IntervalError<NInterval>>;
@@ -97,7 +92,7 @@ impl DNInterval {
     fn new(x: NInterval) -> Self {
         use Decoration::*;
 
-        let d = if x == NInterval::empty() {
+        let d = if x == NInterval::EMPTY {
             Trv
         } else if x.0 == Number::NegInfinity || x.1 == Number::Infinity {
             Dac
@@ -108,28 +103,24 @@ impl DNInterval {
         Self { x, d }
     }
 
-    fn empty() -> Self {
-        Self {
-            x: NInterval::empty(),
-            d: Decoration::Trv,
-        }
-    }
+    const EMPTY: Self = Self {
+        x: NInterval::EMPTY,
+        d: Decoration::Trv,
+    };
 
-    fn nai() -> Self {
-        Self {
-            x: NInterval::empty(),
-            d: Decoration::Ill,
-        }
-    }
+    const NAI: Self = Self {
+        x: NInterval::EMPTY,
+        d: Decoration::Ill,
+    };
 
     fn set_dec(x: NInterval, d: Decoration) -> Self {
         use Decoration::*;
 
         if d == Ill {
-            return Self::nai();
+            return Self::NAI;
         }
-        if x == NInterval::empty() {
-            return Self::empty();
+        if x == NInterval::EMPTY {
+            return Self::EMPTY;
         }
         if d == Com && x.0 < Number::Infinity && x.1 > Number::NegInfinity {
             return Self { x, d: Dac };
@@ -145,7 +136,7 @@ impl From<ParseNumberError> for IntervalError<NInterval> {
     fn from(_: ParseNumberError) -> Self {
         Self {
             kind: IntervalErrorKind::PossiblyUndefinedOperation,
-            value: NInterval::entire(),
+            value: NInterval::ENTIRE,
         }
     }
 }
@@ -371,7 +362,7 @@ fn infsup(s: &str) -> IResult<&str, NIntervalResult> {
             } else {
                 Err(IntervalError {
                     kind: IntervalErrorKind::UndefinedOperation,
-                    value: NInterval::empty(),
+                    value: NInterval::EMPTY,
                 })
             }
         },
@@ -388,7 +379,7 @@ fn point(s: &str) -> IResult<&str, NIntervalResult> {
             }
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: NInterval::empty(),
+                value: NInterval::EMPTY,
             }),
         }
     })(s)
@@ -399,12 +390,12 @@ fn bracket(s: &str) -> IResult<&str, NIntervalResult> {
         pair(char('['), space0),
         map(
             opt(alt((
-                map(tag_no_case("empty"), |_| Ok(NInterval::empty())),
-                map(tag_no_case("entire"), |_| Ok(NInterval::entire())),
+                map(tag_no_case("empty"), |_| Ok(NInterval::EMPTY)),
+                map(tag_no_case("entire"), |_| Ok(NInterval::ENTIRE)),
                 infsup,
                 point,
             ))),
-            |x| x.unwrap_or_else(|| Ok(NInterval::empty())),
+            |x| x.unwrap_or_else(|| Ok(NInterval::EMPTY)),
         ),
         pair(space0, char(']')),
     )(s)
@@ -479,7 +470,7 @@ fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
     alt((
         map(
             tuple((char('['), space0, tag_no_case("nai"), space0, char(']'))),
-            |_| Ok(DNInterval::nai()),
+            |_| Ok(DNInterval::NAI),
         ),
         map(
             pair(interval, opt(preceded(char('_'), decoration))),
@@ -492,7 +483,7 @@ fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
                     } else {
                         Err(IntervalError {
                             kind: IntervalErrorKind::UndefinedOperation,
-                            value: DNInterval::nai(),
+                            value: DNInterval::NAI,
                         })
                     }
                 }
@@ -510,7 +501,7 @@ fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
                 }
                 _ => Err(IntervalError {
                     kind: IntervalErrorKind::UndefinedOperation,
-                    value: DNInterval::nai(),
+                    value: DNInterval::NAI,
                 }),
             },
         ),
@@ -584,7 +575,7 @@ impl From<DNInterval> for DecoratedInterval {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
         // Fails on the empty interval.
-        let x = Interval::try_from((a.f, b.f)).unwrap_or_else(|_| Interval::empty());
+        let x = Interval::try_from((a.f, b.f)).unwrap_or_else(|_| Interval::EMPTY);
         let d = if a.overflow || b.overflow {
             d.min(Decoration::Dac)
         } else {
@@ -609,7 +600,7 @@ impl FromStr for Interval {
             // Invalid syntax.
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::empty(),
+                value: Self::EMPTY,
             }),
         }
     }
@@ -629,7 +620,7 @@ impl FromStr for DecoratedInterval {
             },
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::nai(),
+                value: Self::NAI,
             }),
         }
     }
@@ -639,11 +630,11 @@ impl Interval {
     fn try_from_ninterval_exact(x: NInterval) -> Result<Self, IntervalError<Self>> {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
-        let x = Self::try_from((a.f, b.f)).unwrap_or_else(|_| Self::empty());
+        let x = Self::try_from((a.f, b.f)).unwrap_or_else(|_| Self::EMPTY);
         if a.inexact || b.inexact {
             Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::empty(),
+                value: Self::EMPTY,
             })
         } else {
             Ok(x)
@@ -657,12 +648,12 @@ impl Interval {
                 Ok(x) => Self::try_from_ninterval_exact(x),
                 Err(e) => Err(IntervalError {
                     kind: e.kind,
-                    value: Self::empty(),
+                    value: Self::EMPTY,
                 }),
             },
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::empty(),
+                value: Self::EMPTY,
             }),
         }
     }
@@ -691,48 +682,48 @@ mod tests {
         // Exponent == i32::MAX + 1.
         assert_eq!(
             interval!("[123e2147483648]").unwrap_err().value(),
-            I::entire()
+            I::ENTIRE
         );
         assert_eq!(
             interval!("[0x123p2147483648]").unwrap_err().value(),
-            I::entire()
+            I::ENTIRE
         );
 
         // Exponent == i32::MIN - 1.
         assert_eq!(
             interval!("[123e-2147483649]").unwrap_err().value(),
-            I::entire()
+            I::ENTIRE
         );
         assert_eq!(
             interval!("[0x123p-2147483649]").unwrap_err().value(),
-            I::entire()
+            I::ENTIRE
         );
 
         assert_eq!(
             dec_interval!("[123e2147483648]").unwrap_err().value(),
-            DI::entire()
+            DI::ENTIRE
         );
         assert_eq!(
             dec_interval!("[123e2147483648]_com").unwrap_err().value(),
-            DI::entire()
+            DI::ENTIRE
         );
     }
 
     #[test]
     fn try_from_str_exact() {
-        assert_eq!(interval!("[Empty]", exact).unwrap(), I::empty());
-        assert_eq!(interval!("[Entire]", exact).unwrap(), I::entire());
+        assert_eq!(interval!("[Empty]", exact).unwrap(), I::EMPTY);
+        assert_eq!(interval!("[Entire]", exact).unwrap(), I::ENTIRE);
         assert_eq!(
             interval!("[0.0, 1.0]", exact).unwrap(),
             interval!(0.0, 1.0).unwrap()
         );
         assert_eq!(
             interval!("[0.0, 0.1]", exact).unwrap_err().value(),
-            I::empty()
+            I::EMPTY
         );
         assert_eq!(
             interval!("[0.1, 1.0]", exact).unwrap_err().value(),
-            I::empty()
+            I::EMPTY
         );
 
         // The smallest positive subnormal number.
@@ -745,19 +736,19 @@ mod tests {
             interval!("[0x0.0000000000000ffffp-1022]", exact)
                 .unwrap_err()
                 .value(),
-            I::empty()
+            I::EMPTY
         );
         assert_eq!(
             interval!("[0x0.00000000000010001p-1022]", exact)
                 .unwrap_err()
                 .value(),
-            I::empty()
+            I::EMPTY
         );
         assert_eq!(
             interval!("[0x0.0000000000001p-1023]", exact)
                 .unwrap_err()
                 .value(),
-            I::empty()
+            I::EMPTY
         );
 
         // The largest normal number.
@@ -770,24 +761,24 @@ mod tests {
             interval!("[0x1.ffffffffffffeffffp+1023]", exact)
                 .unwrap_err()
                 .value(),
-            I::empty()
+            I::EMPTY
         );
         assert_eq!(
             interval!("[0x1.fffffffffffff0001p+1023]", exact)
                 .unwrap_err()
                 .value(),
-            I::empty()
+            I::EMPTY
         );
         assert_eq!(
             interval!("[0x1.fffffffffffffp+1024]", exact)
                 .unwrap_err()
                 .value(),
-            I::empty()
+            I::EMPTY
         );
 
         assert_eq!(
             interval!("[123e2147483648]", exact).unwrap_err().value(),
-            I::empty()
+            I::EMPTY
         );
     }
 }

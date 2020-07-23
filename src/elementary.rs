@@ -68,7 +68,7 @@ macro_rules! impl_log {
             let a = x.inf_raw();
             let b = x.sup_raw();
             if x.is_empty() || b <= 0.0 {
-                return (Self::empty(), Decoration::Trv);
+                return (Self::EMPTY, Decoration::Trv);
             }
 
             let y = Self::with_infsup_raw($f_rd(a), $f_ru(b));
@@ -176,7 +176,7 @@ impl Interval {
         let a = x.inf_raw();
         let b = x.sup_raw();
         if x.is_empty() || b <= -1.0 || a >= 1.0 {
-            return (Self::empty(), Decoration::Trv);
+            return (Self::EMPTY, Decoration::Trv);
         }
 
         let y = Self::with_infsup_raw(atanh_rd(a), atanh_ru(b));
@@ -308,7 +308,7 @@ impl Interval {
             // In case of overflow, the decoration must be corrected by the caller.
             (Self::with_infsup_raw(tan_rd(a), tan_ru(b)), Decoration::Com)
         } else {
-            (Self::entire(), Decoration::Trv)
+            (Self::ENTIRE, Decoration::Trv)
         }
     }
 
@@ -360,24 +360,24 @@ mod tests {
 
     #[test]
     fn nai() {
-        assert!(DI::nai().acos().is_nai());
-        assert!(DI::nai().acosh().is_nai());
-        assert!(DI::nai().asin().is_nai());
-        assert!(DI::nai().asinh().is_nai());
-        assert!(DI::nai().atan().is_nai());
-        assert!(DI::nai().atanh().is_nai());
-        assert!(DI::nai().cos().is_nai());
-        assert!(DI::nai().cosh().is_nai());
-        assert!(DI::nai().exp().is_nai());
-        assert!(DI::nai().exp10().is_nai());
-        assert!(DI::nai().exp2().is_nai());
-        assert!(DI::nai().log().is_nai());
-        assert!(DI::nai().log10().is_nai());
-        assert!(DI::nai().log2().is_nai());
-        assert!(DI::nai().sin().is_nai());
-        assert!(DI::nai().sinh().is_nai());
-        assert!(DI::nai().tan().is_nai());
-        assert!(DI::nai().tanh().is_nai());
+        assert!(DI::NAI.acos().is_nai());
+        assert!(DI::NAI.acosh().is_nai());
+        assert!(DI::NAI.asin().is_nai());
+        assert!(DI::NAI.asinh().is_nai());
+        assert!(DI::NAI.atan().is_nai());
+        assert!(DI::NAI.atanh().is_nai());
+        assert!(DI::NAI.cos().is_nai());
+        assert!(DI::NAI.cosh().is_nai());
+        assert!(DI::NAI.exp().is_nai());
+        assert!(DI::NAI.exp10().is_nai());
+        assert!(DI::NAI.exp2().is_nai());
+        assert!(DI::NAI.log().is_nai());
+        assert!(DI::NAI.log10().is_nai());
+        assert!(DI::NAI.log2().is_nai());
+        assert!(DI::NAI.sin().is_nai());
+        assert!(DI::NAI.sinh().is_nai());
+        assert!(DI::NAI.tan().is_nai());
+        assert!(DI::NAI.tanh().is_nai());
     }
 
     #[test]

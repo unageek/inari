@@ -35,7 +35,7 @@ impl Interval {
     // NOTE: Returns 0.0 for 0.0, which is a different definition from `f64::signum`.
     pub fn sign(self) -> Self {
         if self.is_empty() {
-            return Self::empty();
+            return Self::EMPTY;
         }
 
         unsafe {
@@ -127,28 +127,28 @@ mod tests {
 
     #[test]
     fn empty() {
-        assert!(I::empty().ceil().is_empty());
-        assert!(I::empty().floor().is_empty());
-        assert!(I::empty().round_ties_to_away().is_empty());
-        assert!(I::empty().round_ties_to_even().is_empty());
-        assert!(I::empty().sign().is_empty());
-        assert!(I::empty().trunc().is_empty());
+        assert!(I::EMPTY.ceil().is_empty());
+        assert!(I::EMPTY.floor().is_empty());
+        assert!(I::EMPTY.round_ties_to_away().is_empty());
+        assert!(I::EMPTY.round_ties_to_even().is_empty());
+        assert!(I::EMPTY.sign().is_empty());
+        assert!(I::EMPTY.trunc().is_empty());
 
-        assert!(DI::empty().ceil().is_empty());
-        assert!(DI::empty().floor().is_empty());
-        assert!(DI::empty().round_ties_to_away().is_empty());
-        assert!(DI::empty().round_ties_to_even().is_empty());
-        assert!(DI::empty().sign().is_empty());
-        assert!(DI::empty().trunc().is_empty());
+        assert!(DI::EMPTY.ceil().is_empty());
+        assert!(DI::EMPTY.floor().is_empty());
+        assert!(DI::EMPTY.round_ties_to_away().is_empty());
+        assert!(DI::EMPTY.round_ties_to_even().is_empty());
+        assert!(DI::EMPTY.sign().is_empty());
+        assert!(DI::EMPTY.trunc().is_empty());
     }
 
     #[test]
     fn nai() {
-        assert!(DI::nai().ceil().is_nai());
-        assert!(DI::nai().floor().is_nai());
-        assert!(DI::nai().round_ties_to_away().is_nai());
-        assert!(DI::nai().round_ties_to_even().is_nai());
-        assert!(DI::nai().sign().is_nai());
-        assert!(DI::nai().trunc().is_nai());
+        assert!(DI::NAI.ceil().is_nai());
+        assert!(DI::NAI.floor().is_nai());
+        assert!(DI::NAI.round_ties_to_away().is_nai());
+        assert!(DI::NAI.round_ties_to_even().is_nai());
+        assert!(DI::NAI.sign().is_nai());
+        assert!(DI::NAI.trunc().is_nai());
     }
 }

@@ -28,7 +28,7 @@ impl Interval {
         // IEEE 754's min/max do not propagate nan.
         // https://www.agner.org/optimize/blog/read.php?i=1012
         if self.is_empty() || rhs.is_empty() {
-            return Self::empty();
+            return Self::EMPTY;
         }
 
         unsafe {
@@ -41,7 +41,7 @@ impl Interval {
 
     pub fn min(self, rhs: Self) -> Self {
         if self.is_empty() || rhs.is_empty() {
-            return Self::empty();
+            return Self::EMPTY;
         }
 
         unsafe {
@@ -87,31 +87,31 @@ mod tests {
 
     #[test]
     fn empty() {
-        assert!(I::empty().abs().is_empty());
+        assert!(I::EMPTY.abs().is_empty());
 
-        assert!(I::empty().max(I::PI).is_empty());
-        assert!(I::PI.max(I::empty()).is_empty());
+        assert!(I::EMPTY.max(I::PI).is_empty());
+        assert!(I::PI.max(I::EMPTY).is_empty());
 
-        assert!(I::empty().min(I::PI).is_empty());
-        assert!(I::PI.min(I::empty()).is_empty());
+        assert!(I::EMPTY.min(I::PI).is_empty());
+        assert!(I::PI.min(I::EMPTY).is_empty());
 
-        assert!(DI::empty().abs().is_empty());
+        assert!(DI::EMPTY.abs().is_empty());
 
-        assert!(DI::empty().max(DI::PI).is_empty());
-        assert!(DI::PI.max(DI::empty()).is_empty());
+        assert!(DI::EMPTY.max(DI::PI).is_empty());
+        assert!(DI::PI.max(DI::EMPTY).is_empty());
 
-        assert!(DI::empty().min(DI::PI).is_empty());
-        assert!(DI::PI.min(DI::empty()).is_empty());
+        assert!(DI::EMPTY.min(DI::PI).is_empty());
+        assert!(DI::PI.min(DI::EMPTY).is_empty());
     }
 
     #[test]
     fn nai() {
-        assert!(DI::nai().abs().is_nai());
+        assert!(DI::NAI.abs().is_nai());
 
-        assert!(DI::nai().max(DI::PI).is_nai());
-        assert!(DI::PI.max(DI::nai()).is_nai());
+        assert!(DI::NAI.max(DI::PI).is_nai());
+        assert!(DI::PI.max(DI::NAI).is_nai());
 
-        assert!(DI::nai().min(DI::PI).is_nai());
-        assert!(DI::PI.min(DI::nai()).is_nai());
+        assert!(DI::NAI.min(DI::PI).is_nai());
+        assert!(DI::PI.min(DI::NAI).is_nai());
     }
 }
