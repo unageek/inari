@@ -21,14 +21,14 @@
 //Preamble
 use crate::util::*;
 use hexf::*;
-type D = inari::Decoration;
 type DI = inari::DecoratedInterval;
 type I = inari::Interval;
 
+#[cfg(feature = "gmp")]
 #[test]
 fn exceptions() {
-    assert_eq!(t2i("[+infinity]"), I::empty());
-    assert_eq!(n2i(f64::INFINITY, f64::NEG_INFINITY), I::empty());
-    assert_eq!(interval_part(DI::nai()), I::empty());
+    assert_eq!(t2i("[+infinity]"), I::EMPTY);
+    assert_eq!(n2i(f64::INFINITY, f64::NEG_INFINITY), I::EMPTY);
+    assert_eq!(interval_part(DI::NAI), I::EMPTY);
     assert_eq!(t2i("[1.0000000000000001, 1.0000000000000002]"), n2i(1.0, hexf64!("0x1.0000000000001p+0")));
 }

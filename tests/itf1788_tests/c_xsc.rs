@@ -68,14 +68,14 @@ fn cxsc_intervalmuldiv() {
     assert_eq!(n2i(-1.0, 2.0) / n2i(4.0, 8.0), n2i(-0.25, 0.5));
     assert_eq!(n2i(-2.0, 1.0) / n2i(4.0, 8.0), n2i(-0.5, 0.25));
     assert_eq!(n2i(-2.0, -1.0) / n2i(4.0, 8.0), n2i(-0.5, -0.125));
-    assert_eq!(n2i(1.0, 2.0) / n2i(-4.0, 8.0), I::entire());
-    assert_eq!(n2i(-1.0, 2.0) / n2i(-4.0, 8.0), I::entire());
-    assert_eq!(n2i(-2.0, 1.0) / n2i(-4.0, 8.0), I::entire());
-    assert_eq!(n2i(-2.0, -1.0) / n2i(-4.0, 8.0), I::entire());
-    assert_eq!(n2i(1.0, 2.0) / n2i(-8.0, 4.0), I::entire());
-    assert_eq!(n2i(-1.0, 2.0) / n2i(-8.0, 4.0), I::entire());
-    assert_eq!(n2i(-2.0, 1.0) / n2i(-8.0, 4.0), I::entire());
-    assert_eq!(n2i(-2.0, -1.0) / n2i(-8.0, 4.0), I::entire());
+    assert_eq!(n2i(1.0, 2.0) / n2i(-4.0, 8.0), I::ENTIRE);
+    assert_eq!(n2i(-1.0, 2.0) / n2i(-4.0, 8.0), I::ENTIRE);
+    assert_eq!(n2i(-2.0, 1.0) / n2i(-4.0, 8.0), I::ENTIRE);
+    assert_eq!(n2i(-2.0, -1.0) / n2i(-4.0, 8.0), I::ENTIRE);
+    assert_eq!(n2i(1.0, 2.0) / n2i(-8.0, 4.0), I::ENTIRE);
+    assert_eq!(n2i(-1.0, 2.0) / n2i(-8.0, 4.0), I::ENTIRE);
+    assert_eq!(n2i(-2.0, 1.0) / n2i(-8.0, 4.0), I::ENTIRE);
+    assert_eq!(n2i(-2.0, -1.0) / n2i(-8.0, 4.0), I::ENTIRE);
     assert_eq!(n2i(1.0, 2.0) / n2i(-8.0, -4.0), n2i(-0.5, -0.125));
     assert_eq!(n2i(-1.0, 2.0) / n2i(-8.0, -4.0), n2i(-0.5, 0.25));
     assert_eq!(n2i(-2.0, 1.0) / n2i(-8.0, -4.0), n2i(-0.25, 0.5));
@@ -97,18 +97,18 @@ fn cxsc_intervalsetops() {
     assert_eq!(n2i(-1.0, 1.0).convex_hull(n2i(-2.0, 2.0)), n2i(-2.0, 2.0));
     assert_eq!(n2i(1.0, 4.0).convex_hull(n2i(-2.0, 2.0)), n2i(-2.0, 4.0));
     assert_eq!(n2i(3.0, 4.0).convex_hull(n2i(-2.0, 2.0)), n2i(-2.0, 4.0));
-    assert_eq!(n2i(-2.0, 2.0).intersection(n2i(-4.0, -3.0)), I::empty());
+    assert_eq!(n2i(-2.0, 2.0).intersection(n2i(-4.0, -3.0)), I::EMPTY);
     assert_eq!(n2i(-2.0, 2.0).intersection(n2i(-4.0, -1.0)), n2i(-2.0, -1.0));
     assert_eq!(n2i(-2.0, 2.0).intersection(n2i(-4.0, 4.0)), n2i(-2.0, 2.0));
     assert_eq!(n2i(-2.0, 2.0).intersection(n2i(-1.0, 1.0)), n2i(-1.0, 1.0));
     assert_eq!(n2i(-2.0, 2.0).intersection(n2i(1.0, 4.0)), n2i(1.0, 2.0));
-    assert_eq!(n2i(-2.0, 2.0).intersection(n2i(3.0, 4.0)), I::empty());
-    assert_eq!(n2i(-4.0, -3.0).intersection(n2i(-2.0, 2.0)), I::empty());
+    assert_eq!(n2i(-2.0, 2.0).intersection(n2i(3.0, 4.0)), I::EMPTY);
+    assert_eq!(n2i(-4.0, -3.0).intersection(n2i(-2.0, 2.0)), I::EMPTY);
     assert_eq!(n2i(-4.0, -1.0).intersection(n2i(-2.0, 2.0)), n2i(-2.0, -1.0));
     assert_eq!(n2i(-4.0, 4.0).intersection(n2i(-2.0, 2.0)), n2i(-2.0, 2.0));
     assert_eq!(n2i(-1.0, 1.0).intersection(n2i(-2.0, 2.0)), n2i(-1.0, 1.0));
     assert_eq!(n2i(1.0, 4.0).intersection(n2i(-2.0, 2.0)), n2i(1.0, 2.0));
-    assert_eq!(n2i(3.0, 4.0).intersection(n2i(-2.0, 2.0)), I::empty());
+    assert_eq!(n2i(3.0, 4.0).intersection(n2i(-2.0, 2.0)), I::EMPTY);
 }
 
 // Tests A|B, B|A, A&B, B&A, B is scalar-type
@@ -120,12 +120,12 @@ fn cxsc_intervalmixsetops() {
     assert_eq!(n2i(-4.0, -4.0).convex_hull(n2i(-2.0, 2.0)), n2i(-4.0, 2.0));
     assert_eq!(n2i(1.0, 1.0).convex_hull(n2i(-2.0, 2.0)), n2i(-2.0, 2.0));
     assert_eq!(n2i(4.0, 4.0).convex_hull(n2i(-2.0, 2.0)), n2i(-2.0, 4.0));
-    assert_eq!(n2i(-2.0, 2.0).intersection(n2i(-4.0, -4.0)), I::empty());
+    assert_eq!(n2i(-2.0, 2.0).intersection(n2i(-4.0, -4.0)), I::EMPTY);
     assert_eq!(n2i(-2.0, 2.0).intersection(n2i(1.0, 1.0)), n2i(1.0, 1.0));
-    assert_eq!(n2i(-2.0, 2.0).intersection(n2i(4.0, 4.0)), I::empty());
-    assert_eq!(n2i(-4.0, -4.0).intersection(n2i(-2.0, 2.0)), I::empty());
+    assert_eq!(n2i(-2.0, 2.0).intersection(n2i(4.0, 4.0)), I::EMPTY);
+    assert_eq!(n2i(-4.0, -4.0).intersection(n2i(-2.0, 2.0)), I::EMPTY);
     assert_eq!(n2i(1.0, 1.0).intersection(n2i(-2.0, 2.0)), n2i(1.0, 1.0));
-    assert_eq!(n2i(4.0, 4.0).intersection(n2i(-2.0, 2.0)), I::empty());
+    assert_eq!(n2i(4.0, 4.0).intersection(n2i(-2.0, 2.0)), I::EMPTY);
 }
 
 // Tests A|B, B|A, A and B are scalar-type

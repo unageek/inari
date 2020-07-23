@@ -1,12 +1,18 @@
 # Changelog
 
-❗ indicates an breaking change.
+The ❗ icon indicates a breaking change.
 
 ## Unreleased
 
 ### Added
 
-- Add macros `const_interval!` and `const_dec_interval!` for making constant intervals evaluated at compile time.
+- Add macros `const_interval!` and `const_dec_interval!` for making constant intervals from `f64` bounds, evaluated at compile time.
+
+- Add constants `(Decorated)Interval::EMPTY`, `(Decorated)Interval::ENTIRE` and `DecoratedInterval::NAI`.
+
+### Removed
+
+- ❗ Remove functions `(Decorated)Interval::empty()`, `(Decorated)Interval::entire()` and `DecoratedInterval::nai()`.
 
 ### Changed
 

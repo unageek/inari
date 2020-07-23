@@ -1,4 +1,4 @@
-#![allow(clippy::approx_constant, clippy::float_cmp)]
+#![allow(clippy::approx_constant, clippy::eq_op, clippy::float_cmp)]
 
 mod itf1788_tests {
     //mod abs_rev;
@@ -6,7 +6,7 @@ mod itf1788_tests {
     mod c_xsc;
     mod fi_lib;
     mod ieee1788_constructors;
-    //mod ieee1788_exceptions;
+    mod ieee1788_exceptions;
     mod libieeep1788_bool;
     //mod libieeep1788_cancel;
     mod libieeep1788_class;

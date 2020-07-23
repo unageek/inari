@@ -28,7 +28,7 @@ type I = inari::Interval;
 // According to the examples in Section 7.4.2, unbounded intervals can be constructed with non-common inputs.
 #[test]
 fn ieee1788_a() {
-    assert_eq!(n2i(f64::NEG_INFINITY, f64::INFINITY), I::entire());
+    assert_eq!(n2i(f64::NEG_INFINITY, f64::INFINITY), I::ENTIRE);
 }
 
 // Examples from Sections 9.7.1 and 9.8
@@ -64,7 +64,7 @@ fn ieee1788_c() {
 fn ieee1788_d() {
     assert_eq!(t2i("[1.234e5,Inf]"), n2i(123400.0, f64::INFINITY));
     assert_eq!(t2i("3.1416?1"), n2i(hexf64!("0x1.921cac083126ep+1"), hexf64!("0x1.922339c0ebee0p+1")));
-    assert_eq!(t2i("[Empty]"), I::empty());
+    assert_eq!(t2i("[Empty]"), I::EMPTY);
 }
 
 // Example from Section 11.3
@@ -77,7 +77,7 @@ fn ieee1788_e() {
 #[cfg(feature = "gmp")]
 #[test]
 fn ieee1788_e2() {
-    assert_eq!(t2di("[ ]"), DI::empty());
+    assert_eq!(t2di("[ ]"), DI::EMPTY);
     assert_eq!(t2di("[entire]"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq!(t2di("[1.e-3, 1.1e-3]"), nd2di(hexf64!("0x1.0624dd2f1a9fbp-10"), hexf64!("0x1.205bc01a36e2fp-10"), D::Com));
     assert_eq!(t2di("[-Inf, 2/3]"), nd2di(f64::NEG_INFINITY, hexf64!("0x1.5555555555556p-1"), D::Dac));
@@ -101,9 +101,9 @@ fn ieee1788_e2() {
 #[cfg(feature = "gmp")]
 #[test]
 fn ieee1788_f() {
-    assert_eq!(t2i("[]"), I::empty());
-    assert_eq!(t2i("[empty]"), I::empty());
-    assert_eq!(t2i("[ empty ]"), I::empty());
-    assert_eq!(t2i("[,]"), I::entire());
-    assert_eq!(t2i("[ entire ]"), I::entire());
+    assert_eq!(t2i("[]"), I::EMPTY);
+    assert_eq!(t2i("[empty]"), I::EMPTY);
+    assert_eq!(t2i("[ empty ]"), I::EMPTY);
+    assert_eq!(t2i("[,]"), I::ENTIRE);
+    assert_eq!(t2i("[ entire ]"), I::ENTIRE);
 }

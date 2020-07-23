@@ -170,22 +170,22 @@ mod tests {
 
         macro_rules! check {
             ($($f:literal),*) => {$(
-                assert_eq!(format!($f, I::empty()), "[empty]");
-                assert_eq!(format!($f, I::entire()), "[entire]");
-                assert_eq!(format!($f, DI::empty()), "[empty]_trv");
-                assert_eq!(format!($f, DI::entire()), "[entire]_dac");
-                assert_eq!(format!($f, DI::nai()), "[nai]");
+                assert_eq!(format!($f, I::EMPTY), "[empty]");
+                assert_eq!(format!($f, I::ENTIRE), "[entire]");
+                assert_eq!(format!($f, DI::EMPTY), "[empty]_trv");
+                assert_eq!(format!($f, DI::ENTIRE), "[entire]_dac");
+                assert_eq!(format!($f, DI::NAI), "[nai]");
             )*};
         }
         check!("{}", "{:e}", "{:x}");
 
         macro_rules! check {
             ($($f:literal),*) => {$(
-                assert_eq!(format!($f, I::empty()), "[   empty   ]");
-                assert_eq!(format!($f, I::entire()), "[  entire   ]");
-                assert_eq!(format!($f, DI::empty()), "[   empty   ]_trv");
-                assert_eq!(format!($f, DI::entire()), "[  entire   ]_dac");
-                assert_eq!(format!($f, DI::nai()), "[    nai    ]");
+                assert_eq!(format!($f, I::EMPTY), "[   empty   ]");
+                assert_eq!(format!($f, I::ENTIRE), "[  entire   ]");
+                assert_eq!(format!($f, DI::EMPTY), "[   empty   ]_trv");
+                assert_eq!(format!($f, DI::ENTIRE), "[  entire   ]_dac");
+                assert_eq!(format!($f, DI::NAI), "[    nai    ]");
             )*};
         }
         check!("{:5}", "{:5e}", "{:5x}");

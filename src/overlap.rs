@@ -120,7 +120,7 @@ mod tests {
 
     #[test]
     fn nai() {
-        assert_eq!(DI::nai().overlap(DI::PI), OverlappingState::Undefined);
-        assert_eq!(DI::PI.overlap(DI::nai()), OverlappingState::Undefined);
+        assert_eq!(DI::NAI.overlap(DI::PI), OverlappingState::Undefined);
+        assert_eq!(DI::PI.overlap(DI::NAI), OverlappingState::Undefined);
     }
 }
