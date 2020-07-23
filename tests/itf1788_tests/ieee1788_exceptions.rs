@@ -21,7 +21,6 @@
 //Preamble
 use crate::util::*;
 use hexf::*;
-type D = inari::Decoration;
 type DI = inari::DecoratedInterval;
 type I = inari::Interval;
 
