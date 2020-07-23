@@ -14,13 +14,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install latest nightly
+    - name: Install toolchain
       uses: actions-rs/toolchain@v1
       with:
         components: clippy, rustfmt
-        override: true
         profile: minimal
-        toolchain: nightly
 
     - name: Run tests (Minimal)
       run: cargo test --release --no-default-features
