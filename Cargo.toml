@@ -37,6 +37,11 @@ nom = { version = "5", optional = true }
 rug = { version = "1.10", default-features = false, features = ["float", "integer", "rational"], optional = true }
 static_assertions = "1.1"
 
+[dev-dependencies]
+bitflags = "1.2"
+image = { version = "0.23", default-features = false, features = ["png"] }
+smallvec = "1.4"
+
 [[example]]
 name = "cancellation"
 required-features = ["gmp"]
@@ -44,6 +49,10 @@ required-features = ["gmp"]
 [[example]]
 name = "exact"
 required-features = ["gmp"]
+
+[[example]]
+name = "graph"
+required-features = ["gmp", "_reserve_u64_in_dec_interval"]
 
 [[example]]
 name = "parse"
