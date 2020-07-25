@@ -111,11 +111,11 @@ mod tests {
     fn format() {
         assert_eq!(
             format!("{}", interval!(f64::NEG_INFINITY, 0.0).unwrap()),
-            "[-inf,0]"
+            "[-inf,0.000000]"
         );
         assert_eq!(
             format!("{:e}", interval!(f64::NEG_INFINITY, 0.0).unwrap()),
-            "[-inf,0e+00]"
+            "[-inf,0.0000000000000000e+00]"
         );
         assert_eq!(
             format!("{:x}", interval!(f64::NEG_INFINITY, 0.0).unwrap()),
@@ -124,11 +124,11 @@ mod tests {
 
         assert_eq!(
             format!("{}", interval!(0.0, f64::INFINITY).unwrap()),
-            "[-0,inf]"
+            "[-0.000000,inf]"
         );
         assert_eq!(
             format!("{:e}", interval!(0.0, f64::INFINITY).unwrap()),
-            "[-0e+00,inf]"
+            "[-0.0000000000000000e+00,inf]"
         );
         assert_eq!(
             format!("{:x}", interval!(0.0, f64::INFINITY).unwrap()),
