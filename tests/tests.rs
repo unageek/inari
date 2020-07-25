@@ -2,7 +2,7 @@
 
 mod itf1788_tests {
     //mod abs_rev;
-    //mod atan2;
+    mod atan2;
     mod c_xsc;
     mod fi_lib;
     mod ieee1788_constructors;

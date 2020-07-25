@@ -216,6 +216,31 @@ fn mpfi_atan() {
 
 #[cfg(feature = "gmp")]
 #[test]
+fn mpfi_atan2() {
+    // special values
+    assert_eq!(n2i(f64::NEG_INFINITY, -7.0).atan2(n2i(-1.0, 8.0)), n2i(hexf64!("-0x1.b67312cd2f434p+0"), hexf64!("-0x1.700a7c5784633p-1")));
+    assert_eq!(n2i(f64::NEG_INFINITY, 0.0).atan2(n2i(8.0, f64::INFINITY)), n2i(hexf64!("-0x1.921fb54442d19p+0"), 0.0));
+    assert_eq!(n2i(f64::NEG_INFINITY, 8.0).atan2(n2i(0.0, 8.0)), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(I::ENTIRE.atan2(n2i(0.0, 8.0)), n2i(hexf64!("-0x1.921fb54442d19p+0"), hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(0.0, 0.0).atan2(n2i(f64::NEG_INFINITY, -7.0)), n2i(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(0.0, 8.0).atan2(n2i(-7.0, 0.0)), n2i(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(0.0, 0.0).atan2(n2i(0.0, 8.0)), n2i(0.0, 0.0));
+    assert_eq!(n2i(0.0, f64::INFINITY).atan2(n2i(0.0, 8.0)), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    assert_eq!(n2i(0.0, 0.0).atan2(n2i(8.0, f64::INFINITY)), n2i(0.0, 0.0));
+    assert_eq!(n2i(0.0, 0.0).atan2(I::ENTIRE), n2i(0.0, hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(0.0, 8.0).atan2(n2i(-7.0, 8.0)), n2i(0.0, hexf64!("0x1.921fb54442d19p+1")));
+    assert_eq!(n2i(0.0, 0.0).atan2(n2i(0.0, 0.0)), I::EMPTY);
+    assert_eq!(n2i(0.0, f64::INFINITY).atan2(n2i(0.0, 8.0)), n2i(0.0, hexf64!("0x1.921fb54442d19p+0")));
+    // regular values
+    assert_eq!(n2i(-17.0, -5.0).atan2(n2i(-4002.0, -1.0)), n2i(hexf64!("-0x1.91f6c4c09a81bp+1"), hexf64!("-0x1.a12a5465464cfp+0")));
+    assert_eq!(n2i(-17.0, -5.0).atan2(n2i(1.0, 4002.0)), n2i(hexf64!("-0x1.831516233f561p+0"), hexf64!("-0x1.47841d427ebcap-10")));
+    assert_eq!(n2i(5.0, 17.0).atan2(n2i(1.0, 4002.0)), n2i(hexf64!("0x1.47841d427ebcap-10"), hexf64!("0x1.831516233f561p+0")));
+    assert_eq!(n2i(5.0, 17.0).atan2(n2i(-4002.0, -1.0)), n2i(hexf64!("0x1.a12a5465464cfp+0"), hexf64!("0x1.91f6c4c09a81bp+1")));
+    assert_eq!(n2i(-17.0, 5.0).atan2(n2i(-4002.0, 1.0)), n2i(hexf64!("-0x1.921fb54442d19p+1"), hexf64!("0x1.921fb54442d19p+1")));
+}
+
+#[cfg(feature = "gmp")]
+#[test]
 fn mpfi_atanh() {
     // special values
     assert_eq!(n2i(-1.0, 0.0).atanh(), n2i(f64::NEG_INFINITY, 0.0));
