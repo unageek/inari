@@ -308,6 +308,53 @@ impl TupperIntervalSet {
         rs.normalize()
     }
 
+    pub fn tan(&self, site: Option<u8>) -> Self {
+        let mut rs = Self::new();
+        for x in &self.0 {
+            let a = x.base().inf();
+            let b = x.base().sup();
+            let q_nowrap = (x.x / Interval::FRAC_PI_2).floor();
+            let qa = q_nowrap.inf();
+            let qb = q_nowrap.sup();
+            let n = if a == b { 0.0 } else { qb - qa };
+            let q = qa.rem_euclid(2.0);
+
+            let cont = b
+                <= (interval!(q_nowrap.sup(), q_nowrap.sup()).unwrap() * Interval::FRAC_PI_2).inf();
+            if q == 0.0 && (n < 1.0 || n == 1.0 && cont)
+                || q == 1.0 && (n < 2.0 || n == 2.0 && cont)
+            {
+                rs.insert(TupperInterval::new(x.base().tan(), x.g));
+            } else if q == 0.0 && (n < 2.0 || n == 2.0 && cont)
+                || q == 1.0 && (n < 3.0 || n == 3.0 && cont)
+            {
+                rs.insert(TupperInterval::new(
+                    DecoratedInterval::set_dec(
+                        interval!(interval!(a, a).unwrap().tan().inf(), f64::INFINITY).unwrap(),
+                        Decoration::Trv,
+                    ),
+                    match site {
+                        Some(site) => x.g.inserted(site, 0),
+                        _ => x.g,
+                    },
+                ));
+                rs.insert(TupperInterval::new(
+                    DecoratedInterval::set_dec(
+                        interval!(f64::NEG_INFINITY, interval!(b, b).unwrap().tan().sup()).unwrap(),
+                        Decoration::Trv,
+                    ),
+                    match site {
+                        Some(site) => x.g.inserted(site, 1),
+                        _ => x.g,
+                    },
+                ));
+            } else {
+                rs.insert(TupperInterval::new(x.base().tan(), x.g));
+            }
+        }
+        rs.normalize()
+    }
+
     // absmax
     impl_no_cut_op!(abs);
     impl_no_cut_op2!(max);
@@ -345,8 +392,8 @@ impl TupperIntervalSet {
     impl_integer_op!(trunc);
 }
 
-// TODO: mul_add?, recip?, tan
-// TODO: add_sub?
+// TODO: mul_add?, recip?
+// TODO: add_or_sub (plus_or_minus)?
 
 bitflags! {
     pub struct SignSet: u8 {

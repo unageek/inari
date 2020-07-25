@@ -596,8 +596,11 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
     //let c1 = TupperIntervalSet::from(C1);
     //(&(&(&x.sqr() + &y.sqr()) - &c1) * &(&y + &x.cos())).eq(&c0)
 
-    // From fig. 1a in Tupper (2001)
+    // From Fig. 1a in Tupper (2001)
     //y.lt(&x.sqrt())
+
+    // From Fig. 17 in Tupper (2001)
+    //y.eq(&(&x - &x.tan(None).atan()))
 
     // Some intriguing examples from GrafEq
     // Icons after each filename:
