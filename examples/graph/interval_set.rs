@@ -201,6 +201,99 @@ macro_rules! impl_integer_op {
 }
 
 impl TupperIntervalSet {
+    pub fn atan2(&self, rhs: &Self, site: Option<u8>) -> Self {
+        let mut rs = Self::new();
+        for y in &self.0 {
+            for x in &rhs.0 {
+                if let Some(g) = x.g.union(y.g) {
+                    let a = x.base().inf();
+                    let b = x.base().sup();
+                    let c = y.base().inf();
+                    let d = y.base().sup();
+                    if a == 0.0 && b == 0.0 && c < 0.0 && d > 0.0 {
+                        rs.insert(TupperInterval::new(
+                            DecoratedInterval::set_dec(-Interval::FRAC_PI_2, Decoration::Trv),
+                            match site {
+                                Some(site) => g.inserted(site, 0),
+                                _ => g,
+                            },
+                        ));
+                        rs.insert(TupperInterval::new(
+                            DecoratedInterval::set_dec(Interval::FRAC_PI_2, Decoration::Trv),
+                            match site {
+                                Some(site) => g.inserted(site, 1),
+                                _ => g,
+                            },
+                        ));
+                    } else if b == 0.0 && c < 0.0 && d >= 0.0 {
+                        let x0 = interval!(b, b).unwrap();
+                        let y0 = interval!(c, c).unwrap();
+                        rs.insert(TupperInterval::new(
+                            DecoratedInterval::set_dec(
+                                interval!(-Interval::PI.sup(), y0.atan2(x0).sup()).unwrap(),
+                                Decoration::Trv,
+                            ),
+                            match site {
+                                Some(site) => g.inserted(site, 0),
+                                _ => g,
+                            },
+                        ));
+                        if d == 0.0 {
+                            rs.insert(TupperInterval::new(
+                                DecoratedInterval::set_dec(Interval::PI, Decoration::Trv),
+                                match site {
+                                    Some(site) => g.inserted(site, 1),
+                                    _ => g,
+                                },
+                            ));
+                        } else {
+                            let x1 = interval!(b, b).unwrap();
+                            let y1 = interval!(d, d).unwrap();
+                            rs.insert(TupperInterval::new(
+                                DecoratedInterval::set_dec(
+                                    interval!(y1.atan2(x1).inf(), Interval::PI.sup()).unwrap(),
+                                    Decoration::Trv,
+                                ),
+                                match site {
+                                    Some(site) => g.inserted(site, 1),
+                                    _ => g,
+                                },
+                            ));
+                        }
+                    } else if b < 0.0 && c < 0.0 && d >= 0.0 {
+                        let x0 = interval!(b, b).unwrap();
+                        let y0 = interval!(c, c).unwrap();
+                        rs.insert(TupperInterval::new(
+                            DecoratedInterval::set_dec(
+                                interval!(-Interval::PI.sup(), y0.atan2(x0).sup()).unwrap(),
+                                Decoration::Def,
+                            ),
+                            match site {
+                                Some(site) => g.inserted(site, 0),
+                                _ => g,
+                            },
+                        ));
+                        let x1 = interval!(b, b).unwrap();
+                        let y1 = interval!(d, d).unwrap();
+                        rs.insert(TupperInterval::new(
+                            DecoratedInterval::set_dec(
+                                interval!(y1.atan2(x1).inf(), Interval::PI.sup()).unwrap(),
+                                Decoration::Def,
+                            ),
+                            match site {
+                                Some(site) => g.inserted(site, 1),
+                                _ => g,
+                            },
+                        ));
+                    } else {
+                        rs.insert(TupperInterval::new(y.base().atan2(x.base()), g));
+                    }
+                }
+            }
+        }
+        rs.normalize()
+    }
+
     pub fn div(&self, rhs: &Self, site: Option<u8>) -> Self {
         let mut rs = Self::new();
         for x in &self.0 {
