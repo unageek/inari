@@ -170,9 +170,6 @@ macro_rules! impl_integer_op {
         pub fn $op(&self, site: Option<u8>) -> Self {
             let mut rs = Self::new();
             for x in &self.0 {
-                if x.base().is_empty() {
-                    continue;
-                }
                 let y = TupperInterval::new(x.base().$op(), x.g);
                 let a = y.base().inf();
                 let b = y.base().sup();
@@ -225,13 +222,18 @@ impl TupperIntervalSet {
                                 _ => g,
                             },
                         ));
-                    } else if b == 0.0 && c < 0.0 && d >= 0.0 {
+                    } else if b <= 0.0 && c < 0.0 && d >= 0.0 {
+                        let dec = if b == 0.0 {
+                            Decoration::Trv
+                        } else {
+                            Decoration::Def
+                        };
                         let x0 = interval!(b, b).unwrap();
                         let y0 = interval!(c, c).unwrap();
                         rs.insert(TupperInterval::new(
                             DecoratedInterval::set_dec(
                                 interval!(-Interval::PI.sup(), y0.atan2(x0).sup()).unwrap(),
-                                Decoration::Trv,
+                                dec,
                             ),
                             match site {
                                 Some(site) => g.inserted(site, 0),
@@ -240,7 +242,7 @@ impl TupperIntervalSet {
                         ));
                         if d == 0.0 {
                             rs.insert(TupperInterval::new(
-                                DecoratedInterval::set_dec(Interval::PI, Decoration::Trv),
+                                DecoratedInterval::set_dec(Interval::PI, dec),
                                 match site {
                                     Some(site) => g.inserted(site, 1),
                                     _ => g,
@@ -252,7 +254,7 @@ impl TupperIntervalSet {
                             rs.insert(TupperInterval::new(
                                 DecoratedInterval::set_dec(
                                     interval!(y1.atan2(x1).inf(), Interval::PI.sup()).unwrap(),
-                                    Decoration::Trv,
+                                    dec,
                                 ),
                                 match site {
                                     Some(site) => g.inserted(site, 1),
@@ -260,31 +262,6 @@ impl TupperIntervalSet {
                                 },
                             ));
                         }
-                    } else if b < 0.0 && c < 0.0 && d >= 0.0 {
-                        let x0 = interval!(b, b).unwrap();
-                        let y0 = interval!(c, c).unwrap();
-                        rs.insert(TupperInterval::new(
-                            DecoratedInterval::set_dec(
-                                interval!(-Interval::PI.sup(), y0.atan2(x0).sup()).unwrap(),
-                                Decoration::Def,
-                            ),
-                            match site {
-                                Some(site) => g.inserted(site, 0),
-                                _ => g,
-                            },
-                        ));
-                        let x1 = interval!(b, b).unwrap();
-                        let y1 = interval!(d, d).unwrap();
-                        rs.insert(TupperInterval::new(
-                            DecoratedInterval::set_dec(
-                                interval!(y1.atan2(x1).inf(), Interval::PI.sup()).unwrap(),
-                                Decoration::Def,
-                            ),
-                            match site {
-                                Some(site) => g.inserted(site, 1),
-                                _ => g,
-                            },
-                        ));
                     } else {
                         rs.insert(TupperInterval::new(y.base().atan2(x.base()), g));
                     }
