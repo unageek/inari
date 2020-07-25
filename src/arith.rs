@@ -54,7 +54,7 @@ impl Mul for Interval {
         //  Z | empty |       zero |       zero |       zero |  zero
         // *1 [min(a*d, b*c), max(a*c, b*d)]
 
-        match (self.classify() << 4) | rhs.classify() {
+        match self.classify2(rhs) {
             C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_N0_E | C_N1_E
             | C_P0_E | C_P1_E | C_Z_E => Self::EMPTY,
             C_M_Z | C_N0_Z | C_N1_Z | C_P0_Z | C_P1_Z | C_Z_M | C_Z_N0 | C_Z_N1 | C_Z_P0
@@ -153,7 +153,7 @@ impl Div for Interval {
         //  P | empty | entire | [-inf, a/c] | [b/d, a/c] | [ a/d, inf] | [a/d, b/c] | empty
         //  Z | empty |   zero |        zero |       zero |        zero |       zero | empty
 
-        match (self.classify() << 4) | rhs.classify() {
+        match self.classify2(rhs) {
             C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_M_Z | C_N0_E
             | C_N0_Z | C_N1_E | C_N1_Z | C_P0_E | C_P0_Z | C_P1_E | C_P1_Z | C_Z_E | C_Z_Z => {
                 Self::EMPTY
