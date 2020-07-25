@@ -198,6 +198,7 @@ impl Interval {
         self.atan2_impl(rhs).0
     }
 
+    #[allow(clippy::many_single_char_names)]
     pub fn atan2_impl(self, rhs: Self) -> (Self, Decoration) {
         let (x, y) = (rhs, self);
         let a = x.inf_raw();
