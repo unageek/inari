@@ -1,8 +1,11 @@
+#![allow(clippy::float_cmp)]
+
 use bitflags::*;
 use core::ops::{Add, Mul, Neg, Sub};
+use hexf::*;
 use inari::{interval, DecoratedInterval, Decoration, Interval};
 use smallvec::SmallVec;
-use std::{cmp::Ordering, convert::From};
+use std::convert::From;
 
 // Represents a partial function {0, ..., 31} -> {0, 1}
 // which domain is the set of branch cut site ids
@@ -46,6 +49,16 @@ impl IntervalBranch {
         }
     }
 }
+
+// Relationship between the decoration system and the properties of Tupper IA:
+//  Decoration | Properties
+// ------------+---------------------------
+//  com, dac   | def: [T,T]
+//             | cont: [T,T]
+//  def        | def: [T,T]
+//             | cont: [F,F], [F,T]
+//  trv        | def: [F,F], [F,T]
+//             | cont: [F,F], [F,T], [T,T]
 
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
@@ -276,11 +289,10 @@ impl TupperIntervalSet {
         for x in &self.0 {
             for y in &rhs.0 {
                 if let Some(g) = x.g.union(y.g) {
-                    if y.base().inf() <= 0.0 && y.base().sup() >= 0.0 {
-                        let y0 = DecoratedInterval::set_dec(
-                            interval!(y.base().inf(), 0.0).unwrap(),
-                            y.d,
-                        );
+                    let c = y.base().inf();
+                    let d = y.base().sup();
+                    if c < 0.0 && d > 0.0 {
+                        let y0 = DecoratedInterval::set_dec(interval!(c, 0.0).unwrap(), y.d);
                         rs.insert(TupperInterval::new(
                             x.base() / y0,
                             match site {
@@ -288,10 +300,7 @@ impl TupperIntervalSet {
                                 _ => g,
                             },
                         ));
-                        let y1 = DecoratedInterval::set_dec(
-                            interval!(0.0, y.base().sup()).unwrap(),
-                            y.d,
-                        );
+                        let y1 = DecoratedInterval::set_dec(interval!(0.0, d).unwrap(), y.d);
                         rs.insert(TupperInterval::new(
                             x.base() / y1,
                             match site {
@@ -303,6 +312,72 @@ impl TupperIntervalSet {
                         rs.insert(TupperInterval::new(x.base() / y.base(), g));
                     }
                 }
+            }
+        }
+        rs.normalize()
+    }
+
+    pub fn recip(&self, site: Option<u8>) -> Self {
+        let mut rs = Self::new();
+        for x in &self.0 {
+            let a = x.base().inf();
+            let b = x.base().sup();
+            if a < 0.0 && b > 0.0 {
+                let x0 = DecoratedInterval::set_dec(interval!(a, 0.0).unwrap(), x.d);
+                rs.insert(TupperInterval::new(
+                    x0.recip(),
+                    match site {
+                        Some(site) => x.g.inserted(site, 0),
+                        _ => x.g,
+                    },
+                ));
+                let x1 = DecoratedInterval::set_dec(interval!(0.0, b).unwrap(), x.d);
+                rs.insert(TupperInterval::new(
+                    x1.recip(),
+                    match site {
+                        Some(site) => x.g.inserted(site, 1),
+                        _ => x.g,
+                    },
+                ));
+            } else {
+                rs.insert(TupperInterval::new(x.base().recip(), x.g));
+            }
+        }
+        rs.normalize()
+    }
+
+    pub fn sin_over_x(&self) -> Self {
+        const ARGMIN_RD: f64 = hexf64!("0x4.7e50150d41abp+0");
+        const MIN_RD: f64 = hexf64!("-0x3.79c9f80c234ecp-4");
+        let mut rs = Self::new();
+        for x in &self.0 {
+            let a = x.base().inf();
+            let b = x.base().sup();
+            if a <= 0.0 && b >= 0.0 {
+                let yn = if a < 0.0 {
+                    if -a < ARGMIN_RD {
+                        let x = interval!(a, a).unwrap();
+                        interval!((x.sin() / x).inf(), 1.0).unwrap()
+                    } else {
+                        interval!(MIN_RD, 1.0).unwrap()
+                    }
+                } else {
+                    Interval::EMPTY
+                };
+                let yp = if b > 0.0 {
+                    if b < ARGMIN_RD {
+                        let x = interval!(b, b).unwrap();
+                        interval!((x.sin() / x).inf(), 1.0).unwrap()
+                    } else {
+                        interval!(MIN_RD, 1.0).unwrap()
+                    }
+                } else {
+                    Interval::EMPTY
+                };
+                let y = DecoratedInterval::set_dec(yn.convex_hull(yp), Decoration::Trv);
+                rs.insert(TupperInterval::new(y, x.g));
+            } else {
+                rs.insert(TupperInterval::new(x.base().sin() / x.base(), x.g));
             }
         }
         rs.normalize()
@@ -392,8 +467,8 @@ impl TupperIntervalSet {
     impl_integer_op!(trunc);
 }
 
-// TODO: mul_add?, recip?
-// TODO: add_or_sub (plus_or_minus)?
+// TODO: mul_add?
+// TODO: add_or_sub (binary)?, plus_or_minus (unary)?
 
 bitflags! {
     pub struct SignSet: u8 {
