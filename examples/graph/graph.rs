@@ -395,18 +395,20 @@ impl Graph {
                 continue;
             }
             if d >= Decoration::Dac {
-                // TODO: Should we pass the cache to the next level?
-                // In that case, the indices at the finest level must be used.
-
-                // Use (cx, cy) instead of (bx, by) for cache indices so that
-                // values at the pixel boundary may not be shared among
-                // the adjacent pixels.
-                //                     Values are different at these two points.
+                // Use `(cx, cy)` instead of `(bx, by)` for cache indices
+                // so that values at the pixel boundary may not be shared
+                // among the adjacent pixels.
+                //
+                //                   Values are different at these two points.
                 //                     vv
                 //   +  ||  +   +   +  ||  +   +   +  ||  +
                 //       \_____________/
                 //             p_dn
                 // The exact pixel boundary is somewhere between ||.
+                //
+                // It is easy to share the cache across levels by multiplying
+                // `cy` and `cy` by `1u32 << (bs.k - MIN_K)`, but that
+                // increased graphing time significantly.
                 let cx = bx + ix;
                 let cy = by + iy;
 
