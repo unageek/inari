@@ -52,6 +52,8 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
     const C40: DecoratedInterval = const_dec_interval!(40.0, 40.0);
     const C81: DecoratedInterval = const_dec_interval!(81.0, 81.0);
 
+    // [🐌]: Takes a long time to finish graphing.
+
     x.sin().eq(&y.cos())
 
     //(&y - &x).eq(&(&x + &y).exp().sin())
@@ -63,12 +65,10 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
     // From Fig. 1a in Tupper (2001)
     //y.lt(&x.sqrt())
 
-    // From Fig. 17 in Tupper (2001)
+    // From Fig. 17 in Tupper (2001) [🐌]
     //y.eq(&(&x - &x.tan(None).atan()))
 
     // Some intriguing examples from GrafEq
-    // Icons after each filename:
-    //   🐌: Very slow to finish
 
     // 📂 Single Relation/Abstract/Simple/
     //  📄 Parabolic Waves.gqs
@@ -82,7 +82,7 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
     //let c25 = TupperIntervalSet::from(C25);
     //(&x.floor(None).sqr() + &y.floor(None).sqr()).eq(&c25)
 
-    //  📄 Wave.gqs (GrafEq seems to handle sin(x)/x specially)
+    //  📄 Wave.gqs (GrafEq seems to handle sin(x)/x specially like this)
     //y.eq(&x.sin_over_x())
 
     // 📂 Single Relation/Abstract/Traditionally Difficult/

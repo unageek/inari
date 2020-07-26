@@ -317,6 +317,22 @@ impl TupperIntervalSet {
         rs.normalize()
     }
 
+    pub fn mul_add(&self, rhs: &Self, addend: &Self) -> Self {
+        let mut rs = Self::new();
+        for x in &self.0 {
+            for y in &rhs.0 {
+                if let Some(g) = x.g.union(y.g) {
+                    for z in &addend.0 {
+                        if let Some(g) = g.union(z.g) {
+                            rs.insert(TupperInterval::new(x.base().mul_add(y.base(), z.base()), g));
+                        }
+                    }
+                }
+            }
+        }
+        rs.normalize()
+    }
+
     pub fn recip(&self, site: Option<u8>) -> Self {
         let mut rs = Self::new();
         for x in &self.0 {
@@ -467,7 +483,6 @@ impl TupperIntervalSet {
     impl_integer_op!(trunc);
 }
 
-// TODO: mul_add?
 // TODO: add_or_sub (binary)?, plus_or_minus (unary)?
 
 bitflags! {
