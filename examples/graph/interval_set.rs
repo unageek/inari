@@ -526,6 +526,8 @@ macro_rules! impl_rel_op {
 
 impl TupperIntervalSet {
     impl_rel_op!(eq, SignSet::NEG, SignSet::ZERO, SignSet::POS);
+
+    // f >= 0 ⇔ (f >= 0 ? 0 : 1) == 0, etc.
     impl_rel_op!(ge, SignSet::POS, SignSet::ZERO, SignSet::ZERO);
     impl_rel_op!(gt, SignSet::POS, SignSet::POS, SignSet::ZERO);
     impl_rel_op!(le, SignSet::ZERO, SignSet::ZERO, SignSet::POS);
