@@ -323,7 +323,7 @@ impl Graph {
 
             let EvaluationResult(ss, d) = r_u_up;
             let is_true = d >= Decoration::Def && ss == SignSet::ZERO;
-            let is_false = ss & SignSet::ZERO == SignSet::NONE;
+            let is_false = !ss.contains(SignSet::ZERO);
             if is_true || is_false {
                 let ix = bx * ibw;
                 let iy = by * ibw;
@@ -383,7 +383,7 @@ impl Graph {
                 *self.im.pixel_mut(ix, iy) = STAT_TRUE;
                 continue;
             }
-            if ss & SignSet::ZERO == SignSet::NONE {
+            if !ss.contains(SignSet::ZERO) {
                 // This subpixel is proven to be false.
                 *self.im.pixel_mut(ix, iy) -= area;
                 continue;

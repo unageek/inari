@@ -60,7 +60,7 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
 
     //let c0 = TupperIntervalSet::from(C0);
     //let c1 = TupperIntervalSet::from(C1);
-    //(&(&(&x.sqr() + &y.sqr()) - &c1) * &(&y + &x.cos())).eq(&c0)
+    //(&(&x.sqr() + &y.sqr()) - &c1).eq(&c0) | (&y + &x.cos()).eq(&c0)
 
     // From Fig. 1a in Tupper (2001)
     //y.lt(&x.sqrt())
@@ -125,7 +125,7 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
     //let fy = y.floor(Some(0));
     //let a = &(&fy.exp2() * &x) - &frac_pi_2;
     //let b = &frac_pi_4 * &(&y - &fy);
-    //(&(&a + &b).sin() * &(&a - &b).sin()).eq(&c0)
+    //(&a + &b).sin().eq(&c0) | (&a - &b).sin().eq(&c0)
 
     // 📂 Single Relation/Linelike/
     //  📄 Frontispiece #2.gqs
@@ -136,7 +136,7 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
     //let c = xy.div(&xy.cos(), Some(2));
     //let apb = &a + &b;
     //let amb = &a - &b;
-    //(&(&(&apb + &c) * &(&apb - &c)) * &(&(&amb + &c) * &(&amb - &c))).eq(&c0)
+    //(&apb + &c).eq(&c0) | (&apb - &c).eq(&c0) | (&amb + &c).eq(&c0) | (&amb - &c).eq(&c0)
 
     //  📄 Frontispiece.gqs
     //let c0 = TupperIntervalSet::from(C0);
@@ -146,7 +146,7 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
     //let c = xy.sin_over_x().recip(Some(2));
     //let apb = &a + &b;
     //let amb = &a - &b;
-    //(&(&(&apb + &c) * &(&apb - &c)) * &(&(&amb + &c) * &(&amb - &c))).eq(&c0)
+    //(&apb + &c).eq(&c0) | (&apb - &c).eq(&c0) | (&amb + &c).eq(&c0) | (&amb - &c).eq(&c0)
 
     //  📄 Hair.gqs
     // Should be plotted over Region::new(4.0, 6.5, 2.0, 4.5).
@@ -171,23 +171,22 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
     //let f2 = -&(&c1 * &d2).sin().cos();
     //let f3 = -&(&c2 * &d1).sin().cos();
     //let f4 = -&(&c2 * &d2).sin().cos();
-    //(&(&e1 + &f1)
-    //    * &(&(&e1 + &f2)
-    //        * &(&(&e1 + &f3)
-    //            * &(&(&e1 + &f4)
-    //                * &(&(&e2 + &f1)
-    //                    * &(&(&e2 + &f2)
-    //                        * &(&(&e2 + &f3)
-    //                            * &(&(&e2 + &f4)
-    //                                * &(&(&e3 + &f1)
-    //                                    * &(&(&e3 + &f2)
-    //                                        * &(&(&e3 + &f3)
-    //                                            * &(&(&e3 + &f4)
-    //                                                * &(&(&e4 + &f1)
-    //                                                    * &(&(&e4 + &f2)
-    //                                                        * &(&(&e4 + &f3)
-    //                                                            * &(&e4 + &f4))))))))))))))))
-    //    .eq(&c0)
+    //(&e1 + &f1).eq(&c0)
+    //    | (&e1 + &f2).eq(&c0)
+    //    | (&e1 + &f3).eq(&c0)
+    //    | (&e1 + &f4).eq(&c0)
+    //    | (&e2 + &f1).eq(&c0)
+    //    | (&e2 + &f2).eq(&c0)
+    //    | (&e2 + &f3).eq(&c0)
+    //    | (&e2 + &f4).eq(&c0)
+    //    | (&e3 + &f1).eq(&c0)
+    //    | (&e3 + &f2).eq(&c0)
+    //    | (&e3 + &f3).eq(&c0)
+    //    | (&e3 + &f4).eq(&c0)
+    //    | (&e4 + &f1).eq(&c0)
+    //    | (&e4 + &f2).eq(&c0)
+    //    | (&e4 + &f3).eq(&c0)
+    //    | (&e4 + &f4).eq(&c0)
 
     //  📄 Highwire.gqs [🐌]
     //(&(&x * &x.cos()) - &(&y * &y.sin()))

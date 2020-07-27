@@ -1,7 +1,7 @@
 #![allow(clippy::float_cmp)]
 
 use bitflags::*;
-use core::ops::{Add, Mul, Neg, Sub};
+use core::ops::{Add, BitAnd, BitOr, Mul, Neg, Sub};
 use hexf::*;
 use inari::{interval, DecoratedInterval, Decoration, Interval};
 use smallvec::SmallVec;
@@ -483,17 +483,15 @@ impl TupperIntervalSet {
     impl_integer_op!(trunc);
 }
 
-// TODO: add_or_sub (binary)?, plus_or_minus (unary)?
-
 bitflags! {
     pub struct SignSet: u8 {
-        const NONE = 0;
         const NEG = 1;
         const ZERO = 2;
         const POS = 4;
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct EvaluationResult(pub SignSet, pub Decoration);
 
 macro_rules! impl_rel_op {
@@ -501,10 +499,10 @@ macro_rules! impl_rel_op {
         pub fn $op(&self, rhs: &Self) -> EvaluationResult {
             let xs = self - rhs;
             if xs.is_empty() {
-                return EvaluationResult(SignSet::NONE, Decoration::Trv);
+                return EvaluationResult(SignSet::empty(), Decoration::Trv);
             }
 
-            let mut ss = SignSet::NONE;
+            let mut ss = SignSet::empty();
             let mut d = Decoration::Com;
             for x in xs.0.iter() {
                 let a = x.x.inf();
@@ -528,8 +526,57 @@ macro_rules! impl_rel_op {
 
 impl TupperIntervalSet {
     impl_rel_op!(eq, SignSet::NEG, SignSet::ZERO, SignSet::POS);
-    impl_rel_op!(ge, SignSet::NEG, SignSet::ZERO, SignSet::ZERO);
-    impl_rel_op!(gt, SignSet::NEG, SignSet::NEG, SignSet::ZERO);
-    impl_rel_op!(le, SignSet::ZERO, SignSet::ZERO, SignSet::NEG);
-    impl_rel_op!(lt, SignSet::ZERO, SignSet::NEG, SignSet::NEG);
+    impl_rel_op!(ge, SignSet::POS, SignSet::ZERO, SignSet::ZERO);
+    impl_rel_op!(gt, SignSet::POS, SignSet::POS, SignSet::ZERO);
+    impl_rel_op!(le, SignSet::ZERO, SignSet::ZERO, SignSet::POS);
+    impl_rel_op!(lt, SignSet::ZERO, SignSet::POS, SignSet::POS);
+}
+
+impl BitAnd for EvaluationResult {
+    type Output = Self;
+
+    // f == 0 ∧ g == 0 ⇔ |f| + |g| == 0
+    fn bitand(self, rhs: Self) -> Self {
+        const SIGNS: [SignSet; 3] = [SignSet::NEG, SignSet::ZERO, SignSet::POS];
+        let mut ss = SignSet::empty();
+        for sx in SIGNS.iter().copied().filter(|s| self.0.contains(*s)) {
+            for sy in SIGNS.iter().copied().filter(|s| rhs.0.contains(*s)) {
+                match (sx, sy) {
+                    (SignSet::ZERO, SignSet::ZERO) => {
+                        ss |= SignSet::ZERO;
+                    }
+                    _ => {
+                        ss |= SignSet::POS;
+                    }
+                }
+            }
+        }
+        Self(ss, self.1.min(rhs.1))
+    }
+}
+
+impl BitOr for EvaluationResult {
+    type Output = Self;
+
+    // f == 0 ∨ g == 0 ⇔ f * g == 0
+    fn bitor(self, rhs: Self) -> Self {
+        const SIGNS: [SignSet; 3] = [SignSet::NEG, SignSet::ZERO, SignSet::POS];
+        let mut ss = SignSet::empty();
+        for sx in SIGNS.iter().copied().filter(|s| self.0.contains(*s)) {
+            for sy in SIGNS.iter().copied().filter(|s| rhs.0.contains(*s)) {
+                match (sx, sy) {
+                    (SignSet::NEG, SignSet::NEG) | (SignSet::POS, SignSet::POS) => {
+                        ss |= SignSet::POS;
+                    }
+                    (SignSet::NEG, SignSet::POS) | (SignSet::POS, SignSet::NEG) => {
+                        ss |= SignSet::NEG;
+                    }
+                    _ => {
+                        ss |= SignSet::ZERO;
+                    }
+                }
+            }
+        }
+        Self(ss, self.1.min(rhs.1))
+    }
 }
