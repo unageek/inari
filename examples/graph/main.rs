@@ -2,6 +2,7 @@
 
 mod graph;
 mod interval_set;
+mod lang;
 
 use crate::graph::*;
 use crate::interval_set::*;

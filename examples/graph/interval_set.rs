@@ -5,12 +5,15 @@ use core::ops::{Add, BitAnd, BitOr, Mul, Neg, Sub};
 use hexf::*;
 use inari::{interval, DecoratedInterval, Decoration, Interval};
 use smallvec::SmallVec;
-use std::convert::From;
+use std::{
+    convert::From,
+    hash::{Hash, Hasher},
+};
 
 // Represents a partial function {0, ..., 31} -> {0, 1}
 // which domain is the set of branch cut site ids
 // and range is the set of branch indices.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 #[repr(C)]
 struct IntervalBranch {
     // A bit field that keeps track of at which sites
@@ -80,13 +83,32 @@ impl TupperInterval {
     }
 }
 
+impl PartialEq for TupperInterval {
+    fn eq(&self, rhs: &Self) -> bool {
+        self.base() == rhs.base() && self.g == rhs.g
+    }
+}
+
+// This is safe as long as nai is not involved.
+impl Eq for TupperInterval {}
+
+impl Hash for TupperInterval {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.base().inf().to_bits().hash(state);
+        self.base().sup().to_bits().hash(state);
+        (self.d as u8).hash(state);
+        self.g.hash(state);
+    }
+}
+
 type TupperIntervalVec = SmallVec<[TupperInterval; 2]>;
 
-#[derive(Debug)]
+// NOTE: Equality is order-sensitive.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct TupperIntervalSet(TupperIntervalVec);
 
 impl TupperIntervalSet {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self(TupperIntervalVec::new())
     }
 

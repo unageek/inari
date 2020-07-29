@@ -53,6 +53,7 @@ required-features = ["gmp"]
 [[example]]
 name = "graph"
 required-features = ["gmp", "_reserve_u64_in_dec_interval"]
+test = true
 
 [[example]]
 name = "parse"
