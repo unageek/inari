@@ -6,6 +6,7 @@ use inari::{dec_interval, interval, DecoratedInterval, Decoration, Interval};
 use std::{
     collections::HashMap,
     error, fmt, mem,
+    ops::FnMut,
     time::{Duration, Instant},
 };
 
@@ -181,16 +182,21 @@ impl fmt::Display for GraphingError {
 impl error::Error for GraphingError {}
 
 #[derive(Debug)]
-pub struct Relation(pub fn(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult);
+pub struct Relation<T>(pub T)
+where
+    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult;
 
-impl Relation {
-    fn eval_on_point(&self, x: f64, y: f64) -> EvaluationResult {
+impl<T> Relation<T>
+where
+    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult,
+{
+    fn eval_on_point(&mut self, x: f64, y: f64) -> EvaluationResult {
         let x = dec_interval!(x, x).unwrap();
         let y = dec_interval!(y, y).unwrap();
         (self.0)(TupperIntervalSet::from(x), TupperIntervalSet::from(y))
     }
 
-    fn eval_on_region(&self, r: &Region) -> EvaluationResult {
+    fn eval_on_region(&mut self, r: &Region) -> EvaluationResult {
         let x = DecoratedInterval::new(r.0);
         let y = DecoratedInterval::new(r.1);
         (self.0)(TupperIntervalSet::from(x), TupperIntervalSet::from(y))
@@ -206,8 +212,11 @@ pub struct GraphingStatistics {
 }
 
 #[derive(Debug)]
-pub struct Graph {
-    relation: Relation,
+pub struct Graph<T>
+where
+    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult,
+{
+    relation: Relation<T>,
     im: Image,
     bs: ImageBlockSet,
     // Affine transformation from pixel coordinates to real coordinates.
@@ -218,9 +227,12 @@ pub struct Graph {
     stats: GraphingStatistics,
 }
 
-impl Graph {
+impl<T> Graph<T>
+where
+    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult,
+{
     // TODO: Accept `InexactRegion` instead of `Region` for more exactness?
-    pub fn new(relation: Relation, region: Region, im_width: u32, im_height: u32) -> Self {
+    pub fn new(relation: Relation<T>, region: Region, im_width: u32, im_height: u32) -> Self {
         assert!(im_width > 0 && im_height > 0);
         let mut g = Self {
             relation,
@@ -412,6 +424,7 @@ impl Graph {
                 let cx = bx + ix;
                 let cy = by + iy;
 
+                let rel = &mut self.relation;
                 let mut found_zero = false;
                 let mut found_neg = false;
                 let mut found_pos = false;
@@ -420,22 +433,22 @@ impl Graph {
                         0 => *cache.entry(ImageBlock(cx, cy)).or_insert_with(|| {
                             // bottom left
                             *evals += 1;
-                            self.relation.eval_on_point(inter.0.inf(), inter.1.inf()).0
+                            rel.eval_on_point(inter.0.inf(), inter.1.inf()).0
                         }),
                         1 => *cache.entry(ImageBlock(cx + 1, cy)).or_insert_with(|| {
                             // bottom right
                             *evals += 1;
-                            self.relation.eval_on_point(inter.0.sup(), inter.1.inf()).0
+                            rel.eval_on_point(inter.0.sup(), inter.1.inf()).0
                         }),
                         2 => *cache.entry(ImageBlock(cx, cy + 1)).or_insert_with(|| {
                             // top left
                             *evals += 1;
-                            self.relation.eval_on_point(inter.0.inf(), inter.1.sup()).0
+                            rel.eval_on_point(inter.0.inf(), inter.1.sup()).0
                         }),
                         3 => *cache.entry(ImageBlock(cx + 1, cy + 1)).or_insert_with(|| {
                             // top right
                             *evals += 1;
-                            self.relation.eval_on_point(inter.0.sup(), inter.1.sup()).0
+                            rel.eval_on_point(inter.0.sup(), inter.1.sup()).0
                         }),
                         _ => unreachable!(),
                     };

@@ -4,8 +4,7 @@ mod graph;
 mod interval_set;
 mod lang;
 
-use crate::graph::*;
-use crate::interval_set::*;
+use crate::{graph::*, interval_set::*, lang::DynRelation};
 use hexf::*;
 use inari::{const_dec_interval, const_interval, interval, DecoratedInterval, Interval};
 
@@ -221,8 +220,9 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
 }
 
 fn main() {
+    let mut rel = DynRelation::new("sin(exp2(floor(y)) * x + pi/4 * (y - floor(y)) - pi/2) == 0 || sin(exp2(floor(y)) * x - pi/4 * (y - floor(y)) - pi/2) == 0");
     let mut g = Graph::new(
-        Relation(f),
+        Relation(|x, y| rel.evaluate(x, y)),
         Region::new(-10.0, 10.0, -10.0, 10.0),
         1024,
         1024,

@@ -36,8 +36,12 @@ enum UnaryOp {
     Cos,
     Cosh,
     Exp,
+    Exp10,
+    Exp2,
     Floor,
     Log,
+    Log10,
+    Log2,
     Sign,
     Sin,
     Sinh,
@@ -183,8 +187,12 @@ impl Node {
             Unary(Cos, x) => x.value(vs).cos(),
             Unary(Cosh, x) => x.value(vs).cosh(),
             Unary(Exp, x) => x.value(vs).exp(),
+            Unary(Exp10, x) => x.value(vs).exp10(),
+            Unary(Exp2, x) => x.value(vs).exp2(),
             Unary(Floor, x) => x.value(vs).floor(self.site),
             Unary(Log, x) => x.value(vs).log(),
+            Unary(Log10, x) => x.value(vs).log10(),
+            Unary(Log2, x) => x.value(vs).log2(),
             Unary(Sign, x) => x.value(vs).sign(self.site),
             Unary(Sin, x) => x.value(vs).sin(),
             Unary(Sinh, x) => x.value(vs).sinh(),
@@ -288,26 +296,33 @@ fn primary_expr(i: &str) -> IResult<&str, Node> {
 }
 
 fn fn1(i: &str) -> IResult<&str, UnaryOp> {
+    // alt is limited to 21 choices.
     alt((
         value(UnaryOp::Acosh, tag("acosh")),
         value(UnaryOp::Asinh, tag("asinh")),
         value(UnaryOp::Atanh, tag("atanh")),
+        value(UnaryOp::Exp10, tag("exp10")),
         value(UnaryOp::Floor, tag("floor")),
+        value(UnaryOp::Log10, tag("log10")),
         value(UnaryOp::Acos, tag("acos")),
         value(UnaryOp::Asin, tag("asin")),
         value(UnaryOp::Atan, tag("atan")),
         value(UnaryOp::Ceil, tag("ceil")),
         value(UnaryOp::Cosh, tag("cosh")),
+        value(UnaryOp::Exp2, tag("exp2")),
+        value(UnaryOp::Log2, tag("log2")),
         value(UnaryOp::Sign, tag("sign")),
         value(UnaryOp::Sinh, tag("sinh")),
         value(UnaryOp::Sqrt, tag("sqrt")),
         value(UnaryOp::Tanh, tag("tanh")),
-        value(UnaryOp::Abs, tag("abs")),
-        value(UnaryOp::Cos, tag("cos")),
-        value(UnaryOp::Exp, tag("exp")),
-        value(UnaryOp::Log, tag("log")),
-        value(UnaryOp::Sin, tag("sin")),
-        value(UnaryOp::Tan, tag("tan")),
+        alt((
+            value(UnaryOp::Abs, tag("abs")),
+            value(UnaryOp::Cos, tag("cos")),
+            value(UnaryOp::Exp, tag("exp")),
+            value(UnaryOp::Log, tag("log")),
+            value(UnaryOp::Sin, tag("sin")),
+            value(UnaryOp::Tan, tag("tan")),
+        )),
     ))(i)
 }
 
@@ -601,6 +616,7 @@ impl Visitor for NodeCollector {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct Evaluator {
     rel_node: RelNode,
     nodes: Vec<Node>,
@@ -617,7 +633,7 @@ impl Evaluator {
         }
     }
 
-    pub fn eval(&mut self, x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
+    pub fn evaluate(&mut self, x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
         self.vs[0] = x;
         self.vs[1] = y;
         for i in 0..self.nodes.len() {
@@ -627,23 +643,23 @@ impl Evaluator {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[derive(Clone, Debug)]
+pub struct DynRelation {
+    eval: Evaluator,
+}
 
-    #[test]
-    fn hogehoge() {
-        let mut rel = parse("asinh(x) + floor(y) == sin(floor(x) + y)").unwrap();
+impl DynRelation {
+    pub fn new(relation: &str) -> Self {
+        let mut rel = parse(relation).unwrap();
         let v = AssignValueIndexVisitor::new().apply(&mut rel);
         AssignSiteVisitor::new(v.site_map()).apply(&mut rel);
         let v = NodeCollector::new().apply(&mut rel);
-        dbg!(&rel);
+        Self {
+            eval: Evaluator::new(rel, v.nodes()),
+        }
+    }
 
-        let mut eval = Evaluator::new(rel, v.nodes());
-        let x = TupperIntervalSet::from(const_dec_interval!(1.0, 2.0));
-        let y = TupperIntervalSet::from(const_dec_interval!(1.0, 2.0));
-        dbg!(eval.eval(x, y));
-
-        assert!(false);
+    pub fn evaluate(&mut self, x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
+        self.eval.evaluate(x, y)
     }
 }
