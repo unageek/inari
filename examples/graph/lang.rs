@@ -78,76 +78,76 @@ enum RelBinaryOp {
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-enum Expr {
+enum ExprKind {
     Constant(TupperIntervalSet),
     X,
     Y,
-    Unary(UnaryOp, Box<Node>),
-    Binary(BinaryOp, Box<Node>, Box<Node>),
+    Unary(UnaryOp, Box<Expr>),
+    Binary(BinaryOp, Box<Expr>, Box<Expr>),
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-enum RelExpr {
-    Equality(EqualityOp, Box<Node>, Box<Node>),
-    Binary(RelBinaryOp, Box<RelNode>, Box<RelNode>),
+enum RelKind {
+    Equality(EqualityOp, Box<Expr>, Box<Expr>),
+    Binary(RelBinaryOp, Box<Rel>, Box<Rel>),
 }
 
 type NodeId = u32;
 
 #[derive(Clone, Debug)]
-pub struct Node {
+pub struct Expr {
     id: NodeId,
     site: Option<u8>,
-    expr: Expr,
+    kind: ExprKind,
 }
 
-impl PartialEq for Node {
+impl PartialEq for Expr {
     fn eq(&self, rhs: &Self) -> bool {
-        self.expr == rhs.expr
+        self.kind == rhs.kind
     }
 }
 
-impl Eq for Node {}
+impl Eq for Expr {}
 
-impl Hash for Node {
+impl Hash for Expr {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.expr.hash(state);
+        self.kind.hash(state);
     }
 }
 
 #[derive(Clone, Debug)]
-pub struct RelNode {
-    expr: RelExpr,
+pub struct Rel {
+    kind: RelKind,
 }
 
-impl PartialEq for RelNode {
+impl PartialEq for Rel {
     fn eq(&self, rhs: &Self) -> bool {
-        self.expr == rhs.expr
+        self.kind == rhs.kind
     }
 }
 
-impl Eq for RelNode {}
+impl Eq for Rel {}
 
-impl Hash for RelNode {
+impl Hash for Rel {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.expr.hash(state);
+        self.kind.hash(state);
     }
 }
 
 type ValueStore = Vec<TupperIntervalSet>;
 
-impl Node {
-    fn new(expr: Expr) -> Self {
+impl Expr {
+    fn new(kind: ExprKind) -> Self {
         Self {
             id: 0,
             site: None,
-            expr,
+            kind,
         }
     }
 
     fn accept<V: Visitor>(&self, visitor: &mut V) {
-        use Expr::*;
-        match &self.expr {
+        use ExprKind::*;
+        match &self.kind {
             Unary(_, x) => x.accept(visitor),
             Binary(_, x, y) => {
                 x.accept(visitor);
@@ -155,12 +155,12 @@ impl Node {
             }
             _ => (),
         };
-        visitor.visit_node(self);
+        visitor.visit_expr(self);
     }
 
     fn accept_mut<V: VisitorMut>(&mut self, visitor: &mut V) {
-        use Expr::*;
-        match &mut self.expr {
+        use ExprKind::*;
+        match &mut self.kind {
             Unary(_, x) => x.accept_mut(visitor),
             Binary(_, x, y) => {
                 x.accept_mut(visitor);
@@ -168,12 +168,12 @@ impl Node {
             }
             _ => (),
         };
-        visitor.visit_node_mut(self);
+        visitor.visit_expr_mut(self);
     }
 
     fn evaluate(&self, vs: &ValueStore) -> TupperIntervalSet {
-        use {BinaryOp::*, Expr::*, UnaryOp::*};
-        match &self.expr {
+        use {BinaryOp::*, ExprKind::*, UnaryOp::*};
+        match &self.kind {
             Constant(x) => x.clone(),
             X => vs[0].clone(),
             Y => vs[1].clone(),
@@ -216,14 +216,14 @@ impl Node {
     }
 }
 
-impl RelNode {
-    fn new(expr: RelExpr) -> Self {
-        Self { expr }
+impl Rel {
+    fn new(kind: RelKind) -> Self {
+        Self { kind }
     }
 
     fn accept<V: Visitor>(&self, visitor: &mut V) {
-        use RelExpr::*;
-        match &self.expr {
+        use RelKind::*;
+        match &self.kind {
             Equality(_, x, y) => {
                 x.accept(visitor);
                 y.accept(visitor);
@@ -233,12 +233,12 @@ impl RelNode {
                 y.accept(visitor);
             }
         };
-        visitor.visit_rel_node(self);
+        visitor.visit_rel(self);
     }
 
     fn accept_mut<V: VisitorMut>(&mut self, visitor: &mut V) {
-        use RelExpr::*;
-        match &mut self.expr {
+        use RelKind::*;
+        match &mut self.kind {
             Equality(_, x, y) => {
                 x.accept_mut(visitor);
                 y.accept_mut(visitor);
@@ -248,12 +248,12 @@ impl RelNode {
                 y.accept_mut(visitor);
             }
         };
-        visitor.visit_rel_node_mut(self);
+        visitor.visit_rel_mut(self);
     }
 
     fn evaluate(&self, vs: &ValueStore) -> EvaluationResult {
-        use {EqualityOp::*, RelBinaryOp::*, RelExpr::*};
-        match &self.expr {
+        use {EqualityOp::*, RelBinaryOp::*, RelKind::*};
+        match &self.kind {
             Equality(Eq, x, y) => x.value(vs).eq(&y.value(vs)),
             Equality(Ge, x, y) => x.value(vs).ge(&y.value(vs)),
             Equality(Gt, x, y) => x.value(vs).gt(&y.value(vs)),
@@ -272,23 +272,23 @@ fn decimal_literal(i: &str) -> IResult<&str, &str> {
     ))(i)
 }
 
-fn primary_expr(i: &str) -> IResult<&str, Node> {
+fn primary_expr(i: &str) -> IResult<&str, Expr> {
     alt((
         map(decimal_literal, |s| {
             let s = ["[", s, ",", s, "]"].concat();
             let x = TupperIntervalSet::from(dec_interval!(&s).unwrap());
-            Node::new(Expr::Constant(x))
+            Expr::new(ExprKind::Constant(x))
         }),
         map(tag("pi"), |_| {
             let x = TupperIntervalSet::from(DecoratedInterval::PI);
-            Node::new(Expr::Constant(x))
+            Expr::new(ExprKind::Constant(x))
         }),
         map(char('e'), |_| {
             let x = TupperIntervalSet::from(DecoratedInterval::E);
-            Node::new(Expr::Constant(x))
+            Expr::new(ExprKind::Constant(x))
         }),
-        value(Node::new(Expr::X), char('x')),
-        value(Node::new(Expr::Y), char('y')),
+        value(Expr::new(ExprKind::X), char('x')),
+        value(Expr::new(ExprKind::Y), char('y')),
         delimited(
             terminated(char('('), space0),
             additive_expr,
@@ -336,7 +336,7 @@ fn fn2(i: &str) -> IResult<&str, BinaryOp> {
     ))(i)
 }
 
-fn postfix_expr(i: &str) -> IResult<&str, Node> {
+fn postfix_expr(i: &str) -> IResult<&str, Expr> {
     alt((
         map(
             pair(
@@ -347,7 +347,7 @@ fn postfix_expr(i: &str) -> IResult<&str, Node> {
                     preceded(space0, cut(char(')'))),
                 ),
             ),
-            move |(f, x)| Node::new(Expr::Unary(f, Box::new(x))),
+            move |(f, x)| Expr::new(ExprKind::Unary(f, Box::new(x))),
         ),
         map(
             pair(
@@ -362,23 +362,23 @@ fn postfix_expr(i: &str) -> IResult<&str, Node> {
                     preceded(space0, cut(char(')'))),
                 ),
             ),
-            move |(f, (x, y))| Node::new(Expr::Binary(f, Box::new(x), Box::new(y))),
+            move |(f, (x, y))| Expr::new(ExprKind::Binary(f, Box::new(x), Box::new(y))),
         ),
         primary_expr,
     ))(i)
 }
 
-fn unary_expr(i: &str) -> IResult<&str, Node> {
+fn unary_expr(i: &str) -> IResult<&str, Expr> {
     alt((
         map(
             separated_pair(value(UnaryOp::Neg, char('-')), space0, unary_expr),
-            |(op, x)| Node::new(Expr::Unary(op, Box::new(x))),
+            |(op, x)| Expr::new(ExprKind::Unary(op, Box::new(x))),
         ),
         postfix_expr,
     ))(i)
 }
 
-fn multiplicative_expr(i: &str) -> IResult<&str, Node> {
+fn multiplicative_expr(i: &str) -> IResult<&str, Expr> {
     let (i, x) = unary_expr(i)?;
 
     fold_many0(
@@ -394,11 +394,11 @@ fn multiplicative_expr(i: &str) -> IResult<&str, Node> {
             unary_expr,
         ),
         x,
-        move |xs, (op, y)| Node::new(Expr::Binary(op, Box::new(xs), Box::new(y))),
+        move |xs, (op, y)| Expr::new(ExprKind::Binary(op, Box::new(xs), Box::new(y))),
     )(i)
 }
 
-fn additive_expr(i: &str) -> IResult<&str, Node> {
+fn additive_expr(i: &str) -> IResult<&str, Expr> {
     let (i, x) = multiplicative_expr(i)?;
 
     fold_many0(
@@ -414,11 +414,11 @@ fn additive_expr(i: &str) -> IResult<&str, Node> {
             multiplicative_expr,
         ),
         x,
-        move |xs, (op, y)| Node::new(Expr::Binary(op, Box::new(xs), Box::new(y))),
+        move |xs, (op, y)| Expr::new(ExprKind::Binary(op, Box::new(xs), Box::new(y))),
     )(i)
 }
 
-fn equality_expr(i: &str) -> IResult<&str, RelNode> {
+fn equality_expr(i: &str) -> IResult<&str, Rel> {
     map(
         tuple((
             additive_expr,
@@ -435,11 +435,11 @@ fn equality_expr(i: &str) -> IResult<&str, RelNode> {
             ),
             additive_expr,
         )),
-        move |(x, op, y)| RelNode::new(RelExpr::Equality(op, Box::new(x), Box::new(y))),
+        move |(x, op, y)| Rel::new(RelKind::Equality(op, Box::new(x), Box::new(y))),
     )(i)
 }
 
-fn rel_primary_expr(i: &str) -> IResult<&str, RelNode> {
+fn rel_primary_expr(i: &str) -> IResult<&str, Rel> {
     alt((
         delimited(
             terminated(char('('), space0),
@@ -450,27 +450,27 @@ fn rel_primary_expr(i: &str) -> IResult<&str, RelNode> {
     ))(i)
 }
 
-fn and_expr(i: &str) -> IResult<&str, RelNode> {
+fn and_expr(i: &str) -> IResult<&str, Rel> {
     let (i, x) = rel_primary_expr(i)?;
 
     fold_many0(
         preceded(delimited(space0, tag("&&"), space0), rel_primary_expr),
         x,
-        move |xs, y| RelNode::new(RelExpr::Binary(RelBinaryOp::And, Box::new(xs), Box::new(y))),
+        move |xs, y| Rel::new(RelKind::Binary(RelBinaryOp::And, Box::new(xs), Box::new(y))),
     )(i)
 }
 
-fn or_expr(i: &str) -> IResult<&str, RelNode> {
+fn or_expr(i: &str) -> IResult<&str, Rel> {
     let (i, x) = and_expr(i)?;
 
     fold_many0(
         preceded(delimited(space0, tag("||"), space0), and_expr),
         x,
-        move |xs, y| RelNode::new(RelExpr::Binary(RelBinaryOp::Or, Box::new(xs), Box::new(y))),
+        move |xs, y| Rel::new(RelKind::Binary(RelBinaryOp::Or, Box::new(xs), Box::new(y))),
     )(i)
 }
 
-fn parse(i: &str) -> Option<RelNode> {
+fn parse(i: &str) -> Option<Rel> {
     match or_expr(i) {
         Ok(("", x)) => Some(x),
         _ => None,
@@ -481,26 +481,26 @@ pub trait Visitor
 where
     Self: Sized,
 {
-    fn apply(mut self, node: &RelNode) -> Self {
-        node.accept(&mut self);
+    fn apply(mut self, rel: &Rel) -> Self {
+        rel.accept(&mut self);
         self
     }
 
-    fn visit_node(&mut self, _: &Node) {}
-    fn visit_rel_node(&mut self, _: &RelNode) {}
+    fn visit_expr(&mut self, _: &Expr) {}
+    fn visit_rel(&mut self, _: &Rel) {}
 }
 
 pub trait VisitorMut
 where
     Self: Sized,
 {
-    fn apply(mut self, node: &mut RelNode) -> Self {
-        node.accept_mut(&mut self);
+    fn apply(mut self, rel: &mut Rel) -> Self {
+        rel.accept_mut(&mut self);
         self
     }
 
-    fn visit_node_mut(&mut self, _: &mut Node) {}
-    fn visit_rel_node_mut(&mut self, _: &mut RelNode) {}
+    fn visit_expr_mut(&mut self, _: &mut Expr) {}
+    fn visit_rel_mut(&mut self, _: &mut Rel) {}
 }
 
 type SiteMap = HashMap<NodeId, Option<u8>>;
@@ -509,7 +509,7 @@ pub struct AssignNodeIdVisitor {
     next_id: NodeId,
     next_site: u8,
     site_map: SiteMap,
-    visited_nodes: HashSet<Node>,
+    visited_nodes: HashSet<Expr>,
 }
 
 impl AssignNodeIdVisitor {
@@ -526,11 +526,11 @@ impl AssignNodeIdVisitor {
         self.site_map
     }
 
-    fn expr_can_perform_cut(expr: &Expr) -> bool {
+    fn expr_can_perform_cut(kind: &ExprKind) -> bool {
         use BinaryOp::*;
-        use Expr::*;
+        use ExprKind::*;
         use UnaryOp::*;
-        matches!(expr,
+        matches!(kind,
             Unary(Ceil, _)
             | Unary(Floor, _)
             | Unary(Sign, _)
@@ -541,12 +541,12 @@ impl AssignNodeIdVisitor {
 }
 
 impl VisitorMut for AssignNodeIdVisitor {
-    fn visit_node_mut(&mut self, node: &mut Node) {
-        match self.visited_nodes.get(node) {
+    fn visit_expr_mut(&mut self, expr: &mut Expr) {
+        match self.visited_nodes.get(expr) {
             Some(visited) => {
-                node.id = visited.id;
+                expr.id = visited.id;
 
-                if let Some(site) = self.site_map.get_mut(&node.id) {
+                if let Some(site) = self.site_map.get_mut(&expr.id) {
                     if site.is_none() && self.next_site <= 31 {
                         *site = Some(self.next_site as u8);
                         self.next_site += 1;
@@ -554,9 +554,9 @@ impl VisitorMut for AssignNodeIdVisitor {
                 }
             }
             _ => {
-                node.id = match &node.expr {
-                    Expr::X => 0,
-                    Expr::Y => 1,
+                expr.id = match &expr.kind {
+                    ExprKind::X => 0,
+                    ExprKind::Y => 1,
                     _ => {
                         let i = self.next_id;
                         self.next_id += 1;
@@ -564,11 +564,11 @@ impl VisitorMut for AssignNodeIdVisitor {
                     }
                 };
 
-                if Self::expr_can_perform_cut(&node.expr) {
-                    self.site_map.insert(node.id, None);
+                if Self::expr_can_perform_cut(&expr.kind) {
+                    self.site_map.insert(expr.id, None);
                 }
 
-                self.visited_nodes.insert(node.clone());
+                self.visited_nodes.insert(expr.clone());
             }
         }
     }
@@ -585,16 +585,16 @@ impl AssignSiteVisitor {
 }
 
 impl VisitorMut for AssignSiteVisitor {
-    fn visit_node_mut(&mut self, node: &mut Node) {
-        if let Some(site) = self.site_map.get(&node.id) {
-            node.site = *site;
+    fn visit_expr_mut(&mut self, expr: &mut Expr) {
+        if let Some(site) = self.site_map.get(&expr.id) {
+            expr.site = *site;
         }
     }
 }
 
 // Collects nodes (except the ones for x and y) sorted topologically.
 pub struct NodeCollector {
-    nodes: Vec<Node>,
+    nodes: Vec<Expr>,
     next_node_id: NodeId,
 }
 
@@ -606,15 +606,15 @@ impl NodeCollector {
         }
     }
 
-    pub fn nodes(self) -> Vec<Node> {
+    pub fn nodes(self) -> Vec<Expr> {
         self.nodes
     }
 }
 
 impl Visitor for NodeCollector {
-    fn visit_node(&mut self, node: &Node) {
-        if node.id == self.next_node_id {
-            self.nodes.push(node.clone());
+    fn visit_expr(&mut self, expr: &Expr) {
+        if expr.id == self.next_node_id {
+            self.nodes.push(expr.clone());
             self.next_node_id += 1;
         }
     }
@@ -622,13 +622,13 @@ impl Visitor for NodeCollector {
 
 #[derive(Clone, Debug)]
 pub struct Evaluator {
-    rel_node: RelNode,
-    nodes: Vec<Node>,
+    rel_node: Rel,
+    nodes: Vec<Expr>,
     vs: ValueStore,
 }
 
 impl Evaluator {
-    pub fn new(rel_node: RelNode, nodes: Vec<Node>) -> Self {
+    pub fn new(rel_node: Rel, nodes: Vec<Expr>) -> Self {
         let n = nodes.len() + 2;
         Self {
             rel_node,
