@@ -1,10 +1,13 @@
 // Plots the graph of a relation over ℝ².
 
+mod ast;
+mod dyn_relation;
 mod graph;
 mod interval_set;
-mod lang;
+mod parse;
+mod visitor;
 
-use crate::{graph::*, interval_set::*, lang::DynRelation};
+use crate::{dyn_relation::*, graph::*, interval_set::*};
 use hexf::*;
 use inari::{const_dec_interval, const_interval, interval, DecoratedInterval, Interval};
 
