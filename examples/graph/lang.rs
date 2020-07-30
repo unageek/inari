@@ -92,11 +92,13 @@ enum RelExpr {
     Binary(RelBinaryOp, Box<RelNode>, Box<RelNode>),
 }
 
+type NodeId = u32;
+
 #[derive(Clone, Debug)]
 pub struct Node {
-    expr: Expr,
+    id: NodeId,
     site: Option<u8>,
-    value_index: usize,
+    expr: Expr,
 }
 
 impl PartialEq for Node {
@@ -137,9 +139,9 @@ type ValueStore = Vec<TupperIntervalSet>;
 impl Node {
     fn new(expr: Expr) -> Self {
         Self {
-            expr,
+            id: 0,
             site: None,
-            value_index: 0,
+            expr,
         }
     }
 
@@ -210,7 +212,7 @@ impl Node {
     }
 
     fn value<'a>(&self, vs: &'a ValueStore) -> &'a TupperIntervalSet {
-        &vs[self.value_index]
+        &vs[self.id as usize]
     }
 }
 
@@ -501,24 +503,26 @@ where
     fn visit_rel_node_mut(&mut self, _: &mut RelNode) {}
 }
 
-pub struct AssignValueIndexVisitor {
-    next_index: usize,
+type SiteMap = HashMap<NodeId, Option<u8>>;
+
+pub struct AssignNodeIdVisitor {
+    next_id: NodeId,
     next_site: u8,
-    site_map: HashMap<usize, Option<u8>>,
+    site_map: SiteMap,
     visited_nodes: HashSet<Node>,
 }
 
-impl AssignValueIndexVisitor {
+impl AssignNodeIdVisitor {
     pub fn new() -> Self {
         Self {
-            next_index: 2, // 0 for x, 1 for y
+            next_id: 2, // 0 for x, 1 for y
             next_site: 0,
             site_map: HashMap::new(),
             visited_nodes: HashSet::new(),
         }
     }
 
-    pub fn site_map(self) -> HashMap<usize, Option<u8>> {
+    pub fn site_map(self) -> SiteMap {
         self.site_map
     }
 
@@ -536,13 +540,13 @@ impl AssignValueIndexVisitor {
     }
 }
 
-impl VisitorMut for AssignValueIndexVisitor {
+impl VisitorMut for AssignNodeIdVisitor {
     fn visit_node_mut(&mut self, node: &mut Node) {
         match self.visited_nodes.get(node) {
             Some(visited) => {
-                node.value_index = visited.value_index;
+                node.id = visited.id;
 
-                if let Some(site) = self.site_map.get_mut(&node.value_index) {
+                if let Some(site) = self.site_map.get_mut(&node.id) {
                     if site.is_none() && self.next_site <= 31 {
                         *site = Some(self.next_site as u8);
                         self.next_site += 1;
@@ -550,18 +554,18 @@ impl VisitorMut for AssignValueIndexVisitor {
                 }
             }
             _ => {
-                node.value_index = match &node.expr {
+                node.id = match &node.expr {
                     Expr::X => 0,
                     Expr::Y => 1,
                     _ => {
-                        let i = self.next_index;
-                        self.next_index += 1;
+                        let i = self.next_id;
+                        self.next_id += 1;
                         i
                     }
                 };
 
                 if Self::expr_can_perform_cut(&node.expr) {
-                    self.site_map.insert(node.value_index, None);
+                    self.site_map.insert(node.id, None);
                 }
 
                 self.visited_nodes.insert(node.clone());
@@ -571,18 +575,18 @@ impl VisitorMut for AssignValueIndexVisitor {
 }
 
 pub struct AssignSiteVisitor {
-    site_map: HashMap<usize, Option<u8>>,
+    site_map: SiteMap,
 }
 
 impl AssignSiteVisitor {
-    pub fn new(site_map: HashMap<usize, Option<u8>>) -> Self {
+    pub fn new(site_map: SiteMap) -> Self {
         Self { site_map }
     }
 }
 
 impl VisitorMut for AssignSiteVisitor {
     fn visit_node_mut(&mut self, node: &mut Node) {
-        if let Some(site) = self.site_map.get(&node.value_index) {
+        if let Some(site) = self.site_map.get(&node.id) {
             node.site = *site;
         }
     }
@@ -591,14 +595,14 @@ impl VisitorMut for AssignSiteVisitor {
 // Collects nodes (except the ones for x and y) sorted topologically.
 pub struct NodeCollector {
     nodes: Vec<Node>,
-    next_index: usize,
+    next_node_id: NodeId,
 }
 
 impl NodeCollector {
     pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
-            next_index: 2, // 0 for x, 1 for y
+            next_node_id: 2, // 0 for x, 1 for y
         }
     }
 
@@ -609,9 +613,9 @@ impl NodeCollector {
 
 impl Visitor for NodeCollector {
     fn visit_node(&mut self, node: &Node) {
-        if node.value_index == self.next_index {
+        if node.id == self.next_node_id {
             self.nodes.push(node.clone());
-            self.next_index += 1;
+            self.next_node_id += 1;
         }
     }
 }
@@ -651,7 +655,7 @@ pub struct DynRelation {
 impl DynRelation {
     pub fn new(relation: &str) -> Self {
         let mut rel = parse(relation).unwrap();
-        let v = AssignValueIndexVisitor::new().apply(&mut rel);
+        let v = AssignNodeIdVisitor::new().apply(&mut rel);
         AssignSiteVisitor::new(v.site_map()).apply(&mut rel);
         let v = NodeCollector::new().apply(&mut rel);
         Self {
