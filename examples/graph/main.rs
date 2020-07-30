@@ -8,6 +8,7 @@ mod parse;
 mod visitor;
 
 use crate::{dyn_relation::*, graph::*, interval_set::*};
+use clap::{App, Arg};
 use hexf::*;
 use inari::{const_dec_interval, const_interval, interval, DecoratedInterval, Interval};
 
@@ -223,12 +224,40 @@ fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
 }
 
 fn main() {
-    let mut rel = DynRelation::new("sin(exp2(floor(y)) * x + pi/4 * (y - floor(y)) - pi/2) == 0 || sin(exp2(floor(y)) * x - pi/4 * (y - floor(y)) - pi/2) == 0");
+    let matches = App::new("inari-graph")
+        .arg(Arg::new("relation").index(1))
+        .arg(
+            Arg::with_name("bounds")
+                .short('b')
+                .number_of_values(4)
+                .default_values(&["-10", "10", "-10", "10"])
+                .value_names(&["XMIN", "XMAX", "YMIN", "YMAX"]),
+        )
+        .arg(
+            Arg::with_name("size")
+                .short('s')
+                .number_of_values(2)
+                .default_values(&["1024", "1024"])
+                .value_names(&["WIDTH", "HEIGHT"]),
+        )
+        .arg(Arg::with_name("perturb").short('p'))
+        .get_matches();
+
+    // TODO: Output path
+    // TODO: Implement perturb bounds
+
+    let relation = matches.value_of_t_or_exit::<String>("relation");
+    let bounds = matches.values_of_t_or_exit::<f64>("bounds");
+    let size = matches.values_of_t_or_exit::<u32>("size");
+    let perturb = matches.occurrences_of("perturb") > 0;
+
+    //let mut rel = DynRelation::new("sin(exp2(floor(y)) * x + pi/4 * (y - floor(y)) - pi/2) == 0 || sin(exp2(floor(y)) * x - pi/4 * (y - floor(y)) - pi/2) == 0");
+    let mut rel = DynRelation::new(&relation);
     let mut g = Graph::new(
         Relation(|x, y| rel.evaluate(x, y)),
-        Region::new(-10.0, 10.0, -10.0, 10.0),
-        1024,
-        1024,
+        Region::new(bounds[0], bounds[1], bounds[2], bounds[3]),
+        size[0],
+        size[1],
     );
     let mut prev_stat = g.get_statistics();
 

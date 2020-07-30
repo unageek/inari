@@ -39,6 +39,7 @@ static_assertions = "1.1"
 
 [dev-dependencies]
 bitflags = "1.2"
+clap = { version = "3.0.0-beta.1", default-features = false, features = ["cargo", "std"] }
 image = { version = "0.23", default-features = false, features = ["png"] }
 smallvec = "1.4"
 
