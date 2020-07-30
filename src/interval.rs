@@ -129,8 +129,6 @@ impl PartialOrd for Decoration {
 pub struct DecoratedInterval {
     pub(crate) x: Interval,
     pub(crate) d: Decoration,
-    #[cfg(feature = "_reserve_u64_in_dec_interval")]
-    _reserved: u64,
 }
 
 impl DecoratedInterval {
@@ -149,12 +147,7 @@ impl DecoratedInterval {
     }
 
     pub(crate) const fn new_unchecked(x: Interval, d: Decoration) -> Self {
-        Self {
-            x,
-            d,
-            #[cfg(feature = "_reserve_u64_in_dec_interval")]
-            _reserved: 0,
-        }
+        Self { x, d }
     }
 
     pub fn decoration_part(self) -> Decoration {
@@ -317,8 +310,6 @@ macro_rules! const_dec_interval {
         struct _DecoratedInterval {
             x: $crate::Interval,
             d: $crate::Decoration,
-            #[cfg(feature = "_reserve_u64_in_dec_interval")]
-            _reserved: u64,
         }
 
         #[repr(C)]
@@ -337,8 +328,6 @@ macro_rules! const_dec_interval {
                     } else {
                         $crate::Decoration::Com
                     },
-                    #[cfg(feature = "_reserve_u64_in_dec_interval")]
-                    _reserved: 0,
                 },
             }
             .di
