@@ -63,6 +63,15 @@ impl IntervalBranch {
 //  trv        | def: [F,F], [F,T]
 //             | cont: [F,F], [F,T], [T,T]
 
+#[derive(Clone, Copy)]
+#[repr(C)]
+struct _DecoratedInterval {
+    x: Interval,
+    d: Decoration,
+}
+
+// We don't store `DecoratedInterval` directly as that would make
+// the size of `TupperInterval` 48 bytes, instead of 32.
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 struct TupperInterval {
@@ -73,31 +82,37 @@ struct TupperInterval {
 
 impl TupperInterval {
     fn new(x: DecoratedInterval, g: IntervalBranch) -> Self {
-        let mut x = unsafe { std::mem::transmute::<DecoratedInterval, TupperInterval>(x) };
-        x.g = g;
-        x
+        let x = unsafe { std::mem::transmute::<DecoratedInterval, _DecoratedInterval>(x) };
+        // nai is prohibited.
+        assert!(x.d != Decoration::Ill);
+        Self { x: x.x, d: x.d, g }
     }
 
-    fn base(self) -> DecoratedInterval {
-        unsafe { std::mem::transmute(self) }
+    fn to_dec_interval(self) -> DecoratedInterval {
+        let x = _DecoratedInterval {
+            x: self.x,
+            d: self.d,
+        };
+        unsafe { std::mem::transmute(x) }
     }
 }
+
+// NOTE: Hash, PartialEq and Eq look only the interval part
+// as these are used solely to discriminate constants with
+// the maximum decorations.
 
 impl PartialEq for TupperInterval {
     fn eq(&self, rhs: &Self) -> bool {
-        self.base() == rhs.base() && self.g == rhs.g
+        self.x == rhs.x
     }
 }
 
-// This is safe as long as nai is not involved.
 impl Eq for TupperInterval {}
 
 impl Hash for TupperInterval {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.base().inf().to_bits().hash(state);
-        self.base().sup().to_bits().hash(state);
-        (self.d as u8).hash(state);
-        self.g.hash(state);
+        self.x.inf().to_bits().hash(state);
+        self.x.sup().to_bits().hash(state);
     }
 }
 
@@ -113,7 +128,7 @@ impl TupperIntervalSet {
     }
 
     fn insert(&mut self, x: TupperInterval) {
-        if !x.base().is_empty() {
+        if !x.x.is_empty() {
             self.0.push(x);
         }
     }
@@ -142,7 +157,7 @@ impl Neg for &TupperIntervalSet {
     fn neg(self) -> Self::Output {
         let mut rs = Self::Output::new();
         for x in &self.0 {
-            rs.insert(TupperInterval::new(-x.base(), x.g));
+            rs.insert(TupperInterval::new(-x.to_dec_interval(), x.g));
         }
         rs.normalize()
     }
@@ -158,7 +173,10 @@ macro_rules! impl_arith_op {
                 for x in &self.0 {
                     for y in &rhs.0 {
                         if let Some(g) = x.g.union(y.g) {
-                            rs.insert(TupperInterval::new(x.base().$op(y.base()), g));
+                            rs.insert(TupperInterval::new(
+                                x.to_dec_interval().$op(y.to_dec_interval()),
+                                g,
+                            ));
                         }
                     }
                 }
@@ -177,7 +195,7 @@ macro_rules! impl_no_cut_op {
         pub fn $op(&self) -> Self {
             let mut rs = Self::new();
             for x in &self.0 {
-                rs.insert(TupperInterval::new(x.base().$op(), x.g));
+                rs.insert(TupperInterval::new(x.to_dec_interval().$op(), x.g));
             }
             rs.normalize()
         }
@@ -191,7 +209,10 @@ macro_rules! impl_no_cut_op2 {
             for x in &self.0 {
                 for y in &rhs.0 {
                     if let Some(g) = x.g.union(y.g) {
-                        rs.insert(TupperInterval::new(x.base().$op(y.base()), g));
+                        rs.insert(TupperInterval::new(
+                            x.to_dec_interval().$op(y.to_dec_interval()),
+                            g,
+                        ));
                     }
                 }
             }
@@ -205,9 +226,9 @@ macro_rules! impl_integer_op {
         pub fn $op(&self, site: Option<u8>) -> Self {
             let mut rs = Self::new();
             for x in &self.0 {
-                let y = TupperInterval::new(x.base().$op(), x.g);
-                let a = y.base().inf();
-                let b = y.base().sup();
+                let y = TupperInterval::new(x.to_dec_interval().$op(), x.g);
+                let a = y.x.inf();
+                let b = y.x.sup();
                 if b - a == 1.0 {
                     rs.insert(TupperInterval::new(
                         DecoratedInterval::set_dec(interval!(a, a).unwrap(), y.d),
@@ -238,10 +259,10 @@ impl TupperIntervalSet {
         for y in &self.0 {
             for x in &rhs.0 {
                 if let Some(g) = x.g.union(y.g) {
-                    let a = x.base().inf();
-                    let b = x.base().sup();
-                    let c = y.base().inf();
-                    let d = y.base().sup();
+                    let a = x.x.inf();
+                    let b = x.x.sup();
+                    let c = y.x.inf();
+                    let d = y.x.sup();
                     if a == 0.0 && b == 0.0 && c < 0.0 && d > 0.0 {
                         rs.insert(TupperInterval::new(
                             DecoratedInterval::set_dec(-Interval::FRAC_PI_2, Decoration::Trv),
@@ -298,7 +319,10 @@ impl TupperIntervalSet {
                             ));
                         }
                     } else {
-                        rs.insert(TupperInterval::new(y.base().atan2(x.base()), g));
+                        rs.insert(TupperInterval::new(
+                            y.to_dec_interval().atan2(x.to_dec_interval()),
+                            g,
+                        ));
                     }
                 }
             }
@@ -311,12 +335,12 @@ impl TupperIntervalSet {
         for x in &self.0 {
             for y in &rhs.0 {
                 if let Some(g) = x.g.union(y.g) {
-                    let c = y.base().inf();
-                    let d = y.base().sup();
+                    let c = y.x.inf();
+                    let d = y.x.sup();
                     if c < 0.0 && d > 0.0 {
                         let y0 = DecoratedInterval::set_dec(interval!(c, 0.0).unwrap(), y.d);
                         rs.insert(TupperInterval::new(
-                            x.base() / y0,
+                            x.to_dec_interval() / y0,
                             match site {
                                 Some(site) => g.inserted(site, 0),
                                 _ => g,
@@ -324,14 +348,17 @@ impl TupperIntervalSet {
                         ));
                         let y1 = DecoratedInterval::set_dec(interval!(0.0, d).unwrap(), y.d);
                         rs.insert(TupperInterval::new(
-                            x.base() / y1,
+                            x.to_dec_interval() / y1,
                             match site {
                                 Some(site) => g.inserted(site, 1),
                                 _ => g,
                             },
                         ));
                     } else {
-                        rs.insert(TupperInterval::new(x.base() / y.base(), g));
+                        rs.insert(TupperInterval::new(
+                            x.to_dec_interval() / y.to_dec_interval(),
+                            g,
+                        ));
                     }
                 }
             }
@@ -346,7 +373,11 @@ impl TupperIntervalSet {
                 if let Some(g) = x.g.union(y.g) {
                     for z in &addend.0 {
                         if let Some(g) = g.union(z.g) {
-                            rs.insert(TupperInterval::new(x.base().mul_add(y.base(), z.base()), g));
+                            rs.insert(TupperInterval::new(
+                                x.to_dec_interval()
+                                    .mul_add(y.to_dec_interval(), z.to_dec_interval()),
+                                g,
+                            ));
                         }
                     }
                 }
@@ -358,8 +389,8 @@ impl TupperIntervalSet {
     pub fn recip(&self, site: Option<u8>) -> Self {
         let mut rs = Self::new();
         for x in &self.0 {
-            let a = x.base().inf();
-            let b = x.base().sup();
+            let a = x.x.inf();
+            let b = x.x.sup();
             if a < 0.0 && b > 0.0 {
                 let x0 = DecoratedInterval::set_dec(interval!(a, 0.0).unwrap(), x.d);
                 rs.insert(TupperInterval::new(
@@ -378,7 +409,7 @@ impl TupperIntervalSet {
                     },
                 ));
             } else {
-                rs.insert(TupperInterval::new(x.base().recip(), x.g));
+                rs.insert(TupperInterval::new(x.to_dec_interval().recip(), x.g));
             }
         }
         rs.normalize()
@@ -389,8 +420,8 @@ impl TupperIntervalSet {
         const MIN_RD: f64 = hexf64!("-0x3.79c9f80c234ecp-4");
         let mut rs = Self::new();
         for x in &self.0 {
-            let a = x.base().inf();
-            let b = x.base().sup();
+            let a = x.x.inf();
+            let b = x.x.sup();
             if a <= 0.0 && b >= 0.0 {
                 let yn = if a < 0.0 {
                     if -a < ARGMIN_RD {
@@ -415,7 +446,10 @@ impl TupperIntervalSet {
                 let y = DecoratedInterval::set_dec(yn.convex_hull(yp), Decoration::Trv);
                 rs.insert(TupperInterval::new(y, x.g));
             } else {
-                rs.insert(TupperInterval::new(x.base().sin() / x.base(), x.g));
+                rs.insert(TupperInterval::new(
+                    x.to_dec_interval().sin() / x.to_dec_interval(),
+                    x.g,
+                ));
             }
         }
         rs.normalize()
@@ -424,8 +458,8 @@ impl TupperIntervalSet {
     pub fn tan(&self, site: Option<u8>) -> Self {
         let mut rs = Self::new();
         for x in &self.0 {
-            let a = x.base().inf();
-            let b = x.base().sup();
+            let a = x.x.inf();
+            let b = x.x.sup();
             let q_nowrap = (x.x / Interval::FRAC_PI_2).floor();
             let qa = q_nowrap.inf();
             let qb = q_nowrap.sup();
@@ -437,7 +471,7 @@ impl TupperIntervalSet {
             if q == 0.0 && (n < 1.0 || n == 1.0 && cont)
                 || q == 1.0 && (n < 2.0 || n == 2.0 && cont)
             {
-                rs.insert(TupperInterval::new(x.base().tan(), x.g));
+                rs.insert(TupperInterval::new(x.to_dec_interval().tan(), x.g));
             } else if q == 0.0 && (n < 2.0 || n == 2.0 && cont)
                 || q == 1.0 && (n < 3.0 || n == 3.0 && cont)
             {
@@ -462,7 +496,7 @@ impl TupperIntervalSet {
                     },
                 ));
             } else {
-                rs.insert(TupperInterval::new(x.base().tan(), x.g));
+                rs.insert(TupperInterval::new(x.to_dec_interval().tan(), x.g));
             }
         }
         rs.normalize()

@@ -328,7 +328,7 @@ fn fn1(i: &str) -> IResult<&str, UnaryOp> {
 
 fn fn2(i: &str) -> IResult<&str, BinaryOp> {
     alt((
-        value(BinaryOp::Atan2, tag("atan")),
+        value(BinaryOp::Atan2, tag("atan2")),
         value(BinaryOp::Max, tag("max")),
         value(BinaryOp::Min, tag("min")),
     ))(i)
