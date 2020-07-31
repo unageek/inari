@@ -10,6 +10,7 @@ pub struct DynRelation {
 impl DynRelation {
     pub fn new(relation: &str) -> Self {
         let mut rel = parse(relation).unwrap();
+        Transform.visit_rel_mut(&mut rel);
         let mut v = AssignNodeId::new();
         v.visit_rel_mut(&mut rel);
         let mut v = AssignSite::new(v.site_map());

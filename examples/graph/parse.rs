@@ -11,6 +11,7 @@ use nom::{
 };
 
 // TODO:
+// - Implement power_expr for general exponents
 // - Error handling
 
 fn decimal_literal(i: &str) -> IResult<&str, &str> {
@@ -112,15 +113,14 @@ fn postfix_expr(i: &str) -> IResult<&str, Expr> {
     ))(i)
 }
 
-// TODO: Implement power.
 fn power_expr(i: &str) -> IResult<&str, Expr> {
-    alt((
-        map(
-            terminated(postfix_expr, tuple((space0, tag("^"), space0, tag("2")))),
-            move |x| Expr::new(ExprKind::Unary(UnaryOp::Sqr, Box::new(x))),
-        ),
-        postfix_expr,
-    ))(i)
+    let (i, x) = postfix_expr(i)?;
+
+    fold_many0(
+        pair(delimited(space0, char('^'), space0), tag("2")),
+        x,
+        move |xs, _| Expr::new(ExprKind::Unary(UnaryOp::Sqr, Box::new(xs))),
+    )(i)
 }
 
 fn unary_expr(i: &str) -> IResult<&str, Expr> {

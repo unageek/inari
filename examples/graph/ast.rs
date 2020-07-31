@@ -22,8 +22,10 @@ pub enum UnaryOp {
     Log,
     Log10,
     Log2,
+    Recip,
     Sign,
     Sin,
+    SinOverX,
     Sinh,
     Sqr,
     Sqrt,
@@ -80,6 +82,16 @@ pub struct Expr {
     pub id: NodeId,
     pub site: Option<u8>,
     pub kind: ExprKind,
+}
+
+impl Default for Expr {
+    fn default() -> Self {
+        Self {
+            id: 0,
+            site: None,
+            kind: ExprKind::Constant(TupperIntervalSet::new()),
+        }
+    }
 }
 
 impl PartialEq for Expr {
@@ -151,8 +163,10 @@ impl Expr {
             Unary(Log, x) => x.value(vs).log(),
             Unary(Log10, x) => x.value(vs).log10(),
             Unary(Log2, x) => x.value(vs).log2(),
+            Unary(Recip, x) => x.value(vs).recip(self.site),
             Unary(Sign, x) => x.value(vs).sign(self.site),
             Unary(Sin, x) => x.value(vs).sin(),
+            Unary(SinOverX, x) => x.value(vs).sin_over_x(),
             Unary(Sinh, x) => x.value(vs).sinh(),
             Unary(Sqr, x) => x.value(vs).sqr(),
             Unary(Sqrt, x) => x.value(vs).sqrt(),

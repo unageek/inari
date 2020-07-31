@@ -415,6 +415,7 @@ impl TupperIntervalSet {
         rs.normalize()
     }
 
+    // Less precise for an interval near zero but does not contain zero.
     pub fn sin_over_x(&self) -> Self {
         const ARGMIN_RD: f64 = hexf64!("0x4.7e50150d41abp+0");
         const MIN_RD: f64 = hexf64!("-0x3.79c9f80c234ecp-4");

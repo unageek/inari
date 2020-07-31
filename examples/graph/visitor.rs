@@ -6,7 +6,6 @@ use std::{
 
 // TODO:
 // - Constant folding
-// - Some transformation (sin(x)/x -> sin_over_x(x), etc.)
 // - Cloning every nodes as done in some visitors is stupid
 
 pub trait Visitor
@@ -14,15 +13,15 @@ where
     Self: Sized,
 {
     fn visit_expr(&mut self, expr: &Expr) {
-        noop_visit_expr(self, expr);
+        traverse_expr(self, expr);
     }
 
     fn visit_rel(&mut self, rel: &Rel) {
-        noop_visit_rel(self, rel)
+        traverse_rel(self, rel)
     }
 }
 
-fn noop_visit_expr<V: Visitor>(v: &mut V, expr: &Expr) {
+fn traverse_expr<V: Visitor>(v: &mut V, expr: &Expr) {
     use ExprKind::*;
     match &expr.kind {
         Unary(_, x) => v.visit_expr(x),
@@ -34,7 +33,7 @@ fn noop_visit_expr<V: Visitor>(v: &mut V, expr: &Expr) {
     };
 }
 
-fn noop_visit_rel<V: Visitor>(v: &mut V, rel: &Rel) {
+fn traverse_rel<V: Visitor>(v: &mut V, rel: &Rel) {
     use RelKind::*;
     match &rel.kind {
         Equality(_, x, y) => {
@@ -53,15 +52,15 @@ where
     Self: Sized,
 {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        noop_visit_expr_mut(self, expr);
+        traverse_expr_mut(self, expr);
     }
 
     fn visit_rel_mut(&mut self, rel: &mut Rel) {
-        noop_visit_rel_mut(self, rel);
+        traverse_rel_mut(self, rel);
     }
 }
 
-fn noop_visit_expr_mut<V: VisitorMut>(v: &mut V, expr: &mut Expr) {
+fn traverse_expr_mut<V: VisitorMut>(v: &mut V, expr: &mut Expr) {
     use ExprKind::*;
     match &mut expr.kind {
         Unary(_, x) => v.visit_expr_mut(x),
@@ -73,7 +72,7 @@ fn noop_visit_expr_mut<V: VisitorMut>(v: &mut V, expr: &mut Expr) {
     };
 }
 
-fn noop_visit_rel_mut<V: VisitorMut>(v: &mut V, rel: &mut Rel) {
+fn traverse_rel_mut<V: VisitorMut>(v: &mut V, rel: &mut Rel) {
     use RelKind::*;
     match &mut rel.kind {
         Equality(_, x, y) => {
@@ -88,6 +87,37 @@ fn noop_visit_rel_mut<V: VisitorMut>(v: &mut V, rel: &mut Rel) {
 }
 
 type SiteMap = HashMap<NodeId, Option<u8>>;
+
+pub struct Transform;
+
+impl VisitorMut for Transform {
+    fn visit_expr_mut(&mut self, expr: &mut Expr) {
+        traverse_expr_mut(self, expr);
+
+        match &mut expr.kind {
+            ExprKind::Binary(BinaryOp::Div, x, y) => {
+                match (&x.kind, &y.kind) {
+                    (ExprKind::Unary(UnaryOp::Sin, z), _) if z == y => {
+                        // (Div (Sin z) y) => (SinOverX y)
+                        *expr = Expr::new(ExprKind::Unary(UnaryOp::SinOverX, std::mem::take(y)));
+                    }
+                    (_, ExprKind::Unary(UnaryOp::Sin, z)) if z == x => {
+                        // (Div x (Sin z)) => (Recip (SinOverX x))
+                        *expr = Expr::new(ExprKind::Unary(
+                            UnaryOp::Recip,
+                            Box::new(Expr::new(ExprKind::Unary(
+                                UnaryOp::SinOverX,
+                                std::mem::take(x),
+                            ))),
+                        ));
+                    }
+                    _ => (),
+                };
+            }
+            _ => (),
+        }
+    }
+}
 
 pub struct AssignNodeId {
     next_id: NodeId,
@@ -117,6 +147,7 @@ impl AssignNodeId {
         matches!(kind,
             Unary(Ceil, _)
             | Unary(Floor, _)
+            | Unary(Recip, _)
             | Unary(Sign, _)
             | Unary(Tan, _)
             | Binary(Div, _, _)
@@ -126,7 +157,7 @@ impl AssignNodeId {
 
 impl VisitorMut for AssignNodeId {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        noop_visit_expr_mut(self, expr);
+        traverse_expr_mut(self, expr);
 
         match self.visited_nodes.get(expr) {
             Some(visited) => {
@@ -172,7 +203,7 @@ impl AssignSite {
 
 impl VisitorMut for AssignSite {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        noop_visit_expr_mut(self, expr);
+        traverse_expr_mut(self, expr);
 
         if let Some(site) = self.site_map.get(&expr.id) {
             expr.site = *site;
@@ -201,7 +232,7 @@ impl CollectNodes {
 
 impl Visitor for CollectNodes {
     fn visit_expr(&mut self, expr: &Expr) {
-        noop_visit_expr(self, expr);
+        traverse_expr(self, expr);
 
         if expr.id == self.next_node_id {
             self.nodes.push(expr.clone());
