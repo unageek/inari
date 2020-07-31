@@ -89,7 +89,7 @@ impl Default for Expr {
         Self {
             id: 0,
             site: None,
-            kind: ExprKind::Constant(TupperIntervalSet::new()),
+            kind: ExprKind::Constant(TupperIntervalSet::empty()),
         }
     }
 }

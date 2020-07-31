@@ -94,27 +94,24 @@ impl VisitorMut for Transform {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
         traverse_expr_mut(self, expr);
 
-        match &mut expr.kind {
-            ExprKind::Binary(BinaryOp::Div, x, y) => {
-                match (&x.kind, &y.kind) {
-                    (ExprKind::Unary(UnaryOp::Sin, z), _) if z == y => {
-                        // (Div (Sin z) y) => (SinOverX y)
-                        *expr = Expr::new(ExprKind::Unary(UnaryOp::SinOverX, std::mem::take(y)));
-                    }
-                    (_, ExprKind::Unary(UnaryOp::Sin, z)) if z == x => {
-                        // (Div x (Sin z)) => (Recip (SinOverX x))
-                        *expr = Expr::new(ExprKind::Unary(
-                            UnaryOp::Recip,
-                            Box::new(Expr::new(ExprKind::Unary(
-                                UnaryOp::SinOverX,
-                                std::mem::take(x),
-                            ))),
-                        ));
-                    }
-                    _ => (),
-                };
-            }
-            _ => (),
+        if let ExprKind::Binary(BinaryOp::Div, x, y) = &mut expr.kind {
+            match (&x.kind, &y.kind) {
+                (ExprKind::Unary(UnaryOp::Sin, z), _) if z == y => {
+                    // (Div (Sin z) y) => (SinOverX y)
+                    *expr = Expr::new(ExprKind::Unary(UnaryOp::SinOverX, std::mem::take(y)));
+                }
+                (_, ExprKind::Unary(UnaryOp::Sin, z)) if z == x => {
+                    // (Div x (Sin z)) => (Recip (SinOverX x))
+                    *expr = Expr::new(ExprKind::Unary(
+                        UnaryOp::Recip,
+                        Box::new(Expr::new(ExprKind::Unary(
+                            UnaryOp::SinOverX,
+                            std::mem::take(x),
+                        ))),
+                    ));
+                }
+                _ => (),
+            };
         }
     }
 }

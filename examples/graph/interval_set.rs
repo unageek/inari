@@ -123,7 +123,7 @@ type TupperIntervalVec = SmallVec<[TupperInterval; 2]>;
 pub struct TupperIntervalSet(TupperIntervalVec);
 
 impl TupperIntervalSet {
-    pub fn new() -> Self {
+    pub fn empty() -> Self {
         Self(TupperIntervalVec::new())
     }
 
@@ -145,7 +145,7 @@ impl TupperIntervalSet {
 
 impl From<DecoratedInterval> for TupperIntervalSet {
     fn from(x: DecoratedInterval) -> Self {
-        let mut xs = Self::new();
+        let mut xs = Self::empty();
         xs.insert(TupperInterval::new(x, IntervalBranch::new()));
         xs
     }
@@ -155,7 +155,7 @@ impl Neg for &TupperIntervalSet {
     type Output = TupperIntervalSet;
 
     fn neg(self) -> Self::Output {
-        let mut rs = Self::Output::new();
+        let mut rs = Self::Output::empty();
         for x in &self.0 {
             rs.insert(TupperInterval::new(-x.to_dec_interval(), x.g));
         }
@@ -169,7 +169,7 @@ macro_rules! impl_arith_op {
             type Output = TupperIntervalSet;
 
             fn $op(self, rhs: &'b TupperIntervalSet) -> Self::Output {
-                let mut rs = Self::Output::new();
+                let mut rs = Self::Output::empty();
                 for x in &self.0 {
                     for y in &rhs.0 {
                         if let Some(g) = x.g.union(y.g) {
@@ -193,7 +193,7 @@ impl_arith_op!(Mul, mul);
 macro_rules! impl_no_cut_op {
     ($op:ident) => {
         pub fn $op(&self) -> Self {
-            let mut rs = Self::new();
+            let mut rs = Self::empty();
             for x in &self.0 {
                 rs.insert(TupperInterval::new(x.to_dec_interval().$op(), x.g));
             }
@@ -205,7 +205,7 @@ macro_rules! impl_no_cut_op {
 macro_rules! impl_no_cut_op2 {
     ($op:ident) => {
         pub fn $op(&self, rhs: &Self) -> Self {
-            let mut rs = Self::new();
+            let mut rs = Self::empty();
             for x in &self.0 {
                 for y in &rhs.0 {
                     if let Some(g) = x.g.union(y.g) {
@@ -224,7 +224,7 @@ macro_rules! impl_no_cut_op2 {
 macro_rules! impl_integer_op {
     ($op:ident) => {
         pub fn $op(&self, site: Option<u8>) -> Self {
-            let mut rs = Self::new();
+            let mut rs = Self::empty();
             for x in &self.0 {
                 let y = TupperInterval::new(x.to_dec_interval().$op(), x.g);
                 let a = y.x.inf();
@@ -255,7 +255,7 @@ macro_rules! impl_integer_op {
 
 impl TupperIntervalSet {
     pub fn atan2(&self, rhs: &Self, site: Option<u8>) -> Self {
-        let mut rs = Self::new();
+        let mut rs = Self::empty();
         for y in &self.0 {
             for x in &rhs.0 {
                 if let Some(g) = x.g.union(y.g) {
@@ -331,7 +331,7 @@ impl TupperIntervalSet {
     }
 
     pub fn div(&self, rhs: &Self, site: Option<u8>) -> Self {
-        let mut rs = Self::new();
+        let mut rs = Self::empty();
         for x in &self.0 {
             for y in &rhs.0 {
                 if let Some(g) = x.g.union(y.g) {
@@ -367,7 +367,7 @@ impl TupperIntervalSet {
     }
 
     pub fn mul_add(&self, rhs: &Self, addend: &Self) -> Self {
-        let mut rs = Self::new();
+        let mut rs = Self::empty();
         for x in &self.0 {
             for y in &rhs.0 {
                 if let Some(g) = x.g.union(y.g) {
@@ -387,7 +387,7 @@ impl TupperIntervalSet {
     }
 
     pub fn recip(&self, site: Option<u8>) -> Self {
-        let mut rs = Self::new();
+        let mut rs = Self::empty();
         for x in &self.0 {
             let a = x.x.inf();
             let b = x.x.sup();
@@ -419,7 +419,7 @@ impl TupperIntervalSet {
     pub fn sin_over_x(&self) -> Self {
         const ARGMIN_RD: f64 = hexf64!("0x4.7e50150d41abp+0");
         const MIN_RD: f64 = hexf64!("-0x3.79c9f80c234ecp-4");
-        let mut rs = Self::new();
+        let mut rs = Self::empty();
         for x in &self.0 {
             let a = x.x.inf();
             let b = x.x.sup();
@@ -457,7 +457,7 @@ impl TupperIntervalSet {
     }
 
     pub fn tan(&self, site: Option<u8>) -> Self {
-        let mut rs = Self::new();
+        let mut rs = Self::empty();
         for x in &self.0 {
             let a = x.x.inf();
             let b = x.x.sup();

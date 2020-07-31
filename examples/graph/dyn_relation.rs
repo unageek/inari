@@ -22,7 +22,7 @@ impl DynRelation {
         Self {
             rel,
             nodes,
-            vs: vec![TupperIntervalSet::new(); n],
+            vs: vec![TupperIntervalSet::empty(); n],
         }
     }
 
