@@ -39,7 +39,7 @@ fn primary_expr(i: &str) -> IResult<&str, Expr> {
         value(Expr::new(ExprKind::Y), char('y')),
         delimited(
             terminated(char('('), space0),
-            additive_expr,
+            expr,
             preceded(space0, cut(char(')'))),
         ),
     ))(i)
@@ -91,7 +91,7 @@ fn postfix_expr(i: &str) -> IResult<&str, Expr> {
                 fn1,
                 delimited(
                     terminated(char('('), space0),
-                    additive_expr,
+                    expr,
                     preceded(space0, cut(char(')'))),
                 ),
             ),
@@ -102,11 +102,7 @@ fn postfix_expr(i: &str) -> IResult<&str, Expr> {
                 fn2,
                 delimited(
                     terminated(char('('), space0),
-                    separated_pair(
-                        additive_expr,
-                        delimited(space0, char(','), space0),
-                        additive_expr,
-                    ),
+                    separated_pair(expr, delimited(space0, char(','), space0), expr),
                     preceded(space0, cut(char(')'))),
                 ),
             ),
@@ -116,13 +112,24 @@ fn postfix_expr(i: &str) -> IResult<&str, Expr> {
     ))(i)
 }
 
+// TODO: Implement power.
+fn power_expr(i: &str) -> IResult<&str, Expr> {
+    alt((
+        map(
+            terminated(postfix_expr, tuple((space0, tag("^"), space0, tag("2")))),
+            move |x| Expr::new(ExprKind::Unary(UnaryOp::Sqr, Box::new(x))),
+        ),
+        postfix_expr,
+    ))(i)
+}
+
 fn unary_expr(i: &str) -> IResult<&str, Expr> {
     alt((
         map(
             separated_pair(value(UnaryOp::Neg, char('-')), space0, unary_expr),
             |(op, x)| Expr::new(ExprKind::Unary(op, Box::new(x))),
         ),
-        postfix_expr,
+        power_expr,
     ))(i)
 }
 
@@ -166,10 +173,14 @@ fn additive_expr(i: &str) -> IResult<&str, Expr> {
     )(i)
 }
 
-fn equality_expr(i: &str) -> IResult<&str, Rel> {
+fn expr(i: &str) -> IResult<&str, Expr> {
+    additive_expr(i)
+}
+
+fn equality(i: &str) -> IResult<&str, Rel> {
     map(
         tuple((
-            additive_expr,
+            expr,
             delimited(
                 space0,
                 alt((
@@ -181,45 +192,49 @@ fn equality_expr(i: &str) -> IResult<&str, Rel> {
                 )),
                 space0,
             ),
-            additive_expr,
+            expr,
         )),
         move |(x, op, y)| Rel::new(RelKind::Equality(op, Box::new(x), Box::new(y))),
     )(i)
 }
 
-fn rel_primary_expr(i: &str) -> IResult<&str, Rel> {
+fn primary_rel(i: &str) -> IResult<&str, Rel> {
     alt((
         delimited(
             terminated(char('('), space0),
-            or_expr,
+            rel,
             preceded(space0, cut(char(')'))),
         ),
-        equality_expr,
+        equality,
     ))(i)
 }
 
-fn and_expr(i: &str) -> IResult<&str, Rel> {
-    let (i, x) = rel_primary_expr(i)?;
+fn and_rel(i: &str) -> IResult<&str, Rel> {
+    let (i, x) = primary_rel(i)?;
 
     fold_many0(
-        preceded(delimited(space0, tag("&&"), space0), rel_primary_expr),
+        preceded(delimited(space0, tag("&&"), space0), primary_rel),
         x,
         move |xs, y| Rel::new(RelKind::Binary(RelBinaryOp::And, Box::new(xs), Box::new(y))),
     )(i)
 }
 
-fn or_expr(i: &str) -> IResult<&str, Rel> {
-    let (i, x) = and_expr(i)?;
+fn or_rel(i: &str) -> IResult<&str, Rel> {
+    let (i, x) = and_rel(i)?;
 
     fold_many0(
-        preceded(delimited(space0, tag("||"), space0), and_expr),
+        preceded(delimited(space0, tag("||"), space0), and_rel),
         x,
         move |xs, y| Rel::new(RelKind::Binary(RelBinaryOp::Or, Box::new(xs), Box::new(y))),
     )(i)
 }
 
+fn rel(i: &str) -> IResult<&str, Rel> {
+    or_rel(i)
+}
+
 pub fn parse(i: &str) -> Option<Rel> {
-    match or_expr(i) {
+    match rel(i) {
         Ok(("", x)) => Some(x),
         _ => None,
     }

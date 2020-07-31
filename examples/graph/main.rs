@@ -7,10 +7,9 @@ mod interval_set;
 mod parse;
 mod visitor;
 
-use crate::{dyn_relation::*, graph::*, interval_set::*};
-use clap::{App, Arg};
-use hexf::*;
-use inari::{const_dec_interval, const_interval, interval, DecoratedInterval, Interval};
+use crate::{dyn_relation::*, graph::*};
+use clap::{App, AppSettings, Arg};
+use inari::{const_interval, interval, Interval};
 
 fn print_statistics_header() {
     println!(
@@ -40,192 +39,150 @@ fn print_statistics(cur: &GraphingStatistics, prev: &GraphingStatistics) {
     );
 }
 
-fn f(x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
-    const C0: DecoratedInterval = const_dec_interval!(0.0, 0.0);
-    const C1: DecoratedInterval = const_dec_interval!(1.0, 1.0);
-    const C3: DecoratedInterval = const_dec_interval!(3.0, 3.0);
-    // Hull of 3.001.
-    const C3_001: DecoratedInterval = const_dec_interval!(
-        hexf64!("0x3.004189374bc6ap+0"),
-        hexf64!("0x3.004189374bc6cp+0")
-    );
-    const C5: DecoratedInterval = const_dec_interval!(5.0, 5.0);
-    const C8: DecoratedInterval = const_dec_interval!(8.0, 8.0);
-    const C9: DecoratedInterval = const_dec_interval!(9.0, 9.0);
-    const C25: DecoratedInterval = const_dec_interval!(25.0, 25.0);
-    const C40: DecoratedInterval = const_dec_interval!(40.0, 40.0);
-    const C81: DecoratedInterval = const_dec_interval!(81.0, 81.0);
+// [🐌]: Takes a long time to finish graphing.
 
-    // [🐌]: Takes a long time to finish graphing.
+// "sin(x) == cos(y)"
 
-    x.sin().eq(&y.cos())
+// "y - x == sin(exp(x + y))"
 
-    //(&y - &x).eq(&(&x + &y).exp().sin())
+// "(x^2 + y^2) == 1 || y == -cos(x)"
 
-    //let c0 = TupperIntervalSet::from(C0);
-    //let c1 = TupperIntervalSet::from(C1);
-    //(&(&x.sqr() + &y.sqr()) - &c1).eq(&c0) | (&y + &x.cos()).eq(&c0)
+// From Fig. 1a in Tupper (2001)
+// "y < sqrt(x)"
 
-    // From Fig. 1a in Tupper (2001)
-    //y.lt(&x.sqrt())
+// From Fig. 17 in Tupper (2001) [🐌]
+// "y == x - atan(tan(x))"
 
-    // From Fig. 17 in Tupper (2001) [🐌]
-    //y.eq(&(&x - &x.tan(None).atan()))
+// Some intriguing examples from GrafEq
 
-    // Some intriguing examples from GrafEq
+// 📂 Single Relation/Abstract/Simple/
+//  📄 Parabolic Waves.gqs
+// "abs(sin(sqrt(x^2 + y^2))) == abs(cos(x))"
 
-    // 📂 Single Relation/Abstract/Simple/
-    //  📄 Parabolic Waves.gqs
-    //(&x.sqr() + &y.sqr()).sqrt().sin().abs().eq(&x.cos().abs())
+//  📄 Pythagorean Pairs.gqs [🐌]
+// "floor(x)^2 + floor(y)^2 == floor(sqrt(floor(x)^2 + floor(y)^2))^2"
 
-    //  📄 Pythagorean Pairs.gqs [🐌]
-    //let a = &x.floor(Some(0)).sqr() + &y.floor(Some(1)).sqr();
-    //a.eq(&a.sqrt().floor(None).sqr())
+//  📄 Pythagorean Triples.gqs [🐌]
+// "floor(x)^2 + floor(y)^2 == 25"
 
-    //  📄 Pythagorean Triples.gqs [🐌]
-    //let c25 = TupperIntervalSet::from(C25);
-    //(&x.floor(None).sqr() + &y.floor(None).sqr()).eq(&c25)
+// 📂 Single Relation/Abstract/Traditionally Difficult/
+//  📄 Infinite Frequency.gqs
+// "y == sin(40/x)"
 
-    //  📄 Wave.gqs (GrafEq seems to handle sin(x)/x specially like this)
-    //y.eq(&x.sin_over_x())
+//  📄 O Spike.gqs
+// "(x*(x - 3)/(x - 3.001))^2 + (y*(y - 3)/(y - 3.001))^2 == 81"
 
-    // 📂 Single Relation/Abstract/Traditionally Difficult/
-    //  📄 Infinite Frequency.gqs
-    //let c40 = TupperIntervalSet::from(C40);
-    //y.eq(&c40.div(&x, None).sin())
+//  📄 Solid Disc.gqs
+// "81 - x^2 - y^2 == abs(81 - x^2 - y^2)"
 
-    //  📄 O Spike.gqs
-    //let c3 = TupperIntervalSet::from(C3);
-    //let c3_001 = TupperIntervalSet::from(C3_001);
-    //let c81 = TupperIntervalSet::from(C81);
-    //(&(&x * &(&x - &c3)).div(&(&x - &c3_001), None).sqr()
-    //    + &(&y * &(&y - &c3)).div(&(&y - &c3_001), None).sqr())
-    //    .eq(&c81)
+//  📄 Spike.gqs
+// "y == x*(x - 3)/(x - 3.001)"
 
-    //  📄 Solid Disc.gqs
-    //let c81 = TupperIntervalSet::from(C81);
-    //let a = &c81 - &(&x.sqr() + &y.sqr());
-    //a.eq(&a.abs())
+//  📄 Step.gqs
+// TODO
 
-    //  📄 Spike.gqs
-    //let c3 = TupperIntervalSet::from(C3);
-    //let c3_001 = TupperIntervalSet::from(C3_001);
-    //y.eq(&(&x * &(&x - &c3)).div(&(&x - &c3_001), None))
+//  📄 Upper Triangle.gqs
+// "x + y == abs(x + y)"
 
-    //  📄 Step.gqs
-    //let c1 = TupperIntervalSet::from(C1);
-    //let c9 = TupperIntervalSet::from(C9);
-    //y.eq(&(&(&c9.sqr() * &c9) * &(&x - &c1)).atan())
+//  📄 Wave.gqs (GrafEq seems to handle sin(x)/x specially like this)
+//y.eq(&x.sin_over_x())
 
-    //  📄 Upper Triangle.gqs
-    //let a = &x + &y;
-    //a.eq(&a.abs())
+// 📂 Single Relation/Enumerations/Trees/
+//  📄 bi-infinite binary tree.gqs [🐌]
+// "sin(exp2(floor(y))*x + pi/4*(y - floor(y)) - pi/2) == 0 || sin(exp2(floor(y))*x - pi/4*(y - floor(y)) - pi/2) == 0"
 
-    // 📂 Single Relation/Enumerations/Trees/
-    //  📄 bi-infinite binary tree.gqs [🐌]
-    //let c0 = TupperIntervalSet::from(C0);
-    //let frac_pi_2 = TupperIntervalSet::from(DecoratedInterval::FRAC_PI_2);
-    //let frac_pi_4 = TupperIntervalSet::from(DecoratedInterval::FRAC_PI_4);
-    //let fy = y.floor(Some(0));
-    //let a = &(&fy.exp2() * &x) - &frac_pi_2;
-    //let b = &frac_pi_4 * &(&y - &fy);
-    //(&a + &b).sin().eq(&c0) | (&a - &b).sin().eq(&c0)
+// 📂 Single Relation/Linelike/
+//  📄 Frontispiece #2.gqs
+//let c0 = TupperIntervalSet::from(C0);
+//let xy = &x * &y;
+//let a = x.div(&x.cos(), Some(0));
+//let b = y.div(&y.cos(), Some(1));
+//let c = xy.div(&xy.cos(), Some(2));
+//let apb = &a + &b;
+//let amb = &a - &b;
+//(&apb + &c).eq(&c0) | (&apb - &c).eq(&c0) | (&amb + &c).eq(&c0) | (&amb - &c).eq(&c0)
 
-    // 📂 Single Relation/Linelike/
-    //  📄 Frontispiece #2.gqs
-    //let c0 = TupperIntervalSet::from(C0);
-    //let xy = &x * &y;
-    //let a = x.div(&x.cos(), Some(0));
-    //let b = y.div(&y.cos(), Some(1));
-    //let c = xy.div(&xy.cos(), Some(2));
-    //let apb = &a + &b;
-    //let amb = &a - &b;
-    //(&apb + &c).eq(&c0) | (&apb - &c).eq(&c0) | (&amb + &c).eq(&c0) | (&amb - &c).eq(&c0)
+//  📄 Frontispiece.gqs
+//let c0 = TupperIntervalSet::from(C0);
+//let xy = &x * &y;
+//let a = x.sin_over_x().recip(Some(0));
+//let b = y.sin_over_x().recip(Some(1));
+//let c = xy.sin_over_x().recip(Some(2));
+//let apb = &a + &b;
+//let amb = &a - &b;
+//(&apb + &c).eq(&c0) | (&apb - &c).eq(&c0) | (&amb + &c).eq(&c0) | (&amb - &c).eq(&c0)
 
-    //  📄 Frontispiece.gqs
-    //let c0 = TupperIntervalSet::from(C0);
-    //let xy = &x * &y;
-    //let a = x.sin_over_x().recip(Some(0));
-    //let b = y.sin_over_x().recip(Some(1));
-    //let c = xy.sin_over_x().recip(Some(2));
-    //let apb = &a + &b;
-    //let amb = &a - &b;
-    //(&apb + &c).eq(&c0) | (&apb - &c).eq(&c0) | (&amb + &c).eq(&c0) | (&amb - &c).eq(&c0)
+//  📄 Hair.gqs
+// Should be plotted over Region::new(4.0, 6.5, 2.0, 4.5).
+//let c0 = TupperIntervalSet::from(C0);
+//let cx = x.cos();
+//let cy = y.cos();
+//let sx = x.sin();
+//let sy = y.sin();
+//let a1 = &x + &sy;
+//let a2 = &x - &sy;
+//let b1 = &sx + &y;
+//let b2 = &sx - &y;
+//let c1 = &sx + &cy;
+//let c2 = &sx - &cy;
+//let d1 = &sy + &cx;
+//let d2 = &sy - &cx;
+//let e1 = (&a1 * &b1).sin();
+//let e2 = (&a1 * &b2).sin();
+//let e3 = (&a2 * &b1).sin();
+//let e4 = (&a2 * &b2).sin();
+//let f1 = -&(&c1 * &d1).sin().cos();
+//let f2 = -&(&c1 * &d2).sin().cos();
+//let f3 = -&(&c2 * &d1).sin().cos();
+//let f4 = -&(&c2 * &d2).sin().cos();
+//(&e1 + &f1).eq(&c0)
+//    | (&e1 + &f2).eq(&c0)
+//    | (&e1 + &f3).eq(&c0)
+//    | (&e1 + &f4).eq(&c0)
+//    | (&e2 + &f1).eq(&c0)
+//    | (&e2 + &f2).eq(&c0)
+//    | (&e2 + &f3).eq(&c0)
+//    | (&e2 + &f4).eq(&c0)
+//    | (&e3 + &f1).eq(&c0)
+//    | (&e3 + &f2).eq(&c0)
+//    | (&e3 + &f3).eq(&c0)
+//    | (&e3 + &f4).eq(&c0)
+//    | (&e4 + &f1).eq(&c0)
+//    | (&e4 + &f2).eq(&c0)
+//    | (&e4 + &f3).eq(&c0)
+//    | (&e4 + &f4).eq(&c0)
 
-    //  📄 Hair.gqs
-    // Should be plotted over Region::new(4.0, 6.5, 2.0, 4.5).
-    //let c0 = TupperIntervalSet::from(C0);
-    //let cx = x.cos();
-    //let cy = y.cos();
-    //let sx = x.sin();
-    //let sy = y.sin();
-    //let a1 = &x + &sy;
-    //let a2 = &x - &sy;
-    //let b1 = &sx + &y;
-    //let b2 = &sx - &y;
-    //let c1 = &sx + &cy;
-    //let c2 = &sx - &cy;
-    //let d1 = &sy + &cx;
-    //let d2 = &sy - &cx;
-    //let e1 = (&a1 * &b1).sin();
-    //let e2 = (&a1 * &b2).sin();
-    //let e3 = (&a2 * &b1).sin();
-    //let e4 = (&a2 * &b2).sin();
-    //let f1 = -&(&c1 * &d1).sin().cos();
-    //let f2 = -&(&c1 * &d2).sin().cos();
-    //let f3 = -&(&c2 * &d1).sin().cos();
-    //let f4 = -&(&c2 * &d2).sin().cos();
-    //(&e1 + &f1).eq(&c0)
-    //    | (&e1 + &f2).eq(&c0)
-    //    | (&e1 + &f3).eq(&c0)
-    //    | (&e1 + &f4).eq(&c0)
-    //    | (&e2 + &f1).eq(&c0)
-    //    | (&e2 + &f2).eq(&c0)
-    //    | (&e2 + &f3).eq(&c0)
-    //    | (&e2 + &f4).eq(&c0)
-    //    | (&e3 + &f1).eq(&c0)
-    //    | (&e3 + &f2).eq(&c0)
-    //    | (&e3 + &f3).eq(&c0)
-    //    | (&e3 + &f4).eq(&c0)
-    //    | (&e4 + &f1).eq(&c0)
-    //    | (&e4 + &f2).eq(&c0)
-    //    | (&e4 + &f3).eq(&c0)
-    //    | (&e4 + &f4).eq(&c0)
+//  📄 Highwire.gqs [🐌]
+// "abs(x*cos(x) - y*sin(y)) == abs(x*cos(y) - y*sin(x))"
 
-    //  📄 Highwire.gqs [🐌]
-    //(&(&x * &x.cos()) - &(&y * &y.sin()))
-    //    .abs()
-    //    .eq(&(&(&x * &y.cos()) - &(&y * &x.sin())).abs())
+//  📄 Trapezoidal Fortress.gqs [🐌]
+// "abs(x*cos(x) + y*sin(y)) == x*cos(y) - y*sin(x)"
 
-    //  📄 Trapezoidal Fortress.gqs [🐌]
-    //(&(&x * &x.cos()) + &(&y * &y.sin()))
-    //    .abs()
-    //    .eq(&(&(&x * &y.cos()) - &(&y * &x.sin())))
+// 📂 Single Relation/Solid/
+//  📄 Sharp Threesome.gqs
+//let c0 = TupperIntervalSet::from(C0);
+//let c5 = TupperIntervalSet::from(C5);
+//let c8 = TupperIntervalSet::from(C8);
+//let xp5 = &x + &c5;
+//let xm5 = &x - &c5;
+//let yp5 = &y + &c5;
+//let ym5 = &y - &c5;
+//let a = (&xp5.sqr() + &y.sqr()).sqrt().sin();
+//let b = (&c8 * &y.div(&xp5, None).atan()).cos();
+//let c = (&xm5.sqr() + &ym5.sqr()).sqrt().sin();
+//let d = (&c8 * &ym5.div(&xm5, None).atan()).cos();
+//let e = (&x.sqr() + &yp5.sqr()).sqrt().sin();
+//let f = (&c8 * &yp5.div(&x, None).atan()).cos();
+//(&a * &(&b * &(&c * &(&d * &(&e * &f))))).gt(&c0)
 
-    // 📂 Single Relation/Solid/
-    //  📄 Sharp Threesome.gqs
-    //let c0 = TupperIntervalSet::from(C0);
-    //let c5 = TupperIntervalSet::from(C5);
-    //let c8 = TupperIntervalSet::from(C8);
-    //let xp5 = &x + &c5;
-    //let xm5 = &x - &c5;
-    //let yp5 = &y + &c5;
-    //let ym5 = &y - &c5;
-    //let a = (&xp5.sqr() + &y.sqr()).sqrt().sin();
-    //let b = (&c8 * &y.div(&xp5, None).atan()).cos();
-    //let c = (&xm5.sqr() + &ym5.sqr()).sqrt().sin();
-    //let d = (&c8 * &ym5.div(&xm5, None).atan()).cos();
-    //let e = (&x.sqr() + &yp5.sqr()).sqrt().sin();
-    //let f = (&c8 * &yp5.div(&x, None).atan()).cos();
-    //(&a * &(&b * &(&c * &(&d * &(&e * &f))))).gt(&c0)
-
-    //  📄 The Disco Hall.gqs
-    //(&x + &y).abs().sin().gt(&x.sqr().cos().max(&y.sqr().sin()))
-}
+//  📄 The Disco Hall.gqs
+// "sin(abs(x + y)) > max(cos(x^2), sin(y^2))"
 
 fn main() {
     let matches = App::new("inari-graph")
+        .setting(AppSettings::AllowLeadingHyphen)
         .arg(Arg::new("relation").index(1))
+        .arg(Arg::new("output").index(2))
         .arg(
             Arg::with_name("bounds")
                 .short('b')
@@ -240,18 +197,13 @@ fn main() {
                 .default_values(&["1024", "1024"])
                 .value_names(&["WIDTH", "HEIGHT"]),
         )
-        .arg(Arg::with_name("perturb").short('p'))
         .get_matches();
 
-    // TODO: Output path
-    // TODO: Implement perturb bounds
-
     let relation = matches.value_of_t_or_exit::<String>("relation");
+    let output = matches.value_of_t_or_exit::<String>("output");
     let bounds = matches.values_of_t_or_exit::<f64>("bounds");
     let size = matches.values_of_t_or_exit::<u32>("size");
-    let perturb = matches.occurrences_of("perturb") > 0;
 
-    //let mut rel = DynRelation::new("sin(exp2(floor(y)) * x + pi/4 * (y - floor(y)) - pi/2) == 0 || sin(exp2(floor(y)) * x - pi/4 * (y - floor(y)) - pi/2) == 0");
     let mut rel = DynRelation::new(&relation);
     let mut g = Graph::new(
         Relation(|x, y| rel.evaluate(x, y)),
@@ -271,7 +223,7 @@ fn main() {
         prev_stat = stat;
 
         let im = g.get_image();
-        im.save("/mnt/e/graph.png").unwrap();
+        im.save(&output).unwrap();
 
         match result {
             Ok(true) => break,
