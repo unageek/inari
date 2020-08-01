@@ -76,7 +76,7 @@ Some intriguing examples from GrafEq
   - 📄 Step.gqs
     
     ```
-    "y == atan(10^2^2^2^2 * (x - 1))" 
+    "y == atan(10^309 * (x - 1))" 
     ```
 
   - 📄 Upper Triangle.gqs

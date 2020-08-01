@@ -25,6 +25,7 @@ fn traverse_expr<'a, V: Visitor<'a>>(v: &mut V, expr: &'a Expr) {
             v.visit_expr(x);
             v.visit_expr(y);
         }
+        Pown(x, _) => v.visit_expr(x),
         _ => (),
     };
 }
@@ -64,6 +65,7 @@ fn traverse_expr_mut<V: VisitorMut>(v: &mut V, expr: &mut Expr) {
             v.visit_expr_mut(x);
             v.visit_expr_mut(y);
         }
+        Pown(x, _) => v.visit_expr_mut(x),
         _ => (),
     };
 }
@@ -91,21 +93,37 @@ impl VisitorMut for Transform {
         use {BinaryOp::*, ExprKind::*, UnaryOp::*};
         traverse_expr_mut(self, expr);
 
-        if let Binary(Div, x, y) = &mut expr.kind {
-            match (&x.kind, &y.kind) {
-                // (Div (Sin z) y) => (SinOverX y) if z == y
-                (Unary(Sin, z), _) if z == y => {
-                    *expr = Expr::new(Unary(SinOverX, std::mem::take(y)));
+        match &mut expr.kind {
+            Binary(Div, x, y) => {
+                match (&x.kind, &y.kind) {
+                    // (Div (Sin z) y) => (SinOverX y) if z == y
+                    (Unary(Sin, z), _) if z == y => {
+                        *expr = Expr::new(Unary(SinOverX, std::mem::take(y)));
+                    }
+                    // (Div x (Sin z)) => (Recip (SinOverX x)) if z == x
+                    (_, Unary(Sin, z)) if z == x => {
+                        *expr = Expr::new(Unary(
+                            Recip,
+                            Box::new(Expr::new(Unary(SinOverX, std::mem::take(x)))),
+                        ));
+                    }
+                    _ => (),
+                };
+            }
+            Pown(x, y) => match y {
+                -1 => {
+                    *expr = Expr::new(Unary(Recip, std::mem::take(x)));
                 }
-                // (Div x (Sin z)) => (Recip (SinOverX x)) if z == x
-                (_, Unary(Sin, z)) if z == x => {
-                    *expr = Expr::new(Unary(
-                        Recip,
-                        Box::new(Expr::new(Unary(SinOverX, std::mem::take(x)))),
-                    ));
+                // Do not transform x^0 to 1.0 as that could discard the decoration.
+                1 => {
+                    *expr = *std::mem::take(x);
+                }
+                2 => {
+                    *expr = Expr::new(Unary(Sqr, std::mem::take(x)));
                 }
                 _ => (),
-            };
+            },
+            _ => (),
         }
     }
 }
@@ -131,6 +149,14 @@ impl VisitorMut for FoldConstant {
             }
             Binary(_, x, y) => {
                 if let (Constant(_), Constant(_)) = (&x.kind, &y.kind) {
+                    let value = expr.evaluate_constant();
+                    if value.len() <= 1 {
+                        *expr = Expr::new(Constant(value));
+                    }
+                }
+            }
+            Pown(x, _) => {
+                if let Constant(_) = &x.kind {
                     let value = expr.evaluate_constant();
                     if value.len() <= 1 {
                         *expr = Expr::new(Constant(value));
@@ -172,7 +198,8 @@ impl<'a> AssignNodeId<'a> {
             | Unary(Sign, _)
             | Unary(Tan, _)
             | Binary(Div, _, _)
-            | Binary(Atan2, _, _))
+            | Binary(Atan2, _, _)
+            | Pown(_, _))
     }
 }
 

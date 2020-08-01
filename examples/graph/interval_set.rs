@@ -390,6 +390,35 @@ impl TupperIntervalSet {
         rs.normalize()
     }
 
+    pub fn pown(&self, rhs: i32, site: Option<u8>) -> Self {
+        let mut rs = Self::empty();
+        for x in &self.0 {
+            let a = x.x.inf();
+            let b = x.x.sup();
+            if rhs < 0 && rhs % 2 == 1 && a < 0.0 && b > 0.0 {
+                let x0 = DecoratedInterval::set_dec(interval!(a, 0.0).unwrap(), x.d);
+                rs.insert(TupperInterval::new(
+                    x0.pown(rhs),
+                    match site {
+                        Some(site) => x.g.inserted(site, 0),
+                        _ => x.g,
+                    },
+                ));
+                let x1 = DecoratedInterval::set_dec(interval!(0.0, b).unwrap(), x.d);
+                rs.insert(TupperInterval::new(
+                    x1.pown(rhs),
+                    match site {
+                        Some(site) => x.g.inserted(site, 1),
+                        _ => x.g,
+                    },
+                ));
+            } else {
+                rs.insert(TupperInterval::new(x.to_dec_interval().pown(rhs), x.g));
+            }
+        }
+        rs.normalize()
+    }
+
     pub fn recip(&self, site: Option<u8>) -> Self {
         let mut rs = Self::empty();
         for x in &self.0 {

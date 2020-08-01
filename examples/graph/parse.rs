@@ -3,16 +3,21 @@ use inari::*;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{char, digit0, digit1, space0},
-    combinator::{cut, map, opt, recognize, value},
+    character::complete::{char, digit0, digit1, one_of, space0},
+    combinator::{cut, map, map_res, opt, recognize, value},
     multi::fold_many0,
     sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
     IResult,
 };
 
 // TODO:
-// - Implement power_expr for general exponents
 // - Error handling
+
+fn integer_literal(s: &str) -> IResult<&str, i32> {
+    map_res(recognize(pair(opt(one_of("+-")), digit1)), |i: &str| {
+        i.parse::<i32>()
+    })(s)
+}
 
 fn decimal_literal(i: &str) -> IResult<&str, &str> {
     alt((
@@ -113,14 +118,20 @@ fn postfix_expr(i: &str) -> IResult<&str, Expr> {
     ))(i)
 }
 
+// Repeated powers like x^2^2 (== x^(2^2)) is not permitted as
+// we don't have a way to make the power operator right-associative.
 fn power_expr(i: &str) -> IResult<&str, Expr> {
-    let (i, x) = postfix_expr(i)?;
-
-    fold_many0(
-        pair(delimited(space0, char('^'), space0), tag("2")),
-        x,
-        move |xs, _| Expr::new(ExprKind::Unary(UnaryOp::Sqr, Box::new(xs))),
-    )(i)
+    alt((
+        map(
+            tuple((
+                postfix_expr,
+                delimited(space0, char('^'), space0),
+                integer_literal,
+            )),
+            move |(x, _, y)| Expr::new(ExprKind::Pown(Box::new(x), y)),
+        ),
+        postfix_expr,
+    ))(i)
 }
 
 fn unary_expr(i: &str) -> IResult<&str, Expr> {

@@ -70,6 +70,7 @@ pub enum ExprKind {
     Y,
     Unary(UnaryOp, Box<Expr>),
     Binary(BinaryOp, Box<Expr>, Box<Expr>),
+    Pown(Box<Expr>, i32),
     Never,
 }
 
@@ -169,6 +170,14 @@ impl Expr {
                     kind: ExprKind::Never,
                 }),
             ),
+            Pown(x, y) => Pown(
+                Box::new(Expr {
+                    id: x.id.clone(),
+                    site: Cell::new(None),
+                    kind: ExprKind::Never,
+                }),
+                *y,
+            ),
             x => x.clone(),
         };
         Self {
@@ -216,6 +225,7 @@ impl Expr {
             Binary(Atan2, x, y) => x.evaluate_constant().atan2(&y.evaluate_constant(), None),
             Binary(Max, x, y) => x.evaluate_constant().max(&y.evaluate_constant()),
             Binary(Min, x, y) => x.evaluate_constant().min(&y.evaluate_constant()),
+            Pown(x, y) => x.evaluate_constant().pown(*y, None),
             X | Y | Never => panic!("The expression is not a constant."),
         }
     }
@@ -260,6 +270,7 @@ impl Expr {
             Binary(Atan2, x, y) => x.value(vs).atan2(y.value(vs), self.site.get()),
             Binary(Max, x, y) => x.value(vs).max(y.value(vs)),
             Binary(Min, x, y) => x.value(vs).min(y.value(vs)),
+            Pown(x, y) => x.value(vs).pown(*y, self.site.get()),
             Never => panic!(),
         }
     }
