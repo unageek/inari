@@ -1,5 +1,4 @@
-use crate::classify::*;
-use crate::interval::*;
+use crate::{classify::*, interval::*};
 use gmp_mpfr_sys::mpfr;
 use rug::Float;
 
@@ -34,6 +33,19 @@ fn mpfr_fn2(
     }
 }
 
+fn mpfr_fn_si(
+    f: unsafe extern "C" fn(*mut mpfr::mpfr_t, *const mpfr::mpfr_t, i64, mpfr::rnd_t) -> i32,
+    x: f64,
+    y: i64,
+    rnd: mpfr::rnd_t,
+) -> f64 {
+    let mut x = Float::with_val(f64::MANTISSA_DIGITS, x);
+    unsafe {
+        f(x.as_raw_mut(), x.as_raw(), y, rnd);
+        mpfr::get_d(x.as_raw(), rnd)
+    }
+}
+
 macro_rules! mpfr_fn {
     ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
         fn $f_rd(x: f64) -> f64 {
@@ -58,6 +70,18 @@ macro_rules! mpfr_fn2 {
     };
 }
 
+macro_rules! mpfr_fn_si {
+    ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
+        fn $f_rd(x: f64, y: i64) -> f64 {
+            mpfr_fn_si(mpfr::$mpfr_f, x, y, mpfr::rnd_t::RNDD)
+        }
+
+        fn $f_ru(x: f64, y: i64) -> f64 {
+            mpfr_fn_si(mpfr::$mpfr_f, x, y, mpfr::rnd_t::RNDU)
+        }
+    };
+}
+
 mpfr_fn!(acos, acos_rd, acos_ru);
 mpfr_fn!(acosh, acosh_rd, acosh_ru);
 mpfr_fn!(asin, asin_rd, asin_ru);
@@ -73,6 +97,8 @@ mpfr_fn!(exp2, exp2_rd, exp2_ru);
 mpfr_fn!(log, log_rd, log_ru);
 mpfr_fn!(log10, log10_rd, log10_ru);
 mpfr_fn!(log2, log2_rd, log2_ru);
+mpfr_fn2!(pow, pow_rd, pow_ru);
+mpfr_fn_si!(pow_si, pown_rd, pown_ru);
 mpfr_fn!(sin, sin_rd, sin_ru);
 mpfr_fn!(sinh, sinh_rd, sinh_ru);
 mpfr_fn!(tan, tan_rd, tan_ru);
@@ -93,7 +119,7 @@ macro_rules! impl_log {
         }
 
         #[allow(clippy::many_single_char_names)]
-        pub(crate) fn $f_impl(self) -> (Self, Decoration) {
+        fn $f_impl(self) -> (Self, Decoration) {
             // See the comment in atanh_impl.
             let dom = Self::with_infsup_raw(0.0, f64::INFINITY);
             let x = self.intersection(dom);
@@ -132,7 +158,7 @@ impl Interval {
         self.acos_impl().0
     }
 
-    pub(crate) fn acos_impl(self) -> (Self, Decoration) {
+    fn acos_impl(self) -> (Self, Decoration) {
         let dom = Self::with_infsup_raw(-1.0, 1.0);
         let x = self.intersection(dom);
 
@@ -153,7 +179,7 @@ impl Interval {
         self.acosh_impl().0
     }
 
-    pub(crate) fn acosh_impl(self) -> (Self, Decoration) {
+    fn acosh_impl(self) -> (Self, Decoration) {
         let dom = Self::with_infsup_raw(1.0, f64::INFINITY);
         let x = self.intersection(dom);
 
@@ -174,7 +200,7 @@ impl Interval {
         self.asin_impl().0
     }
 
-    pub(crate) fn asin_impl(self) -> (Self, Decoration) {
+    fn asin_impl(self) -> (Self, Decoration) {
         let dom = Self::with_infsup_raw(-1.0, 1.0);
         let x = self.intersection(dom);
 
@@ -309,7 +335,7 @@ impl Interval {
     }
 
     #[allow(clippy::many_single_char_names)]
-    pub(crate) fn atanh_impl(self) -> (Self, Decoration) {
+    fn atanh_impl(self) -> (Self, Decoration) {
         // Mathematically, the domain of atanh is (-1.0, 1.0), not [-1.0, 1.0].
         // However, IEEE 754 and thus MPFR define atanh to return ±infinity for ±1.0
         // (and signal the divideByZero exception), so we will make use of that.
@@ -396,6 +422,130 @@ impl Interval {
     impl_log!(log10, log10_impl, log10_rd, log10_ru);
     impl_log!(log2, log2_impl, log2_rd, log2_ru);
 
+    pub fn pow(self, rhs: Self) -> Self {
+        self.pow_impl(rhs).0
+    }
+
+    #[allow(clippy::many_single_char_names)]
+    fn pow_impl(self, rhs: Self) -> (Self, Decoration) {
+        let dom = Self::with_infsup_raw(0.0, f64::INFINITY);
+        let x = self.intersection(dom);
+
+        if x.is_empty() || rhs.is_empty() {
+            return (Self::EMPTY, Decoration::Trv);
+        }
+
+        let a = x.inf_raw();
+        let b = x.sup_raw();
+        let c = rhs.inf_raw();
+        let d = rhs.sup_raw();
+
+        if d <= 0.0 {
+            if b == 0.0 {
+                return (Self::EMPTY, Decoration::Trv);
+            }
+
+            let dec = if a == 0.0 {
+                Decoration::Trv
+            } else {
+                Decoration::Com
+            };
+
+            if b < 1.0 {
+                (Self::with_infsup_raw(pow_rd(b, d), pow_ru(a, c)), dec)
+            } else if a > 1.0 {
+                (Self::with_infsup_raw(pow_rd(b, c), pow_ru(a, d)), dec)
+            } else {
+                (Self::with_infsup_raw(pow_rd(b, c), pow_ru(a, c)), dec)
+            }
+        } else if c > 0.0 {
+            let dec = Decoration::Com;
+
+            if b < 1.0 {
+                (Self::with_infsup_raw(pow_rd(a, d), pow_ru(b, c)), dec)
+            } else if a > 1.0 {
+                (Self::with_infsup_raw(pow_rd(a, c), pow_ru(b, d)), dec)
+            } else {
+                (Self::with_infsup_raw(pow_rd(a, d), pow_ru(b, d)), dec)
+            }
+        } else {
+            if b == 0.0 {
+                return (Self::zero(), Decoration::Trv);
+            }
+
+            let z_ac = pow_ru(a, c);
+            let z_ad = pow_rd(a, d);
+            let z_bc = pow_rd(b, c);
+            let z_bd = pow_ru(b, d);
+            let dec = if a == 0.0 {
+                Decoration::Trv
+            } else {
+                Decoration::Com
+            };
+
+            (Self::with_infsup_raw(z_ad.min(z_bc), z_ac.max(z_bd)), dec)
+        }
+    }
+
+    pub fn pown(self, rhs: i64) -> Self {
+        self.pown_impl(rhs).0
+    }
+
+    fn pown_impl(self, rhs: i64) -> (Self, Decoration) {
+        if self.is_empty() {
+            return (self, Decoration::Trv);
+        }
+
+        let mut a = self.inf_raw();
+        let mut b = self.sup_raw();
+
+        #[allow(clippy::collapsible_if)]
+        if rhs < 0 {
+            let d = if a <= 0.0 && b >= 0.0 {
+                Decoration::Trv
+            } else {
+                Decoration::Com
+            };
+
+            if a == 0.0 && b == 0.0 {
+                return (Self::EMPTY, d);
+            }
+
+            if rhs % 2 == 0 {
+                let abs = self.abs();
+                (
+                    Self::with_infsup_raw(pown_rd(abs.sup_raw(), rhs), pown_ru(abs.inf_raw(), rhs)),
+                    d,
+                )
+            } else {
+                if a < 0.0 && b > 0.0 {
+                    (Self::ENTIRE, d)
+                } else {
+                    if a == 0.0 {
+                        a = 0.0; // [0, b]
+                    }
+                    if b == 0.0 {
+                        b = -0.0; // [a, 0]
+                    }
+                    (Self::with_infsup_raw(pown_rd(b, rhs), pown_ru(a, rhs)), d)
+                }
+            }
+        } else {
+            if rhs % 2 == 0 {
+                let abs = self.abs();
+                (
+                    Self::with_infsup_raw(pown_rd(abs.inf_raw(), rhs), pown_ru(abs.sup_raw(), rhs)),
+                    Decoration::Com,
+                )
+            } else {
+                (
+                    Self::with_infsup_raw(pown_rd(a, rhs), pown_ru(b, rhs)),
+                    Decoration::Com,
+                )
+            }
+        }
+    }
+
     pub fn sin(self) -> Self {
         if self.is_empty() {
             return self;
@@ -432,7 +582,7 @@ impl Interval {
         self.tan_impl().0
     }
 
-    pub(crate) fn tan_impl(self) -> (Self, Decoration) {
+    fn tan_impl(self) -> (Self, Decoration) {
         if self.is_empty() {
             return (self, Decoration::Trv);
         }
@@ -500,6 +650,13 @@ impl DecoratedInterval {
     impl_dec!(log, log_impl);
     impl_dec!(log10, log10_impl);
     impl_dec!(log2, log2_impl);
+    impl_dec2!(pow, pow_impl);
+
+    pub fn pown(self, rhs: i64) -> Self {
+        let (y, d) = self.x.pown_impl(rhs);
+        Self::set_dec(y, self.d.min(d))
+    }
+
     impl_dec!(sin);
     impl_dec!(sinh);
     impl_dec!(tan, tan_impl);
@@ -509,7 +666,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interval;
+    use crate::{const_interval, interval};
     type DI = DecoratedInterval;
     type I = Interval;
 
@@ -531,10 +688,20 @@ mod tests {
         assert!(DI::NAI.log().is_nai());
         assert!(DI::NAI.log10().is_nai());
         assert!(DI::NAI.log2().is_nai());
+        assert!(DI::NAI.pow(DI::EMPTY).is_nai());
+        assert!(DI::EMPTY.pow(DI::NAI).is_nai());
+        assert!(DI::NAI.pown(1).is_nai());
         assert!(DI::NAI.sin().is_nai());
         assert!(DI::NAI.sinh().is_nai());
         assert!(DI::NAI.tan().is_nai());
         assert!(DI::NAI.tanh().is_nai());
+    }
+
+    #[test]
+    fn pown() {
+        const ONE: I = const_interval!(1.0, 1.0);
+        assert_eq!(ONE.pown(i64::MAX), ONE);
+        assert_eq!(ONE.pown(i64::MIN), ONE);
     }
 
     #[test]

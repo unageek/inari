@@ -227,3 +227,12 @@ fn cxsc_intervalstdfunc() {
     assert_eq!(n2i(0.0, 0.0).sqrt(), n2i(0.0, 0.0));
     assert_eq!(n2i(81.0, 81.0).sqrt(), n2i(9.0, 9.0));
 }
+
+#[cfg(feature = "gmp")]
+#[test]
+fn cxsc_intervalstdfunc_gmp() {
+    assert_eq!(n2i(2.0, 2.0).pow(n2i(2.0, 2.0)), n2i(4.0, 4.0));
+    assert_eq!(n2i(4.0, 4.0).pow(n2i(5.0, 5.0)), n2i(1024.0, 1024.0));
+    // Negativ geht noch nicht
+    assert_eq!(n2i(2.0, 2.0).pow(n2i(3.0, 3.0)), n2i(8.0, 8.0));
+}
