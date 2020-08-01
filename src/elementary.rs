@@ -232,13 +232,6 @@ impl Interval {
         let c = y.inf_raw();
         let d = y.sup_raw();
 
-        // (a, d)      (b, d)
-        //      +------+
-        //      |      |
-        //      |      |
-        //      +------+
-        // (a, c)      (b, c)
-
         match x.classify2(y) {
             C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_N0_E | C_N1_E
             | C_P0_E | C_P1_E | C_Z_E | C_Z_Z => (Self::EMPTY, Decoration::Trv),
@@ -246,15 +239,17 @@ impl Interval {
                 Self::with_infsup_raw(-Self::PI.sup_raw(), Self::PI.sup_raw()),
                 Decoration::Trv,
             ),
+
             // First quadrant
             C_P0_P0 => (
                 Self::with_infsup_raw(0.0, Self::FRAC_PI_2.sup_raw()),
                 Decoration::Trv,
             ),
-            C_P0_P1 | C_P1_P0 | C_P1_P1 => (
+            C_P0_P1 | C_P1_P0 | C_P1_P1 | C_P1_Z | C_Z_P1 => (
                 Self::with_infsup_raw(atan2_rd(c, b), atan2_ru(d, a)),
                 Decoration::Dac,
             ),
+
             // First & second quadrant
             C_M_P0 | C_M_Z => (
                 Self::with_infsup_raw(0.0, Self::PI.sup_raw()),
@@ -264,6 +259,7 @@ impl Interval {
                 Self::with_infsup_raw(atan2_rd(c, b), atan2_ru(c, a)),
                 Decoration::Dac,
             ),
+
             // Second quadrant
             C_N0_P0 => (
                 Self::with_infsup_raw(Self::FRAC_PI_2.inf_raw(), Self::PI.sup_raw()),
@@ -277,34 +273,39 @@ impl Interval {
                 Self::with_infsup_raw(atan2_rd(d, b), Self::PI.sup_raw()),
                 Decoration::Def,
             ),
+
             // Second & third quadrant
-            // C_N0_M => See above.
+            //C_N0_M => See above.
             C_N1_M | C_N1_N0 => (
                 Self::with_infsup_raw(-Self::PI.sup_raw(), Self::PI.sup_raw()),
                 Decoration::Def,
             ),
+
             // Third quadrant
-            // C_N0_N0 => See above.
+            //C_N0_N0 => See above.
             C_N0_N1 | C_N1_N1 => (
                 Self::with_infsup_raw(atan2_rd(d, a), atan2_ru(c, b)),
                 Decoration::Dac,
             ),
-            // C_N1_N0 => See above.
+            //C_N1_N0 => See above.
+
             // Third & fourth quadrant
-            // C_M_N0 => See above.
+            //C_M_N0 => See above.
             C_M_N1 => (
                 Self::with_infsup_raw(atan2_rd(d, a), atan2_ru(d, b)),
                 Decoration::Dac,
             ),
+
             // Fourth quadrant
             C_P0_N0 => (
                 Self::with_infsup_raw(-Self::FRAC_PI_2.sup_raw(), 0.0),
                 Decoration::Trv,
             ),
-            C_P0_N1 | C_P1_N0 | C_P1_N1 => (
+            C_P0_N1 | C_P1_N0 | C_P1_N1 | C_Z_N1 => (
                 Self::with_infsup_raw(atan2_rd(c, a), atan2_ru(d, b)),
                 Decoration::Dac,
             ),
+
             // Fourth & first quadrant
             C_P0_M | C_Z_M => (
                 Self::with_infsup_raw(-Self::FRAC_PI_2.sup_raw(), Self::FRAC_PI_2.sup_raw()),
@@ -314,18 +315,20 @@ impl Interval {
                 Self::with_infsup_raw(atan2_rd(c, a), atan2_ru(d, a)),
                 Decoration::Dac,
             ),
+
             // X axis
-            // C_M_Z => See above.
+            //C_M_Z => See above.
             C_N0_Z => (Self::PI, Decoration::Trv),
             C_N1_Z => (Self::PI, Decoration::Def),
             C_P0_Z => (Self::with_infsup_raw(0.0, 0.0), Decoration::Trv),
-            C_P1_Z => (Self::with_infsup_raw(0.0, 0.0), Decoration::Dac),
+            //C_P1_Z => See above.
+
             // Y axis
-            // C_Z_M => See above.
+            //C_Z_M => See above.
             C_Z_N0 => (-Self::FRAC_PI_2, Decoration::Trv),
-            C_Z_N1 => (-Self::FRAC_PI_2, Decoration::Dac),
+            //C_Z_N1 => See above.
             C_Z_P0 => (Self::FRAC_PI_2, Decoration::Trv),
-            C_Z_P1 => (Self::FRAC_PI_2, Decoration::Dac),
+            //C_Z_P1 => See above.
             _ => unreachable!(),
         }
     }
