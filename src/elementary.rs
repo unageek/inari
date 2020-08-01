@@ -72,12 +72,12 @@ macro_rules! mpfr_fn2 {
 
 macro_rules! mpfr_fn_si {
     ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
-        fn $f_rd(x: f64, y: i64) -> f64 {
-            mpfr_fn_si(mpfr::$mpfr_f, x, y, mpfr::rnd_t::RNDD)
+        fn $f_rd(x: f64, y: i32) -> f64 {
+            mpfr_fn_si(mpfr::$mpfr_f, x, y as i64, mpfr::rnd_t::RNDD)
         }
 
-        fn $f_ru(x: f64, y: i64) -> f64 {
-            mpfr_fn_si(mpfr::$mpfr_f, x, y, mpfr::rnd_t::RNDU)
+        fn $f_ru(x: f64, y: i32) -> f64 {
+            mpfr_fn_si(mpfr::$mpfr_f, x, y as i64, mpfr::rnd_t::RNDU)
         }
     };
 }
@@ -490,11 +490,11 @@ impl Interval {
         }
     }
 
-    pub fn pown(self, rhs: i64) -> Self {
+    pub fn pown(self, rhs: i32) -> Self {
         self.pown_impl(rhs).0
     }
 
-    fn pown_impl(self, rhs: i64) -> (Self, Decoration) {
+    fn pown_impl(self, rhs: i32) -> (Self, Decoration) {
         if self.is_empty() {
             return (self, Decoration::Trv);
         }
@@ -655,7 +655,7 @@ impl DecoratedInterval {
     impl_dec!(log2, log2_impl);
     impl_dec2!(pow, pow_impl);
 
-    pub fn pown(self, rhs: i64) -> Self {
+    pub fn pown(self, rhs: i32) -> Self {
         let (y, d) = self.x.pown_impl(rhs);
         Self::set_dec(y, self.d.min(d))
     }
@@ -669,7 +669,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{const_interval, interval};
+    use crate::interval;
     type DI = DecoratedInterval;
     type I = Interval;
 
@@ -698,13 +698,6 @@ mod tests {
         assert!(DI::NAI.sinh().is_nai());
         assert!(DI::NAI.tan().is_nai());
         assert!(DI::NAI.tanh().is_nai());
-    }
-
-    #[test]
-    fn pown() {
-        const ONE: I = const_interval!(1.0, 1.0);
-        assert_eq!(ONE.pown(i64::MAX), ONE);
-        assert_eq!(ONE.pown(i64::MIN), ONE);
     }
 
     #[test]
