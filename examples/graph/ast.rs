@@ -1,5 +1,8 @@
 use crate::interval_set::*;
-use std::hash::{Hash, Hasher};
+use std::{
+    cell::Cell,
+    hash::{Hash, Hasher},
+};
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum UnaryOp {
@@ -67,6 +70,7 @@ pub enum ExprKind {
     Y,
     Unary(UnaryOp, Box<Expr>),
     Binary(BinaryOp, Box<Expr>, Box<Expr>),
+    Never,
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -79,17 +83,17 @@ pub type NodeId = u32;
 
 #[derive(Clone, Debug)]
 pub struct Expr {
-    pub id: NodeId,
-    pub site: Option<u8>,
+    pub id: Cell<NodeId>,
+    pub site: Cell<Option<u8>>,
     pub kind: ExprKind,
 }
 
 impl Default for Expr {
     fn default() -> Self {
         Self {
-            id: 0,
-            site: None,
-            kind: ExprKind::Constant(TupperIntervalSet::empty()),
+            id: Cell::new(0),
+            site: Cell::new(None),
+            kind: ExprKind::Never,
         }
     }
 }
@@ -133,8 +137,42 @@ pub type ValueStoreSlice = [TupperIntervalSet];
 impl Expr {
     pub fn new(kind: ExprKind) -> Self {
         Self {
-            id: 0,
-            site: None,
+            id: Cell::new(0),
+            site: Cell::new(None),
+            kind,
+        }
+    }
+
+    // Clones self with only information required for evaluation.
+    pub fn clone_shallow(&self) -> Self {
+        use ExprKind::*;
+        let kind = match &self.kind {
+            Unary(op, x) => Unary(
+                *op,
+                Box::new(Expr {
+                    id: x.id.clone(),
+                    site: Cell::new(None),
+                    kind: ExprKind::Never,
+                }),
+            ),
+            Binary(op, x, y) => Binary(
+                *op,
+                Box::new(Expr {
+                    id: x.id.clone(),
+                    site: Cell::new(None),
+                    kind: ExprKind::Never,
+                }),
+                Box::new(Expr {
+                    id: y.id.clone(),
+                    site: Cell::new(None),
+                    kind: ExprKind::Never,
+                }),
+            ),
+            x => x.clone(),
+        };
+        Self {
+            id: self.id.clone(), // This one is not required for evaluation.
+            site: self.site.clone(),
             kind,
         }
     }
@@ -153,37 +191,38 @@ impl Expr {
             Unary(Asinh, x) => x.value(vs).asinh(),
             Unary(Atan, x) => x.value(vs).atan(),
             Unary(Atanh, x) => x.value(vs).atanh(),
-            Unary(Ceil, x) => x.value(vs).ceil(self.site),
+            Unary(Ceil, x) => x.value(vs).ceil(self.site.get()),
             Unary(Cos, x) => x.value(vs).cos(),
             Unary(Cosh, x) => x.value(vs).cosh(),
             Unary(Exp, x) => x.value(vs).exp(),
             Unary(Exp10, x) => x.value(vs).exp10(),
             Unary(Exp2, x) => x.value(vs).exp2(),
-            Unary(Floor, x) => x.value(vs).floor(self.site),
+            Unary(Floor, x) => x.value(vs).floor(self.site.get()),
             Unary(Log, x) => x.value(vs).log(),
             Unary(Log10, x) => x.value(vs).log10(),
             Unary(Log2, x) => x.value(vs).log2(),
-            Unary(Recip, x) => x.value(vs).recip(self.site),
-            Unary(Sign, x) => x.value(vs).sign(self.site),
+            Unary(Recip, x) => x.value(vs).recip(self.site.get()),
+            Unary(Sign, x) => x.value(vs).sign(self.site.get()),
             Unary(Sin, x) => x.value(vs).sin(),
             Unary(SinOverX, x) => x.value(vs).sin_over_x(),
             Unary(Sinh, x) => x.value(vs).sinh(),
             Unary(Sqr, x) => x.value(vs).sqr(),
             Unary(Sqrt, x) => x.value(vs).sqrt(),
-            Unary(Tan, x) => x.value(vs).tan(self.site),
+            Unary(Tan, x) => x.value(vs).tan(self.site.get()),
             Unary(Tanh, x) => x.value(vs).tanh(),
             Binary(Add, x, y) => x.value(vs) + y.value(vs),
             Binary(Sub, x, y) => x.value(vs) - y.value(vs),
             Binary(Mul, x, y) => x.value(vs) * y.value(vs),
-            Binary(Div, x, y) => x.value(vs).div(y.value(vs), self.site),
-            Binary(Atan2, x, y) => x.value(vs).atan2(y.value(vs), self.site),
+            Binary(Div, x, y) => x.value(vs).div(y.value(vs), self.site.get()),
+            Binary(Atan2, x, y) => x.value(vs).atan2(y.value(vs), self.site.get()),
             Binary(Max, x, y) => x.value(vs).max(y.value(vs)),
             Binary(Min, x, y) => x.value(vs).min(y.value(vs)),
+            Never => panic!(),
         }
     }
 
     fn value<'a>(&self, vs: &'a ValueStoreSlice) -> &'a TupperIntervalSet {
-        &vs[self.id as usize]
+        &vs[self.id.get() as usize]
     }
 }
 

@@ -12,9 +12,9 @@ impl DynRelation {
         let mut rel = parse(relation).unwrap();
         Transform.visit_rel_mut(&mut rel);
         let mut v = AssignNodeId::new();
-        v.visit_rel_mut(&mut rel);
+        v.visit_rel(&rel);
         let mut v = AssignSite::new(v.site_map());
-        v.visit_rel_mut(&mut rel);
+        v.visit_rel(&rel);
         let mut v = CollectNodes::new();
         v.visit_rel(&rel);
         let nodes = v.nodes();

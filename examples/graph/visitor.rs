@@ -6,22 +6,21 @@ use std::{
 
 // TODO:
 // - Constant folding
-// - Cloning every nodes as done in some visitors is stupid
 
-pub trait Visitor
+pub trait Visitor<'a>
 where
     Self: Sized,
 {
-    fn visit_expr(&mut self, expr: &Expr) {
+    fn visit_expr(&mut self, expr: &'a Expr) {
         traverse_expr(self, expr);
     }
 
-    fn visit_rel(&mut self, rel: &Rel) {
+    fn visit_rel(&mut self, rel: &'a Rel) {
         traverse_rel(self, rel)
     }
 }
 
-fn traverse_expr<V: Visitor>(v: &mut V, expr: &Expr) {
+fn traverse_expr<'a, V: Visitor<'a>>(v: &mut V, expr: &'a Expr) {
     use ExprKind::*;
     match &expr.kind {
         Unary(_, x) => v.visit_expr(x),
@@ -33,7 +32,7 @@ fn traverse_expr<V: Visitor>(v: &mut V, expr: &Expr) {
     };
 }
 
-fn traverse_rel<V: Visitor>(v: &mut V, rel: &Rel) {
+fn traverse_rel<'a, V: Visitor<'a>>(v: &mut V, rel: &'a Rel) {
     use RelKind::*;
     match &rel.kind {
         Equality(_, x, y) => {
@@ -116,14 +115,14 @@ impl VisitorMut for Transform {
     }
 }
 
-pub struct AssignNodeId {
+pub struct AssignNodeId<'a> {
     next_id: NodeId,
     next_site: u8,
     site_map: SiteMap,
-    visited_nodes: HashSet<Expr>,
+    visited_nodes: HashSet<&'a Expr>,
 }
 
-impl AssignNodeId {
+impl<'a> AssignNodeId<'a> {
     pub fn new() -> Self {
         Self {
             next_id: 2, // 0 for x, 1 for y
@@ -152,15 +151,16 @@ impl AssignNodeId {
     }
 }
 
-impl VisitorMut for AssignNodeId {
-    fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        traverse_expr_mut(self, expr);
+impl<'a> Visitor<'a> for AssignNodeId<'a> {
+    fn visit_expr(&mut self, expr: &'a Expr) {
+        traverse_expr(self, expr);
 
         match self.visited_nodes.get(expr) {
             Some(visited) => {
-                expr.id = visited.id;
+                let id = visited.id.get();
+                expr.id.set(id);
 
-                if let Some(site) = self.site_map.get_mut(&expr.id) {
+                if let Some(site) = self.site_map.get_mut(&id) {
                     if site.is_none() && self.next_site <= 31 {
                         *site = Some(self.next_site as u8);
                         self.next_site += 1;
@@ -168,7 +168,7 @@ impl VisitorMut for AssignNodeId {
                 }
             }
             _ => {
-                expr.id = match &expr.kind {
+                let id = match &expr.kind {
                     ExprKind::X => 0,
                     ExprKind::Y => 1,
                     _ => {
@@ -177,12 +177,13 @@ impl VisitorMut for AssignNodeId {
                         i
                     }
                 };
+                expr.id.set(id);
 
                 if Self::expr_can_perform_cut(&expr.kind) {
-                    self.site_map.insert(expr.id, None);
+                    self.site_map.insert(id, None);
                 }
 
-                self.visited_nodes.insert(expr.clone());
+                self.visited_nodes.insert(expr);
             }
         }
     }
@@ -198,17 +199,17 @@ impl AssignSite {
     }
 }
 
-impl VisitorMut for AssignSite {
-    fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        traverse_expr_mut(self, expr);
+impl<'a> Visitor<'a> for AssignSite {
+    fn visit_expr(&mut self, expr: &'a Expr) {
+        traverse_expr(self, expr);
 
-        if let Some(site) = self.site_map.get(&expr.id) {
-            expr.site = *site;
+        if let Some(site) = self.site_map.get(&expr.id.get()) {
+            expr.site.set(*site);
         }
     }
 }
 
-// Collects nodes (except the ones for x and y) sorted topologically.
+// Collects nodes for evaluation (except the ones for x and y), sorted topologically.
 pub struct CollectNodes {
     nodes: Vec<Expr>,
     next_node_id: NodeId,
@@ -227,12 +228,12 @@ impl CollectNodes {
     }
 }
 
-impl Visitor for CollectNodes {
-    fn visit_expr(&mut self, expr: &Expr) {
+impl<'a> Visitor<'a> for CollectNodes {
+    fn visit_expr(&mut self, expr: &'a Expr) {
         traverse_expr(self, expr);
 
-        if expr.id == self.next_node_id {
-            self.nodes.push(expr.clone());
+        if expr.id.get() == self.next_node_id {
+            self.nodes.push(expr.clone_shallow());
             self.next_node_id += 1;
         }
     }
