@@ -115,7 +115,7 @@ Some intriguing examples from GrafEq
      x/sin(x) - y/sin(y) == x*y/sin(x*y) || x/sin(x) - y/sin(y) == -(x*y/sin(x*y))"
     ```
 
-  - 📄 Hair.gqs
+  - 📄 Hair.gqs [🐌]
 
     ```
     "sin((x + sin(y)) * (sin(x) + y)) == cos(sin((sin(x) + cos(y)) * (sin(y) + cos(x)))) || \
