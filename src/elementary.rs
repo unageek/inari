@@ -426,13 +426,65 @@ impl Interval {
         self.pow_impl(rhs).0
     }
 
+    #[allow(clippy::many_single_char_names)]
     fn pow_impl(self, rhs: Self) -> (Self, Decoration) {
-        let a = self.inf_raw();
-        let b = self.sup_raw();
+        let dom = Self::with_infsup_raw(0.0, f64::INFINITY);
+        let x = self.intersection(dom);
+
+        if x.is_empty() || rhs.is_empty() {
+            return (Self::EMPTY, Decoration::Trv);
+        }
+
+        let a = x.inf_raw();
+        let b = x.sup_raw();
         let c = rhs.inf_raw();
         let d = rhs.sup_raw();
 
-        todo!();
+        if d <= 0.0 {
+            if b == 0.0 {
+                return (Self::EMPTY, Decoration::Trv);
+            }
+
+            let dec = if a == 0.0 {
+                Decoration::Trv
+            } else {
+                Decoration::Com
+            };
+
+            if b < 1.0 {
+                (Self::with_infsup_raw(pow_rd(b, d), pow_ru(a, c)), dec)
+            } else if a > 1.0 {
+                (Self::with_infsup_raw(pow_rd(b, c), pow_ru(a, d)), dec)
+            } else {
+                (Self::with_infsup_raw(pow_rd(b, c), pow_ru(a, c)), dec)
+            }
+        } else if c > 0.0 {
+            let dec = Decoration::Com;
+
+            if b < 1.0 {
+                (Self::with_infsup_raw(pow_rd(a, d), pow_ru(b, c)), dec)
+            } else if a > 1.0 {
+                (Self::with_infsup_raw(pow_rd(a, c), pow_ru(b, d)), dec)
+            } else {
+                (Self::with_infsup_raw(pow_rd(a, d), pow_ru(b, d)), dec)
+            }
+        } else {
+            if b == 0.0 {
+                return (Self::zero(), Decoration::Trv);
+            }
+
+            let z_ac = pow_ru(a, c);
+            let z_ad = pow_rd(a, d);
+            let z_bc = pow_rd(b, c);
+            let z_bd = pow_ru(b, d);
+            let dec = if a == 0.0 {
+                Decoration::Trv
+            } else {
+                Decoration::Com
+            };
+
+            (Self::with_infsup_raw(z_ad.min(z_bc), z_ac.max(z_bd)), dec)
+        }
     }
 
     pub fn pown(self, rhs: i64) -> Self {
