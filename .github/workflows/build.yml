@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Use v1 until the issue is fixed: https://github.com/actions/checkout/issues/237#issuecomment-662662682
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Install toolchain
       uses: actions-rs/toolchain@v1
