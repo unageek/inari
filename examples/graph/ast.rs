@@ -79,11 +79,12 @@ pub enum RelKind {
     Binary(RelBinaryOp, Box<Rel>, Box<Rel>),
 }
 
-pub type NodeId = u32;
+pub type ExprId = u32;
+const NO_EXPR_ID: ExprId = ExprId::MAX;
 
 #[derive(Clone, Debug)]
 pub struct Expr {
-    pub id: Cell<NodeId>,
+    pub id: Cell<ExprId>,
     pub site: Cell<Option<u8>>,
     pub kind: ExprKind,
 }
@@ -91,7 +92,7 @@ pub struct Expr {
 impl Default for Expr {
     fn default() -> Self {
         Self {
-            id: Cell::new(0),
+            id: Cell::new(NO_EXPR_ID),
             site: Cell::new(None),
             kind: ExprKind::Never,
         }
@@ -137,14 +138,14 @@ pub type ValueStoreSlice = [TupperIntervalSet];
 impl Expr {
     pub fn new(kind: ExprKind) -> Self {
         Self {
-            id: Cell::new(0),
+            id: Cell::new(NO_EXPR_ID),
             site: Cell::new(None),
             kind,
         }
     }
 
-    // Clones self with only information required for evaluation.
-    pub fn clone_shallow(&self) -> Self {
+    // Clones self with minimum information required for evaluation.
+    pub fn clone_for_evaluation(&self) -> Self {
         use ExprKind::*;
         let kind = match &self.kind {
             Unary(op, x) => Unary(
@@ -171,9 +172,51 @@ impl Expr {
             x => x.clone(),
         };
         Self {
-            id: self.id.clone(), // This one is not required for evaluation.
+            id: Cell::new(NO_EXPR_ID),
             site: self.site.clone(),
             kind,
+        }
+    }
+
+    pub fn evaluate_constant(&self) -> TupperIntervalSet {
+        use {BinaryOp::*, ExprKind::*, UnaryOp::*};
+        match &self.kind {
+            Constant(x) => x.clone(),
+            Unary(Neg, x) => -&x.evaluate_constant(),
+            Unary(Abs, x) => x.evaluate_constant().abs(),
+            Unary(Acos, x) => x.evaluate_constant().acos(),
+            Unary(Acosh, x) => x.evaluate_constant().acosh(),
+            Unary(Asin, x) => x.evaluate_constant().asin(),
+            Unary(Asinh, x) => x.evaluate_constant().asinh(),
+            Unary(Atan, x) => x.evaluate_constant().atan(),
+            Unary(Atanh, x) => x.evaluate_constant().atanh(),
+            Unary(Ceil, x) => x.evaluate_constant().ceil(None),
+            Unary(Cos, x) => x.evaluate_constant().cos(),
+            Unary(Cosh, x) => x.evaluate_constant().cosh(),
+            Unary(Exp, x) => x.evaluate_constant().exp(),
+            Unary(Exp10, x) => x.evaluate_constant().exp10(),
+            Unary(Exp2, x) => x.evaluate_constant().exp2(),
+            Unary(Floor, x) => x.evaluate_constant().floor(None),
+            Unary(Log, x) => x.evaluate_constant().log(),
+            Unary(Log10, x) => x.evaluate_constant().log10(),
+            Unary(Log2, x) => x.evaluate_constant().log2(),
+            Unary(Recip, x) => x.evaluate_constant().recip(None),
+            Unary(Sign, x) => x.evaluate_constant().sign(None),
+            Unary(Sin, x) => x.evaluate_constant().sin(),
+            Unary(SinOverX, x) => x.evaluate_constant().sin_over_x(),
+            Unary(Sinh, x) => x.evaluate_constant().sinh(),
+            Unary(Sqr, x) => x.evaluate_constant().sqr(),
+            Unary(Sqrt, x) => x.evaluate_constant().sqrt(),
+            Unary(Tan, x) => x.evaluate_constant().tan(None),
+            Unary(Tanh, x) => x.evaluate_constant().tanh(),
+            Binary(Add, x, y) => &x.evaluate_constant() + &y.evaluate_constant(),
+            Binary(Sub, x, y) => &x.evaluate_constant() - &y.evaluate_constant(),
+            Binary(Mul, x, y) => &x.evaluate_constant() * &y.evaluate_constant(),
+            Binary(Div, x, y) => x.evaluate_constant().div(&y.evaluate_constant(), None),
+            Binary(Atan2, x, y) => x.evaluate_constant().atan2(&y.evaluate_constant(), None),
+            Binary(Max, x, y) => x.evaluate_constant().max(&y.evaluate_constant()),
+            Binary(Min, x, y) => x.evaluate_constant().min(&y.evaluate_constant()),
+            X | Y | Never => panic!("The expression is not a constant."),
         }
     }
 

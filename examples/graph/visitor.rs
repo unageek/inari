@@ -4,9 +4,6 @@ use std::{
     marker::Sized,
 };
 
-// TODO:
-// - Constant folding
-
 pub trait Visitor<'a>
 where
     Self: Sized,
@@ -85,28 +82,26 @@ fn traverse_rel_mut<V: VisitorMut>(v: &mut V, rel: &mut Rel) {
     };
 }
 
-type SiteMap = HashMap<NodeId, Option<u8>>;
+type SiteMap = HashMap<ExprId, Option<u8>>;
 
 pub struct Transform;
 
 impl VisitorMut for Transform {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
+        use {BinaryOp::*, ExprKind::*, UnaryOp::*};
         traverse_expr_mut(self, expr);
 
-        if let ExprKind::Binary(BinaryOp::Div, x, y) = &mut expr.kind {
+        if let Binary(Div, x, y) = &mut expr.kind {
             match (&x.kind, &y.kind) {
-                (ExprKind::Unary(UnaryOp::Sin, z), _) if z == y => {
-                    // (Div (Sin z) y) => (SinOverX y)
-                    *expr = Expr::new(ExprKind::Unary(UnaryOp::SinOverX, std::mem::take(y)));
+                // (Div (Sin z) y) => (SinOverX y) if z == y
+                (Unary(Sin, z), _) if z == y => {
+                    *expr = Expr::new(Unary(SinOverX, std::mem::take(y)));
                 }
-                (_, ExprKind::Unary(UnaryOp::Sin, z)) if z == x => {
-                    // (Div x (Sin z)) => (Recip (SinOverX x))
-                    *expr = Expr::new(ExprKind::Unary(
-                        UnaryOp::Recip,
-                        Box::new(Expr::new(ExprKind::Unary(
-                            UnaryOp::SinOverX,
-                            std::mem::take(x),
-                        ))),
+                // (Div x (Sin z)) => (Recip (SinOverX x)) if z == x
+                (_, Unary(Sin, z)) if z == x => {
+                    *expr = Expr::new(Unary(
+                        Recip,
+                        Box::new(Expr::new(Unary(SinOverX, std::mem::take(x)))),
                     ));
                 }
                 _ => (),
@@ -115,8 +110,40 @@ impl VisitorMut for Transform {
     }
 }
 
+pub struct FoldConstant;
+
+// Only fold constants which evaluate to an empty or a single interval
+// because sites are not assigned and branch cut tracking cannot be done
+// at this moment.
+impl VisitorMut for FoldConstant {
+    fn visit_expr_mut(&mut self, expr: &mut Expr) {
+        use ExprKind::*;
+        traverse_expr_mut(self, expr);
+
+        match &mut expr.kind {
+            Unary(_, x) => {
+                if let Constant(_) = &x.kind {
+                    let value = expr.evaluate_constant();
+                    if value.len() <= 1 {
+                        *expr = Expr::new(Constant(value));
+                    }
+                }
+            }
+            Binary(_, x, y) => {
+                if let (Constant(_), Constant(_)) = (&x.kind, &y.kind) {
+                    let value = expr.evaluate_constant();
+                    if value.len() <= 1 {
+                        *expr = Expr::new(Constant(value));
+                    }
+                }
+            }
+            _ => (),
+        }
+    }
+}
+
 pub struct AssignNodeId<'a> {
-    next_id: NodeId,
+    next_id: ExprId,
     next_site: u8,
     site_map: SiteMap,
     visited_nodes: HashSet<&'a Expr>,
@@ -137,9 +164,7 @@ impl<'a> AssignNodeId<'a> {
     }
 
     fn expr_can_perform_cut(kind: &ExprKind) -> bool {
-        use BinaryOp::*;
-        use ExprKind::*;
-        use UnaryOp::*;
+        use {BinaryOp::*, ExprKind::*, UnaryOp::*};
         matches!(kind,
             Unary(Ceil, _)
             | Unary(Floor, _)
@@ -209,15 +234,15 @@ impl<'a> Visitor<'a> for AssignSite {
     }
 }
 
-// Collects nodes for evaluation (except the ones for x and y), sorted topologically.
-pub struct CollectNodes {
+// Collects nodes (except the ones for X and Y), sorted topologically.
+pub struct CollectNodesForEvaluation {
     nodes: Vec<Expr>,
-    next_node_id: NodeId,
+    next_node_id: ExprId,
 }
 
-impl CollectNodes {
+impl CollectNodesForEvaluation {
     pub fn new() -> Self {
-        Self {
+        CollectNodesForEvaluation {
             nodes: Vec::new(),
             next_node_id: 2, // 0 for x, 1 for y
         }
@@ -228,12 +253,12 @@ impl CollectNodes {
     }
 }
 
-impl<'a> Visitor<'a> for CollectNodes {
+impl<'a> Visitor<'a> for CollectNodesForEvaluation {
     fn visit_expr(&mut self, expr: &'a Expr) {
         traverse_expr(self, expr);
 
         if expr.id.get() == self.next_node_id {
-            self.nodes.push(expr.clone_shallow());
+            self.nodes.push(expr.clone_for_evaluation());
             self.next_node_id += 1;
         }
     }

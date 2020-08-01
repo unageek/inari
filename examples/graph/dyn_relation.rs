@@ -11,11 +11,12 @@ impl DynRelation {
     pub fn new(relation: &str) -> Self {
         let mut rel = parse(relation).unwrap();
         Transform.visit_rel_mut(&mut rel);
+        FoldConstant.visit_rel_mut(&mut rel);
         let mut v = AssignNodeId::new();
         v.visit_rel(&rel);
         let mut v = AssignSite::new(v.site_map());
         v.visit_rel(&rel);
-        let mut v = CollectNodes::new();
+        let mut v = CollectNodesForEvaluation::new();
         v.visit_rel(&rel);
         let nodes = v.nodes();
         let n = nodes.len() + 2;

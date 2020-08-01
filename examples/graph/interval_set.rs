@@ -127,6 +127,10 @@ impl TupperIntervalSet {
         Self(TupperIntervalVec::new())
     }
 
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
     fn insert(&mut self, x: TupperInterval) {
         if !x.x.is_empty() {
             self.0.push(x);
