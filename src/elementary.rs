@@ -97,6 +97,7 @@ mpfr_fn!(exp2, exp2_rd, exp2_ru);
 mpfr_fn!(log, log_rd, log_ru);
 mpfr_fn!(log10, log10_rd, log10_ru);
 mpfr_fn!(log2, log2_rd, log2_ru);
+mpfr_fn2!(pow, pow_rd, pow_ru);
 mpfr_fn_si!(pow_si, pown_rd, pown_ru);
 mpfr_fn!(sin, sin_rd, sin_ru);
 mpfr_fn!(sinh, sinh_rd, sinh_ru);
@@ -118,7 +119,7 @@ macro_rules! impl_log {
         }
 
         #[allow(clippy::many_single_char_names)]
-        pub(crate) fn $f_impl(self) -> (Self, Decoration) {
+        fn $f_impl(self) -> (Self, Decoration) {
             // See the comment in atanh_impl.
             let dom = Self::with_infsup_raw(0.0, f64::INFINITY);
             let x = self.intersection(dom);
@@ -157,7 +158,7 @@ impl Interval {
         self.acos_impl().0
     }
 
-    pub(crate) fn acos_impl(self) -> (Self, Decoration) {
+    fn acos_impl(self) -> (Self, Decoration) {
         let dom = Self::with_infsup_raw(-1.0, 1.0);
         let x = self.intersection(dom);
 
@@ -178,7 +179,7 @@ impl Interval {
         self.acosh_impl().0
     }
 
-    pub(crate) fn acosh_impl(self) -> (Self, Decoration) {
+    fn acosh_impl(self) -> (Self, Decoration) {
         let dom = Self::with_infsup_raw(1.0, f64::INFINITY);
         let x = self.intersection(dom);
 
@@ -199,7 +200,7 @@ impl Interval {
         self.asin_impl().0
     }
 
-    pub(crate) fn asin_impl(self) -> (Self, Decoration) {
+    fn asin_impl(self) -> (Self, Decoration) {
         let dom = Self::with_infsup_raw(-1.0, 1.0);
         let x = self.intersection(dom);
 
@@ -334,7 +335,7 @@ impl Interval {
     }
 
     #[allow(clippy::many_single_char_names)]
-    pub(crate) fn atanh_impl(self) -> (Self, Decoration) {
+    fn atanh_impl(self) -> (Self, Decoration) {
         // Mathematically, the domain of atanh is (-1.0, 1.0), not [-1.0, 1.0].
         // However, IEEE 754 and thus MPFR define atanh to return ±infinity for ±1.0
         // (and signal the divideByZero exception), so we will make use of that.
@@ -421,11 +422,24 @@ impl Interval {
     impl_log!(log10, log10_impl, log10_rd, log10_ru);
     impl_log!(log2, log2_impl, log2_rd, log2_ru);
 
+    pub fn pow(self, rhs: Self) -> Self {
+        self.pow_impl(rhs).0
+    }
+
+    fn pow_impl(self, rhs: Self) -> (Self, Decoration) {
+        let a = self.inf_raw();
+        let b = self.sup_raw();
+        let c = rhs.inf_raw();
+        let d = rhs.sup_raw();
+
+        todo!();
+    }
+
     pub fn pown(self, rhs: i64) -> Self {
         self.pown_impl(rhs).0
     }
 
-    pub(crate) fn pown_impl(self, rhs: i64) -> (Self, Decoration) {
+    fn pown_impl(self, rhs: i64) -> (Self, Decoration) {
         if self.is_empty() {
             return (self, Decoration::Trv);
         }
@@ -433,6 +447,7 @@ impl Interval {
         let mut a = self.inf_raw();
         let mut b = self.sup_raw();
 
+        #[allow(clippy::collapsible_if)]
         if rhs < 0 {
             let d = if a <= 0.0 && b >= 0.0 {
                 Decoration::Trv
@@ -515,7 +530,7 @@ impl Interval {
         self.tan_impl().0
     }
 
-    pub(crate) fn tan_impl(self) -> (Self, Decoration) {
+    fn tan_impl(self) -> (Self, Decoration) {
         if self.is_empty() {
             return (self, Decoration::Trv);
         }
@@ -583,6 +598,7 @@ impl DecoratedInterval {
     impl_dec!(log, log_impl);
     impl_dec!(log10, log10_impl);
     impl_dec!(log2, log2_impl);
+    impl_dec2!(pow, pow_impl);
 
     pub fn pown(self, rhs: i64) -> Self {
         let (y, d) = self.x.pown_impl(rhs);
@@ -620,6 +636,8 @@ mod tests {
         assert!(DI::NAI.log().is_nai());
         assert!(DI::NAI.log10().is_nai());
         assert!(DI::NAI.log2().is_nai());
+        assert!(DI::NAI.pow(DI::EMPTY).is_nai());
+        assert!(DI::EMPTY.pow(DI::NAI).is_nai());
         assert!(DI::NAI.pown(1).is_nai());
         assert!(DI::NAI.sin().is_nai());
         assert!(DI::NAI.sinh().is_nai());
