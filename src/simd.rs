@@ -1,4 +1,4 @@
-use core::arch::x86_64::*;
+use std::arch::x86_64::*;
 
 pub(crate) fn abs(x: __m128d) -> __m128d {
     // Drop sign bits.

@@ -320,7 +320,7 @@ impl Interval {
             //C_M_Z => See above.
             C_N0_Z => (Self::PI, Decoration::Trv),
             C_N1_Z => (Self::PI, Decoration::Def),
-            C_P0_Z => (Self::with_infsup_raw(0.0, 0.0), Decoration::Trv),
+            C_P0_Z => (Self::zero(), Decoration::Trv),
             //C_P1_Z => See above.
 
             // Y axis

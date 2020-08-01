@@ -1,6 +1,4 @@
-use core::arch::x86_64::*;
-use core::cmp::Ordering;
-use std::{convert::TryFrom, error::Error, fmt};
+use std::{arch::x86_64::*, cmp::Ordering, convert::TryFrom, error::Error, fmt};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IntervalErrorKind {

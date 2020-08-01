@@ -1,9 +1,11 @@
 use crate::interval::*;
 use gmp_mpfr_sys::mpfr;
 use rug::Float;
-use std::ffi::{CStr, CString};
-use std::fmt;
-use std::os::raw::c_char;
+use std::{
+    ffi::{CStr, CString},
+    fmt,
+    os::raw::c_char,
+};
 
 fn mpfr_printf(template: &str, f: &Float) -> String {
     assert!(!f.is_nan());

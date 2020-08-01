@@ -1,5 +1,5 @@
 use crate::interval::Interval;
-use core::arch::x86_64::*;
+use std::arch::x86_64::*;
 
 impl Interval {
     // For a given interval [a, b], returns the bit pattern

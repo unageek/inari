@@ -1,5 +1,5 @@
 use crate::interval::*;
-use core::arch::x86_64::*;
+use std::arch::x86_64::*;
 
 // NOTE: `eq` is implemented in interval.rs
 

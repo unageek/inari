@@ -1,5 +1,5 @@
 use crate::interval::*;
-use core::arch::x86_64::*;
+use std::arch::x86_64::*;
 
 impl Interval {
     pub fn convex_hull(self, rhs: Self) -> Self {

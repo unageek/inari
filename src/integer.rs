@@ -1,6 +1,5 @@
-use crate::interval::*;
-use crate::simd::*;
-use core::arch::x86_64::*;
+use crate::{interval::*, simd::*};
+use std::arch::x86_64::*;
 
 impl Interval {
     pub fn ceil(self) -> Self {

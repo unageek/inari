@@ -1,7 +1,5 @@
-use crate::classify::*;
-use crate::interval::*;
-use crate::simd::*;
-use core::arch::x86_64::*;
+use crate::{classify::*, interval::*, simd::*};
+use std::arch::x86_64::*;
 
 impl Interval {
     pub fn abs(self) -> Self {

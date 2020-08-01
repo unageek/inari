@@ -2,10 +2,10 @@
 #![feature(asm)]
 #![allow(clippy::float_cmp)]
 
-pub use self::interval::{
-    DecoratedInterval, Decoration, Interval, IntervalError, IntervalErrorKind,
+pub use self::{
+    interval::{DecoratedInterval, Decoration, Interval, IntervalError, IntervalErrorKind},
+    overlap::OverlappingState,
 };
-pub use self::overlap::OverlappingState;
 
 mod absmax;
 mod arith;

@@ -1,5 +1,4 @@
 use crate::interval::*;
-use core::cmp::Ordering;
 use gmp_mpfr_sys::{gmp, mpfr};
 use nom::{
     branch::alt,
@@ -10,8 +9,7 @@ use nom::{
     IResult,
 };
 use rug::{Float, Integer, Rational};
-use std::convert::TryFrom;
-use std::str::FromStr;
+use std::{cmp::Ordering, convert::TryFrom, str::FromStr};
 
 #[derive(Clone, Debug)]
 struct ParseNumberError;

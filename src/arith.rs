@@ -1,8 +1,8 @@
-use crate::classify::*;
-use crate::interval::*;
-use crate::simd::*;
-use core::arch::x86_64::*;
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use crate::{classify::*, interval::*, simd::*};
+use std::{
+    arch::x86_64::*,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+};
 
 impl Neg for Interval {
     type Output = Self;
