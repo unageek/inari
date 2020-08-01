@@ -1,5 +1,4 @@
-use crate::classify::*;
-use crate::interval::*;
+use crate::{classify::*, interval::*};
 use gmp_mpfr_sys::mpfr;
 use rug::Float;
 
@@ -34,6 +33,19 @@ fn mpfr_fn2(
     }
 }
 
+fn mpfr_fn_si(
+    f: unsafe extern "C" fn(*mut mpfr::mpfr_t, *const mpfr::mpfr_t, i64, mpfr::rnd_t) -> i32,
+    x: f64,
+    y: i64,
+    rnd: mpfr::rnd_t,
+) -> f64 {
+    let mut x = Float::with_val(f64::MANTISSA_DIGITS, x);
+    unsafe {
+        f(x.as_raw_mut(), x.as_raw(), y, rnd);
+        mpfr::get_d(x.as_raw(), rnd)
+    }
+}
+
 macro_rules! mpfr_fn {
     ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
         fn $f_rd(x: f64) -> f64 {
@@ -58,6 +70,18 @@ macro_rules! mpfr_fn2 {
     };
 }
 
+macro_rules! mpfr_fn_si {
+    ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
+        fn $f_rd(x: f64, y: i64) -> f64 {
+            mpfr_fn_si(mpfr::$mpfr_f, x, y, mpfr::rnd_t::RNDD)
+        }
+
+        fn $f_ru(x: f64, y: i64) -> f64 {
+            mpfr_fn_si(mpfr::$mpfr_f, x, y, mpfr::rnd_t::RNDU)
+        }
+    };
+}
+
 mpfr_fn!(acos, acos_rd, acos_ru);
 mpfr_fn!(acosh, acosh_rd, acosh_ru);
 mpfr_fn!(asin, asin_rd, asin_ru);
@@ -73,6 +97,7 @@ mpfr_fn!(exp2, exp2_rd, exp2_ru);
 mpfr_fn!(log, log_rd, log_ru);
 mpfr_fn!(log10, log10_rd, log10_ru);
 mpfr_fn!(log2, log2_rd, log2_ru);
+mpfr_fn_si!(pow_si, pown_rd, pown_ru);
 mpfr_fn!(sin, sin_rd, sin_ru);
 mpfr_fn!(sinh, sinh_rd, sinh_ru);
 mpfr_fn!(tan, tan_rd, tan_ru);
@@ -396,6 +421,64 @@ impl Interval {
     impl_log!(log10, log10_impl, log10_rd, log10_ru);
     impl_log!(log2, log2_impl, log2_rd, log2_ru);
 
+    pub fn pown(self, rhs: i64) -> Self {
+        self.pown_impl(rhs).0
+    }
+
+    pub(crate) fn pown_impl(self, rhs: i64) -> (Self, Decoration) {
+        if self.is_empty() {
+            return (self, Decoration::Trv);
+        }
+
+        let mut a = self.inf_raw();
+        let mut b = self.sup_raw();
+
+        if rhs < 0 {
+            let d = if a <= 0.0 && b >= 0.0 {
+                Decoration::Trv
+            } else {
+                Decoration::Com
+            };
+
+            if a == 0.0 && b == 0.0 {
+                return (Self::EMPTY, d);
+            }
+
+            if rhs % 2 == 0 {
+                let abs = self.abs();
+                (
+                    Self::with_infsup_raw(pown_rd(abs.sup_raw(), rhs), pown_ru(abs.inf_raw(), rhs)),
+                    d,
+                )
+            } else {
+                if a < 0.0 && b > 0.0 {
+                    (Self::ENTIRE, d)
+                } else {
+                    if a == 0.0 {
+                        a = 0.0; // [0, b]
+                    }
+                    if b == 0.0 {
+                        b = -0.0; // [a, 0]
+                    }
+                    (Self::with_infsup_raw(pown_rd(b, rhs), pown_ru(a, rhs)), d)
+                }
+            }
+        } else {
+            if rhs % 2 == 0 {
+                let abs = self.abs();
+                (
+                    Self::with_infsup_raw(pown_rd(abs.inf_raw(), rhs), pown_ru(abs.sup_raw(), rhs)),
+                    Decoration::Com,
+                )
+            } else {
+                (
+                    Self::with_infsup_raw(pown_rd(a, rhs), pown_ru(b, rhs)),
+                    Decoration::Com,
+                )
+            }
+        }
+    }
+
     pub fn sin(self) -> Self {
         if self.is_empty() {
             return self;
@@ -500,6 +583,12 @@ impl DecoratedInterval {
     impl_dec!(log, log_impl);
     impl_dec!(log10, log10_impl);
     impl_dec!(log2, log2_impl);
+
+    pub fn pown(self, rhs: i64) -> Self {
+        let (y, d) = self.x.pown_impl(rhs);
+        Self::set_dec(y, self.d.min(d))
+    }
+
     impl_dec!(sin);
     impl_dec!(sinh);
     impl_dec!(tan, tan_impl);
@@ -509,7 +598,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interval;
+    use crate::{const_interval, interval};
     type DI = DecoratedInterval;
     type I = Interval;
 
@@ -531,10 +620,18 @@ mod tests {
         assert!(DI::NAI.log().is_nai());
         assert!(DI::NAI.log10().is_nai());
         assert!(DI::NAI.log2().is_nai());
+        assert!(DI::NAI.pown(1).is_nai());
         assert!(DI::NAI.sin().is_nai());
         assert!(DI::NAI.sinh().is_nai());
         assert!(DI::NAI.tan().is_nai());
         assert!(DI::NAI.tanh().is_nai());
+    }
+
+    #[test]
+    fn pown() {
+        const ONE: I = const_interval!(1.0, 1.0);
+        assert_eq!(ONE.pown(i64::MAX), ONE);
+        assert_eq!(ONE.pown(i64::MIN), ONE);
     }
 
     #[test]
