@@ -29,7 +29,6 @@ lto = true
 [features]
 default = ["gmp"]
 gmp = ["gmp-mpfr-sys", "nom", "rug"]
-tau_constant = []
 
 [dependencies]
 gmp-mpfr-sys = { version = "1.3", default-features = false, features = ["mpfr"], optional = true }
