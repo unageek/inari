@@ -9,12 +9,14 @@ A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.or
 
 ## Requirements
 
-The nightly Rust toolchain is required, until the new `asm!` macro is stabilized.
+The nightly Rust toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used in the crate.
+
+There is one conditional feature:
+
+- `gmp` (enabled by default) - Enables operations that depend on GMP and MPFR, namely transcendental functions and conversion between texts and intervals. You can opt-out the feature to reduce dependency. Even in that case, you can still access to basic arithmetic operations that are required for writing filters for geometric predicates.
 
 ## TODO
 
-- Pass `Interval`s by value or by reference?
-  - https://github.com/rust-lang/rust/issues/52274
 - AVX512F support (_mm512_add_round_pd, etc.)
   - https://github.com/rust-lang/stdarch/issues/310
 - Improve conformance to the standard

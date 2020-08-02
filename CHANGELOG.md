@@ -2,11 +2,13 @@
 
 The ❗ icon indicates a breaking change.
 
-## Unreleased
+## v0.3.0 - 2020-08-03
 
 ### Added
 
-- Add macros `const_interval!` and `const_dec_interval!` for making constant intervals from `f64` bounds, evaluated at compile time.
+- Add elementary functions `pown`, `pow`, `exp`, `exp2`, `exp10`, `log`, `log2`, `log10`, `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh` and `atanh`.
+
+- Add macros `const_interval!` and `const_dec_interval!` which let you make intervals from `f64` numbers in a const context.
 
 - Add constants `(Decorated)Interval::EMPTY`, `(Decorated)Interval::ENTIRE` and `DecoratedInterval::NAI`.
 
