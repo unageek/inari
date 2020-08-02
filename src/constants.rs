@@ -93,7 +93,6 @@ impl Interval {
         hexf64!("0x1.6a09e667f3bccp0"),
         hexf64!("0x1.6a09e667f3bcdp0")
     );
-    #[cfg(feature = "tau_constant")]
     pub const TAU: Self = const_interval!(
         hexf64!("0x6.487ed5110b460p0"),
         hexf64!("0x6.487ed5110b464p0")
@@ -129,7 +128,6 @@ impl DecoratedInterval {
     def_com!(LOG2_E);
     def_com!(PI);
     def_com!(SQRT_2);
-    #[cfg(feature = "tau_constant")]
     def_com!(TAU);
 }
 
@@ -139,7 +137,7 @@ mod tests {
     type I = Interval;
     type DI = DecoratedInterval;
 
-    // Only works with positive numbers.
+    // This only works with positive numbers.
     fn succ(x: f64) -> f64 {
         f64::from_bits(x.to_bits() + 1)
     }
@@ -179,7 +177,6 @@ mod tests {
         check!(LOG2_E);
         check!(PI);
         check!(SQRT_2);
-        #[cfg(feature = "tau_constant")]
-        check!(TAU, 2.0 * std::f64::consts::PI);
+        check!(TAU);
     }
 }
