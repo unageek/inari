@@ -11,6 +11,7 @@ mod absmax;
 mod arith;
 mod basic;
 mod boolean;
+mod bytes;
 mod classify;
 mod constants;
 #[cfg(feature = "gmp")]
