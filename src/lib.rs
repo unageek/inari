@@ -3,7 +3,7 @@
 #![allow(clippy::float_cmp)]
 
 pub use self::{
-    interval::{DecoratedInterval, Decoration, Interval, IntervalError, IntervalErrorKind},
+    interval::{DecoratedInterval, Decoration, Interval, IntervalError, IntervalErrorKind, Result},
     overlap::OverlappingState,
 };
 
