@@ -71,7 +71,7 @@ struct _DecoratedInterval {
 }
 
 // We don't store `DecoratedInterval` directly as that would make
-// the size of `TupperInterval` 48 bytes, instead of 32.
+// the size of `TupperInterval` 48 bytes instead of 32 due to the alignment.
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 struct TupperInterval {
@@ -82,9 +82,9 @@ struct TupperInterval {
 
 impl TupperInterval {
     fn new(x: DecoratedInterval, g: IntervalBranch) -> Self {
-        let x = unsafe { std::mem::transmute::<DecoratedInterval, _DecoratedInterval>(x) };
         // nai is prohibited.
-        assert!(x.d != Decoration::Ill);
+        assert!(!x.is_nai());
+        let x = unsafe { std::mem::transmute::<DecoratedInterval, _DecoratedInterval>(x) };
         Self { x: x.x, d: x.d, g }
     }
 
