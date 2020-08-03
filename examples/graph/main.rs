@@ -1,5 +1,3 @@
-// Plots the graph of a relation over ℝ².
-
 mod ast;
 mod dyn_relation;
 mod graph;
@@ -42,27 +40,39 @@ fn print_statistics(cur: &GraphingStatistics, prev: &GraphingStatistics) {
 fn main() {
     let matches = App::new("inari-graph")
         .setting(AppSettings::AllowLeadingHyphen)
-        .arg(Arg::new("relation").index(1))
-        .arg(Arg::new("output").index(2))
+        .about("Plots the graph of a relation over the x-y plane.")
+        .arg(
+            Arg::with_name("relation")
+                .index(1)
+                .about("The relation to plot."),
+        )
         .arg(
             Arg::with_name("bounds")
                 .short('b')
                 .number_of_values(4)
                 .default_values(&["-10", "10", "-10", "10"])
-                .value_names(&["XMIN", "XMAX", "YMIN", "YMAX"]),
+                .value_names(&["xmin", "xmax", "ymin", "ymax"])
+                .about("Sets the bounds of the plot region."),
+        )
+        .arg(
+            Arg::with_name("output")
+                .short('o')
+                .takes_value(true)
+                .about("Sets the path to the output image (only .png is supported)."),
         )
         .arg(
             Arg::with_name("size")
                 .short('s')
                 .number_of_values(2)
                 .default_values(&["1024", "1024"])
-                .value_names(&["WIDTH", "HEIGHT"]),
+                .value_names(&["width", "height"])
+                .about("Sets the dimensions of the output image."),
         )
         .get_matches();
 
     let relation = matches.value_of_t_or_exit::<String>("relation");
-    let output = matches.value_of_t_or_exit::<String>("output");
     let bounds = matches.values_of_t_or_exit::<f64>("bounds");
+    let output = matches.value_of("output");
     let size = matches.values_of_t_or_exit::<u32>("size");
 
     let mut rel = DynRelation::new(&relation);
@@ -83,8 +93,10 @@ fn main() {
         print_statistics(&stat, &prev_stat);
         prev_stat = stat;
 
-        let im = g.get_image();
-        im.save(&output).unwrap();
+        if let Some(output) = output {
+            let im = g.get_image();
+            im.save(output).unwrap();
+        }
 
         match result {
             Ok(true) => break,
