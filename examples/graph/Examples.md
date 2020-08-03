@@ -164,3 +164,23 @@ Some intriguing examples from GrafEq
     ```
     "sin(abs(x + y)) > max(cos(x^2), sin(y^2))"
     ```
+
+From http://www.peda.com/grafeq/reviews.html
+
+- 1.
+
+  ```
+  "y == sqrt(x)^2"
+  ```
+
+- 2.
+
+  ```
+  "y == sqrt(x - 1)/sqrt(x - 3)"
+  ```
+
+- 3: the graph should be empty.
+
+  ```
+  "y == sqrt(x - 3)*sqrt(1 - x)"
+  ```
