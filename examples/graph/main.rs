@@ -3,7 +3,7 @@ mod dyn_relation;
 mod graph;
 mod interval_set;
 mod parse;
-mod visitor;
+mod visit;
 
 use crate::{dyn_relation::*, graph::*};
 use clap::{App, AppSettings, Arg};

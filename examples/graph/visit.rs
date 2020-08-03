@@ -4,7 +4,7 @@ use std::{
     marker::Sized,
 };
 
-pub trait Visitor<'a>
+pub trait Visit<'a>
 where
     Self: Sized,
 {
@@ -17,7 +17,7 @@ where
     }
 }
 
-fn traverse_expr<'a, V: Visitor<'a>>(v: &mut V, expr: &'a Expr) {
+fn traverse_expr<'a, V: Visit<'a>>(v: &mut V, expr: &'a Expr) {
     use ExprKind::*;
     match &expr.kind {
         Unary(_, x) => v.visit_expr(x),
@@ -30,7 +30,7 @@ fn traverse_expr<'a, V: Visitor<'a>>(v: &mut V, expr: &'a Expr) {
     };
 }
 
-fn traverse_rel<'a, V: Visitor<'a>>(v: &mut V, rel: &'a Rel) {
+fn traverse_rel<'a, V: Visit<'a>>(v: &mut V, rel: &'a Rel) {
     use RelKind::*;
     match &rel.kind {
         Equality(_, x, y) => {
@@ -44,7 +44,7 @@ fn traverse_rel<'a, V: Visitor<'a>>(v: &mut V, rel: &'a Rel) {
     };
 }
 
-pub trait VisitorMut
+pub trait VisitMut
 where
     Self: Sized,
 {
@@ -57,7 +57,7 @@ where
     }
 }
 
-fn traverse_expr_mut<V: VisitorMut>(v: &mut V, expr: &mut Expr) {
+fn traverse_expr_mut<V: VisitMut>(v: &mut V, expr: &mut Expr) {
     use ExprKind::*;
     match &mut expr.kind {
         Unary(_, x) => v.visit_expr_mut(x),
@@ -70,7 +70,7 @@ fn traverse_expr_mut<V: VisitorMut>(v: &mut V, expr: &mut Expr) {
     };
 }
 
-fn traverse_rel_mut<V: VisitorMut>(v: &mut V, rel: &mut Rel) {
+fn traverse_rel_mut<V: VisitMut>(v: &mut V, rel: &mut Rel) {
     use RelKind::*;
     match &mut rel.kind {
         Equality(_, x, y) => {
@@ -88,7 +88,7 @@ type SiteMap = HashMap<ExprId, Option<u8>>;
 
 pub struct Transform;
 
-impl VisitorMut for Transform {
+impl VisitMut for Transform {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
         use {BinaryOp::*, ExprKind::*, UnaryOp::*};
         traverse_expr_mut(self, expr);
@@ -133,7 +133,7 @@ pub struct FoldConstant;
 // Only fold constants which evaluate to an empty or a single interval
 // because sites are not assigned and branch cut tracking cannot be done
 // at this moment.
-impl VisitorMut for FoldConstant {
+impl VisitMut for FoldConstant {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
         use ExprKind::*;
         traverse_expr_mut(self, expr);
@@ -168,16 +168,16 @@ impl VisitorMut for FoldConstant {
     }
 }
 
-pub struct AssignNodeId<'a> {
+pub struct AssignId<'a> {
     next_id: ExprId,
     next_site: u8,
     site_map: SiteMap,
     visited_nodes: HashSet<&'a Expr>,
 }
 
-impl<'a> AssignNodeId<'a> {
+impl<'a> AssignId<'a> {
     pub fn new() -> Self {
-        Self {
+        AssignId {
             next_id: 2, // 0 for x, 1 for y
             next_site: 0,
             site_map: HashMap::new(),
@@ -203,7 +203,7 @@ impl<'a> AssignNodeId<'a> {
     }
 }
 
-impl<'a> Visitor<'a> for AssignNodeId<'a> {
+impl<'a> Visit<'a> for AssignId<'a> {
     fn visit_expr(&mut self, expr: &'a Expr) {
         traverse_expr(self, expr);
 
@@ -251,7 +251,7 @@ impl AssignSite {
     }
 }
 
-impl<'a> Visitor<'a> for AssignSite {
+impl<'a> Visit<'a> for AssignSite {
     fn visit_expr(&mut self, expr: &'a Expr) {
         traverse_expr(self, expr);
 
@@ -262,31 +262,31 @@ impl<'a> Visitor<'a> for AssignSite {
 }
 
 // Collects nodes (except the ones for X and Y), sorted topologically.
-pub struct CollectNodesForEvaluation {
-    nodes: Vec<Expr>,
-    next_node_id: ExprId,
+pub struct CollectExprsForEvaluation {
+    exprs: Vec<Expr>,
+    next_id: ExprId,
 }
 
-impl CollectNodesForEvaluation {
+impl CollectExprsForEvaluation {
     pub fn new() -> Self {
-        CollectNodesForEvaluation {
-            nodes: Vec::new(),
-            next_node_id: 2, // 0 for x, 1 for y
+        CollectExprsForEvaluation {
+            exprs: Vec::new(),
+            next_id: 2, // 0 for x, 1 for y
         }
     }
 
-    pub fn nodes(self) -> Vec<Expr> {
-        self.nodes
+    pub fn exprs(self) -> Vec<Expr> {
+        self.exprs
     }
 }
 
-impl<'a> Visitor<'a> for CollectNodesForEvaluation {
+impl<'a> Visit<'a> for CollectExprsForEvaluation {
     fn visit_expr(&mut self, expr: &'a Expr) {
         traverse_expr(self, expr);
 
-        if expr.id.get() == self.next_node_id {
-            self.nodes.push(expr.clone_for_evaluation());
-            self.next_node_id += 1;
+        if expr.id.get() == self.next_id {
+            self.exprs.push(expr.clone_for_evaluation());
+            self.next_id += 1;
         }
     }
 }
