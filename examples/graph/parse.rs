@@ -87,6 +87,7 @@ fn fn2(i: &str) -> IResult<&str, BinaryOp> {
         value(BinaryOp::Atan2, tag("atan2")),
         value(BinaryOp::Max, tag("max")),
         value(BinaryOp::Min, tag("min")),
+        value(BinaryOp::Mod, tag("mod")),
     ))(i)
 }
 

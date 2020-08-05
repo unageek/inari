@@ -199,6 +199,7 @@ impl<'a> AssignId<'a> {
             | Unary(Tan, _)
             | Binary(Div, _, _)
             | Binary(Atan2, _, _)
+            | Binary(Mod, _, _)
             | Pown(_, _))
     }
 }

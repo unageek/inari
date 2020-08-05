@@ -3,7 +3,7 @@
 use bitflags::*;
 use core::ops::{Add, BitAnd, BitOr, Mul, Neg, Sub};
 use hexf::*;
-use inari::{interval, DecoratedInterval, Decoration, Interval};
+use inari::*;
 use smallvec::SmallVec;
 use std::{
     convert::From,
@@ -446,6 +446,14 @@ impl TupperIntervalSet {
             }
         }
         rs.normalize()
+    }
+
+    pub fn rem_euclid(&self, rhs: &Self, site: Option<u8>) -> Self {
+        let zero = TupperIntervalSet::from(const_dec_interval!(0.0, 0.0));
+        let y = rhs.abs();
+        (self - &(&y * &self.div(&y, None).floor(site)))
+            .max(&zero)
+            .min(&y)
     }
 
     // Less precise for an interval near zero but does not contain zero.
