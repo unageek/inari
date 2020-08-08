@@ -76,7 +76,7 @@ Some intriguing examples from GrafEq
   - 📄 Step.gqs
     
     ```
-    "y == atan(10^309 * (x - 1))" 
+    "y == atan(10^309 * (x - 1))"
     ```
 
   - 📄 Upper Triangle.gqs
@@ -91,9 +91,19 @@ Some intriguing examples from GrafEq
     "y == sin(x)/x"
     ```
 
+- 📂 Single Relation/Enumerations/Binary/
+
+  - 📄 binary naturals.gqs
+
+    ```
+    "(1 + 99 * floor(mod(floor(y) * exp2(ceil(x)), 2))) * (mod(x, 1) - 1/2)^2 + \
+     (mod(y, 1) - 1/2)^2 == 0.15 && floor(-log2(y)) < x && x < 0" -b -14 4 -4 14
+    ```
+
+
 - 📂 Single Relation/Enumerations/Trees/
 
-  - 📄 bi-infinite binary tree.gqs [🐌]
+  - 📄 bi-infinite binary tree.gqs
 
     ```
     "sin(exp2(floor(y))*x + pi/4*(y - floor(y)) - pi/2) == 0 || \
