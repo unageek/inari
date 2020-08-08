@@ -27,12 +27,16 @@ impl DynRelation {
         }
     }
 
-    pub fn evaluate(&mut self, x: TupperIntervalSet, y: TupperIntervalSet) -> EvaluationResult {
+    pub fn evaluate(&mut self, x: TupperIntervalSet, y: TupperIntervalSet) -> EvalResult {
         self.vs[0] = x;
         self.vs[1] = y;
         for i in 0..self.exprs.len() {
             self.vs[i + 2] = self.exprs[i].evaluate(&self.vs);
         }
         self.rel.evaluate(&self.vs)
+    }
+
+    pub fn get_proposition(&self) -> Proposition {
+        self.rel.get_proposition()
     }
 }

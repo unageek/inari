@@ -182,24 +182,28 @@ impl fmt::Display for GraphingError {
 impl error::Error for GraphingError {}
 
 #[derive(Debug)]
-pub struct Relation<T>(pub T)
+pub struct Relation<T>
 where
-    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult;
+    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvalResult,
+{
+    pub eval: T,
+    pub prop: Proposition,
+}
 
 impl<T> Relation<T>
 where
-    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult,
+    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvalResult,
 {
-    fn eval_on_point(&mut self, x: f64, y: f64) -> EvaluationResult {
+    fn eval_on_point(&mut self, x: f64, y: f64) -> EvalResult {
         let x = dec_interval!(x, x).unwrap();
         let y = dec_interval!(y, y).unwrap();
-        (self.0)(TupperIntervalSet::from(x), TupperIntervalSet::from(y))
+        (self.eval)(TupperIntervalSet::from(x), TupperIntervalSet::from(y))
     }
 
-    fn eval_on_region(&mut self, r: &Region) -> EvaluationResult {
+    fn eval_on_region(&mut self, r: &Region) -> EvalResult {
         let x = DecoratedInterval::new(r.0);
         let y = DecoratedInterval::new(r.1);
-        (self.0)(TupperIntervalSet::from(x), TupperIntervalSet::from(y))
+        (self.eval)(TupperIntervalSet::from(x), TupperIntervalSet::from(y))
     }
 }
 
@@ -214,7 +218,7 @@ pub struct GraphingStatistics {
 #[derive(Debug)]
 pub struct Graph<T>
 where
-    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult,
+    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvalResult,
 {
     relation: Relation<T>,
     im: Image,
@@ -229,7 +233,7 @@ where
 
 impl<T> Graph<T>
 where
-    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvaluationResult,
+    T: FnMut(TupperIntervalSet, TupperIntervalSet) -> EvalResult,
 {
     // TODO: Accept `InexactRegion` instead of `Region` for more exactness?
     pub fn new(relation: Relation<T>, region: Region, im_width: u32, im_height: u32) -> Self {
@@ -333,8 +337,10 @@ where
             let r_u_up = self.relation.eval_on_region(&u_up);
             *evals += 1;
 
-            let is_true = r_u_up.map_reduce(&|ss, d| d >= Decoration::Def && ss == SignSet::ZERO);
-            let is_false = !r_u_up.map_reduce(&|ss, _| ss.contains(SignSet::ZERO));
+            let prop = &self.relation.prop;
+            let is_true =
+                r_u_up.map_reduce(prop, &|ss, d| d >= Decoration::Def && ss == SignSet::ZERO);
+            let is_false = !r_u_up.map_reduce(prop, &|ss, _| ss.contains(SignSet::ZERO));
             if is_true || is_false {
                 let ix = bx * ibw;
                 let iy = by * ibw;
@@ -365,7 +371,7 @@ where
         let fbw = bs.block_width;
         let nbx = 1u32 << -bs.k; // Number of blocks in each row per pixel.
         let area = 1u32 << (2 * (bs.k - MIN_K));
-        let mut cache = HashMap::<ImageBlock, EvaluationResult>::with_capacity(bs.blocks.len());
+        let mut cache = HashMap::<ImageBlock, EvalResult>::with_capacity(bs.blocks.len());
         let mut some_test_failed = false;
         let mut sub_blocks = Vec::<ImageBlock>::new();
         for ImageBlock(bx, by) in bs.blocks.iter().copied() {
@@ -388,12 +394,12 @@ where
             let r_u_up = self.relation.eval_on_region(&u_up);
             *evals += 1;
 
-            if r_u_up.map_reduce(&|ss, _| ss == SignSet::ZERO) {
+            if r_u_up.map_reduce(&self.relation.prop, &|ss, _| ss == SignSet::ZERO) {
                 // This pixel is proven to be true.
                 *self.im.pixel_mut(ix, iy) = STAT_TRUE;
                 continue;
             }
-            if !r_u_up.map_reduce(&|ss, _| ss.contains(SignSet::ZERO)) {
+            if !r_u_up.map_reduce(&self.relation.prop, &|ss, _| ss.contains(SignSet::ZERO)) {
                 // This subpixel is proven to be false.
                 *self.im.pixel_mut(ix, iy) -= area;
                 continue;
@@ -406,11 +412,11 @@ where
             }
             // We could evaluate on `inter` instead of `u_up` to get more
             // accurate result.
-            let dac_mask = r_u_up.map(&|_, d| d >= Decoration::Dac);
+            let dac_mask = r_u_up.map(&self.relation.prop, &|_, d| d >= Decoration::Dac);
             // To prove the existence of a solution by a change of sign...
             //   at conjunctions, both operands must be dac.
             //   at disjunctions, at least one operand must be dac.
-            if dac_mask.reduce() {
+            if dac_mask.reduce(&self.relation.prop) {
                 // Suppose we are plotting the graph of a conjunction such as
                 // "y == sin(x) && x >= 0".
                 // If the conjunct "x >= 0" holds everywhere in the subpixel,
@@ -419,7 +425,8 @@ where
                 // there exists a point where the entire relation holds.
                 // Such a test is not possible by merely converting the relation
                 // to "|y - sin(x)| + |x >= 0 ? 0 : 1| == 0".
-                let locally_zero_mask = r_u_up.map(&|ss, _| ss == SignSet::ZERO);
+                let locally_zero_mask =
+                    r_u_up.map(&self.relation.prop, &|ss, _| ss == SignSet::ZERO);
 
                 // Use `(cx, cy)` instead of `(bx, by)` for cache indices
                 // so that values at the pixel boundary may not be shared
@@ -440,7 +447,7 @@ where
 
                 let rel = &mut self.relation;
                 let mut found_solution = false;
-                let mut neg_mask = r_u_up.map(&|_, _| false);
+                let mut neg_mask = r_u_up.map(&rel.prop, &|_, _| false);
                 let mut pos_mask = neg_mask.clone();
                 for i in 0..4 {
                     let r = match i {
@@ -467,10 +474,16 @@ where
                         _ => unreachable!(),
                     };
 
-                    neg_mask |= r.map(&|ss, _| ss == SignSet::NEG || ss == SignSet::ZERO);
-                    pos_mask |= r.map(&|ss, _| ss == SignSet::POS || ss == SignSet::ZERO);
+                    neg_mask |= r.map(&rel.prop, &|ss, _| {
+                        ss == SignSet::NEG || ss == SignSet::ZERO
+                    });
+                    pos_mask |= r.map(&rel.prop, &|ss, _| {
+                        ss == SignSet::POS || ss == SignSet::ZERO
+                    });
 
-                    if (&(&neg_mask & &pos_mask) & &dac_mask).implies_solution(&locally_zero_mask) {
+                    if (&(&neg_mask & &pos_mask) & &dac_mask)
+                        .implies_solution(&rel.prop, &locally_zero_mask)
+                    {
                         found_solution = true;
                         break;
                     }

@@ -189,8 +189,46 @@ From http://www.peda.com/grafeq/reviews.html
   "y == sqrt(x - 1)/sqrt(x - 3)"
   ```
 
-- 3: the graph should be empty.
+- 3: the graph must be empty.
 
   ```
   "y == sqrt(x - 3)*sqrt(1 - x)"
   ```
+
+Tests for conjunction and disjunction
+
+The graph must be empty:
+
+```
+"y == x && y == x + 0.0001"
+```
+
+The graph must not be empty:
+
+```
+"y == x || y == x + 0.0001"
+```
+
+```
+'y < sqrt(x) && y < sqrt(-x)'
+```
+
+```
+'y < sqrt(x) || y < sqrt(-x)'
+```
+
+```
+"y == sin(40/x) && (x > 0 && y > 0)"
+```
+
+```
+"y == sin(40/x) && (x > 0 || y > 0)"
+```
+
+```
+"y == sin(40/x) || (x > 0 && y > 0)"
+```
+
+```
+"y == sin(40/x) || (x > 0 || y > 0)"
+```

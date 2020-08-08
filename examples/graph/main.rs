@@ -78,8 +78,12 @@ fn main() {
     let size = matches.values_of_t_or_exit::<u32>("size");
 
     let mut rel = DynRelation::new(&relation);
+    let prop = rel.get_proposition();
     let mut g = Graph::new(
-        Relation(|x, y| rel.evaluate(x, y)),
+        Relation {
+            eval: |x, y| rel.evaluate(x, y),
+            prop,
+        },
         Region::new(bounds[0], bounds[1], bounds[2], bounds[3]),
         size[0],
         size[1],

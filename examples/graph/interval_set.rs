@@ -591,10 +591,10 @@ bitflags! {
 
 macro_rules! impl_rel_op {
     ($op:ident, $map_neg:expr, $map_zero:expr, $map_pos:expr) => {
-        pub fn $op(&self, rhs: &Self) -> EvaluationResult {
+        pub fn $op(&self, rhs: &Self) -> EvalResult {
             let xs = self - rhs;
             if xs.is_empty() {
-                return EvaluationResult::Atomic(SignSet::empty(), Decoration::Trv);
+                return EvalResult(vec![(SignSet::empty(), Decoration::Trv)]);
             }
 
             let mut ss = SignSet::empty();
@@ -614,7 +614,7 @@ macro_rules! impl_rel_op {
                 d = d.min(x.d);
             }
 
-            EvaluationResult::Atomic(ss, d)
+            EvalResult(vec![(ss, d)])
         }
     };
 }
@@ -629,113 +629,162 @@ impl TupperIntervalSet {
     impl_rel_op!(lt, SignSet::ZERO, SignSet::POS, SignSet::POS);
 }
 
-// TODO: Flatten (use `Vec` and slice, store only leaves).
-
 #[derive(Clone, Debug)]
-pub enum EvaluationResult {
-    Atomic(SignSet, Decoration),
-    And(Box<(Self, Self)>),
-    Or(Box<(Self, Self)>),
+pub enum PropositionKind {
+    Atomic,
+    And(Box<(Proposition, Proposition)>),
+    Or(Box<(Proposition, Proposition)>),
 }
 
 #[derive(Clone, Debug)]
-pub enum EvaluationResultMask {
-    Atomic(bool),
-    And(Box<(Self, Self)>),
-    Or(Box<(Self, Self)>),
+pub struct Proposition {
+    pub kind: PropositionKind,
+    pub size: usize,
 }
 
-impl EvaluationResult {
-    pub fn map<F>(&self, f: &F) -> EvaluationResultMask
+pub type EvalResultStore = Vec<(SignSet, Decoration)>;
+#[derive(Clone, Debug)]
+pub struct EvalResult(pub EvalResultStore);
+
+pub type EvalResultMaskStore = Vec<bool>;
+#[derive(Clone, Debug)]
+pub struct EvalResultMask(pub EvalResultMaskStore);
+
+impl EvalResult {
+    pub fn map<F>(&self, p: &Proposition, f: &F) -> EvalResultMask
     where
         F: Fn(SignSet, Decoration) -> bool,
     {
-        match self {
-            Self::Atomic(ss, d) => EvaluationResultMask::Atomic(f(*ss, *d)),
-            Self::And(box (x, y)) => EvaluationResultMask::And(box (x.map(f), y.map(f))),
-            Self::Or(box (x, y)) => EvaluationResultMask::Or(box (x.map(f), y.map(f))),
-        }
+        let mut m = EvalResultMask(vec![false; p.size]);
+        Self::map_impl(&self.0[..], p, f, &mut m.0[..]);
+        m
     }
 
-    pub fn map_reduce<F>(&self, f: &F) -> bool
+    fn map_impl<F>(slf: &[(SignSet, Decoration)], p: &Proposition, f: &F, m: &mut [bool])
     where
         F: Fn(SignSet, Decoration) -> bool,
     {
-        match self {
-            Self::Atomic(ss, d) => f(*ss, *d),
-            Self::And(box (x, y)) => x.map_reduce(f) && y.map_reduce(f),
-            Self::Or(box (x, y)) => x.map_reduce(f) || y.map_reduce(f),
+        use PropositionKind::*;
+        match &p.kind {
+            Atomic => {
+                m[0] = f(slf[0].0, slf[0].1);
+            }
+            And(box (x, y)) => {
+                Self::map_impl(&slf[..x.size], &x, f, &mut m[..x.size]);
+                Self::map_impl(&slf[x.size..], &y, f, &mut m[x.size..]);
+            }
+            Or(box (x, y)) => {
+                Self::map_impl(&slf[..x.size], &x, f, &mut m[..x.size]);
+                Self::map_impl(&slf[x.size..], &y, f, &mut m[x.size..]);
+            }
+        }
+    }
+
+    pub fn map_reduce<F>(&self, p: &Proposition, f: &F) -> bool
+    where
+        F: Fn(SignSet, Decoration) -> bool,
+    {
+        Self::map_reduce_impl(&self.0[..], p, f)
+    }
+
+    fn map_reduce_impl<F>(slf: &[(SignSet, Decoration)], p: &Proposition, f: &F) -> bool
+    where
+        F: Fn(SignSet, Decoration) -> bool,
+    {
+        use PropositionKind::*;
+        match &p.kind {
+            Atomic => f(slf[0].0, slf[0].1),
+            And(box (x, y)) => {
+                Self::map_reduce_impl(&slf[..x.size], &x, f)
+                    && Self::map_reduce_impl(&slf[x.size..], &y, f)
+            }
+            Or(box (x, y)) => {
+                Self::map_reduce_impl(&slf[..x.size], &x, f)
+                    || Self::map_reduce_impl(&slf[x.size..], &y, f)
+            }
         }
     }
 }
 
-impl EvaluationResultMask {
-    pub fn implies_solution(&self, locally_zero_mask: &Self) -> bool {
-        match (self, locally_zero_mask) {
-            (Self::Atomic(x), Self::Atomic(_)) => *x,
-            (Self::And(box (x, y)), Self::And(box (xz, yz))) => {
-                if xz.reduce() {
-                    y.implies_solution(&yz)
-                } else if yz.reduce() {
-                    x.implies_solution(&xz)
+impl EvalResultMask {
+    pub fn implies_solution(&self, p: &Proposition, locally_zero_mask: &Self) -> bool {
+        Self::implies_solution_impl(&self.0[..], p, &locally_zero_mask.0[..])
+    }
+
+    fn implies_solution_impl(slf: &[bool], p: &Proposition, locally_zero_mask: &[bool]) -> bool {
+        use PropositionKind::*;
+        match &p.kind {
+            Atomic => slf[0],
+            And(box (x, y)) => {
+                if Self::reduce_impl(&locally_zero_mask[..x.size], &x) {
+                    Self::implies_solution_impl(&slf[x.size..], &y, &locally_zero_mask[x.size..])
+                } else if Self::reduce_impl(&locally_zero_mask[x.size..], &y) {
+                    Self::implies_solution_impl(&slf[..x.size], &x, &locally_zero_mask[..x.size])
                 } else {
                     // Cannot tell the existence of a solution by a normal conjunction.
                     false
                 }
             }
-            (Self::Or(box (x, y)), Self::Or(box (xz, yz))) => {
-                x.implies_solution(&xz) || y.implies_solution(&yz)
+            Or(box (x, y)) => {
+                Self::implies_solution_impl(&slf[..x.size], &x, &locally_zero_mask[..x.size])
+                    || Self::implies_solution_impl(&slf[x.size..], &y, &locally_zero_mask[x.size..])
             }
-            _ => panic!("the shape of `is_zero` does not match with `self`"),
         }
     }
 
-    pub fn reduce(&self) -> bool {
-        match self {
-            Self::Atomic(x) => *x,
-            Self::And(box (x, y)) => x.reduce() && y.reduce(),
-            Self::Or(box (x, y)) => x.reduce() || y.reduce(),
+    pub fn reduce(&self, p: &Proposition) -> bool {
+        Self::reduce_impl(&self.0[..], p)
+    }
+
+    fn reduce_impl(slf: &[bool], p: &Proposition) -> bool {
+        use PropositionKind::*;
+        match &p.kind {
+            Atomic => slf[0],
+            And(box (x, y)) => {
+                Self::reduce_impl(&slf[..x.size], &x) && Self::reduce_impl(&slf[x.size..], &y)
+            }
+            Or(box (x, y)) => {
+                Self::reduce_impl(&slf[..x.size], &x) || Self::reduce_impl(&slf[x.size..], &y)
+            }
         }
     }
 }
 
-impl BitAnd for &EvaluationResultMask {
-    type Output = EvaluationResultMask;
+impl BitAnd for &EvalResultMask {
+    type Output = EvalResultMask;
 
     fn bitand(self, rhs: Self) -> Self::Output {
-        use EvaluationResultMask::*;
-
-        match (self, rhs) {
-            (Atomic(x), Atomic(y)) => Atomic(*x && *y),
-            (And(box (xl, yl)), And(box (xr, yr))) => And(box (xl & xr, yl & yr)),
-            (Or(box (xl, yl)), Or(box (xr, yr))) => Or(box (xl & xr, yl & yr)),
-            _ => panic!("the shape of `rhs` does not match with `self`"),
-        }
+        EvalResultMask(
+            self.0
+                .iter()
+                .zip(rhs.0.iter())
+                .map(|(x, y)| *x && *y)
+                .collect(),
+        )
     }
 }
 
-impl BitAndAssign for EvaluationResultMask {
+impl BitAndAssign for EvalResultMask {
     fn bitand_assign(&mut self, rhs: Self) {
         *self = self.bitand(&rhs)
     }
 }
 
-impl BitOr for &EvaluationResultMask {
-    type Output = EvaluationResultMask;
+impl BitOr for &EvalResultMask {
+    type Output = EvalResultMask;
 
     fn bitor(self, rhs: Self) -> Self::Output {
-        use EvaluationResultMask::*;
-
-        match (self, rhs) {
-            (Atomic(x), Atomic(y)) => Atomic(*x || *y),
-            (And(box (xl, yl)), And(box (xr, yr))) => And(box (xl | xr, yl | yr)),
-            (Or(box (xl, yl)), Or(box (xr, yr))) => Or(box (xl | xr, yl | yr)),
-            _ => panic!("the shape of `rhs` does not match with `self`"),
-        }
+        EvalResultMask(
+            self.0
+                .iter()
+                .zip(rhs.0.iter())
+                .map(|(x, y)| *x || *y)
+                .collect(),
+        )
     }
 }
 
-impl BitOrAssign for EvaluationResultMask {
+impl BitOrAssign for EvalResultMask {
     fn bitor_assign(&mut self, rhs: Self) {
         *self = self.bitor(&rhs)
     }

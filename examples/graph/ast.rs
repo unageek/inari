@@ -152,31 +152,31 @@ impl Expr {
         let kind = match &self.kind {
             Unary(op, x) => Unary(
                 *op,
-                Box::new(Expr {
+                box Expr {
                     id: x.id.clone(),
                     site: Cell::new(None),
                     kind: ExprKind::Never,
-                }),
+                },
             ),
             Binary(op, x, y) => Binary(
                 *op,
-                Box::new(Expr {
+                box Expr {
                     id: x.id.clone(),
                     site: Cell::new(None),
                     kind: ExprKind::Never,
-                }),
-                Box::new(Expr {
+                },
+                box Expr {
                     id: y.id.clone(),
                     site: Cell::new(None),
                     kind: ExprKind::Never,
-                }),
+                },
             ),
             Pown(x, y) => Pown(
-                Box::new(Expr {
+                box Expr {
                     id: x.id.clone(),
                     site: Cell::new(None),
                     kind: ExprKind::Never,
-                }),
+                },
                 *y,
             ),
             x => x.clone(),
@@ -290,7 +290,7 @@ impl Rel {
         Self { kind }
     }
 
-    pub fn evaluate(&self, vs: &ValueStoreSlice) -> EvaluationResult {
+    pub fn evaluate(&self, vs: &ValueStoreSlice) -> EvalResult {
         use {EqualityOp::*, RelBinaryOp::*, RelKind::*};
         match &self.kind {
             Equality(Eq, x, y) => x.value(vs).eq(&y.value(vs)),
@@ -298,8 +298,36 @@ impl Rel {
             Equality(Gt, x, y) => x.value(vs).gt(&y.value(vs)),
             Equality(Le, x, y) => x.value(vs).le(&y.value(vs)),
             Equality(Lt, x, y) => x.value(vs).lt(&y.value(vs)),
-            Binary(And, x, y) => EvaluationResult::And(Box::new((x.evaluate(vs), y.evaluate(vs)))),
-            Binary(Or, x, y) => EvaluationResult::Or(Box::new((x.evaluate(vs), y.evaluate(vs)))),
+            Binary(And, x, y) => EvalResult([x.evaluate(vs).0, y.evaluate(vs).0].concat()),
+            Binary(Or, x, y) => EvalResult([x.evaluate(vs).0, y.evaluate(vs).0].concat()),
+        }
+    }
+
+    pub fn get_proposition(&self) -> Proposition {
+        use {RelBinaryOp::*, RelKind::*};
+        match &self.kind {
+            Equality(_, _, _) => Proposition {
+                kind: PropositionKind::Atomic,
+                size: 1,
+            },
+            Binary(And, x, y) => {
+                let px = x.get_proposition();
+                let py = y.get_proposition();
+                let size = px.size + py.size;
+                Proposition {
+                    kind: PropositionKind::And(box (px, py)),
+                    size,
+                }
+            }
+            Binary(Or, x, y) => {
+                let px = x.get_proposition();
+                let py = y.get_proposition();
+                let size = px.size + py.size;
+                Proposition {
+                    kind: PropositionKind::Or(box (px, py)),
+                    size,
+                }
+            }
         }
     }
 }
