@@ -406,20 +406,20 @@ where
             }
             // We could evaluate on `inter` instead of `u_up` to get more
             // accurate result.
-            let dac_evals = r_u_up.map(&|_, d| d >= Decoration::Dac);
+            let dac_mask = r_u_up.map(&|_, d| d >= Decoration::Dac);
             // To prove the existence of a solution by a change of sign...
             //   at conjunctions, both operands must be dac.
             //   at disjunctions, at least one operand must be dac.
-            if dac_evals.reduce() {
-                // Let us assume that we are plotting the graph of a conjunction
-                // such as "y == sin(x) && x >= 0".
+            if dac_mask.reduce() {
+                // Suppose we are plotting the graph of a conjunction such as
+                // "y == sin(x) && x >= 0".
                 // If the conjunct "x >= 0" holds everywhere in the subpixel,
                 // and "y - sin(x)" evaluates to both `POS` and `NEG` at
                 // different points in the region, we can tell that
                 // there exists a point where the entire relation holds.
                 // Such a test is not possible by merely converting the relation
                 // to "|y - sin(x)| + |x >= 0 ? 0 : 1| == 0".
-                let zero_evals = r_u_up.map(&|ss, _| ss == SignSet::ZERO);
+                let zero_mask = r_u_up.map(&|ss, _| ss == SignSet::ZERO);
 
                 // Use `(cx, cy)` instead of `(bx, by)` for cache indices
                 // so that values at the pixel boundary may not be shared
@@ -440,8 +440,8 @@ where
 
                 let rel = &mut self.relation;
                 let mut found_solution = false;
-                let mut neg_evals = r_u_up.map(&|_, _| false);
-                let mut pos_evals = neg_evals.clone();
+                let mut neg_mask = r_u_up.map(&|_, _| false);
+                let mut pos_mask = neg_mask.clone();
                 for i in 0..4 {
                     let r = match i {
                         0 => cache.entry(ImageBlock(cx, cy)).or_insert_with(|| {
@@ -467,19 +467,10 @@ where
                         _ => unreachable!(),
                     };
 
-                    if r.map(&|ss, _| ss == SignSet::ZERO).reduce() {
-                        found_solution = true;
-                        break;
-                    }
+                    neg_mask |= r.map(&|ss, _| ss == SignSet::NEG || ss == SignSet::ZERO);
+                    pos_mask |= r.map(&|ss, _| ss == SignSet::POS || ss == SignSet::ZERO);
 
-                    neg_evals = neg_evals.union(&r.map(&|ss, _| ss == SignSet::NEG));
-                    pos_evals = pos_evals.union(&r.map(&|ss, _| ss == SignSet::POS));
-
-                    if neg_evals
-                        .intersection(&pos_evals)
-                        .intersection(&dac_evals)
-                        .implies_solution(&zero_evals)
-                    {
+                    if (&(&neg_mask & &pos_mask) & &dac_mask).implies_solution(&zero_mask) {
                         found_solution = true;
                         break;
                     }

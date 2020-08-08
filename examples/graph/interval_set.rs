@@ -1,7 +1,7 @@
 #![allow(clippy::float_cmp)]
 
 use bitflags::*;
-use core::ops::{Add, Mul, Neg, Sub};
+use core::ops::{Add, BitAnd, BitAndAssign, BitOr, BitOrAssign, Mul, Neg, Sub};
 use hexf::*;
 use inari::*;
 use smallvec::SmallVec;
@@ -589,102 +589,6 @@ bitflags! {
     }
 }
 
-// TODO: Flatten (use `Vec` and slice, store only leaves).
-
-#[derive(Clone, Debug)]
-pub enum EvaluationResult {
-    Atomic(SignSet, Decoration),
-    And(Box<(Self, Self)>),
-    Or(Box<(Self, Self)>),
-}
-
-#[derive(Clone, Debug)]
-pub enum EvaluationResultB {
-    Atomic(bool),
-    And(Box<(Self, Self)>),
-    Or(Box<(Self, Self)>),
-}
-
-impl EvaluationResult {
-    pub fn map<F>(&self, f: &F) -> EvaluationResultB
-    where
-        F: Fn(SignSet, Decoration) -> bool,
-    {
-        match self {
-            Self::Atomic(ss, d) => EvaluationResultB::Atomic(f(*ss, *d)),
-            Self::And(box (x, y)) => EvaluationResultB::And(box (x.map(f), y.map(f))),
-            Self::Or(box (x, y)) => EvaluationResultB::Or(box (x.map(f), y.map(f))),
-        }
-    }
-
-    pub fn map_reduce<F>(&self, f: &F) -> bool
-    where
-        F: Fn(SignSet, Decoration) -> bool,
-    {
-        match self {
-            Self::Atomic(ss, d) => f(*ss, *d),
-            Self::And(box (x, y)) => x.map_reduce(f) && y.map_reduce(f),
-            Self::Or(box (x, y)) => x.map_reduce(f) || y.map_reduce(f),
-        }
-    }
-}
-
-impl EvaluationResultB {
-    pub fn implies_solution(&self, is_zero: &Self) -> bool {
-        match (self, is_zero) {
-            (Self::Atomic(x), Self::Atomic(_)) => *x,
-            (Self::And(box (x, y)), Self::And(box (xz, yz))) => {
-                if xz.reduce() {
-                    y.implies_solution(&yz)
-                } else if yz.reduce() {
-                    x.implies_solution(&xz)
-                } else {
-                    // Cannot tell the existence of a solution by a normal conjunction.
-                    false
-                }
-            }
-            (Self::Or(box (x, y)), Self::Or(box (xz, yz))) => {
-                x.implies_solution(&xz) || y.implies_solution(&yz)
-            }
-            _ => panic!("the shape of `is_zero` does not match with `self`"),
-        }
-    }
-
-    pub fn intersection(&self, rhs: &Self) -> Self {
-        match (self, rhs) {
-            (Self::Atomic(x), Self::Atomic(y)) => Self::Atomic(*x && *y),
-            (Self::And(box (xl, yl)), Self::And(box (xr, yr))) => {
-                Self::And(box (xl.intersection(&xr), yl.intersection(&yr)))
-            }
-            (Self::Or(box (xl, yl)), Self::Or(box (xr, yr))) => {
-                Self::Or(box (xl.intersection(&xr), yl.intersection(&yr)))
-            }
-            _ => panic!("the shape of `rhs` does not match with `self`"),
-        }
-    }
-
-    pub fn reduce(&self) -> bool {
-        match self {
-            Self::Atomic(x) => *x,
-            Self::And(box (x, y)) => x.reduce() && y.reduce(),
-            Self::Or(box (x, y)) => x.reduce() || y.reduce(),
-        }
-    }
-
-    pub fn union(&self, rhs: &Self) -> Self {
-        match (self, rhs) {
-            (Self::Atomic(x), Self::Atomic(y)) => Self::Atomic(*x || *y),
-            (Self::And(box (xl, yl)), Self::And(box (xr, yr))) => {
-                Self::And(box (xl.union(&xr), yl.union(&yr)))
-            }
-            (Self::Or(box (xl, yl)), Self::Or(box (xr, yr))) => {
-                Self::Or(box (xl.union(&xr), yl.union(&yr)))
-            }
-            _ => panic!("the shape of `rhs` does not match with `self`"),
-        }
-    }
-}
-
 macro_rules! impl_rel_op {
     ($op:ident, $map_neg:expr, $map_zero:expr, $map_pos:expr) => {
         pub fn $op(&self, rhs: &Self) -> EvaluationResult {
@@ -723,4 +627,116 @@ impl TupperIntervalSet {
     impl_rel_op!(gt, SignSet::POS, SignSet::POS, SignSet::ZERO);
     impl_rel_op!(le, SignSet::ZERO, SignSet::ZERO, SignSet::POS);
     impl_rel_op!(lt, SignSet::ZERO, SignSet::POS, SignSet::POS);
+}
+
+// TODO: Flatten (use `Vec` and slice, store only leaves).
+
+#[derive(Clone, Debug)]
+pub enum EvaluationResult {
+    Atomic(SignSet, Decoration),
+    And(Box<(Self, Self)>),
+    Or(Box<(Self, Self)>),
+}
+
+#[derive(Clone, Debug)]
+pub enum EvaluationResultMask {
+    Atomic(bool),
+    And(Box<(Self, Self)>),
+    Or(Box<(Self, Self)>),
+}
+
+impl EvaluationResult {
+    pub fn map<F>(&self, f: &F) -> EvaluationResultMask
+    where
+        F: Fn(SignSet, Decoration) -> bool,
+    {
+        match self {
+            Self::Atomic(ss, d) => EvaluationResultMask::Atomic(f(*ss, *d)),
+            Self::And(box (x, y)) => EvaluationResultMask::And(box (x.map(f), y.map(f))),
+            Self::Or(box (x, y)) => EvaluationResultMask::Or(box (x.map(f), y.map(f))),
+        }
+    }
+
+    pub fn map_reduce<F>(&self, f: &F) -> bool
+    where
+        F: Fn(SignSet, Decoration) -> bool,
+    {
+        match self {
+            Self::Atomic(ss, d) => f(*ss, *d),
+            Self::And(box (x, y)) => x.map_reduce(f) && y.map_reduce(f),
+            Self::Or(box (x, y)) => x.map_reduce(f) || y.map_reduce(f),
+        }
+    }
+}
+
+impl EvaluationResultMask {
+    pub fn implies_solution(&self, zero_mask: &Self) -> bool {
+        match (self, zero_mask) {
+            (Self::Atomic(x), Self::Atomic(_)) => *x,
+            (Self::And(box (x, y)), Self::And(box (xz, yz))) => {
+                if xz.reduce() {
+                    y.implies_solution(&yz)
+                } else if yz.reduce() {
+                    x.implies_solution(&xz)
+                } else {
+                    // Cannot tell the existence of a solution by a normal conjunction.
+                    false
+                }
+            }
+            (Self::Or(box (x, y)), Self::Or(box (xz, yz))) => {
+                x.implies_solution(&xz) || y.implies_solution(&yz)
+            }
+            _ => panic!("the shape of `is_zero` does not match with `self`"),
+        }
+    }
+
+    pub fn reduce(&self) -> bool {
+        match self {
+            Self::Atomic(x) => *x,
+            Self::And(box (x, y)) => x.reduce() && y.reduce(),
+            Self::Or(box (x, y)) => x.reduce() || y.reduce(),
+        }
+    }
+}
+
+impl BitAnd for &EvaluationResultMask {
+    type Output = EvaluationResultMask;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        use EvaluationResultMask::*;
+
+        match (self, rhs) {
+            (Atomic(x), Atomic(y)) => Atomic(*x && *y),
+            (And(box (xl, yl)), And(box (xr, yr))) => And(box (xl & xr, yl & yr)),
+            (Or(box (xl, yl)), Or(box (xr, yr))) => Or(box (xl & xr, yl & yr)),
+            _ => panic!("the shape of `rhs` does not match with `self`"),
+        }
+    }
+}
+
+impl BitAndAssign for EvaluationResultMask {
+    fn bitand_assign(&mut self, rhs: Self) {
+        *self = self.bitand(&rhs)
+    }
+}
+
+impl BitOr for &EvaluationResultMask {
+    type Output = EvaluationResultMask;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        use EvaluationResultMask::*;
+
+        match (self, rhs) {
+            (Atomic(x), Atomic(y)) => Atomic(*x || *y),
+            (And(box (xl, yl)), And(box (xr, yr))) => And(box (xl | xr, yl | yr)),
+            (Or(box (xl, yl)), Or(box (xr, yr))) => Or(box (xl | xr, yl | yr)),
+            _ => panic!("the shape of `rhs` does not match with `self`"),
+        }
+    }
+}
+
+impl BitOrAssign for EvaluationResultMask {
+    fn bitor_assign(&mut self, rhs: Self) {
+        *self = self.bitor(&rhs)
+    }
 }
