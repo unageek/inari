@@ -298,8 +298,8 @@ impl Rel {
             Equality(Gt, x, y) => x.value(vs).gt(&y.value(vs)),
             Equality(Le, x, y) => x.value(vs).le(&y.value(vs)),
             Equality(Lt, x, y) => x.value(vs).lt(&y.value(vs)),
-            Binary(And, x, y) => x.evaluate(vs) & y.evaluate(vs),
-            Binary(Or, x, y) => x.evaluate(vs) | y.evaluate(vs),
+            Binary(And, x, y) => EvaluationResult::And(Box::new((x.evaluate(vs), y.evaluate(vs)))),
+            Binary(Or, x, y) => EvaluationResult::Or(Box::new((x.evaluate(vs), y.evaluate(vs)))),
         }
     }
 }

@@ -1,3 +1,5 @@
+#![feature(box_patterns, box_syntax)]
+
 mod ast;
 mod dyn_relation;
 mod graph;

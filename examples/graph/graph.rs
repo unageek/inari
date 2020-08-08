@@ -333,9 +333,8 @@ where
             let r_u_up = self.relation.eval_on_region(&u_up);
             *evals += 1;
 
-            let EvaluationResult(ss, d) = r_u_up;
-            let is_true = d >= Decoration::Def && ss == SignSet::ZERO;
-            let is_false = !ss.contains(SignSet::ZERO);
+            let is_true = r_u_up.map_reduce(&|ss, d| d >= Decoration::Def && ss == SignSet::ZERO);
+            let is_false = !r_u_up.map_reduce(&|ss, _| ss.contains(SignSet::ZERO));
             if is_true || is_false {
                 let ix = bx * ibw;
                 let iy = by * ibw;
@@ -366,7 +365,7 @@ where
         let fbw = bs.block_width;
         let nbx = 1u32 << -bs.k; // Number of blocks in each row per pixel.
         let area = 1u32 << (2 * (bs.k - MIN_K));
-        let mut cache = HashMap::<ImageBlock, SignSet>::with_capacity(bs.blocks.len());
+        let mut cache = HashMap::<ImageBlock, EvaluationResult>::with_capacity(bs.blocks.len());
         let mut some_test_failed = false;
         let mut sub_blocks = Vec::<ImageBlock>::new();
         for ImageBlock(bx, by) in bs.blocks.iter().copied() {
@@ -389,13 +388,12 @@ where
             let r_u_up = self.relation.eval_on_region(&u_up);
             *evals += 1;
 
-            let EvaluationResult(ss, d) = r_u_up;
-            if ss == SignSet::ZERO {
+            if r_u_up.map_reduce(&|ss, _| ss == SignSet::ZERO) {
                 // This pixel is proven to be true.
                 *self.im.pixel_mut(ix, iy) = STAT_TRUE;
                 continue;
             }
-            if !ss.contains(SignSet::ZERO) {
+            if !r_u_up.map_reduce(&|ss, _| ss.contains(SignSet::ZERO)) {
                 // This subpixel is proven to be false.
                 *self.im.pixel_mut(ix, iy) -= area;
                 continue;
@@ -406,7 +404,23 @@ where
                 *self.im.pixel_mut(ix, iy) -= area;
                 continue;
             }
-            if d >= Decoration::Dac {
+            // We could evaluate on `inter` instead of `u_up` to get more
+            // accurate result.
+            let dac_evals = r_u_up.map(&|_, d| d >= Decoration::Dac);
+            // To prove the existence of a solution by a change of sign...
+            //   at conjunctions, both operands must be dac.
+            //   at disjunctions, at least one operand must be dac.
+            if dac_evals.reduce() {
+                // Let us assume that we are plotting the graph of a conjunction
+                // such as "y == sin(x) && x >= 0".
+                // If the conjunct "x >= 0" holds everywhere in the subpixel,
+                // and "y - sin(x)" evaluates to both `POS` and `NEG` at
+                // different points in the region, we can tell that
+                // there exists a point where the entire relation holds.
+                // Such a test is not possible by merely converting the relation
+                // to "|y - sin(x)| + |x >= 0 ? 0 : 1| == 0".
+                let zero_evals = r_u_up.map(&|ss, _| ss == SignSet::ZERO);
+
                 // Use `(cx, cy)` instead of `(bx, by)` for cache indices
                 // so that values at the pixel boundary may not be shared
                 // among the adjacent pixels.
@@ -425,51 +439,53 @@ where
                 let cy = by + iy;
 
                 let rel = &mut self.relation;
-                let mut found_zero = false;
-                let mut found_neg = false;
-                let mut found_pos = false;
+                let mut found_solution = false;
+                let mut neg_evals = r_u_up.map(&|_, _| false);
+                let mut pos_evals = neg_evals.clone();
                 for i in 0..4 {
-                    let ss = match i {
-                        0 => *cache.entry(ImageBlock(cx, cy)).or_insert_with(|| {
+                    let r = match i {
+                        0 => cache.entry(ImageBlock(cx, cy)).or_insert_with(|| {
                             // bottom left
                             *evals += 1;
-                            rel.eval_on_point(inter.0.inf(), inter.1.inf()).0
+                            rel.eval_on_point(inter.0.inf(), inter.1.inf())
                         }),
-                        1 => *cache.entry(ImageBlock(cx + 1, cy)).or_insert_with(|| {
+                        1 => cache.entry(ImageBlock(cx + 1, cy)).or_insert_with(|| {
                             // bottom right
                             *evals += 1;
-                            rel.eval_on_point(inter.0.sup(), inter.1.inf()).0
+                            rel.eval_on_point(inter.0.sup(), inter.1.inf())
                         }),
-                        2 => *cache.entry(ImageBlock(cx, cy + 1)).or_insert_with(|| {
+                        2 => cache.entry(ImageBlock(cx, cy + 1)).or_insert_with(|| {
                             // top left
                             *evals += 1;
-                            rel.eval_on_point(inter.0.inf(), inter.1.sup()).0
+                            rel.eval_on_point(inter.0.inf(), inter.1.sup())
                         }),
-                        3 => *cache.entry(ImageBlock(cx + 1, cy + 1)).or_insert_with(|| {
+                        3 => cache.entry(ImageBlock(cx + 1, cy + 1)).or_insert_with(|| {
                             // top right
                             *evals += 1;
-                            rel.eval_on_point(inter.0.sup(), inter.1.sup()).0
+                            rel.eval_on_point(inter.0.sup(), inter.1.sup())
                         }),
                         _ => unreachable!(),
                     };
 
-                    if ss == SignSet::ZERO {
-                        found_zero = true;
+                    if r.map(&|ss, _| ss == SignSet::ZERO).reduce() {
+                        found_solution = true;
                         break;
-                    } else if ss == SignSet::NEG {
-                        found_neg = true;
-                        if found_pos {
-                            break;
-                        }
-                    } else if ss == SignSet::POS {
-                        found_pos = true;
-                        if found_neg {
-                            break;
-                        }
+                    }
+
+                    neg_evals = neg_evals.union(&r.map(&|ss, _| ss == SignSet::NEG));
+                    pos_evals = pos_evals.union(&r.map(&|ss, _| ss == SignSet::POS));
+
+                    if neg_evals
+                        .intersection(&pos_evals)
+                        .intersection(&dac_evals)
+                        .implies_solution(&zero_evals)
+                    {
+                        found_solution = true;
+                        break;
                     }
                 }
 
-                if found_zero || found_neg && found_pos {
+                if found_solution {
                     *self.im.pixel_mut(ix, iy) = STAT_TRUE;
                     continue;
                 }
