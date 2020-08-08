@@ -670,8 +670,8 @@ impl EvaluationResult {
 }
 
 impl EvaluationResultMask {
-    pub fn implies_solution(&self, zero_mask: &Self) -> bool {
-        match (self, zero_mask) {
+    pub fn implies_solution(&self, locally_zero_mask: &Self) -> bool {
+        match (self, locally_zero_mask) {
             (Self::Atomic(x), Self::Atomic(_)) => *x,
             (Self::And(box (x, y)), Self::And(box (xz, yz))) => {
                 if xz.reduce() {

@@ -419,7 +419,7 @@ where
                 // there exists a point where the entire relation holds.
                 // Such a test is not possible by merely converting the relation
                 // to "|y - sin(x)| + |x >= 0 ? 0 : 1| == 0".
-                let zero_mask = r_u_up.map(&|ss, _| ss == SignSet::ZERO);
+                let locally_zero_mask = r_u_up.map(&|ss, _| ss == SignSet::ZERO);
 
                 // Use `(cx, cy)` instead of `(bx, by)` for cache indices
                 // so that values at the pixel boundary may not be shared
@@ -470,7 +470,7 @@ where
                     neg_mask |= r.map(&|ss, _| ss == SignSet::NEG || ss == SignSet::ZERO);
                     pos_mask |= r.map(&|ss, _| ss == SignSet::POS || ss == SignSet::ZERO);
 
-                    if (&(&neg_mask & &pos_mask) & &dac_mask).implies_solution(&zero_mask) {
+                    if (&(&neg_mask & &pos_mask) & &dac_mask).implies_solution(&locally_zero_mask) {
                         found_solution = true;
                         break;
                     }
