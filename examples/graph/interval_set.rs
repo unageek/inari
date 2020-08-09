@@ -651,6 +651,10 @@ pub type EvalResultMaskStore = Vec<bool>;
 pub struct EvalResultMask(pub EvalResultMaskStore);
 
 impl EvalResult {
+    pub fn get_size_of_payload(&self) -> usize {
+        self.0.capacity() * std::mem::size_of::<(SignSet, Decoration)>()
+    }
+
     pub fn map<F>(&self, p: &Proposition, f: &F) -> EvalResultMask
     where
         F: Fn(SignSet, Decoration) -> bool,

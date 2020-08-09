@@ -352,7 +352,9 @@ where
                 }
             } else {
                 Self::push_sub_blocks_clipped(&mut sub_blocks, bx, by, sub_nbc, sub_nbr);
-                if (bs.blocks.len() + sub_blocks.len()) * mem::size_of::<ImageBlock>() > MEM_LIMIT {
+                if (bs.blocks.capacity() + sub_blocks.capacity()) * mem::size_of::<ImageBlock>()
+                    > MEM_LIMIT
+                {
                     return Err(GraphingError {
                         kind: GraphingErrorKind::ReachedMemLimit,
                     });
@@ -372,6 +374,7 @@ where
         let nbx = 1u32 << -bs.k; // Number of blocks in each row per pixel.
         let area = 1u32 << (2 * (bs.k - MIN_K));
         let mut cache = HashMap::<ImageBlock, EvalResult>::with_capacity(bs.blocks.len());
+        let mut size_of_cached_payloads = 0usize;
         let mut some_test_failed = false;
         let mut sub_blocks = Vec::<ImageBlock>::new();
         for ImageBlock(bx, by) in bs.blocks.iter().copied() {
@@ -454,23 +457,31 @@ where
                     let r = match i {
                         0 => cache.entry(ImageBlock(cx, cy)).or_insert_with(|| {
                             // bottom left
+                            let res = rel.eval_on_point(inter.0.inf(), inter.1.inf());
                             *evals += 1;
-                            rel.eval_on_point(inter.0.inf(), inter.1.inf())
+                            size_of_cached_payloads += res.get_size_of_payload();
+                            res
                         }),
                         1 => cache.entry(ImageBlock(cx + 1, cy)).or_insert_with(|| {
                             // bottom right
+                            let res = rel.eval_on_point(inter.0.sup(), inter.1.inf());
                             *evals += 1;
-                            rel.eval_on_point(inter.0.sup(), inter.1.inf())
+                            size_of_cached_payloads += res.get_size_of_payload();
+                            res
                         }),
                         2 => cache.entry(ImageBlock(cx, cy + 1)).or_insert_with(|| {
                             // top left
+                            let res = rel.eval_on_point(inter.0.inf(), inter.1.sup());
                             *evals += 1;
-                            rel.eval_on_point(inter.0.inf(), inter.1.sup())
+                            size_of_cached_payloads += res.get_size_of_payload();
+                            res
                         }),
                         3 => cache.entry(ImageBlock(cx + 1, cy + 1)).or_insert_with(|| {
                             // top right
+                            let res = rel.eval_on_point(inter.0.sup(), inter.1.sup());
                             *evals += 1;
-                            rel.eval_on_point(inter.0.sup(), inter.1.sup())
+                            size_of_cached_payloads += res.get_size_of_payload();
+                            res
                         }),
                         _ => unreachable!(),
                     };
@@ -498,7 +509,14 @@ where
 
             if bs.k > MIN_K {
                 Self::push_sub_blocks(&mut sub_blocks, bx, by);
-                if (bs.blocks.len() + sub_blocks.len()) * mem::size_of::<ImageBlock>() > MEM_LIMIT {
+                if (bs.blocks.capacity() + sub_blocks.capacity()) * mem::size_of::<ImageBlock>()
+                    + cache.capacity()
+                        * (mem::size_of::<u64>()
+                            + mem::size_of::<ImageBlock>()
+                            + mem::size_of::<EvalResult>())
+                    + size_of_cached_payloads
+                    > MEM_LIMIT
+                {
                     return Err(GraphingError {
                         kind: GraphingErrorKind::ReachedMemLimit,
                     });
