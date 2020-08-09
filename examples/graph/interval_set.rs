@@ -508,8 +508,8 @@ impl TupperIntervalSet {
             let n = if a == b { 0.0 } else { qb - qa };
             let q = qa.rem_euclid(2.0);
 
-            let cont = b
-                <= (interval!(q_nowrap.sup(), q_nowrap.sup()).unwrap() * Interval::FRAC_PI_2).inf();
+            let cont = qb != f64::INFINITY
+                && b <= (interval!(qb, qb).unwrap() * Interval::FRAC_PI_2).inf();
             if q == 0.0 && (n < 1.0 || n == 1.0 && cont)
                 || q == 1.0 && (n < 2.0 || n == 2.0 && cont)
             {
