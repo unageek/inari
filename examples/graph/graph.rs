@@ -1,5 +1,3 @@
-// Plots the graph of a relation over ℝ².
-
 use crate::interval_set::*;
 use image::{imageops, Rgb, RgbImage};
 use inari::{dec_interval, interval, DecoratedInterval, Decoration, Interval};
@@ -17,7 +15,7 @@ const STAT_FALSE: u32 = 0;
 const STAT_UNCERTAIN: u32 = 1u32 << (2 * -MIN_K);
 const STAT_TRUE: u32 = !0u32;
 
-// Each pixel stores a value that indicates the status of the proof as follows.
+// Each pixel of an `Image` keeps track of the proof status as follows.
 //   STAT_FALSE: the relation has been proven to be false on the pixel.
 //   1..STAT_UNCERTAIN: uncertain, but proven to be false on a part of the pixel.
 //   STAT_UNCERTAIN: uncertain.
@@ -413,12 +411,19 @@ where
                 *self.im.pixel_mut(ix, iy) -= area;
                 continue;
             }
-            // We could evaluate on `inter` instead of `u_up` to get more
-            // accurate result.
-            let dac_mask = r_u_up.map(&self.relation.prop, &|_, d| d >= Decoration::Dac);
+
+            // We could re-evaluate the relation on `inter` instead of `u_up`
+            // to get a slightly better result, but the effect would be
+            // negligible.
+
             // To prove the existence of a solution by a change of sign...
-            //   at conjunctions, both operands must be dac.
-            //   at disjunctions, at least one operand must be dac.
+            //   for conjunctions, both operands must be `Dac`.
+            //   for disjunctions, at least one operand must be `Dac`.
+            // There is a little chance that an expression is evaluated
+            // to zero on one of the probe points. In that case,
+            // the expression is not required to be `Dac` on the entire
+            // subpixel. We don't care such a chance.
+            let dac_mask = r_u_up.map(&self.relation.prop, &|_, d| d >= Decoration::Dac);
             if dac_mask.reduce(&self.relation.prop) {
                 // Suppose we are plotting the graph of a conjunction such as
                 // "y == sin(x) && x >= 0".
@@ -426,8 +431,8 @@ where
                 // and "y - sin(x)" evaluates to both `POS` and `NEG` at
                 // different points in the region, we can tell that
                 // there exists a point where the entire relation holds.
-                // Such a test is not possible by merely converting the relation
-                // to "|y - sin(x)| + |x >= 0 ? 0 : 1| == 0".
+                // Such a test is not possible by merely converting
+                // the relation to "|y - sin(x)| + |x >= 0 ? 0 : 1| == 0".
                 let locally_zero_mask = r_u_up.map(&self.relation.prop, &|ss, d| {
                     ss == SignSet::ZERO && d >= Decoration::Dac
                 });
@@ -443,7 +448,7 @@ where
                 //             p_dn
                 // The exact pixel boundary is somewhere between ||.
                 //
-                // It is easy to share the cache across levels by multiplying
+                // We could keep the cache across levels by multiplying
                 // `cy` and `cy` by `1u32 << (bs.k - MIN_K)`, but that
                 // increased graphing time significantly.
                 let cx = bx + ix;

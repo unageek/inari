@@ -1,4 +1,4 @@
-use crate::ast::*;
+use crate::{ast::*, rel::*};
 use std::{
     collections::{HashMap, HashSet},
     marker::Sized,
@@ -131,7 +131,7 @@ impl VisitMut for Transform {
 pub struct FoldConstant;
 
 // Only fold constants which evaluate to an empty or a single interval
-// because sites are not assigned and branch cut tracking cannot be done
+// since the sites are not assigned and branch cut tracking is not possible
 // at this moment.
 impl VisitMut for FoldConstant {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
@@ -141,25 +141,25 @@ impl VisitMut for FoldConstant {
         match &mut expr.kind {
             Unary(_, x) => {
                 if let Constant(_) = &x.kind {
-                    let value = expr.evaluate_constant();
-                    if value.len() <= 1 {
-                        *expr = Expr::new(Constant(value));
+                    let val = expr.evaluate();
+                    if val.len() <= 1 {
+                        *expr = Expr::new(Constant(box val));
                     }
                 }
             }
             Binary(_, x, y) => {
                 if let (Constant(_), Constant(_)) = (&x.kind, &y.kind) {
-                    let value = expr.evaluate_constant();
-                    if value.len() <= 1 {
-                        *expr = Expr::new(Constant(value));
+                    let val = expr.evaluate();
+                    if val.len() <= 1 {
+                        *expr = Expr::new(Constant(box val));
                     }
                 }
             }
             Pown(x, _) => {
                 if let Constant(_) = &x.kind {
-                    let value = expr.evaluate_constant();
-                    if value.len() <= 1 {
-                        *expr = Expr::new(Constant(value));
+                    let val = expr.evaluate();
+                    if val.len() <= 1 {
+                        *expr = Expr::new(Constant(box val));
                     }
                 }
             }
@@ -169,19 +169,23 @@ impl VisitMut for FoldConstant {
 }
 
 pub struct AssignId<'a> {
-    next_id: ExprId,
+    next_expr_id: ExprId,
     next_site: u8,
     site_map: SiteMap,
-    visited_nodes: HashSet<&'a Expr>,
+    visited_exprs: HashSet<&'a Expr>,
+    next_rel_id: RelId,
+    visited_rels: HashSet<&'a Rel>,
 }
 
 impl<'a> AssignId<'a> {
     pub fn new() -> Self {
         AssignId {
-            next_id: 2, // 0 for x, 1 for y
+            next_expr_id: 2, // 0 for x, 1 for y
             next_site: 0,
             site_map: HashMap::new(),
-            visited_nodes: HashSet::new(),
+            visited_exprs: HashSet::new(),
+            next_rel_id: 0,
+            visited_rels: HashSet::new(),
         }
     }
 
@@ -197,8 +201,8 @@ impl<'a> AssignId<'a> {
             | Unary(Recip, _)
             | Unary(Sign, _)
             | Unary(Tan, _)
-            | Binary(Div, _, _)
             | Binary(Atan2, _, _)
+            | Binary(Div, _, _)
             | Binary(Mod, _, _)
             | Pown(_, _))
     }
@@ -208,7 +212,7 @@ impl<'a> Visit<'a> for AssignId<'a> {
     fn visit_expr(&mut self, expr: &'a Expr) {
         traverse_expr(self, expr);
 
-        match self.visited_nodes.get(expr) {
+        match self.visited_exprs.get(expr) {
             Some(visited) => {
                 let id = visited.id.get();
                 expr.id.set(id);
@@ -225,9 +229,9 @@ impl<'a> Visit<'a> for AssignId<'a> {
                     ExprKind::X => 0,
                     ExprKind::Y => 1,
                     _ => {
-                        let i = self.next_id;
-                        self.next_id += 1;
-                        i
+                        let id = self.next_expr_id;
+                        self.next_expr_id += 1;
+                        id
                     }
                 };
                 expr.id.set(id);
@@ -236,7 +240,23 @@ impl<'a> Visit<'a> for AssignId<'a> {
                     self.site_map.insert(id, None);
                 }
 
-                self.visited_nodes.insert(expr);
+                self.visited_exprs.insert(expr);
+            }
+        }
+    }
+
+    fn visit_rel(&mut self, rel: &'a Rel) {
+        traverse_rel(self, rel);
+
+        match self.visited_rels.get(rel) {
+            Some(visited) => {
+                let id = visited.id.get();
+                rel.id.set(id);
+            }
+            _ => {
+                rel.id.set(self.next_rel_id);
+                self.next_rel_id += 1;
+                self.visited_rels.insert(rel);
             }
         }
     }
@@ -262,32 +282,62 @@ impl<'a> Visit<'a> for AssignSite {
     }
 }
 
-// Collects nodes (except the ones for X and Y), sorted topologically.
-pub struct CollectExprsForEvaluation {
-    exprs: Vec<Expr>,
-    next_id: ExprId,
+// Collects `StaticExpr`s (except the ones for X and Y) and `StaticRel`s,
+// sorted topologically.
+pub struct CollectStatic {
+    exprs: Vec<StaticExpr>,
+    next_expr_id: ExprId,
+    rels: Vec<StaticRel>,
+    next_rel_id: RelId,
 }
 
-impl CollectExprsForEvaluation {
+impl CollectStatic {
     pub fn new() -> Self {
-        CollectExprsForEvaluation {
+        Self {
             exprs: Vec::new(),
-            next_id: 2, // 0 for x, 1 for y
+            next_expr_id: 2, // 0 for x, 1 for y
+            rels: Vec::new(),
+            next_rel_id: 0,
         }
     }
 
-    pub fn exprs(self) -> Vec<Expr> {
-        self.exprs
+    pub fn exprs_rels(self) -> (Vec<StaticExpr>, Vec<StaticRel>) {
+        (self.exprs, self.rels)
     }
 }
 
-impl<'a> Visit<'a> for CollectExprsForEvaluation {
+impl<'a> Visit<'a> for CollectStatic {
     fn visit_expr(&mut self, expr: &'a Expr) {
+        use ExprKind::*;
         traverse_expr(self, expr);
 
-        if expr.id.get() == self.next_id {
-            self.exprs.push(expr.clone_for_evaluation());
-            self.next_id += 1;
+        if expr.id.get() == self.next_expr_id {
+            self.exprs.push(StaticExpr {
+                site: expr.site.get(),
+                kind: match &expr.kind {
+                    Constant(x) => StaticExprKind::Constant(x.clone()),
+                    Unary(op, x) => StaticExprKind::Unary(*op, x.id.get()),
+                    Binary(op, x, y) => StaticExprKind::Binary(*op, x.id.get(), y.id.get()),
+                    Pown(x, y) => StaticExprKind::Pown(x.id.get(), *y),
+                    X | Y | Uninit => panic!(),
+                },
+            });
+            self.next_expr_id += 1;
+        }
+    }
+
+    fn visit_rel(&mut self, rel: &'a Rel) {
+        use RelKind::*;
+        traverse_rel(self, rel);
+
+        if rel.id.get() == self.next_rel_id {
+            self.rels.push(StaticRel {
+                kind: match &rel.kind {
+                    Equality(op, x, y) => StaticRelKind::Equality(*op, x.id.get(), y.id.get()),
+                    Binary(op, x, y) => StaticRelKind::Binary(*op, x.id.get(), y.id.get()),
+                },
+            });
+            self.next_rel_id += 1;
         }
     }
 }

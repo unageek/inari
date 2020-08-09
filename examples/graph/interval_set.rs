@@ -642,13 +642,11 @@ pub struct Proposition {
     pub size: usize,
 }
 
-pub type EvalResultStore = Vec<(SignSet, Decoration)>;
 #[derive(Clone, Debug)]
-pub struct EvalResult(pub EvalResultStore);
+pub struct EvalResult(pub Vec<(SignSet, Decoration)>);
 
-pub type EvalResultMaskStore = Vec<bool>;
 #[derive(Clone, Debug)]
-pub struct EvalResultMask(pub EvalResultMaskStore);
+pub struct EvalResultMask(pub Vec<bool>);
 
 impl EvalResult {
     pub fn get_size_of_payload(&self) -> usize {
@@ -664,6 +662,7 @@ impl EvalResult {
         m
     }
 
+    #[allow(clippy::many_single_char_names)]
     fn map_impl<F>(slf: &[(SignSet, Decoration)], p: &Proposition, f: &F, m: &mut [bool])
     where
         F: Fn(SignSet, Decoration) -> bool,
@@ -707,6 +706,12 @@ impl EvalResult {
                     || Self::map_reduce_impl(&slf[x.size..], &y, f)
             }
         }
+    }
+}
+
+impl Default for EvalResult {
+    fn default() -> Self {
+        Self(Vec::new())
     }
 }
 

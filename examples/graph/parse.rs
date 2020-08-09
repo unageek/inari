@@ -1,4 +1,4 @@
-use crate::{ast::*, interval_set::*};
+use crate::{ast::*, interval_set::*, rel::*};
 use inari::*;
 use nom::{
     branch::alt,
@@ -31,15 +31,15 @@ fn primary_expr(i: &str) -> IResult<&str, Expr> {
         map(decimal_literal, |s| {
             let s = ["[", s, ",", s, "]"].concat();
             let x = TupperIntervalSet::from(dec_interval!(&s).unwrap());
-            Expr::new(ExprKind::Constant(x))
+            Expr::new(ExprKind::Constant(box x))
         }),
         map(tag("pi"), |_| {
             let x = TupperIntervalSet::from(DecoratedInterval::PI);
-            Expr::new(ExprKind::Constant(x))
+            Expr::new(ExprKind::Constant(box x))
         }),
         map(char('e'), |_| {
             let x = TupperIntervalSet::from(DecoratedInterval::E);
-            Expr::new(ExprKind::Constant(x))
+            Expr::new(ExprKind::Constant(box x))
         }),
         value(Expr::new(ExprKind::X), char('x')),
         value(Expr::new(ExprKind::Y), char('y')),

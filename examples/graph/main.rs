@@ -5,6 +5,7 @@ mod dyn_relation;
 mod graph;
 mod interval_set;
 mod parse;
+mod rel;
 mod visit;
 
 use crate::{dyn_relation::*, graph::*};
@@ -78,7 +79,7 @@ fn main() {
     let size = matches.values_of_t_or_exit::<u32>("size");
 
     let mut rel = DynRelation::new(&relation);
-    let prop = rel.get_proposition();
+    let prop = rel.proposition().clone();
     let mut g = Graph::new(
         Relation {
             eval: |x, y| rel.evaluate(x, y),

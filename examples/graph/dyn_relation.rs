@@ -1,10 +1,12 @@
-use crate::{ast::*, interval_set::*, parse::*, visit::*};
+use crate::{interval_set::*, parse::*, rel::*, visit::*};
 
 #[derive(Clone, Debug)]
 pub struct DynRelation {
-    rel: Rel,
-    exprs: Vec<Expr>,
-    vs: ValueStore,
+    prop: Proposition,
+    exprs: Vec<StaticExpr>,
+    rels: Vec<StaticRel>,
+    ts: Vec<TupperIntervalSet>,
+    es: Vec<EvalResult>,
 }
 
 impl DynRelation {
@@ -16,27 +18,33 @@ impl DynRelation {
         v.visit_rel(&rel);
         let mut v = AssignSite::new(v.site_map());
         v.visit_rel(&rel);
-        let mut v = CollectExprsForEvaluation::new();
+        let mut v = CollectStatic::new();
         v.visit_rel(&rel);
-        let exprs = v.exprs();
-        let n = exprs.len() + 2;
+        let (exprs, rels) = v.exprs_rels();
+        let n_ts = exprs.len() + 2;
+        let n_es = rels.len();
         Self {
-            rel,
+            prop: rel.get_proposition(),
             exprs,
-            vs: vec![TupperIntervalSet::empty(); n],
+            rels,
+            ts: vec![TupperIntervalSet::empty(); n_ts],
+            es: vec![EvalResult::default(); n_es],
         }
     }
 
     pub fn evaluate(&mut self, x: TupperIntervalSet, y: TupperIntervalSet) -> EvalResult {
-        self.vs[0] = x;
-        self.vs[1] = y;
+        self.ts[0] = x;
+        self.ts[1] = y;
         for i in 0..self.exprs.len() {
-            self.vs[i + 2] = self.exprs[i].evaluate(&self.vs);
+            self.ts[i + 2] = self.exprs[i].evaluate(&self.ts);
         }
-        self.rel.evaluate(&self.vs)
+        for i in 0..self.rels.len() {
+            self.es[i] = self.rels[i].evaluate(&self.ts, &self.es);
+        }
+        self.es.last().unwrap().clone()
     }
 
-    pub fn get_proposition(&self) -> Proposition {
-        self.rel.get_proposition()
+    pub fn proposition(&self) -> &Proposition {
+        &self.prop
     }
 }
