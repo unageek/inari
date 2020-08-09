@@ -425,8 +425,9 @@ where
                 // there exists a point where the entire relation holds.
                 // Such a test is not possible by merely converting the relation
                 // to "|y - sin(x)| + |x >= 0 ? 0 : 1| == 0".
-                let locally_zero_mask =
-                    r_u_up.map(&self.relation.prop, &|ss, _| ss == SignSet::ZERO);
+                let locally_zero_mask = r_u_up.map(&self.relation.prop, &|ss, d| {
+                    ss == SignSet::ZERO && d >= Decoration::Dac
+                });
 
                 // Use `(cx, cy)` instead of `(bx, by)` for cache indices
                 // so that values at the pixel boundary may not be shared
