@@ -598,10 +598,8 @@ impl Interval {
         let n = if a == b { 0.0 } else { qb - qa };
         let q = rem_euclid_2(qa);
 
-        let cont = b
-            <= (Self::with_infsup_raw(q_nowrap.sup_raw(), q_nowrap.sup_raw())
-                * Interval::FRAC_PI_2)
-                .inf_raw();
+        let cont = qb != f64::INFINITY
+            && b <= (Self::with_infsup_raw(qb, qb) * Interval::FRAC_PI_2).inf_raw();
         if q == 0.0 && (n < 1.0 || n == 1.0 && cont) || q == 1.0 && (n < 2.0 || n == 2.0 && cont) {
             // In case of overflow, the decoration must be corrected by the caller.
             (Self::with_infsup_raw(tan_rd(a), tan_ru(b)), Decoration::Com)

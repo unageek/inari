@@ -135,7 +135,7 @@ impl DecoratedInterval {
 
         let d = if x.is_empty() {
             Trv
-        } else if x.inf_raw() == f64::INFINITY || x.sup_raw() == f64::INFINITY {
+        } else if !x.is_common_interval() {
             Dac
         } else {
             Com
