@@ -67,7 +67,6 @@ fn fn1(i: &str) -> IResult<&str, UnaryOp> {
         value(UnaryOp::Cosh, tag("cosh")),
         value(UnaryOp::Exp2, tag("exp2")),
         value(UnaryOp::Log2, tag("log2")),
-        value(UnaryOp::Sign, tag("sign")),
         value(UnaryOp::Sinh, tag("sinh")),
         value(UnaryOp::Sqrt, tag("sqrt")),
         value(UnaryOp::Tanh, tag("tanh")),
@@ -76,6 +75,7 @@ fn fn1(i: &str) -> IResult<&str, UnaryOp> {
             value(UnaryOp::Cos, tag("cos")),
             value(UnaryOp::Exp, tag("exp")),
             value(UnaryOp::Log, tag("log")),
+            value(UnaryOp::Sign, tag("sgn")),
             value(UnaryOp::Sin, tag("sin")),
             value(UnaryOp::Tan, tag("tan")),
         )),
@@ -119,8 +119,7 @@ fn postfix_expr(i: &str) -> IResult<&str, Expr> {
     ))(i)
 }
 
-// Repeated powers like x^2^2 (== x^(2^2)) is not permitted as
-// we don't have a way to make the power operator right-associative.
+// Repetition like x^2^3 (== x^(2^3)) is not permitted at the moment.
 fn power_expr(i: &str) -> IResult<&str, Expr> {
     alt((
         map(

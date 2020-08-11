@@ -97,9 +97,16 @@ Some intriguing examples from GrafEq
 
     ```
     "(1 + 99 * floor(mod(floor(y) * exp2(ceil(x)), 2))) * (mod(x, 1) - 1/2)^2 + \
-     (mod(y, 1) - 1/2)^2 == 0.15 && floor(-log2(y)) < x && x < 0" -b -14 4 -4 14
+     (mod(y, 1) - 1/2)^2 == 0.15 && floor(-log2(y)) < x && x < 0" -b -15 5 -5 15
     ```
 
+  - 📄 binary squares.gqs
+
+    ```
+    "(1 + 99 * floor(mod(floor(y)^2 * exp2(ceil(x)), 2))) * \
+     (mod(x, 1) - 1/2)^2 + (mod(y, 1) - 1/2)^2 == 0.15 && x < 0 && 0 < floor(y)^2 && \
+     floor(y)^2 >= exp2(-ceil(x))" -b -15 5 -5 15
+    ```
 
 - 📂 Single Relation/Enumerations/Trees/
 

@@ -456,6 +456,7 @@ impl TupperIntervalSet {
             .min(&y)
     }
 
+    // Like the sinc function, but undefined for 0.
     // Less precise for an interval near zero but does not contain zero.
     pub fn sin_over_x(&self) -> Self {
         const ARGMIN_RD: f64 = hexf64!("0x4.7e50150d41abp+0");
