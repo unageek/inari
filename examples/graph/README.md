@@ -1,6 +1,8 @@
 # inari-graph
 
-![](image.gif)
+<p align="center">
+  <img width="640" height="640" src="image.gif">
+</p>
 
 TODO: Add the command line reference.
 
@@ -48,6 +50,6 @@ TODO: Add the command line reference.
 | `x > y`  | *x* > *y*      |                                                              |
 | `x >= y` | *x* ≥ *y*      |                                                              |
 | `X && Y` | *X* ∧ *Y*      | [Logical conjunction.](https://en.wikipedia.org/wiki/Logical_conjunction)<br />`X` and `Y` must be a relation. |
-| `X || Y` | *X* ∨ *Y*      | [Logical disjunction.](https://en.wikipedia.org/wiki/Logical_disjunction)<br />`X` and `Y` must be a relation. |
+| `X \|\| Y` | *X* ∨ *Y*      | [Logical disjunction.](https://en.wikipedia.org/wiki/Logical_disjunction)<br />`X` and `Y` must be a relation. |
 
 You can group a part of an expression or a relation with `(` … `)`.
