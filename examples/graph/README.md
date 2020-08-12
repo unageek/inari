@@ -1,7 +1,7 @@
 # inari-graph
 
 <p align="center">
-  <img width="640" height="640" src="image.gif">
+  <img src="image.gif">
 </p>
 
 TODO: Add the command line reference.
