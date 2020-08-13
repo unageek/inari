@@ -54,11 +54,7 @@ impl Interval {
 
     pub fn rad(self) -> f64 {
         let m = self.mid();
-        let _r = RoundUpContext::new();
-        f64::max(
-            secure(secure(m) - secure(self.inf_raw())),
-            secure((self.sup_raw()) - secure(m)),
-        )
+        f64::max(sub1_ru(m, self.inf_raw()), sub1_ru(self.sup_raw(), m))
     }
 
     pub fn sup(self) -> f64 {
@@ -74,8 +70,7 @@ impl Interval {
     }
 
     pub fn wid(self) -> f64 {
-        let _r = RoundUpContext::new();
-        let wid = secure(secure(self.sup_raw()) - secure(self.inf_raw()));
+        let wid = sub1_ru(self.sup_raw(), self.inf_raw());
         if wid == 0.0 {
             0.0
         } else {
