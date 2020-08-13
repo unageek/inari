@@ -6,8 +6,8 @@ The ❗ icon indicates a breaking change.
 
 ### Fixed
 
-- Fix decoration returned by the constructors of `DecoratedInterval` and elementary functions `acos`, `acosh`, `asin` `atanh`, `log`, `log2`, `log10` and `pow`.
-  - Hide `atan2` from the doc temporally since its decoration is under investigation (maybe ITF1788 test suite is wrong).
+- Fix decoration returned by the constructors of `DecoratedInterval` and elementary functions `acos`, `acosh`, `asin`, `atan2`, `atanh`, `log`, `log2`, `log10` and `pow`.
+  - `atan2` is still under investigation (maybe ITF1788 test suite is wrong), so use it with caution.
   - Fix broken unit tests.
 
 ## v0.3.0 - 2020-08-03

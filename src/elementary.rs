@@ -220,7 +220,6 @@ impl Interval {
     impl_mono_inc!(asinh, asinh_rd, asinh_ru);
     impl_mono_inc!(atan, atan_rd, atan_ru);
 
-    #[doc(hidden)]
     pub fn atan2(self, rhs: Self) -> Self {
         self.atan2_impl(rhs).0
     }
@@ -646,7 +645,6 @@ impl DecoratedInterval {
     impl_dec!(asin, asin_impl);
     impl_dec!(asinh);
     impl_dec!(atan);
-    #[doc(hidden)]
     impl_dec2!(atan2, atan2_impl);
     impl_dec!(atanh, atanh_impl);
     impl_dec!(cos);
