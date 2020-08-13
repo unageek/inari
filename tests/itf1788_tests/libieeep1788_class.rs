@@ -53,10 +53,10 @@ fn minimal_nums_to_decorated_interval_test() {
     assert_eq2!(n2di(f64::NEG_INFINITY, 1.0), nd2di(f64::NEG_INFINITY, 1.0, D::Dac));
     assert_eq2!(n2di(-1.0, f64::INFINITY), nd2di(-1.0, f64::INFINITY, D::Dac));
     assert_eq2!(n2di(f64::NEG_INFINITY, f64::INFINITY), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
-    assert!(n2di(f64::NAN, f64::NAN).is_nai());
-    assert!(n2di(1.0, -1.0).is_nai());
-    assert!(n2di(f64::NEG_INFINITY, f64::NEG_INFINITY).is_nai());
-    assert!(n2di(f64::INFINITY, f64::INFINITY).is_nai());
+    assert_eq2!(n2di(f64::NAN, f64::NAN), DI::NAI);
+    assert_eq2!(n2di(1.0, -1.0), DI::NAI);
+    assert_eq2!(n2di(f64::NEG_INFINITY, f64::NEG_INFINITY), DI::NAI);
+    assert_eq2!(n2di(f64::INFINITY, f64::INFINITY), DI::NAI);
 }
 
 #[cfg(feature = "gmp")]
@@ -181,36 +181,36 @@ fn minimal_text_to_decorated_interval_test() {
     assert_eq2!(t2di("2.500?5e+27"), nd2di(hexf64!("0x1.01fa19a08fe7fp+91"), hexf64!("0x1.0302cc4352683p+91"), D::Com));
     assert_eq2!(t2di("2.500?5ue4_def"), nd2di(hexf64!("0x1.86a0000000000p+14"), hexf64!("0x1.8768000000000p+14"), D::Def));
     assert_eq2!(t2di("2.500?5de-5"), nd2di(hexf64!("0x1.a2976f1cee4d5p-16"), hexf64!("0x1.a36e2eb1c432dp-16"), D::Com));
-    assert!(t2di("[ Nai  ]").is_nai());
+    assert_eq2!(t2di("[ Nai  ]"), DI::NAI);
     // 10?18 + 308 zeros + _com
     assert_eq2!(t2di("10?1800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000_com"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("10?3_com"), nd2di(7.0, 13.0, D::Com));
     assert_eq2!(t2di("10?3e380_com"), nd2di(hexf64!("0x1.fffffffffffffp+1023"), f64::INFINITY, D::Dac));
-    assert!(t2di("[ Nai  ]_ill").is_nai());
-    assert!(t2di("[ Nai  ]_trv").is_nai());
-    assert!(t2di("[ Empty  ]_ill").is_nai());
-    assert!(t2di("[  ]_com").is_nai());
-    assert!(t2di("[,]_com").is_nai());
-    assert!(t2di("[   Entire ]_com").is_nai());
-    assert!(t2di("[ -inf ,  INF ]_com").is_nai());
-    assert!(t2di("[  -1.0  , 1.0]_ill").is_nai());
-    assert!(t2di("[  -1.0  , 1.0]_fooo").is_nai());
-    assert!(t2di("[  -1.0  , 1.0]_da").is_nai());
-    assert!(t2di("[-1.0,]_com").is_nai());
-    assert!(t2di("[-Inf, 1.000 ]_ill").is_nai());
-    assert!(t2di("[-I  nf, 1.000 ]").is_nai());
-    assert!(t2di("[-Inf, 1.0  00 ]").is_nai());
-    assert!(t2di("[-Inf ]").is_nai());
-    assert!(t2di("[Inf , INF]").is_nai());
-    assert!(t2di("[ foo ]").is_nai());
-    assert!(t2di("0.0??_com").is_nai());
-    assert!(t2di("0.0??u_ill").is_nai());
-    assert!(t2di("0.0??d_com").is_nai());
-    assert!(t2di("0.0??_com").is_nai());
-    assert!(t2di("[1.0,2.0").is_nai());
-    assert!(t2di("[1.0000000000000002,1.0000000000000001]").is_nai());
-    assert!(t2di("[10000000000000001/10000000000000000,10000000000000002/10000000000000001]").is_nai());
-    assert!(t2di("[0x1.00000000000002p0,0x1.00000000000001p0]").is_nai());
+    assert_eq2!(t2di("[ Nai  ]_ill"), DI::NAI);
+    assert_eq2!(t2di("[ Nai  ]_trv"), DI::NAI);
+    assert_eq2!(t2di("[ Empty  ]_ill"), DI::NAI);
+    assert_eq2!(t2di("[  ]_com"), DI::NAI);
+    assert_eq2!(t2di("[,]_com"), DI::NAI);
+    assert_eq2!(t2di("[   Entire ]_com"), DI::NAI);
+    assert_eq2!(t2di("[ -inf ,  INF ]_com"), DI::NAI);
+    assert_eq2!(t2di("[  -1.0  , 1.0]_ill"), DI::NAI);
+    assert_eq2!(t2di("[  -1.0  , 1.0]_fooo"), DI::NAI);
+    assert_eq2!(t2di("[  -1.0  , 1.0]_da"), DI::NAI);
+    assert_eq2!(t2di("[-1.0,]_com"), DI::NAI);
+    assert_eq2!(t2di("[-Inf, 1.000 ]_ill"), DI::NAI);
+    assert_eq2!(t2di("[-I  nf, 1.000 ]"), DI::NAI);
+    assert_eq2!(t2di("[-Inf, 1.0  00 ]"), DI::NAI);
+    assert_eq2!(t2di("[-Inf ]"), DI::NAI);
+    assert_eq2!(t2di("[Inf , INF]"), DI::NAI);
+    assert_eq2!(t2di("[ foo ]"), DI::NAI);
+    assert_eq2!(t2di("0.0??_com"), DI::NAI);
+    assert_eq2!(t2di("0.0??u_ill"), DI::NAI);
+    assert_eq2!(t2di("0.0??d_com"), DI::NAI);
+    assert_eq2!(t2di("0.0??_com"), DI::NAI);
+    assert_eq2!(t2di("[1.0,2.0"), DI::NAI);
+    assert_eq2!(t2di("[1.0000000000000002,1.0000000000000001]"), DI::NAI);
+    assert_eq2!(t2di("[10000000000000001/10000000000000000,10000000000000002/10000000000000001]"), DI::NAI);
+    assert_eq2!(t2di("[0x1.00000000000002p0,0x1.00000000000001p0]"), DI::NAI);
 }
 
 #[test]
@@ -269,9 +269,9 @@ fn minimal_set_dec_test() {
     assert_eq2!(DI::set_dec(n2i(1.0, f64::INFINITY), D::Com), nd2di(1.0, f64::INFINITY, D::Dac));
     assert_eq2!(DI::set_dec(n2i(f64::NEG_INFINITY, 3.0), D::Com), nd2di(f64::NEG_INFINITY, 3.0, D::Dac));
     assert_eq2!(DI::set_dec(n2i(f64::NEG_INFINITY, f64::INFINITY), D::Com), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
-    assert!(DI::set_dec(I::EMPTY, D::Ill).is_nai());
-    assert!(DI::set_dec(n2i(f64::NEG_INFINITY, 3.0), D::Ill).is_nai());
-    assert!(DI::set_dec(n2i(-1.0, 3.0), D::Ill).is_nai());
+    assert_eq2!(DI::set_dec(I::EMPTY, D::Ill), DI::NAI);
+    assert_eq2!(DI::set_dec(n2i(f64::NEG_INFINITY, 3.0), D::Ill), DI::NAI);
+    assert_eq2!(DI::set_dec(n2i(-1.0, 3.0), D::Ill), DI::NAI);
 }
 
 #[test]

@@ -52,7 +52,7 @@ fn minimal_neg_test() {
 
 #[test]
 fn minimal_neg_dec_test() {
-    assert!((-DI::NAI).is_nai());
+    assert_eq2!(-DI::NAI, DI::NAI);
     assert_eq2!(-DI::EMPTY, DI::EMPTY);
     assert_eq2!(-nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq2!(-nd2di(1.0, 2.0, D::Com), nd2di(-2.0, -1.0, D::Com));
@@ -100,7 +100,7 @@ fn minimal_add_dec_test() {
     assert_eq2!(nd2di(1.0, 2.0, D::Com) + nd2di(5.0, hexf64!("0x1.fffffffffffffp+1023"), D::Com), nd2di(6.0, f64::INFINITY, D::Dac));
     assert_eq2!(nd2di(hexf64!("-0x1.fffffffffffffp+1023"), 2.0, D::Com) + nd2di(-0.1, 5.0, D::Com), nd2di(f64::NEG_INFINITY, 7.0, D::Dac));
     assert_eq2!(nd2di(1.0, 2.0, D::Trv) + DI::EMPTY, DI::EMPTY);
-    assert!((DI::NAI + nd2di(1.0, 2.0, D::Trv)).is_nai());
+    assert_eq2!(DI::NAI + nd2di(1.0, 2.0, D::Trv), DI::NAI);
 }
 
 #[test]
@@ -145,7 +145,7 @@ fn minimal_sub_dec_test() {
     assert_eq2!(nd2di(-1.0, 2.0, D::Com) - nd2di(5.0, hexf64!("0x1.fffffffffffffp+1023"), D::Com), nd2di(f64::NEG_INFINITY, -3.0, D::Dac));
     assert_eq2!(nd2di(hexf64!("-0x1.fffffffffffffp+1023"), 2.0, D::Com) - nd2di(-1.0, 5.0, D::Com), nd2di(f64::NEG_INFINITY, 3.0, D::Dac));
     assert_eq2!(nd2di(1.0, 2.0, D::Trv) - DI::EMPTY, DI::EMPTY);
-    assert!((DI::NAI - nd2di(1.0, 2.0, D::Trv)).is_nai());
+    assert_eq2!(DI::NAI - nd2di(1.0, 2.0, D::Trv), DI::NAI);
 }
 
 #[test]
@@ -277,7 +277,7 @@ fn minimal_mul_dec_test() {
     assert_eq2!(nd2di(1.0, 2.0, D::Com) * nd2di(5.0, hexf64!("0x1.fffffffffffffp+1023"), D::Com), nd2di(5.0, f64::INFINITY, D::Dac));
     assert_eq2!(nd2di(hexf64!("-0x1.fffffffffffffp+1023"), 2.0, D::Com) * nd2di(-1.0, 5.0, D::Com), nd2di(f64::NEG_INFINITY, hexf64!("0x1.fffffffffffffp+1023"), D::Dac));
     assert_eq2!(nd2di(1.0, 2.0, D::Trv) * DI::EMPTY, DI::EMPTY);
-    assert!((DI::NAI * nd2di(1.0, 2.0, D::Trv)).is_nai());
+    assert_eq2!(DI::NAI * nd2di(1.0, 2.0, D::Trv), DI::NAI);
 }
 
 #[test]
@@ -632,7 +632,7 @@ fn minimal_div_dec_test() {
     assert_eq2!(nd2di(-2.0, -1.0, D::Com) / nd2di(0.0, 10.0, D::Com), nd2di(f64::NEG_INFINITY, hexf64!("-0x1.9999999999999p-4"), D::Trv));
     assert_eq2!(nd2di(1.0, 3.0, D::Def) / nd2di(f64::NEG_INFINITY, -10.0, D::Dac), nd2di(hexf64!("-0x1.3333333333334p-2"), 0.0, D::Def));
     assert_eq2!(nd2di(1.0, 2.0, D::Trv) / DI::EMPTY, DI::EMPTY);
-    assert!((DI::NAI / nd2di(1.0, 2.0, D::Trv)).is_nai());
+    assert_eq2!(DI::NAI / nd2di(1.0, 2.0, D::Trv), DI::NAI);
 }
 
 #[test]

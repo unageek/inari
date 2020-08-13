@@ -55,7 +55,7 @@ fn minimal_inf_test() {
 
 #[test]
 fn minimal_inf_dec_test() {
-    assert!(DI::NAI.inf().is_nan());
+    assert_eq2!(DI::NAI.inf(), f64::NAN);
     assert_eq2!(DI::EMPTY.inf(), f64::INFINITY);
     assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).inf(), f64::NEG_INFINITY);
     assert_eq2!(nd2di(1.0, 2.0, D::Com).inf(), 1.0);
@@ -92,7 +92,7 @@ fn minimal_sup_test() {
 
 #[test]
 fn minimal_sup_dec_test() {
-    assert!(DI::NAI.sup().is_nan());
+    assert_eq2!(DI::NAI.sup(), f64::NAN);
     assert_eq2!(DI::EMPTY.sup(), f64::NEG_INFINITY);
     assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).sup(), f64::INFINITY);
     assert_eq2!(nd2di(1.0, 2.0, D::Com).sup(), 2.0);
@@ -111,7 +111,7 @@ fn minimal_sup_dec_test() {
 
 #[test]
 fn minimal_mid_test() {
-    assert!(I::EMPTY.mid().is_nan());
+    assert_eq2!(I::EMPTY.mid(), f64::NAN);
     assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).mid(), 0.0);
     assert_eq2!(n2i(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023")).mid(), 0.0);
     assert_eq2!(n2i(0.0, 2.0).mid(), 1.0);
@@ -127,8 +127,8 @@ fn minimal_mid_test() {
 
 #[test]
 fn minimal_mid_dec_test() {
-    assert!(DI::EMPTY.mid().is_nan());
-    assert!(DI::NAI.mid().is_nan());
+    assert_eq2!(DI::EMPTY.mid(), f64::NAN);
+    assert_eq2!(DI::NAI.mid(), f64::NAN);
     assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).mid(), 0.0);
     assert_eq2!(nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Trv).mid(), 0.0);
     assert_eq2!(nd2di(0.0, 2.0, D::Com).mid(), 1.0);
@@ -146,7 +146,7 @@ fn minimal_mid_dec_test() {
 fn minimal_rad_test() {
     assert_eq2!(n2i(0.0, 2.0).rad(), 1.0);
     assert_eq2!(n2i(2.0, 2.0).rad(), 0.0);
-    assert!(I::EMPTY.rad().is_nan());
+    assert_eq2!(I::EMPTY.rad(), f64::NAN);
     assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).rad(), f64::INFINITY);
     assert_eq2!(n2i(0.0, f64::INFINITY).rad(), f64::INFINITY);
     assert_eq2!(n2i(f64::NEG_INFINITY, 1.2).rad(), f64::INFINITY);
@@ -159,8 +159,8 @@ fn minimal_rad_test() {
 fn minimal_rad_dec_test() {
     assert_eq2!(nd2di(0.0, 2.0, D::Trv).rad(), 1.0);
     assert_eq2!(nd2di(2.0, 2.0, D::Com).rad(), 0.0);
-    assert!(DI::EMPTY.rad().is_nan());
-    assert!(DI::NAI.rad().is_nan());
+    assert_eq2!(DI::EMPTY.rad(), f64::NAN);
+    assert_eq2!(DI::NAI.rad(), f64::NAN);
     assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).rad(), f64::INFINITY);
     assert_eq2!(nd2di(0.0, f64::INFINITY, D::Def).rad(), f64::INFINITY);
     assert_eq2!(nd2di(f64::NEG_INFINITY, 1.2, D::Trv).rad(), f64::INFINITY);
@@ -176,7 +176,7 @@ fn minimal_wid_test() {
     assert_eq2!(n2i(1.0, f64::INFINITY).wid(), f64::INFINITY);
     assert_eq2!(n2i(f64::NEG_INFINITY, 2.0).wid(), f64::INFINITY);
     assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).wid(), f64::INFINITY);
-    assert!(I::EMPTY.wid().is_nan());
+    assert_eq2!(I::EMPTY.wid(), f64::NAN);
     assert_eq2!(n2i(hexf64!("0x1.0000000000000p+0"), hexf64!("0x1.0000000000001p+0")).wid(), hexf64!("0x1.0000000000000p-52"));
     assert_eq2!(n2i(hexf64!("0x1.0000000000000p-1022"), hexf64!("0x1.0000000000001p-1022")).wid(), hexf64!("0x0.0000000000001p-1022"));
 }
@@ -188,8 +188,8 @@ fn minimal_wid_dec_test() {
     assert_eq2!(nd2di(1.0, f64::INFINITY, D::Trv).wid(), f64::INFINITY);
     assert_eq2!(nd2di(f64::NEG_INFINITY, 2.0, D::Def).wid(), f64::INFINITY);
     assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).wid(), f64::INFINITY);
-    assert!(DI::EMPTY.wid().is_nan());
-    assert!(DI::NAI.wid().is_nan());
+    assert_eq2!(DI::EMPTY.wid(), f64::NAN);
+    assert_eq2!(DI::NAI.wid(), f64::NAN);
     assert_eq2!(nd2di(hexf64!("0x1.0000000000000p+0"), hexf64!("0x1.0000000000001p+0"), D::Trv).wid(), hexf64!("0x1.0000000000000p-52"));
     assert_eq2!(nd2di(hexf64!("0x1.0000000000000p-1022"), hexf64!("0x1.0000000000001p-1022"), D::Trv).wid(), hexf64!("0x0.0000000000001p-1022"));
 }
@@ -201,7 +201,7 @@ fn minimal_mag_test() {
     assert_eq2!(n2i(f64::NEG_INFINITY, 2.0).mag(), f64::INFINITY);
     assert_eq2!(n2i(1.0, f64::INFINITY).mag(), f64::INFINITY);
     assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).mag(), f64::INFINITY);
-    assert!(I::EMPTY.mag().is_nan());
+    assert_eq2!(I::EMPTY.mag(), f64::NAN);
     assert_eq2!(n2i(-0.0, 0.0).mag(), 0.0);
     assert_eq2!(n2i(-0.0, -0.0).mag(), 0.0);
 }
@@ -213,8 +213,8 @@ fn minimal_mag_dec_test() {
     assert_eq2!(nd2di(f64::NEG_INFINITY, 2.0, D::Trv).mag(), f64::INFINITY);
     assert_eq2!(nd2di(1.0, f64::INFINITY, D::Def).mag(), f64::INFINITY);
     assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).mag(), f64::INFINITY);
-    assert!(DI::EMPTY.mag().is_nan());
-    assert!(DI::NAI.mag().is_nan());
+    assert_eq2!(DI::EMPTY.mag(), f64::NAN);
+    assert_eq2!(DI::NAI.mag(), f64::NAN);
     assert_eq2!(nd2di(-0.0, 0.0, D::Trv).mag(), 0.0);
     assert_eq2!(nd2di(-0.0, -0.0, D::Trv).mag(), 0.0);
 }
@@ -229,7 +229,7 @@ fn minimal_mig_test() {
     assert_eq2!(n2i(-1.0, f64::INFINITY).mig(), 0.0);
     assert_eq2!(n2i(1.0, f64::INFINITY).mig(), 1.0);
     assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).mig(), 0.0);
-    assert!(I::EMPTY.mig().is_nan());
+    assert_eq2!(I::EMPTY.mig(), f64::NAN);
     assert_eq2!(n2i(-0.0, 0.0).mig(), 0.0);
     assert_eq2!(n2i(-0.0, -0.0).mig(), 0.0);
 }
@@ -244,8 +244,8 @@ fn minimal_mig_dec_test() {
     assert_eq2!(nd2di(-1.0, f64::INFINITY, D::Trv).mig(), 0.0);
     assert_eq2!(nd2di(1.0, f64::INFINITY, D::Trv).mig(), 1.0);
     assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).mig(), 0.0);
-    assert!(DI::EMPTY.mig().is_nan());
-    assert!(DI::NAI.mig().is_nan());
+    assert_eq2!(DI::EMPTY.mig(), f64::NAN);
+    assert_eq2!(DI::NAI.mig(), f64::NAN);
     assert_eq2!(nd2di(-0.0, 0.0, D::Trv).mig(), 0.0);
     assert_eq2!(nd2di(-0.0, -0.0, D::Trv).mig(), 0.0);
 }

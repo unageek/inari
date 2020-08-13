@@ -70,7 +70,7 @@ fn ieee1788_d() {
 // Example from Section 11.3
 #[test]
 fn ieee1788_e() {
-    assert!(n2di(2.0, 1.0).is_nai());
+    assert_eq2!(n2di(2.0, 1.0), DI::NAI);
 }
 
 // Examples from Table 12.1
@@ -93,7 +93,7 @@ fn ieee1788_e2() {
     assert_eq2!(t2di("-10?12"), nd2di(-22.0, 2.0, D::Com));
     assert_eq2!(t2di("-10??u"), nd2di(-10.0, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("-10??"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
-    assert!(t2di("[nai]").is_nai());
+    assert_eq2!(t2di("[nai]"), DI::NAI);
     assert_eq2!(t2di("3.56?1_def"), nd2di(hexf64!("0x1.c666666666666p+1"), hexf64!("0x1.c8f5c28f5c290p+1"), D::Def));
 }
 
