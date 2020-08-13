@@ -1,18 +1,16 @@
 # inari-graph
 
 <p align="center">
-  <img src="image.gif">
+  <img src="images/graph.gif">
 </p>
 
 Algorithms 1.1–3.2, 3.4.1 and 3.4.2 of [Tup01] is implemented.
 
 ### Color Legend
 
-| Color                                                        | Description                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![](https://via.placeholder.com/16/000000/000000?text=+) Black | There is at least one point that satisfies the relation in the pixel. |
-| ![](https://via.placeholder.com/16/4080c0/000000?text=+) Blue | Uncertain.                                                   |
-| ![](https://via.placeholder.com/16/ffffff/000000?text=+) White | There is no points that satisfy the relation in the pixel.   |
+- ![Black](images/black.png) There is at least one point that satisfies the relation in the pixel.
+- ![Blue](images/blue.png) Uncertain.
+- ![White](images/white.png) There is no points that satisfy the relation in the pixel.
 
 ### Expression
 
