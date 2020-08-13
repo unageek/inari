@@ -4,7 +4,15 @@
   <img src="image.gif">
 </p>
 
-TODO: Add the command line reference.
+Algorithms 1.1–3.2, 3.4.1 and 3.4.2 of [Tup01] is implemented.
+
+### Color Legend
+
+| Color                                                        | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ![](https://via.placeholder.com/16/000000/000000?text=+) Black | There is at least one point that satisfies the relation in the pixel. |
+| ![](https://via.placeholder.com/16/4080c0/000000?text=+) Blue | Uncertain.                                                   |
+| ![](https://via.placeholder.com/16/ffffff/000000?text=+) White | There is no points that satisfy the relation in the pixel.   |
 
 ### Expression
 
@@ -53,3 +61,9 @@ TODO: Add the command line reference.
 | `X \|\| Y` | *X* ∨ *Y*      | [Logical disjunction.](https://en.wikipedia.org/wiki/Logical_disjunction)<br />`X` and `Y` must be a relation. |
 
 You can group a part of an expression or a relation with `(` … `)`.
+
+## References
+
+[Tup96] Jeffrey Allen Tupper. *Graphing Equations with Generalized Interval Arithmetic.* M.Sc. Thesis, Department of Computer Science, University of Toronto, January 1996. http://www.dgp.toronto.edu/~mooncake/msc.html
+
+[Tup01] Jeff Tupper. *Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables.* SIGGRAPH 2001 Conference Proceedings, August 2001. http://www.dgp.toronto.edu/~mooncake/papers.html

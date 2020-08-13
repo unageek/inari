@@ -1,4 +1,5 @@
 use crate::{interval_set::*, parse::*, rel::*, visit::*};
+use std::str::FromStr;
 
 #[derive(Clone, Debug)]
 pub struct DynRelation {
@@ -10,28 +11,6 @@ pub struct DynRelation {
 }
 
 impl DynRelation {
-    pub fn new(relation: &str) -> Self {
-        let mut rel = parse(relation).unwrap();
-        Transform.visit_rel_mut(&mut rel);
-        FoldConstant.visit_rel_mut(&mut rel);
-        let mut v = AssignId::new();
-        v.visit_rel(&rel);
-        let mut v = AssignSite::new(v.site_map());
-        v.visit_rel(&rel);
-        let mut v = CollectStatic::new();
-        v.visit_rel(&rel);
-        let (exprs, rels) = v.exprs_rels();
-        let n_ts = exprs.len() + 2;
-        let n_es = rels.len();
-        Self {
-            prop: rel.get_proposition(),
-            exprs,
-            rels,
-            ts: vec![TupperIntervalSet::empty(); n_ts],
-            es: vec![EvalResult::default(); n_es],
-        }
-    }
-
     pub fn evaluate(&mut self, x: TupperIntervalSet, y: TupperIntervalSet) -> EvalResult {
         self.ts[0] = x;
         self.ts[1] = y;
@@ -46,5 +25,31 @@ impl DynRelation {
 
     pub fn proposition(&self) -> &Proposition {
         &self.prop
+    }
+}
+
+impl FromStr for DynRelation {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, String> {
+        let mut rel = parse(s)?;
+        Transform.visit_rel_mut(&mut rel);
+        FoldConstant.visit_rel_mut(&mut rel);
+        let mut v = AssignId::new();
+        v.visit_rel(&rel);
+        let mut v = AssignSite::new(v.site_map());
+        v.visit_rel(&rel);
+        let mut v = CollectStatic::new();
+        v.visit_rel(&rel);
+        let (exprs, rels) = v.exprs_rels();
+        let n_ts = exprs.len() + 2;
+        let n_es = rels.len();
+        Ok(Self {
+            prop: rel.get_proposition(),
+            exprs,
+            rels,
+            ts: vec![TupperIntervalSet::empty(); n_ts],
+            es: vec![EvalResult::default(); n_es],
+        })
     }
 }

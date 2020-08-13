@@ -73,12 +73,11 @@ fn main() {
         )
         .get_matches();
 
-    let relation = matches.value_of_t_or_exit::<String>("relation");
+    let mut rel = matches.value_of_t_or_exit::<DynRelation>("relation");
     let bounds = matches.values_of_t_or_exit::<f64>("bounds");
     let output = matches.value_of("output");
     let size = matches.values_of_t_or_exit::<u32>("size");
 
-    let mut rel = DynRelation::new(&relation);
     let prop = rel.proposition().clone();
     let mut g = Graph::new(
         Relation {
