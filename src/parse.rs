@@ -87,6 +87,16 @@ struct DNInterval {
 }
 
 impl DNInterval {
+    const EMPTY: Self = Self {
+        x: NInterval::EMPTY,
+        d: Decoration::Trv,
+    };
+
+    const NAI: Self = Self {
+        x: NInterval::EMPTY,
+        d: Decoration::Ill,
+    };
+
     fn new(x: NInterval) -> Self {
         use Decoration::*;
 
@@ -101,16 +111,6 @@ impl DNInterval {
         Self { x, d }
     }
 
-    const EMPTY: Self = Self {
-        x: NInterval::EMPTY,
-        d: Decoration::Trv,
-    };
-
-    const NAI: Self = Self {
-        x: NInterval::EMPTY,
-        d: Decoration::Ill,
-    };
-
     fn set_dec(x: NInterval, d: Decoration) -> Self {
         use Decoration::*;
 
@@ -120,7 +120,7 @@ impl DNInterval {
         if x == NInterval::EMPTY {
             return Self::EMPTY;
         }
-        if d == Com && x.0 < Number::Infinity && x.1 > Number::NegInfinity {
+        if d == Com && (x.0 == Number::NegInfinity || x.1 == Number::Infinity) {
             return Self { x, d: Dac };
         }
 
@@ -475,9 +475,9 @@ fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
             |pair| match pair {
                 (Ok(x), None) => Ok(DNInterval::new(x)),
                 (Ok(x), Some(d)) => {
-                    let dec_x = DNInterval::new(x);
-                    if d <= dec_x.d {
-                        Ok(DNInterval::set_dec(dec_x.x, d))
+                    let xd = DNInterval::set_dec(x, d);
+                    if xd.d == d {
+                        Ok(xd)
                     } else {
                         Err(IntervalError {
                             kind: IntervalErrorKind::UndefinedOperation,
@@ -564,7 +564,7 @@ fn number_to_f64(n: &Number, infsup: InfSup) -> F64 {
 
 impl From<NInterval> for Interval {
     fn from(x: NInterval) -> Self {
-        DecoratedInterval::from(DNInterval::set_dec(x, Decoration::Trv)).x
+        DecoratedInterval::from(DNInterval::new(x)).x
     }
 }
 

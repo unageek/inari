@@ -2,6 +2,14 @@
 
 The ❗ icon indicates a breaking change.
 
+## Unreleased
+
+### Fixed
+
+- Fix decoration returned by the constructors of `DecoratedInterval` and elementary functions `acos`, `acosh`, `asin` `atanh`, `log`, `log2`, `log10` and `pow`.
+  - `atan2` is under investigation, thus made temporally hidden in the doc.
+  - Fix broken unit tests.
+
 ## v0.3.0 - 2020-08-03
 
 ### Added

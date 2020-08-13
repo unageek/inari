@@ -131,7 +131,7 @@ macro_rules! impl_log {
             }
 
             let y = Self::with_infsup_raw($f_rd(a), $f_ru(b));
-            let d = if a > 0.0 {
+            let d = if self.interior(dom) {
                 Decoration::Com
             } else {
                 Decoration::Trv
@@ -167,10 +167,10 @@ impl Interval {
         }
 
         let y = Self::with_infsup_raw(acos_rd(x.sup_raw()), acos_ru(x.inf_raw()));
-        let d = if x.interior(dom) {
+        let d = if self.subset(dom) {
             Decoration::Com
         } else {
-            Decoration::Def
+            Decoration::Trv
         };
         (y, d)
     }
@@ -188,10 +188,10 @@ impl Interval {
         }
 
         let y = Self::with_infsup_raw(acosh_rd(x.inf_raw()), acosh_ru(x.sup_raw()));
-        let d = if x.interior(dom) {
+        let d = if self.subset(dom) {
             Decoration::Com
         } else {
-            Decoration::Def
+            Decoration::Trv
         };
         (y, d)
     }
@@ -209,10 +209,10 @@ impl Interval {
         }
 
         let y = Self::with_infsup_raw(asin_rd(x.inf_raw()), asin_ru(x.sup_raw()));
-        let d = if x.interior(dom) {
+        let d = if self.subset(dom) {
             Decoration::Com
         } else {
-            Decoration::Def
+            Decoration::Trv
         };
         (y, d)
     }
@@ -220,12 +220,13 @@ impl Interval {
     impl_mono_inc!(asinh, asinh_rd, asinh_ru);
     impl_mono_inc!(atan, atan_rd, atan_ru);
 
+    #[doc(hidden)]
     pub fn atan2(self, rhs: Self) -> Self {
         self.atan2_impl(rhs).0
     }
 
     #[allow(clippy::many_single_char_names)]
-    pub fn atan2_impl(self, rhs: Self) -> (Self, Decoration) {
+    fn atan2_impl(self, rhs: Self) -> (Self, Decoration) {
         let (x, y) = (rhs, self);
         let a = x.inf_raw();
         let b = x.sup_raw();
@@ -247,7 +248,7 @@ impl Interval {
             ),
             C_P0_P1 | C_P1_P0 | C_P1_P1 | C_P1_Z | C_Z_P1 => (
                 Self::with_infsup_raw(atan2_rd(c, b), atan2_ru(d, a)),
-                Decoration::Dac,
+                Decoration::Com,
             ),
 
             // First & second quadrant
@@ -257,7 +258,7 @@ impl Interval {
             ),
             C_M_P1 => (
                 Self::with_infsup_raw(atan2_rd(c, b), atan2_ru(c, a)),
-                Decoration::Dac,
+                Decoration::Com,
             ),
 
             // Second quadrant
@@ -267,7 +268,7 @@ impl Interval {
             ),
             C_N0_P1 | C_N1_P1 => (
                 Self::with_infsup_raw(atan2_rd(d, b), atan2_ru(c, a)),
-                Decoration::Dac,
+                Decoration::Com,
             ),
             C_N1_P0 => (
                 Self::with_infsup_raw(atan2_rd(d, b), Self::PI.sup_raw()),
@@ -285,7 +286,7 @@ impl Interval {
             //C_N0_N0 => See above.
             C_N0_N1 | C_N1_N1 => (
                 Self::with_infsup_raw(atan2_rd(d, a), atan2_ru(c, b)),
-                Decoration::Dac,
+                Decoration::Com,
             ),
             //C_N1_N0 => See above.
 
@@ -293,7 +294,7 @@ impl Interval {
             //C_M_N0 => See above.
             C_M_N1 => (
                 Self::with_infsup_raw(atan2_rd(d, a), atan2_ru(d, b)),
-                Decoration::Dac,
+                Decoration::Com,
             ),
 
             // Fourth quadrant
@@ -303,7 +304,7 @@ impl Interval {
             ),
             C_P0_N1 | C_P1_N0 | C_P1_N1 | C_Z_N1 => (
                 Self::with_infsup_raw(atan2_rd(c, a), atan2_ru(d, b)),
-                Decoration::Dac,
+                Decoration::Com,
             ),
 
             // Fourth & first quadrant
@@ -313,7 +314,7 @@ impl Interval {
             ),
             C_P1_M => (
                 Self::with_infsup_raw(atan2_rd(c, a), atan2_ru(d, a)),
-                Decoration::Dac,
+                Decoration::Com,
             ),
 
             // X axis
@@ -352,7 +353,7 @@ impl Interval {
         }
 
         let y = Self::with_infsup_raw(atanh_rd(a), atanh_ru(b));
-        let d = if a > -1.0 && b < 1.0 {
+        let d = if self.interior(dom) {
             Decoration::Com
         } else {
             Decoration::Trv
@@ -448,10 +449,10 @@ impl Interval {
                 return (Self::EMPTY, Decoration::Trv);
             }
 
-            let dec = if a == 0.0 {
-                Decoration::Trv
-            } else {
+            let dec = if self.interior(dom) {
                 Decoration::Com
+            } else {
+                Decoration::Trv
             };
 
             if b < 1.0 {
@@ -462,7 +463,11 @@ impl Interval {
                 (Self::with_infsup_raw(pow_rd(b, c), pow_ru(a, c)), dec)
             }
         } else if c > 0.0 {
-            let dec = Decoration::Com;
+            let dec = if self.subset(dom) {
+                Decoration::Com
+            } else {
+                Decoration::Trv
+            };
 
             if b < 1.0 {
                 (Self::with_infsup_raw(pow_rd(a, d), pow_ru(b, c)), dec)
@@ -480,10 +485,10 @@ impl Interval {
             let z_ad = pow_rd(a, d);
             let z_bc = pow_rd(b, c);
             let z_bd = pow_ru(b, d);
-            let dec = if a == 0.0 {
-                Decoration::Trv
-            } else {
+            let dec = if self.interior(dom) {
                 Decoration::Com
+            } else {
+                Decoration::Trv
             };
 
             (Self::with_infsup_raw(z_ad.min(z_bc), z_ac.max(z_bd)), dec)
@@ -641,6 +646,7 @@ impl DecoratedInterval {
     impl_dec!(asin, asin_impl);
     impl_dec!(asinh);
     impl_dec!(atan);
+    #[doc(hidden)]
     impl_dec2!(atan2, atan2_impl);
     impl_dec!(atanh, atanh_impl);
     impl_dec!(cos);
