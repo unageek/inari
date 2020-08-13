@@ -53,6 +53,7 @@ impl Eq2 for Interval {}
 impl Eq2 for OverlappingState {}
 
 impl Eq2 for f64 {
+    #[allow(clippy::float_cmp)]
     fn eq2(&self, rhs: &Self) -> bool {
         self.is_nan() && rhs.is_nan() || self == rhs
     }
@@ -71,6 +72,7 @@ impl<T: Eq2> Eq2 for &T {
     }
 }
 
+// Copied from `assert_eq`.
 #[macro_export]
 macro_rules! assert_eq2 {
     ($left:expr, $right:expr) => {{
