@@ -23,7 +23,7 @@ Algorithms 1.1–3.2, 3.4.1 and 3.4.2 of [Tup01] is implemented.
 | `x / y`                                 | *x* / *y*                                                    | Undefined for *y* = 0.                                       |
 | `sqrt(x)`                               | √*x*                                                         | Undefined for *x* < 0.                                       |
 | `x^n`                                   | *x*<sup>*n*</sup>                                            | `n` must be an integer constant.<br />Repetition like `x^2^3` is not supported.<br />See also `exp`, `exp2` and `exp10`. |
-| `exp(x)`<br />`exp2(x)`<br />`exp10(x)` | *e*<sup>*x*</sup><br />2<sup>*x*</sup><br />10<sup>*x*</sup> |                                                              |
+| `exp(x)`<br />`exp2(x)`<br />`exp10(x)` | e<sup>*x*</sup><br />2<sup>*x*</sup><br />10<sup>*x*</sup>   |                                                              |
 | `log(x)`<br />`log2(x)`<br />`log10(x)` | log<sub>e</sub> *x*<br />log<sub>2</sub> *x*<br />log<sub>10</sub> *x* | Undefined for *x* ≤ 0.                                       |
 | `sin(x)`                                | sin *x*                                                      |                                                              |
 | `cos(x)`                                | cos *x*                                                      |                                                              |
@@ -31,7 +31,7 @@ Algorithms 1.1–3.2, 3.4.1 and 3.4.2 of [Tup01] is implemented.
 | `asin(x)`                               | sin<sup>-1</sup> *x*                                         | Undefined for *x* < −1 and *x* > 1.                          |
 | `acox(x)`                               | cos<sup>-1</sup> *x*                                         | Undefined for *x* < −1 and *x* > 1.                          |
 | `atan(x)`                               | tan<sup>-1</sup> *x*                                         |                                                              |
-| `atan2(y, x)`                           | tan<sup>-1</sup> (*y* / *x*)                                 | Undefined for (*x*, *y*) = (0, 0).                           |
+| `atan2(y, x)`                           | tan<sup>-1</sup>(*y* / *x*)                                  | Undefined for (*x*, *y*) = (0, 0).                           |
 | `sinh(x)`                               | sinh *x*                                                     |                                                              |
 | `cosh(x)`                               | cosh *x*                                                     |                                                              |
 | `tanh(x)`                               | tanh *x*                                                     |                                                              |
@@ -62,6 +62,6 @@ You can group a part of an expression or a relation with `(` … `)`.
 
 ## References
 
-[Tup96] Jeffrey Allen Tupper. *Graphing Equations with Generalized Interval Arithmetic.* M.Sc. Thesis, Department of Computer Science, University of Toronto, January 1996. http://www.dgp.toronto.edu/~mooncake/msc.html
+- [Tup96] Jeffrey Allen Tupper. *Graphing Equations with Generalized Interval Arithmetic.* M.Sc. Thesis, Department of Computer Science, University of Toronto, January 1996. http://www.dgp.toronto.edu/~mooncake/msc.html
 
-[Tup01] Jeff Tupper. *Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables.* SIGGRAPH 2001 Conference Proceedings, August 2001. http://www.dgp.toronto.edu/~mooncake/papers.html
+- [Tup01] Jeff Tupper. *Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables.* SIGGRAPH 2001 Conference Proceedings, August 2001. http://www.dgp.toronto.edu/~mooncake/papers.html
