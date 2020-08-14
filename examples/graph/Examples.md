@@ -96,16 +96,37 @@ Some intriguing examples from GrafEq
   - 📄 binary naturals.gqs
 
     ```
-    "(1 + 99 * floor(mod(floor(y) * exp2(ceil(x)), 2))) * (mod(x, 1) - 1/2)^2 + \
-     (mod(y, 1) - 1/2)^2 == 0.15 && floor(-log2(y)) < x && x < 0" -b -15 5 -5 15
+    "(1 + 99 * floor(mod(floor(y) * exp2(ceil(x)), 2))) * (mod(x, 1) - 1/2)^2 + (mod(y, 1) - 1/2)^2 == 0.15 && \
+     floor(-log2(y)) < x && x < 0" -b -15 5 -5 15
     ```
 
   - 📄 binary squares.gqs
 
     ```
-    "(1 + 99 * floor(mod(floor(y)^2 * exp2(ceil(x)), 2))) * \
-     (mod(x, 1) - 1/2)^2 + (mod(y, 1) - 1/2)^2 == 0.15 && x < 0 && 0 < floor(y)^2 && \
-     floor(y)^2 >= exp2(-ceil(x))" -b -15 5 -5 15
+    "(1 + 99 * floor(mod(floor(y)^2 * exp2(ceil(x)), 2))) *  (mod(x, 1) - 1/2)^2 + (mod(y, 1) - 1/2)^2 == 0.15 && \
+     x < 0 && 0 < floor(y)^2 && floor(y)^2 >= exp2(-ceil(x))" -b -15 5 -5 15
+    ```
+
+- 📂 Single Relation/Enumerations/Decimal/
+
+  - 📄 decimal squares.gqs
+
+    ```
+    "(mod(892 * exp2(-floor(mod(floor(y)^2/exp10(-ceil(1.25*x)), 10))), 2) >= 1 && \
+      30 * max(abs(mod(y,1) - 1/2), abs(mod(x,0.8)+0.1 - 1/2) + abs(mod(y,1) - 1/2) - 1/4) < 1 || \
+      mod(365 * exp2(-floor(mod(floor(y)^2/exp10(-ceil(1.25*x)), 10))), 2) >= 1 && \
+      30 * max(abs(mod(y,1) - 1/10), abs(mod(x,0.8)+0.1 - 1/2) + abs(mod(y,1) - 1/10) - 1/4) < 1 || \
+      mod(941 * exp2(-floor(mod(floor(y)^2/exp10(-ceil(1.25*x)), 10))), 2) >= 1 && \
+      30 * max(abs(mod(y,1) - 9/10), abs(mod(x,0.8)+0.1 - 1/2) + abs(mod(y,1) - 9/10) - 1/4) < 1 || \
+      mod(927 * exp2(-floor(mod(floor(y)^2/exp10(-ceil(1.25*x)), 10))), 2) >= 1 && \
+      30 * max(abs(mod(x,0.8)+0.1 - 4/5), abs(mod(y,1) - 7/10) + abs(mod(x,0.8)+0.1 - 4/5) - 1/8) < 1 || \
+      mod(881 * exp2(-floor(mod(floor(y)^2/exp10(-ceil(1.25*x)), 10))), 2) >= 1 && \
+      30 * max(abs(mod(x,0.8)+0.1 - 1/5), abs(mod(y,1) - 7/10) + abs(mod(x,0.8)+0.1 - 1/5) - 1/8) < 1 || \
+      mod(325 * exp2(-floor(mod(floor(y)^2/exp10(-ceil(1.25*x)), 10))), 2) >= 1 && \
+      30 * max(abs(mod(x,0.8)+0.1 - 1/5), abs(mod(y,1) - 3/10) + abs(mod(x,0.8)+0.1 - 1/5) - 1/8) < 1 || \
+      mod(1019 * exp2(-floor(mod(floor(y)^2/exp10(-ceil(1.25*x)), 10))), 2) >= 1 && \
+      30 * max(abs(mod(x,0.8)+0.1 - 4/5), abs(mod(y,1) - 3/10) + abs(mod(x,0.8)+0.1 - 4/5) - 1/8) < 1) && \
+     x < 0 && 0 < floor(y)^2 && floor(y)^2 >= exp10(-ceil(1.25*x))" -b -7 3 1 11
     ```
 
 - 📂 Single Relation/Enumerations/Trees/
@@ -116,6 +137,24 @@ Some intriguing examples from GrafEq
     "sin(exp2(floor(y))*x + pi/4*(y - floor(y)) - pi/2) == 0 || \
      sin(exp2(floor(y))*x - pi/4*(y - floor(y)) - pi/2) == 0"
     ```
+
+  - 📂 Single Relation/Enumerations/Half-Toned/
+
+    - 📄 Simply Spherical.gqs
+
+      ```
+      "sin(20*x) - cos(20*y) + 2 > 4 * (3/4 - 1/15 * sqrt((x+4)^2 + (y-3)^2)) && (x+1)^2 + (y-1)^2 < 25 || \
+       sin(20*x) - cos(20*y) + 2 > 4 * (0.65 + 1/pi * atan(6 * (sqrt((x-1)^2/30 + (y+1)^2/9) - 1))) && (x + 1)^2 + (y - 1)^2 > 25"
+      ```
+
+    - 📄 Tube.gqs
+
+      ```
+      "cos(5*x) + cos(5/2 * (x - sqrt(3)*y)) + cos(5/2 * (x + sqrt(3)*y)) > 1 + 3/2 * sin(1/4 * sqrt((x+3)^2 + 2*(y-3)^2)) && \
+       (x^2 + 2*y^2 - 1600) * (x^2 + 3*(y-2)^2 - 700) <= 0 || \
+       cos(5*x) + cos(5/2 * (x - sqrt(3)*y)) + cos(5/2 * (x + sqrt(3)*y)) > 1 + 2 * atan(1/8 * sqrt(4*(x-2)^2 + 10*(y+4)^2) - 9)^2 && \
+       (x^2 + 2*y^2 - 1600) * (x^2 + 3*(y-2)^2 - 700) > 0" -b -50 50 -50 50
+      ```
 
 - 📂 Single Relation/Linelike/
   - 📄 Frontispiece #2.gqs
