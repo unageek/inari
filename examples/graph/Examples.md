@@ -1,8 +1,8 @@
 # Examples
 
-## Basic Examples
+🐌: Takes a long time to finish graphing.
 
-[🐌]: Takes a long time to finish graphing.
+## Basic Examples
 
 ```
 "sin(x) == cos(y)"
@@ -16,18 +16,6 @@
 "(x^2 + y^2) == 1 || y == -cos(x)"
 ```
 
-From Fig. 1a in [Tup01]
-
-```
-"y < sqrt(x)"
-```
-
-From Fig. 17 in [Tup01] [🐌]
-
-```
-"y == x - atan(tan(x))"
-```
-
 ## Examples from [GrafEq](http://www.peda.com/grafeq/)
 
 - 📂 Single Relation/Abstract/Simple/
@@ -38,14 +26,14 @@ From Fig. 17 in [Tup01] [🐌]
     "abs(sin(sqrt(x^2 + y^2))) == abs(cos(x))"
     ```
 
-  - 📄 Pythagorean Pairs.gqs [🐌]
+  - 📄 Pythagorean Pairs.gqs 🐌
 
     ```
     "floor(x)^2 + floor(y)^2 == floor(sqrt(floor(x)^2 + floor(y)^2))^2" \
     -b -40 40 -40 40
     ```
 
-  - 📄 Pythagorean Triples.gqs [🐌]
+  - 📄 Pythagorean Triples.gqs 🐌
 
     ```
     "floor(x)^2 + floor(y)^2 == 25"
@@ -176,7 +164,7 @@ From Fig. 17 in [Tup01] [🐌]
      x/sin(x) - y/sin(y) == x*y/sin(x*y) || x/sin(x) - y/sin(y) == -(x*y/sin(x*y))"
     ```
 
-  - 📄 Hair.gqs [🐌]
+  - 📄 Hair.gqs 🐌
 
     ```
     "sin((x + sin(y)) * (sin(x) + y)) == cos(sin((sin(x) + cos(y)) * (sin(y) + cos(x)))) || \
@@ -198,13 +186,13 @@ From Fig. 17 in [Tup01] [🐌]
     -b 4.0 6.5 2.0 4.5
     ```
 
-  - 📄 Highwire.gqs [🐌]
+  - 📄 Highwire.gqs 🐌
 
     ```
     "abs(x*cos(x) - y*sin(y)) == abs(x*cos(y) - y*sin(x))"
     ```
 
-  - 📄 Trapezoidal Fortress.gqs [🐌]
+  - 📄 Trapezoidal Fortress.gqs 🐌
 
     ```
     "abs(x*cos(x) + y*sin(y)) == x*cos(y) - y*sin(x)"
@@ -215,9 +203,8 @@ From Fig. 17 in [Tup01] [🐌]
   - 📄 Sharp Threesome.gqs
 
     ```
-    "(sin(sqrt((x + 5)^2 + y^2))) * (cos(8*atan(y/(x + 5)))) * \
-     (sin(sqrt((x - 5)^2 + (y - 5)^2))) * (cos(8*atan((y - 5)/(x - 5)))) * \
-     (sin(sqrt(x^2 + (y + 5)^2))) * (cos(8*atan((y + 5)/x))) > 0"
+    "(sin(sqrt((x + 5)^2 + y^2))) * (cos(8*atan(y/(x + 5)))) * (sin(sqrt((x - 5)^2 + (y - 5)^2))) * \
+     (cos(8*atan((y - 5)/(x - 5)))) * (sin(sqrt(x^2 + (y + 5)^2))) * (cos(8*atan((y + 5)/x))) > 0"
     ```
 
   - 📄 The Disco Hall.gqs
