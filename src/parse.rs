@@ -9,7 +9,7 @@ use nom::{
     IResult,
 };
 use rug::{Float, Integer, Rational};
-use std::{cmp::Ordering, convert::TryFrom, str::FromStr};
+use std::{cmp::Ordering, convert::TryFrom, result, str::FromStr};
 
 #[derive(Clone, Debug)]
 struct ParseNumberError;
@@ -78,8 +78,6 @@ impl NInterval {
     const ENTIRE: Self = Self(Number::NegInfinity, Number::Infinity);
 }
 
-type NIntervalResult = Result<NInterval, IntervalError<NInterval>>;
-
 #[derive(Debug, Eq, PartialEq)]
 struct DNInterval {
     x: NInterval,
@@ -127,8 +125,6 @@ impl DNInterval {
         Self { x, d }
     }
 }
-
-type DNIntervalResult = Result<DNInterval, IntervalError<DNInterval>>;
 
 impl From<ParseNumberError> for IntervalError<NInterval> {
     fn from(_: ParseNumberError) -> Self {
@@ -262,7 +258,7 @@ fn pow(base: u32, exp: i32) -> Rational {
     r
 }
 
-fn parse_hex_float(mant: &str, exp: &str) -> Result<Rational, ParseNumberError> {
+fn parse_hex_float(mant: &str, exp: &str) -> result::Result<Rational, ParseNumberError> {
     let e = exp.parse::<i32>()?;
     let splitted = mant.split('.').collect::<Vec<_>>();
     let int_part = splitted[0];
@@ -285,7 +281,7 @@ fn parse_hex_float(mant: &str, exp: &str) -> Result<Rational, ParseNumberError> 
 fn parse_dec_float_with_ulp(
     mant: &str,
     exp: &str,
-) -> Result<(Rational, Rational), ParseNumberError> {
+) -> result::Result<(Rational, Rational), ParseNumberError> {
     let e = exp.parse::<i32>()?;
     let splitted = mant.split('.').collect::<Vec<_>>();
     let int_part = splitted[0];
@@ -305,11 +301,11 @@ fn parse_dec_float_with_ulp(
     Ok((Rational::from(i) * &ulp, ulp))
 }
 
-fn parse_dec_float(mant: &str, exp: &str) -> Result<Rational, ParseNumberError> {
+fn parse_dec_float(mant: &str, exp: &str) -> result::Result<Rational, ParseNumberError> {
     parse_dec_float_with_ulp(mant, exp).map(|(r, _)| r)
 }
 
-fn parse_rational(s: &str) -> Result<Rational, ParseNumberError> {
+fn parse_rational(s: &str) -> result::Result<Rational, ParseNumberError> {
     unsafe {
         let mut r = Rational::new();
         let c_string = std::ffi::CString::new(s).unwrap();
@@ -319,7 +315,7 @@ fn parse_rational(s: &str) -> Result<Rational, ParseNumberError> {
     }
 }
 
-fn parse_unsigned_number(n: UnsignedNumberLiteral) -> Result<Number, ParseNumberError> {
+fn parse_unsigned_number(n: UnsignedNumberLiteral) -> result::Result<Number, ParseNumberError> {
     use UnsignedNumberLiteral::*;
 
     Ok(match n {
@@ -330,12 +326,15 @@ fn parse_unsigned_number(n: UnsignedNumberLiteral) -> Result<Number, ParseNumber
     })
 }
 
-fn parse_number(NumberLiteral(s, n): NumberLiteral) -> Result<Number, ParseNumberError> {
+fn parse_number(NumberLiteral(s, n): NumberLiteral) -> result::Result<Number, ParseNumberError> {
     let n = parse_unsigned_number(n)?;
     Ok(if s == '-' { -n } else { n })
 }
 
-fn parse_opt_number(n: Option<NumberLiteral>, infsup: InfSup) -> Result<Number, ParseNumberError> {
+fn parse_opt_number(
+    n: Option<NumberLiteral>,
+    infsup: InfSup,
+) -> result::Result<Number, ParseNumberError> {
     match n {
         Some(n) => parse_number(n),
         _ => match infsup {
@@ -345,7 +344,7 @@ fn parse_opt_number(n: Option<NumberLiteral>, infsup: InfSup) -> Result<Number, 
     }
 }
 
-fn infsup(s: &str) -> IResult<&str, NIntervalResult> {
+fn infsup(s: &str) -> IResult<&str, Result<NInterval>> {
     map(
         separated_pair(
             opt(number),
@@ -367,7 +366,7 @@ fn infsup(s: &str) -> IResult<&str, NIntervalResult> {
     )(s)
 }
 
-fn point(s: &str) -> IResult<&str, NIntervalResult> {
+fn point(s: &str) -> IResult<&str, Result<NInterval>> {
     map(number, |n| {
         let a = parse_number(n)?;
         match a {
@@ -383,7 +382,7 @@ fn point(s: &str) -> IResult<&str, NIntervalResult> {
     })(s)
 }
 
-fn bracket(s: &str) -> IResult<&str, NIntervalResult> {
+fn bracket(s: &str) -> IResult<&str, Result<NInterval>> {
     delimited(
         pair(char('['), space0),
         map(
@@ -425,7 +424,7 @@ fn uncertain_bound(
     }
 }
 
-fn uncertain(s: &str) -> IResult<&str, NIntervalResult> {
+fn uncertain(s: &str) -> IResult<&str, Result<NInterval>> {
     map(
         separated_pair(
             recognize(pair(sign, dec_significand)),
@@ -449,7 +448,7 @@ fn uncertain(s: &str) -> IResult<&str, NIntervalResult> {
     )(s)
 }
 
-fn interval(s: &str) -> IResult<&str, NIntervalResult> {
+fn interval(s: &str) -> IResult<&str, Result<NInterval>> {
     alt((bracket, uncertain))(s)
 }
 
@@ -464,7 +463,7 @@ fn decoration(s: &str) -> IResult<&str, Decoration> {
     ))(s)
 }
 
-fn decorated_interval(s: &str) -> IResult<&str, DNIntervalResult> {
+fn decorated_interval(s: &str) -> IResult<&str, Result<DNInterval>> {
     alt((
         map(
             tuple((char('['), space0, tag_no_case("nai"), space0, char(']'))),
@@ -586,7 +585,7 @@ impl From<DNInterval> for DecoratedInterval {
 impl FromStr for Interval {
     type Err = IntervalError<Self>;
 
-    fn from_str(s: &str) -> Result<Self, IntervalError<Self>> {
+    fn from_str(s: &str) -> Result<Self> {
         match interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Ok(Self::from(x)),
@@ -607,7 +606,7 @@ impl FromStr for Interval {
 impl FromStr for DecoratedInterval {
     type Err = IntervalError<Self>;
 
-    fn from_str(s: &str) -> Result<Self, IntervalError<Self>> {
+    fn from_str(s: &str) -> Result<Self> {
         match decorated_interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Ok(Self::from(x)),
@@ -625,7 +624,7 @@ impl FromStr for DecoratedInterval {
 }
 
 impl Interval {
-    fn try_from_ninterval_exact(x: NInterval) -> Result<Self, IntervalError<Self>> {
+    fn try_from_ninterval_exact(x: NInterval) -> Result<Self> {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
         let x = Self::try_from((a.f, b.f)).unwrap_or_else(|_| Self::EMPTY);
@@ -640,7 +639,7 @@ impl Interval {
     }
 
     #[doc(hidden)]
-    pub fn _try_from_str_exact(s: &str) -> Result<Self, IntervalError<Self>> {
+    pub fn _try_from_str_exact(s: &str) -> Result<Self> {
         match interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Self::try_from_ninterval_exact(x),

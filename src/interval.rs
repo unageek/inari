@@ -1,4 +1,4 @@
-use std::{arch::x86_64::*, cmp::Ordering, convert::TryFrom, error::Error, fmt};
+use std::{arch::x86_64::*, cmp::Ordering, convert::TryFrom, error::Error, fmt, result};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IntervalErrorKind {
@@ -36,6 +36,8 @@ impl<T: fmt::Debug> fmt::Display for IntervalError<T> {
 }
 
 impl<T: fmt::Debug> Error for IntervalError<T> {}
+
+pub type Result<T> = result::Result<T, IntervalError<T>>;
 
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
@@ -88,7 +90,7 @@ impl Eq for Interval {}
 impl TryFrom<(f64, f64)> for Interval {
     type Error = IntervalError<Self>;
 
-    fn try_from((a, b): (f64, f64)) -> Result<Self, Self::Error> {
+    fn try_from((a, b): (f64, f64)) -> Result<Self> {
         if a <= b && a != f64::INFINITY && b != f64::NEG_INFINITY {
             Ok(Self::with_infsup_raw(a, b))
         } else {
@@ -152,7 +154,7 @@ impl DecoratedInterval {
         self.d
     }
 
-    pub fn interval_part(self) -> Result<Interval, IntervalError<Interval>> {
+    pub fn interval_part(self) -> Result<Interval> {
         if self.is_nai() {
             return Err(IntervalError {
                 kind: IntervalErrorKind::IntvlPartOfNaI,
@@ -195,7 +197,7 @@ impl PartialEq for DecoratedInterval {
 impl TryFrom<(f64, f64)> for DecoratedInterval {
     type Error = IntervalError<Self>;
 
-    fn try_from(x: (f64, f64)) -> Result<Self, Self::Error> {
+    fn try_from(x: (f64, f64)) -> Result<Self> {
         match Interval::try_from(x) {
             Ok(x) => Ok(Self::new(x)),
             _ => Err(Self::Error {

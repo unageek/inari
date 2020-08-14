@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## Unreleased
+
+### Added
+
+- Add a type alias: `Result<T> = std::result::Result<T, IntervalError<T>>`.
+
 ## v0.3.1 - 2020-08-14
 
 ### Fixed
