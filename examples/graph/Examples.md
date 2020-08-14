@@ -1,4 +1,6 @@
-## Example command lines
+# Examples
+
+## Basic Examples
 
 [🐌]: Takes a long time to finish graphing.
 
@@ -14,21 +16,22 @@
 "(x^2 + y^2) == 1 || y == -cos(x)"
 ```
 
-From Fig. 1a in Tupper (2001)
+From Fig. 1a in [Tup01]
 
 ```
 "y < sqrt(x)"
 ```
 
-From Fig. 17 in Tupper (2001) [🐌]
+From Fig. 17 in [Tup01] [🐌]
 
 ```
 "y == x - atan(tan(x))"
 ```
 
-Some intriguing examples from GrafEq
+## Examples from [GrafEq](http://www.peda.com/grafeq/)
 
 - 📂 Single Relation/Abstract/Simple/
+
   - 📄 Parabolic Waves.gqs
 
     ```
@@ -49,6 +52,7 @@ Some intriguing examples from GrafEq
     ```
 
 - 📂 Single Relation/Abstract/Traditionally Difficult/
+
   - 📄 Infinite Frequency.gqs
 
     ```
@@ -138,25 +142,26 @@ Some intriguing examples from GrafEq
      sin(exp2(floor(y))*x - pi/4*(y - floor(y)) - pi/2) == 0"
     ```
 
-  - 📂 Single Relation/Enumerations/Half-Toned/
+- 📂 Single Relation/Enumerations/Half-Toned/
 
-    - 📄 Simply Spherical.gqs
+  - 📄 Simply Spherical.gqs
 
-      ```
-      "sin(20*x) - cos(20*y) + 2 > 4 * (3/4 - 1/15 * sqrt((x+4)^2 + (y-3)^2)) && (x+1)^2 + (y-1)^2 < 25 || \
-       sin(20*x) - cos(20*y) + 2 > 4 * (0.65 + 1/pi * atan(6 * (sqrt((x-1)^2/30 + (y+1)^2/9) - 1))) && (x + 1)^2 + (y - 1)^2 > 25"
-      ```
+    ```
+    "sin(20*x) - cos(20*y) + 2 > 4 * (3/4 - 1/15 * sqrt((x+4)^2 + (y-3)^2)) && (x+1)^2 + (y-1)^2 < 25 || \
+     sin(20*x) - cos(20*y) + 2 > 4 * (0.65 + 1/pi * atan(6 * (sqrt((x-1)^2/30 + (y+1)^2/9) - 1))) && (x + 1)^2 + (y - 1)^2 > 25"
+    ```
 
-    - 📄 Tube.gqs
+  - 📄 Tube.gqs
 
-      ```
-      "cos(5*x) + cos(5/2 * (x - sqrt(3)*y)) + cos(5/2 * (x + sqrt(3)*y)) > 1 + 3/2 * sin(1/4 * sqrt((x+3)^2 + 2*(y-3)^2)) && \
-       (x^2 + 2*y^2 - 1600) * (x^2 + 3*(y-2)^2 - 700) <= 0 || \
-       cos(5*x) + cos(5/2 * (x - sqrt(3)*y)) + cos(5/2 * (x + sqrt(3)*y)) > 1 + 2 * atan(1/8 * sqrt(4*(x-2)^2 + 10*(y+4)^2) - 9)^2 && \
-       (x^2 + 2*y^2 - 1600) * (x^2 + 3*(y-2)^2 - 700) > 0" -b -50 50 -50 50
-      ```
+    ```
+    "cos(5*x) + cos(5/2 * (x - sqrt(3)*y)) + cos(5/2 * (x + sqrt(3)*y)) > 1 + 3/2 * sin(1/4 * sqrt((x+3)^2 + 2*(y-3)^2)) && \
+     (x^2 + 2*y^2 - 1600) * (x^2 + 3*(y-2)^2 - 700) <= 0 || \
+     cos(5*x) + cos(5/2 * (x - sqrt(3)*y)) + cos(5/2 * (x + sqrt(3)*y)) > 1 + 2 * atan(1/8 * sqrt(4*(x-2)^2 + 10*(y+4)^2) - 9)^2 && \
+     (x^2 + 2*y^2 - 1600) * (x^2 + 3*(y-2)^2 - 700) > 0" -b -50 50 -50 50
+    ```
 
 - 📂 Single Relation/Linelike/
+
   - 📄 Frontispiece #2.gqs
 
     ```
@@ -221,27 +226,23 @@ Some intriguing examples from GrafEq
     "sin(abs(x + y)) > max(cos(x^2), sin(y^2))"
     ```
 
-From http://www.peda.com/grafeq/reviews.html
+## Examples from [GrafEq Reviews](http://www.peda.com/grafeq/reviews.html)
 
-- 1.
+```
+"y == sqrt(x)^2"
+```
 
-  ```
-  "y == sqrt(x)^2"
-  ```
+```
+"y == sqrt(x - 1)/sqrt(x - 3)"
+```
 
-- 2.
+The graph must be empty:
 
-  ```
-  "y == sqrt(x - 1)/sqrt(x - 3)"
-  ```
+```
+"y == sqrt(x - 3)*sqrt(1 - x)"
+```
 
-- 3: the graph must be empty.
-
-  ```
-  "y == sqrt(x - 3)*sqrt(1 - x)"
-  ```
-
-Tests for conjunction and disjunction
+## Tests for Conjunction and Disjunction
 
 The graph must be empty:
 
