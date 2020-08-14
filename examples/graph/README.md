@@ -1,16 +1,23 @@
 # inari-graph
 
 <p align="center">
-  <img src="images/graph.gif">
+  <img src="images/cover.gif"><br>
+  The graph of sin(<i>x</i> ± sin <i>y</i>) (sin <i>x</i> ± <i>y</i>) = cos(sin((sin <i>x</i> ± cos <i>y</i>) (sin <i>y</i> ± cos <i>x</i>))) over [4, 6.5] × [2, 4.5].
 </p>
 
 Algorithms 1.1–3.2, 3.4.1 and 3.4.2 of [Tup01] is implemented.
 
-### Color Legend
+## Building
+
+## [Example Relations](Examples.md)
+
+## Color Legend
 
 - ![Black](images/black.png) There is at least one point that satisfies the relation in the pixel.
 - ![Blue](images/blue.png) Uncertain.
 - ![White](images/white.png) There is no points that satisfy the relation in the pixel.
+
+## Syntax
 
 ### Expression
 
