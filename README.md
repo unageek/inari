@@ -15,6 +15,10 @@ There is one conditional feature:
 
 - `gmp` (enabled by default) - Enables operations that depend on GMP and MPFR, namely transcendental functions and conversion between texts and intervals. You can opt-out the feature to reduce dependency. Even in that case, you can still access to basic arithmetic operations that are required for writing filters for geometric predicates.
 
+## Made with inari
+
+- [inari-graph](https://github.com/mizuno-gsinet/inari-graph)
+
 ## TODO
 
 - AVX512F support (_mm512_add_round_pd, etc.)
