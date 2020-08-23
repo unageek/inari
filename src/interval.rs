@@ -297,7 +297,8 @@ macro_rules! const_interval {
 
         #[allow(unused_unsafe)]
         unsafe {
-            Rep { f: [-$a, $b] }.i
+            // Parentheses are used to avoid `clippy::double_neg`.
+            Rep { f: [-($a), $b] }.i
         }
     }};
 }
