@@ -6,6 +6,7 @@ The ❗ icon indicates a breaking change.
 
 ### Added
 
+- Add type conversions between `(Decorated)Interval` and byte arrays.
 - Add a type alias: `Result<T> = std::result::Result<T, IntervalError<T>>`.
 
 ### Fixed
