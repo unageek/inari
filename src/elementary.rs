@@ -271,7 +271,7 @@ impl Interval {
             ),
             C_N1_P0 => (
                 Self::with_infsup_raw(atan2_rd(d, b), Self::PI.sup_raw()),
-                Decoration::Def,
+                Decoration::Dac,
             ),
 
             // Second & third quadrant
@@ -319,7 +319,9 @@ impl Interval {
             // X axis
             //C_M_Z => See above.
             C_N0_Z => (Self::PI, Decoration::Trv),
-            C_N1_Z => (Self::PI, Decoration::Def),
+            // This case cannot be merged with C_N1_Z since IEEE 754/MPFR's atan2
+            // returns ±π for y = ±0.0, x < 0.0, while we want +π.
+            C_N1_Z => (Self::PI, Decoration::Dac),
             C_P0_Z => (Self::zero(), Decoration::Trv),
             //C_P1_Z => See above.
 
@@ -340,7 +342,7 @@ impl Interval {
     #[allow(clippy::many_single_char_names)]
     fn atanh_impl(self) -> (Self, Decoration) {
         // Mathematically, the domain of atanh is (-1.0, 1.0), not [-1.0, 1.0].
-        // However, IEEE 754 and thus MPFR define atanh to return ±infinity for ±1.0
+        // However, IEEE 754/MPFR's atanh returns ±infinity for ±1.0,
         // (and signal the divideByZero exception), so we will make use of that.
         let dom = Self::with_infsup_raw(-1.0, 1.0);
         let x = self.intersection(dom);
