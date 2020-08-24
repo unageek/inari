@@ -3622,7 +3622,7 @@ fn minimal_atan2_dec_test() {
     assert_eq2!(nd2di(0.0, 0.0, D::Trv).atan2(nd2di(-0.0, 0.0, D::Dac)), DI::EMPTY);
     assert_eq2!(nd2di(0.0, 0.0, D::Com).atan2(nd2di(0.0, -0.0, D::Def)), DI::EMPTY);
     assert_eq2!(nd2di(0.0, 0.0, D::Dac).atan2(nd2di(-0.0, -0.0, D::Com)), DI::EMPTY);
-    //assert_eq2!(nd2di(0.0, 0.0, D::Com).atan2(nd2di(-2.0, -0.1, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
+    assert_eq2!(nd2di(0.0, 0.0, D::Com).atan2(nd2di(-2.0, -0.1, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
     assert_eq2!(nd2di(0.0, 0.0, D::Trv).atan2(nd2di(-2.0, 0.0, D::Com)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(0.0, 0.0, D::Com).atan2(nd2di(-2.0, -0.0, D::Trv)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(0.0, 0.0, D::Dac).atan2(nd2di(-2.0, 1.0, D::Def)), nd2di(0.0, hexf64!("0x1.921fb54442d19p+1"), D::Trv));
@@ -3635,7 +3635,7 @@ fn minimal_atan2_dec_test() {
     assert_eq2!(nd2di(-0.0, 0.0, D::Trv).atan2(nd2di(-0.0, 0.0, D::Trv)), DI::EMPTY);
     assert_eq2!(nd2di(-0.0, 0.0, D::Com).atan2(nd2di(0.0, -0.0, D::Def)), DI::EMPTY);
     assert_eq2!(nd2di(-0.0, 0.0, D::Dac).atan2(nd2di(-0.0, -0.0, D::Com)), DI::EMPTY);
-    //assert_eq2!(nd2di(-0.0, 0.0, D::Dac).atan2(nd2di(-2.0, -0.1, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
+    assert_eq2!(nd2di(-0.0, 0.0, D::Dac).atan2(nd2di(-2.0, -0.1, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
     assert_eq2!(nd2di(-0.0, 0.0, D::Trv).atan2(nd2di(-2.0, 0.0, D::Com)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(-0.0, 0.0, D::Com).atan2(nd2di(-2.0, -0.0, D::Trv)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(-0.0, 0.0, D::Dac).atan2(nd2di(-2.0, 1.0, D::Def)), nd2di(0.0, hexf64!("0x1.921fb54442d19p+1"), D::Trv));
@@ -3648,7 +3648,7 @@ fn minimal_atan2_dec_test() {
     assert_eq2!(nd2di(0.0, -0.0, D::Trv).atan2(nd2di(-0.0, 0.0, D::Com)), DI::EMPTY);
     assert_eq2!(nd2di(0.0, -0.0, D::Dac).atan2(nd2di(0.0, -0.0, D::Def)), DI::EMPTY);
     assert_eq2!(nd2di(0.0, -0.0, D::Com).atan2(nd2di(-0.0, -0.0, D::Trv)), DI::EMPTY);
-    //assert_eq2!(nd2di(0.0, -0.0, D::Com).atan2(nd2di(-2.0, -0.1, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
+    assert_eq2!(nd2di(0.0, -0.0, D::Com).atan2(nd2di(-2.0, -0.1, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
     assert_eq2!(nd2di(0.0, -0.0, D::Def).atan2(nd2di(-2.0, 0.0, D::Com)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(0.0, -0.0, D::Com).atan2(nd2di(-2.0, -0.0, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+1"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(0.0, -0.0, D::Dac).atan2(nd2di(-2.0, 1.0, D::Com)), nd2di(0.0, hexf64!("0x1.921fb54442d19p+1"), D::Trv));
@@ -3726,7 +3726,7 @@ fn minimal_atan2_dec_test() {
     assert_eq2!(nd2di(-0.0, 1.0, D::Trv).atan2(nd2di(-0.0, 0.0, D::Trv)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Trv));
     assert_eq2!(nd2di(-0.0, 1.0, D::Dac).atan2(nd2di(0.0, -0.0, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Trv));
     assert_eq2!(nd2di(-0.0, 1.0, D::Com).atan2(nd2di(-0.0, -0.0, D::Def)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Trv));
-    //assert_eq2!(nd2di(-0.0, 1.0, D::Com).atan2(nd2di(-2.0, -0.1, D::Com)), nd2di(hexf64!("0x1.aba397c7259ddp+0"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
+    assert_eq2!(nd2di(-0.0, 1.0, D::Com).atan2(nd2di(-2.0, -0.1, D::Com)), nd2di(hexf64!("0x1.aba397c7259ddp+0"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
     assert_eq2!(nd2di(-0.0, 1.0, D::Def).atan2(nd2di(-2.0, 0.0, D::Com)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(-0.0, 1.0, D::Def).atan2(nd2di(-2.0, -0.0, D::Def)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(-0.0, 1.0, D::Dac).atan2(nd2di(-2.0, 1.0, D::Dac)), nd2di(0.0, hexf64!("0x1.921fb54442d19p+1"), D::Trv));
@@ -3739,7 +3739,7 @@ fn minimal_atan2_dec_test() {
     assert_eq2!(nd2di(0.0, 1.0, D::Trv).atan2(nd2di(-0.0, 0.0, D::Trv)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Trv));
     assert_eq2!(nd2di(0.0, 1.0, D::Trv).atan2(nd2di(0.0, -0.0, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Trv));
     assert_eq2!(nd2di(0.0, 1.0, D::Def).atan2(nd2di(-0.0, -0.0, D::Com)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+0"), D::Trv));
-    //assert_eq2!(nd2di(0.0, 1.0, D::Dac).atan2(nd2di(-2.0, -0.1, D::Dac)), nd2di(hexf64!("0x1.aba397c7259ddp+0"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
+    assert_eq2!(nd2di(0.0, 1.0, D::Dac).atan2(nd2di(-2.0, -0.1, D::Dac)), nd2di(hexf64!("0x1.aba397c7259ddp+0"), hexf64!("0x1.921fb54442d19p+1"), D::Dac));
     assert_eq2!(nd2di(0.0, 1.0, D::Def).atan2(nd2di(-2.0, 0.0, D::Trv)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(0.0, 1.0, D::Dac).atan2(nd2di(-2.0, -0.0, D::Dac)), nd2di(hexf64!("0x1.921fb54442d18p+0"), hexf64!("0x1.921fb54442d19p+1"), D::Trv));
     assert_eq2!(nd2di(0.0, 1.0, D::Dac).atan2(nd2di(-2.0, 1.0, D::Def)), nd2di(0.0, hexf64!("0x1.921fb54442d19p+1"), D::Trv));

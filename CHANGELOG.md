@@ -11,6 +11,7 @@ The ❗ icon indicates a breaking change.
 
 ### Fixed
 
+- Fix decoration returned by `atan2`; `Def` was returned instead of `Dac` in certain cases.
 - Fix Clippy warning `double_neg` caused by passing a negative value to the lower bound of `const_interval!` macro.
 
 ## v0.3.1 - 2020-08-14
@@ -18,7 +19,7 @@ The ❗ icon indicates a breaking change.
 ### Fixed
 
 - Fix decoration returned by the constructors of `DecoratedInterval` and elementary functions `acos`, `acosh`, `asin`, `atan2`, `atanh`, `log`, `log2`, `log10` and `pow`.
-  - `atan2` is still under investigation (maybe ITF1788 test suite is wrong), so use it with caution.
+  - `atan2` is still under investigation, so use it with caution.
   - Fix broken unit tests.
 
 ## v0.3.0 - 2020-08-03
