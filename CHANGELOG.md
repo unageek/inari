@@ -2,11 +2,13 @@
 
 The ❗ icon indicates a breaking change.
 
-## Unreleased
+## v0.4.0 - 2020-08-25
 
 ### Added
 
-- Add type conversions between `(Decorated)Interval` and byte arrays.
+- Add type conversions between intervals and byte arrays.
+  - `(Decorated)Interval::to_be_bytes`, `to_le_bytes` and `to_ne_bytes` convert intervals into byte arrays.
+  - `(Decorated)Interval::try_from_be_bytes`, `try_from_le_bytes` and `try_from_ne_bytes` convert byte arrays into intervals.
 - Add a type alias: `Result<T> = std::result::Result<T, IntervalError<T>>`.
 
 ### Fixed
