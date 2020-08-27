@@ -94,7 +94,7 @@ mpfr_fn!(cosh, cosh_rd, cosh_ru);
 mpfr_fn!(exp, exp_rd, exp_ru);
 mpfr_fn!(exp10, exp10_rd, exp10_ru);
 mpfr_fn!(exp2, exp2_rd, exp2_ru);
-mpfr_fn!(log, log_rd, log_ru);
+mpfr_fn!(log, ln_rd, ln_ru);
 mpfr_fn!(log10, log10_rd, log10_ru);
 mpfr_fn!(log2, log2_rd, log2_ru);
 mpfr_fn2!(pow, pow_rd, pow_ru);
@@ -459,10 +459,10 @@ impl Interval {
 
     impl_log!(
         /// Returns the natural logarithm of `self`.
-        log,
-        log_impl,
-        log_rd,
-        log_ru
+        ln,
+        ln_impl,
+        ln_rd,
+        ln_ru
     );
     impl_log!(
         /// Returns the base-10 logarithm of `self`.
@@ -720,7 +720,7 @@ impl DecoratedInterval {
     impl_dec!(exp);
     impl_dec!(exp10);
     impl_dec!(exp2);
-    impl_dec!(log, log_impl);
+    impl_dec!(ln, ln_impl);
     impl_dec!(log10, log10_impl);
     impl_dec!(log2, log2_impl);
     impl_dec2!(pow, pow_impl);
@@ -758,7 +758,7 @@ mod tests {
         assert!(DI::NAI.exp().is_nai());
         assert!(DI::NAI.exp10().is_nai());
         assert!(DI::NAI.exp2().is_nai());
-        assert!(DI::NAI.log().is_nai());
+        assert!(DI::NAI.ln().is_nai());
         assert!(DI::NAI.log10().is_nai());
         assert!(DI::NAI.log2().is_nai());
         assert!(DI::NAI.pow(DI::EMPTY).is_nai());
