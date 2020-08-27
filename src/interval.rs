@@ -43,7 +43,7 @@ pub type Result<T> = result::Result<T, IntervalError<T>>;
 #[repr(C)]
 pub struct Interval {
     // The neginf-sup-nan form is used to represent an interval.
-    // 0 is stored as either 0.0 or -0.0.
+    // Zero can be stored as either 0.0 or -0.0.
     // NaN can be stored in any representation.
     //
     // An interval [a, b] is stored as [b; -a]:
@@ -192,7 +192,7 @@ impl PartialEq for DecoratedInterval {
     }
 }
 
-// Do not implement Eq for DecoratedInterval (nai != nai).
+// `DecoratedInterval` is not a model of `Eq` as NaI ≠ NaI.
 
 impl TryFrom<(f64, f64)> for DecoratedInterval {
     type Error = IntervalError<Self>;

@@ -3,19 +3,22 @@ use std::arch::x86_64::*;
 
 impl Interval {
     // For a given interval [a, b], returns the bit pattern
-    // that encodes [b <= 0, -a <= 0, b >= 0, -a >= 0].
+    // that encodes [b ≤ 0, -a ≤ 0, b ≥ 0, -a ≥ 0].
     //
     // The following codes are used to represent the class of an interval:
     //
-    // - `E` - empty
-    // - `M` - a < 0 < b
-    // - `N` - a < 0, b <= 0 (used only in comments)
-    // - `N0` - a < 0, b = 0
-    // - `N1` - b < 0
-    // - `P` - a = 0, 0 <= b (used only in comments)
-    // - `P0` - a = 0, 0 < b
-    // - `P1` - 0 < a
-    // - `Z` - a = b = 0
+    //  Code | Description
+    // ------+---------------
+    //     E | Empty
+    //     M | a < 0 < b
+    //    N0 | a < 0 ∧ b = 0
+    //    N1 | b < 0
+    //    P0 | a = 0 ∧ 0 < b
+    //    P1 | 0 < a
+    //     Z | a = b = 0
+    //   (N) | a < 0 ∧ b ≤ 0
+    //   (P) | a = 0 ∧ 0 ≤ b
+    // Parenthesized codes are used only in comments.
     pub(crate) fn classify(self) -> u32 {
         let zero = unsafe { _mm_setzero_pd() };
         let ge_zero = unsafe { _mm_movemask_pd(_mm_cmpge_pd(self.rep, zero)) };

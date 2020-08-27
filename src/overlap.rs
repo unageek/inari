@@ -22,6 +22,7 @@ pub enum OverlappingState {
 }
 
 impl Interval {
+    /// Returns the overlapping state of `self` and `rhs`.
     pub fn overlap(self, rhs: Self) -> OverlappingState {
         use OverlappingState::*;
 
@@ -48,14 +49,14 @@ impl Interval {
         //   M | x     | x     |   x   | x
         //   O | x     | x     |     x | x
         //   S |   x   | x     |   ? ? | x
-        //  CB |     x | x     |     x | x
+        //  Cb |     x | x     |     x | x
         //   F |     x | ? ?   |     x |   x
         //   E |   x   | ? ?   |   ? ? |   x
-        //  FB | x     | x     |   ? ? |   x
+        //  Fb | x     | x     |   ? ? |   x
         //   C | x     | x     |     x |     x
-        //  SB |   x   | ? ?   |     x |     x
-        //  OB |     x | x     |     x |     x
-        //  MB |     x |   x   |     x |     x
+        //  Sb |   x   | ? ?   |     x |     x
+        //  Ob |     x | x     |     x |     x
+        //  Mb |     x |   x   |     x |     x
         //   A |     x |     x |     x |     x
 
         #[allow(clippy::collapsible_if)]

@@ -41,9 +41,9 @@ impl Interval {
             let zero = _mm_setzero_pd();
             let gt_zero_mask = _mm_cmpgt_pd(self.rep, zero);
             let lt_zero_mask = _mm_cmplt_pd(self.rep, zero);
-            // [-(a <= 0), b >= 0] = [b >= 0; -a >= 0]
+            // [-(a ≤ 0), b ≥ 0] = [b ≥ 0; -a ≥ 0]
             let one_or_zero = _mm_and_pd(_mm_set1_pd(1.0), gt_zero_mask);
-            // [a >= 0, -(b <= 0)] = [-(b <= 0); -(-a <= 0)]
+            // [a ≥ 0, -(b ≤ 0)] = [-(b ≤ 0); -(-a ≤ 0)]
             let m_one_or_zero = _mm_and_pd(_mm_set1_pd(-1.0), lt_zero_mask);
             // Gives the same result as addition, but faster.
             let r = _mm_or_pd(one_or_zero, m_one_or_zero);
@@ -89,11 +89,11 @@ macro_rules! impl_dec {
 
 // https://www.ocf.berkeley.edu/~horie/rounding.html
 impl DecoratedInterval {
-    // Discontinuous at x iff x ∊ ℤ.
+    // Discontinuous at x iff x ∈ ℤ.
     impl_dec!(ceil, x, y, x.sup_raw() == y.sup_raw()); // No need to check inf.
     impl_dec!(floor, x, y, x.inf_raw() == y.inf_raw()); // No need to check sup.
 
-    // Discontinuous at x iff x ∊ {x′ + 0.5 | x′ ∊ ℤ}.
+    // Discontinuous at x iff x ∈ {x′ + 0.5 | x′ ∈ ℤ}.
     impl_dec!(round_ties_to_away, x, y, {
         let abs_a = x.inf_raw().abs();
         let abs_b = x.sup_raw().abs();
@@ -108,7 +108,7 @@ impl DecoratedInterval {
     // Discontinuous at 0.
     impl_dec!(sign, x, y, x.inf_raw() == 0.0); // No need to check sup.
 
-    // Discontinuous at x iff x ∊ ℤ ∖ {0}.
+    // Discontinuous at x iff x ∈ ℤ ∖ {0}.
     impl_dec!(
         trunc,
         x,

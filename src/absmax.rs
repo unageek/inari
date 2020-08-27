@@ -2,6 +2,7 @@ use crate::{classify::*, interval::*, simd::*};
 use std::arch::x86_64::*;
 
 impl Interval {
+    /// Returns the absolute value of `self`.
     pub fn abs(self) -> Self {
         match self.classify() {
             C_E | C_P0 | C_P1 | C_Z => self,

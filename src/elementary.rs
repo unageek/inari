@@ -113,7 +113,8 @@ fn rem_euclid_2(x: f64) -> f64 {
 }
 
 macro_rules! impl_log {
-    ($f:ident, $f_impl:ident, $f_rd:ident, $f_ru:ident) => {
+    ($(#[$meta:meta])* $f:ident, $f_impl:ident, $f_rd:ident, $f_ru:ident) => {
+        $(#[$meta])*
         pub fn $f(self) -> Self {
             self.$f_impl().0
         }
@@ -142,7 +143,8 @@ macro_rules! impl_log {
 }
 
 macro_rules! impl_mono_inc {
-    ($f:ident, $f_rd:ident, $f_ru:ident) => {
+    ($(#[$meta:meta])* $f:ident, $f_rd:ident, $f_ru:ident) => {
+        $(#[$meta])*
         pub fn $f(self) -> Self {
             if self.is_empty() {
                 return self;
@@ -154,6 +156,7 @@ macro_rules! impl_mono_inc {
 }
 
 impl Interval {
+    /// Returns the inverse cosine of `self`.
     pub fn acos(self) -> Self {
         self.acos_impl().0
     }
@@ -175,6 +178,7 @@ impl Interval {
         (y, d)
     }
 
+    /// Returns the inverse hyperbolic cosine of `self`.
     pub fn acosh(self) -> Self {
         self.acosh_impl().0
     }
@@ -196,6 +200,7 @@ impl Interval {
         (y, d)
     }
 
+    /// Returns the inverse sine of `self`.
     pub fn asin(self) -> Self {
         self.asin_impl().0
     }
@@ -217,9 +222,20 @@ impl Interval {
         (y, d)
     }
 
-    impl_mono_inc!(asinh, asinh_rd, asinh_ru);
-    impl_mono_inc!(atan, atan_rd, atan_ru);
+    impl_mono_inc!(
+        /// Returns the inverse hyperbolic sine of `self`.
+        asinh,
+        asinh_rd,
+        asinh_ru
+    );
+    impl_mono_inc!(
+        /// Returns the inverse tangent of `self`.
+        atan,
+        atan_rd,
+        atan_ru
+    );
 
+    /// For `self` (`y`) and `rhs` (`x`), returns the counterclockwise angle of the point `(x, y)` measured from the positive x-axis in the Euclidean plane.
     pub fn atan2(self, rhs: Self) -> Self {
         self.atan2_impl(rhs).0
     }
@@ -335,6 +351,7 @@ impl Interval {
         }
     }
 
+    /// Returns the inverse hyperbolic tangent of `self`.
     pub fn atanh(self) -> Self {
         self.atanh_impl().0
     }
@@ -343,7 +360,7 @@ impl Interval {
     fn atanh_impl(self) -> (Self, Decoration) {
         // Mathematically, the domain of atanh is (-1.0, 1.0), not [-1.0, 1.0].
         // However, IEEE 754/MPFR's atanh returns ±infinity for ±1.0,
-        // (and signal the divideByZero exception), so we will make use of that.
+        // (and signals the divide-by-zero exception), so we will make use of that.
         let dom = Self::with_infsup_raw(-1.0, 1.0);
         let x = self.intersection(dom);
 
@@ -362,6 +379,7 @@ impl Interval {
         (y, d)
     }
 
+    /// Returns the cosine of `self`.
     pub fn cos(self) -> Self {
         if self.is_empty() {
             return self;
@@ -403,6 +421,7 @@ impl Interval {
         }
     }
 
+    /// Returns the hyperbolic cosine of `self`.
     pub fn cosh(self) -> Self {
         if self.is_empty() {
             return self;
@@ -419,14 +438,48 @@ impl Interval {
         }
     }
 
-    impl_mono_inc!(exp, exp_rd, exp_ru);
-    impl_mono_inc!(exp10, exp10_rd, exp10_ru);
-    impl_mono_inc!(exp2, exp2_rd, exp2_ru);
+    impl_mono_inc!(
+        /// Returns the exponential of `self`.
+        exp,
+        exp_rd,
+        exp_ru
+    );
+    impl_mono_inc!(
+        /// Returns `self` raised to the power of 10.
+        exp10,
+        exp10_rd,
+        exp10_ru
+    );
+    impl_mono_inc!(
+        /// Returns `self` raised to the power of 2.
+        exp2,
+        exp2_rd,
+        exp2_ru
+    );
 
-    impl_log!(log, log_impl, log_rd, log_ru);
-    impl_log!(log10, log10_impl, log10_rd, log10_ru);
-    impl_log!(log2, log2_impl, log2_rd, log2_ru);
+    impl_log!(
+        /// Returns the natural logarithm of `self`.
+        log,
+        log_impl,
+        log_rd,
+        log_ru
+    );
+    impl_log!(
+        /// Returns the base-10 logarithm of `self`.
+        log10,
+        log10_impl,
+        log10_rd,
+        log10_ru
+    );
+    impl_log!(
+        /// Returns the base-2 logarithm of `self`.
+        log2,
+        log2_impl,
+        log2_rd,
+        log2_ru
+    );
 
+    /// Returns `self` raised to the power of `rhs`.
     pub fn pow(self, rhs: Self) -> Self {
         self.pow_impl(rhs).0
     }
@@ -496,6 +549,7 @@ impl Interval {
         }
     }
 
+    /// Returns `self` raised to the power of `rhs`, where `rhs` is an integer.
     pub fn pown(self, rhs: i32) -> Self {
         self.pown_impl(rhs).0
     }
@@ -555,6 +609,7 @@ impl Interval {
         }
     }
 
+    /// Returns the sine of `self`.
     pub fn sin(self) -> Self {
         if self.is_empty() {
             return self;
@@ -585,8 +640,14 @@ impl Interval {
         }
     }
 
-    impl_mono_inc!(sinh, sinh_rd, sinh_ru);
+    impl_mono_inc!(
+        /// Returns the hyperbolic sine of `self`.
+        sinh,
+        sinh_rd,
+        sinh_ru
+    );
 
+    /// Returns the tangent of `self`.
     pub fn tan(self) -> Self {
         self.tan_impl().0
     }
@@ -614,7 +675,12 @@ impl Interval {
         }
     }
 
-    impl_mono_inc!(tanh, tanh_rd, tanh_ru);
+    impl_mono_inc!(
+        /// Returns the hyperbolic tangent of `self`.
+        tanh,
+        tanh_rd,
+        tanh_ru
+    );
 }
 
 macro_rules! impl_dec {
@@ -706,7 +772,7 @@ mod tests {
 
     #[test]
     fn tan() {
-        // a, b ∊ (-π/2, π/2)
+        // a, b ∈ (-π/2, π/2)
         assert!(interval!(std::f64::consts::FRAC_PI_4, I::FRAC_PI_2.inf())
             .unwrap()
             .tan()
@@ -716,7 +782,7 @@ mod tests {
             .tan()
             .is_common_interval());
 
-        // a, b ∊ (-3π/2, -π/2)
+        // a, b ∈ (-3π/2, -π/2)
         assert!(
             interval!(-3.0 * std::f64::consts::FRAC_PI_4, -I::FRAC_PI_2.sup())
                 .unwrap()

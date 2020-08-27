@@ -4,6 +4,7 @@ use std::arch::x86_64::*;
 // NOTE: `neg`, `add`, `sub`, `mul` and `div` are implemented in arith.rs
 
 impl Interval {
+    /// Returns `self * rhs + addend`.
     // Almost a copy-paste of mul. Additions/modifications are indicated with "// *".
     #[allow(clippy::many_single_char_names)]
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
@@ -89,6 +90,7 @@ impl Interval {
         }
     }
 
+    /// Returns the multiplicative inverse of `self`.
     pub fn recip(self) -> Self {
         match self.classify() {
             C_E | C_Z => Self::EMPTY,
@@ -121,6 +123,7 @@ impl Interval {
         }
     }
 
+    /// Returns the square of `self`.
     pub fn sqr(self) -> Self {
         match self.classify() {
             C_E => Self::EMPTY,
@@ -149,6 +152,7 @@ impl Interval {
         }
     }
 
+    /// Returns the principal square root of `self`.
     pub fn sqrt(self) -> Self {
         if self.is_empty() {
             return Self::EMPTY;
