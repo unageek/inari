@@ -308,7 +308,6 @@ macro_rules! const_dec_interval {
     ($a:expr, $b:expr) => {{
         use ::std::{mem::transmute, primitive::*};
 
-        #[derive(Clone, Copy)]
         #[repr(C)]
         struct _DecoratedInterval {
             x: $crate::Interval,
