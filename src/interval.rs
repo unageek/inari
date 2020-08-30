@@ -1,4 +1,6 @@
-use std::{arch::x86_64::*, cmp::Ordering, convert::TryFrom, error::Error, fmt, result};
+use std::{
+    arch::x86_64::*, cmp::Ordering, convert::TryFrom, error::Error, fmt, mem::transmute, result,
+};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IntervalErrorKind {
@@ -58,23 +60,22 @@ pub struct Interval {
 
 impl Interval {
     pub(crate) fn inf_raw(self) -> f64 {
-        unsafe { -_mm_cvtsd_f64(self.rep) }
+        unsafe { -transmute::<_, [f64; 2]>(self)[0] }
     }
 
     pub(crate) fn sup_raw(self) -> f64 {
-        unsafe { _mm_cvtsd_f64(_mm_unpackhi_pd(self.rep, self.rep)) }
+        unsafe { transmute::<_, [f64; 2]>(self)[1] }
     }
 
     pub(crate) fn with_infsup_raw(a: f64, b: f64) -> Self {
+        // More optimized code is generated than by `transmute([-a, b])`.
         Self {
             rep: unsafe { _mm_set_pd(b, -a) },
         }
     }
 
     pub(crate) fn zero() -> Self {
-        Self {
-            rep: unsafe { _mm_setzero_pd() },
-        }
+        unsafe { transmute([0.0, 0.0]) }
     }
 }
 
@@ -212,7 +213,7 @@ impl TryFrom<(f64, f64)> for DecoratedInterval {
 #[macro_export]
 macro_rules! _interval {
     ($a:expr, $b:expr) => {{
-        use std::convert::TryFrom;
+        use ::std::{convert::TryFrom, primitive::*};
         fn is_f64(_: f64) {}
         is_f64($a);
         is_f64($b);
@@ -232,12 +233,14 @@ macro_rules! interval {
 #[macro_export]
 macro_rules! interval {
     ($text:expr) => {{
+        use ::std::primitive::*;
         fn is_str(_: &str) {}
         is_str($text);
         $text.parse::<$crate::Interval>()
     }};
 
     ($text:expr, exact) => {{
+        use ::std::primitive::*;
         fn is_str(_: &str) {}
         is_str($text);
         $crate::Interval::_try_from_str_exact($text)
@@ -252,7 +255,7 @@ macro_rules! interval {
 #[macro_export]
 macro_rules! _dec_interval {
     ($a:expr, $b:expr) => {{
-        use std::convert::TryFrom;
+        use ::std::{convert::TryFrom, primitive::*};
         fn is_f64(_: f64) {}
         is_f64($a);
         is_f64($b);
@@ -272,6 +275,7 @@ macro_rules! dec_interval {
 #[macro_export]
 macro_rules! dec_interval {
     ($text:expr) => {{
+        use ::std::primitive::*;
         fn is_str(_: &str) {}
         is_str($text);
         $text.parse::<$crate::DecoratedInterval>()
@@ -285,11 +289,7 @@ macro_rules! dec_interval {
 #[macro_export]
 macro_rules! const_interval {
     ($a:expr, $b:expr) => {{
-        #[repr(C)]
-        union Rep {
-            f: [f64; 2],
-            i: $crate::Interval,
-        }
+        use ::std::{mem::transmute, primitive::*};
 
         static_assertions::const_assert!(
             $a <= $b && $a != f64::INFINITY && $b != f64::NEG_INFINITY
@@ -298,7 +298,7 @@ macro_rules! const_interval {
         #[allow(unused_unsafe)]
         unsafe {
             // Parentheses are used to avoid `clippy::double_neg`.
-            Rep { f: [-($a), $b] }.i
+            transmute([-($a), $b])
         }
     }};
 }
@@ -306,32 +306,24 @@ macro_rules! const_interval {
 #[macro_export]
 macro_rules! const_dec_interval {
     ($a:expr, $b:expr) => {{
-        #[derive(Clone, Copy)]
+        use ::std::{mem::transmute, primitive::*};
+
         #[repr(C)]
         struct _DecoratedInterval {
             x: $crate::Interval,
             d: $crate::Decoration,
         }
 
-        #[repr(C)]
-        union Rep {
-            _di: _DecoratedInterval,
-            di: $crate::DecoratedInterval,
-        }
-
         #[allow(unused_unsafe)]
         unsafe {
-            Rep {
-                _di: _DecoratedInterval {
-                    x: const_interval!($a, $b),
-                    d: if $a == f64::NEG_INFINITY || $b == f64::INFINITY {
-                        $crate::Decoration::Dac
-                    } else {
-                        $crate::Decoration::Com
-                    },
+            transmute(_DecoratedInterval {
+                x: const_interval!($a, $b),
+                d: if $a == f64::NEG_INFINITY || $b == f64::INFINITY {
+                    $crate::Decoration::Dac
+                } else {
+                    $crate::Decoration::Com
                 },
-            }
-            .di
+            })
         }
     }};
 }
@@ -339,6 +331,15 @@ macro_rules! const_dec_interval {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn decoration_order() {
+        use Decoration::*;
+        assert!(Ill < Trv);
+        assert!(Trv < Def);
+        assert!(Def < Dac);
+        assert!(Dac < Com);
+    }
 
     #[test]
     fn macros() {
