@@ -334,6 +334,15 @@ mod tests {
     use super::*;
 
     #[test]
+    fn decoration_order() {
+        use Decoration::*;
+        assert!(Ill < Trv);
+        assert!(Trv < Def);
+        assert!(Def < Dac);
+        assert!(Dac < Com);
+    }
+
+    #[test]
     fn macros() {
         // Check that these macros are usable in const contexts.
         const _I: Interval = const_interval!(1.0, 2.0);
