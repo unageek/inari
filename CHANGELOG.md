@@ -2,11 +2,11 @@
 
 The ❗ icon indicates a breaking change.
 
-## Unreleased
+## v0.5.0 - 2020-08-31
 
 ### Changed
 
-- ❗ Rename `(Decorated)Interval::log` to `ln` to match them with `f64::ln`. 
+- ❗ Rename `(Decorated)Interval::log` to `ln` to make them consistent with `f64::ln`.
 
 ## v0.4.0 - 2020-08-25
 
