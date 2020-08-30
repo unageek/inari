@@ -298,7 +298,7 @@ macro_rules! const_interval {
         #[allow(unused_unsafe)]
         unsafe {
             // Parentheses are used to avoid `clippy::double_neg`.
-            transmute([-($a), $b])
+            transmute::<_, $crate::Interval>([-($a), $b])
         }
     }};
 }
@@ -316,7 +316,7 @@ macro_rules! const_dec_interval {
 
         #[allow(unused_unsafe)]
         unsafe {
-            transmute(_DecoratedInterval {
+            transmute::<_, $crate::DecoratedInterval>(_DecoratedInterval {
                 x: const_interval!($a, $b),
                 d: if $a == f64::NEG_INFINITY || $b == f64::INFINITY {
                     $crate::Decoration::Dac
@@ -343,9 +343,13 @@ mod tests {
 
     #[test]
     fn macros() {
-        // Check that these macros are usable in const contexts.
+        // Check that these macros are usable for constants.
         const _I: Interval = const_interval!(1.0, 2.0);
         const _DI: DecoratedInterval = const_dec_interval!(1.0, 2.0);
+
+        // Check that type inference works.
+        let _i = const_interval!(1.0, 2.0);
+        let _di = const_dec_interval!(1.0, 2.0);
 
         assert_eq!(interval!(1.0, 1.0).unwrap(), const_interval!(1.0, 1.0));
         assert_eq!(interval!(1.0, 2.0).unwrap(), const_interval!(1.0, 2.0));
