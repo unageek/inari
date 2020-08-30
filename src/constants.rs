@@ -2,23 +2,10 @@
 
 use crate::{const_interval, interval::*};
 use hexf::*;
+use std::mem::transmute;
 
 impl Interval {
-    pub const EMPTY: Self = {
-        #[repr(C)]
-        union Rep {
-            f: [f64; 2],
-            i: Interval,
-        }
-
-        unsafe {
-            Rep {
-                f: [f64::NAN, f64::NAN],
-            }
-            .i
-        }
-    };
-
+    pub const EMPTY: Self = unsafe { transmute([f64::NAN, f64::NAN]) };
     pub const ENTIRE: Self = const_interval!(f64::NEG_INFINITY, f64::INFINITY);
 
     pub const E: Self = const_interval!(
