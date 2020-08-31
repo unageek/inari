@@ -317,7 +317,7 @@ macro_rules! const_dec_interval {
         #[allow(unused_unsafe)]
         unsafe {
             transmute::<_, $crate::DecoratedInterval>(_DecoratedInterval {
-                x: const_interval!($a, $b),
+                x: $crate::const_interval!($a, $b),
                 d: if $a == f64::NEG_INFINITY || $b == f64::INFINITY {
                     $crate::Decoration::Dac
                 } else {

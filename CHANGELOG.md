@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.5.1 - 2020-08-31
+
+### Fixed
+
+- Fix `const_dec_interval!` macro to be usable without declaring `use inari::const_interval;`.
+
 ## v0.5.0 - 2020-08-31
 
 ### Changed
