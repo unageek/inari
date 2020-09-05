@@ -235,7 +235,7 @@ impl Interval {
         atan_ru
     );
 
-    /// For `self` (`y`) and `rhs` (`x`), returns the counterclockwise angle of the point `(x, y)` measured from the positive x-axis in the Euclidean plane.
+    /// Returns the counterclockwise angle of the point (`rhs`, `self`) measured from the positive x-axis in the Euclidean xy-plane.
     pub fn atan2(self, rhs: Self) -> Self {
         self.atan2_impl(rhs).0
     }

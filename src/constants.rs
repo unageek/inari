@@ -5,81 +5,121 @@ use hexf::*;
 use std::mem::transmute;
 
 impl Interval {
+    /// The empty set ($∅$).
     pub const EMPTY: Self = unsafe { transmute([f64::NAN, f64::NAN]) };
+
+    /// $[-∞, ∞]$.
     pub const ENTIRE: Self = const_interval!(f64::NEG_INFINITY, f64::INFINITY);
 
+    /// The interval enclosing the base of natural logarithms ($\e$).
     pub const E: Self = const_interval!(
         hexf64!("0x2.b7e151628aed2p0"),
         hexf64!("0x2.b7e151628aed4p0")
     );
+
+    /// The interval enclosing $1 / \pi$.
     pub const FRAC_1_PI: Self = const_interval!(
         hexf64!("0x5.17cc1b7272208p-4"),
         hexf64!("0x5.17cc1b727220cp-4")
     );
+
+    /// The interval enclosing $1 / \sqrt{2}$.
     pub const FRAC_1_SQRT_2: Self = const_interval!(
         hexf64!("0xb.504f333f9de60p-4"),
         hexf64!("0xb.504f333f9de68p-4")
     );
+
+    /// The interval enclosing $2 / \pi$.
     pub const FRAC_2_PI: Self = const_interval!(
         hexf64!("0xa.2f9836e4e4410p-4"),
         hexf64!("0xa.2f9836e4e4418p-4")
     );
+
+    /// The interval enclosing $2 / \sqrt{\pi}$.
     pub const FRAC_2_SQRT_PI: Self = const_interval!(
         hexf64!("0x1.20dd750429b6dp0"),
         hexf64!("0x1.20dd750429b6ep0")
     );
+
+    /// The interval enclosing $\pi / 2$.
     pub const FRAC_PI_2: Self = const_interval!(
         hexf64!("0x1.921fb54442d18p0"),
         hexf64!("0x1.921fb54442d19p0")
     );
+
+    /// The interval enclosing $\pi / 3$.
     pub const FRAC_PI_3: Self = const_interval!(
         hexf64!("0x1.0c152382d7365p0"),
         hexf64!("0x1.0c152382d7366p0")
     );
+
+    /// The interval enclosing $\pi / 4$.
     pub const FRAC_PI_4: Self = const_interval!(
         hexf64!("0xc.90fdaa22168c0p-4"),
         hexf64!("0xc.90fdaa22168c8p-4")
     );
+
+    /// The interval enclosing $\pi / 6$.
     pub const FRAC_PI_6: Self = const_interval!(
         hexf64!("0x8.60a91c16b9b28p-4"),
         hexf64!("0x8.60a91c16b9b30p-4")
     );
+
+    /// The interval enclosing $\pi / 8$.
     pub const FRAC_PI_8: Self = const_interval!(
         hexf64!("0x6.487ed5110b460p-4"),
         hexf64!("0x6.487ed5110b464p-4")
     );
+
+    /// The interval enclosing $\ln 10$.
     pub const LN_10: Self = const_interval!(
         hexf64!("0x2.4d763776aaa2ap0"),
         hexf64!("0x2.4d763776aaa2cp0")
     );
+
+    /// The interval enclosing $\ln 2$.
     pub const LN_2: Self = const_interval!(
         hexf64!("0xb.17217f7d1cf78p-4"),
         hexf64!("0xb.17217f7d1cf80p-4")
     );
+
+    /// The interval enclosing $\log_{10} 2$.
     pub const LOG10_2: Self = const_interval!(
         hexf64!("0x4.d104d427de7f8p-4"),
         hexf64!("0x4.d104d427de7fcp-4")
     );
+
+    /// The interval enclosing $\log_{10} \e$.
     pub const LOG10_E: Self = const_interval!(
         hexf64!("0x6.f2dec549b9438p-4"),
         hexf64!("0x6.f2dec549b943cp-4")
     );
+
+    /// The interval enclosing $\log_2 10$.
     pub const LOG2_10: Self = const_interval!(
         hexf64!("0x3.5269e12f346e2p0"),
         hexf64!("0x3.5269e12f346e4p0")
     );
+
+    /// The interval enclosing $\log_2 \e$.
     pub const LOG2_E: Self = const_interval!(
         hexf64!("0x1.71547652b82fep0"),
         hexf64!("0x1.71547652b82ffp0")
     );
+
+    /// The interval enclosing $\pi$.
     pub const PI: Self = const_interval!(
         hexf64!("0x3.243f6a8885a30p0"),
         hexf64!("0x3.243f6a8885a32p0")
     );
+
+    /// The interval enclosing $\sqrt{2}$.
     pub const SQRT_2: Self = const_interval!(
         hexf64!("0x1.6a09e667f3bccp0"),
         hexf64!("0x1.6a09e667f3bcdp0")
     );
+
+    /// The interval enclosing $2 \pi$.
     pub const TAU: Self = const_interval!(
         hexf64!("0x6.487ed5110b460p0"),
         hexf64!("0x6.487ed5110b464p0")
