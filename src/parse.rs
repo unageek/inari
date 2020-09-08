@@ -392,7 +392,7 @@ fn bracket(s: &str) -> IResult<&str, Result<NInterval>> {
                 infsup,
                 point,
             ))),
-            |x| x.unwrap_or_else(|| Ok(NInterval::EMPTY)),
+            |x| x.unwrap_or(Ok(NInterval::EMPTY)),
         ),
         pair(space0, char(']')),
     )(s)
@@ -572,7 +572,7 @@ impl From<DNInterval> for DecoratedInterval {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
         // Fails on the empty interval.
-        let x = Interval::try_from((a.f, b.f)).unwrap_or_else(|_| Interval::EMPTY);
+        let x = Interval::try_from((a.f, b.f)).unwrap_or(Interval::EMPTY);
         let d = if a.overflow || b.overflow {
             d.min(Decoration::Dac)
         } else {
@@ -627,7 +627,7 @@ impl Interval {
     fn try_from_ninterval_exact(x: NInterval) -> Result<Self> {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
-        let x = Self::try_from((a.f, b.f)).unwrap_or_else(|_| Self::EMPTY);
+        let x = Self::try_from((a.f, b.f)).unwrap_or(Self::EMPTY);
         if a.inexact || b.inexact {
             Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
