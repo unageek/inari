@@ -98,18 +98,18 @@ pub(crate) const C_Z_Z: u32 = (C_Z << 4) | C_Z;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interval;
+    use crate::*;
     type I = Interval;
 
     #[test]
     fn classify() {
         assert!(I::EMPTY.classify() == C_E);
         assert!(I::ENTIRE.classify() == C_M);
-        assert!(interval!(-1.0, 1.0).unwrap().classify() == C_M);
-        assert!(interval!(-1.0, 0.0).unwrap().classify() == C_N0);
-        assert!(interval!(-1.0, -1.0).unwrap().classify() == C_N1);
-        assert!(interval!(0.0, 1.0).unwrap().classify() == C_P0);
-        assert!(interval!(1.0, 1.0).unwrap().classify() == C_P1);
+        assert!(const_interval!(-1.0, 1.0).classify() == C_M);
+        assert!(const_interval!(-1.0, 0.0).classify() == C_N0);
+        assert!(const_interval!(-1.0, -1.0).classify() == C_N1);
+        assert!(const_interval!(0.0, 1.0).classify() == C_P0);
+        assert!(const_interval!(1.0, 1.0).classify() == C_P1);
         assert!(I::zero().classify() == C_Z);
     }
 }

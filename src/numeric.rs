@@ -105,66 +105,66 @@ impl DecoratedInterval {
 
 #[cfg(test)]
 mod tests {
-    use crate::interval;
+    use crate::*;
 
     #[test]
     fn inf() {
-        assert!(interval!(0.0, 0.0).unwrap().inf().is_sign_negative());
-        assert!(interval!(0.0, -0.0).unwrap().inf().is_sign_negative());
-        assert!(interval!(-0.0, 0.0).unwrap().inf().is_sign_negative());
-        assert!(interval!(-0.0, -0.0).unwrap().inf().is_sign_negative());
+        assert!(const_interval!(0.0, 0.0).inf().is_sign_negative());
+        assert!(const_interval!(0.0, -0.0).inf().is_sign_negative());
+        assert!(const_interval!(-0.0, 0.0).inf().is_sign_negative());
+        assert!(const_interval!(-0.0, -0.0).inf().is_sign_negative());
     }
 
     #[test]
     fn mag() {
-        assert!(interval!(0.0, 0.0).unwrap().mag().is_sign_positive());
-        assert!(interval!(0.0, -0.0).unwrap().mag().is_sign_positive());
-        assert!(interval!(-0.0, 0.0).unwrap().mag().is_sign_positive());
-        assert!(interval!(-0.0, -0.0).unwrap().mag().is_sign_positive());
+        assert!(const_interval!(0.0, 0.0).mag().is_sign_positive());
+        assert!(const_interval!(0.0, -0.0).mag().is_sign_positive());
+        assert!(const_interval!(-0.0, 0.0).mag().is_sign_positive());
+        assert!(const_interval!(-0.0, -0.0).mag().is_sign_positive());
     }
 
     #[test]
     fn mid() {
-        assert!(interval!(0.0, 0.0).unwrap().mid().is_sign_positive());
-        assert!(interval!(0.0, -0.0).unwrap().mid().is_sign_positive());
-        assert!(interval!(-0.0, 0.0).unwrap().mid().is_sign_positive());
-        assert!(interval!(-0.0, -0.0).unwrap().mid().is_sign_positive());
+        assert!(const_interval!(0.0, 0.0).mid().is_sign_positive());
+        assert!(const_interval!(0.0, -0.0).mid().is_sign_positive());
+        assert!(const_interval!(-0.0, 0.0).mid().is_sign_positive());
+        assert!(const_interval!(-0.0, -0.0).mid().is_sign_positive());
     }
 
     #[test]
     fn mig() {
-        assert!(interval!(0.0, 0.0).unwrap().mig().is_sign_positive());
-        assert!(interval!(0.0, -0.0).unwrap().mig().is_sign_positive());
-        assert!(interval!(-0.0, 0.0).unwrap().mig().is_sign_positive());
-        assert!(interval!(-0.0, -0.0).unwrap().mig().is_sign_positive());
+        assert!(const_interval!(0.0, 0.0).mig().is_sign_positive());
+        assert!(const_interval!(0.0, -0.0).mig().is_sign_positive());
+        assert!(const_interval!(-0.0, 0.0).mig().is_sign_positive());
+        assert!(const_interval!(-0.0, -0.0).mig().is_sign_positive());
     }
 
     #[test]
     fn rad() {
-        assert!(interval!(0.0, 0.0).unwrap().rad().is_sign_positive());
-        assert!(interval!(0.0, -0.0).unwrap().rad().is_sign_positive());
-        assert!(interval!(-0.0, 0.0).unwrap().rad().is_sign_positive());
-        assert!(interval!(-0.0, -0.0).unwrap().rad().is_sign_positive());
+        assert!(const_interval!(0.0, 0.0).rad().is_sign_positive());
+        assert!(const_interval!(0.0, -0.0).rad().is_sign_positive());
+        assert!(const_interval!(-0.0, 0.0).rad().is_sign_positive());
+        assert!(const_interval!(-0.0, -0.0).rad().is_sign_positive());
     }
 
     #[test]
     fn sup() {
-        assert!(interval!(0.0, 0.0).unwrap().sup().is_sign_positive());
-        assert!(interval!(0.0, -0.0).unwrap().sup().is_sign_positive());
-        assert!(interval!(-0.0, 0.0).unwrap().sup().is_sign_positive());
-        assert!(interval!(-0.0, -0.0).unwrap().sup().is_sign_positive());
+        assert!(const_interval!(0.0, 0.0).sup().is_sign_positive());
+        assert!(const_interval!(0.0, -0.0).sup().is_sign_positive());
+        assert!(const_interval!(-0.0, 0.0).sup().is_sign_positive());
+        assert!(const_interval!(-0.0, -0.0).sup().is_sign_positive());
     }
 
     #[test]
     fn wid() {
-        assert!(interval!(0.0, 0.0).unwrap().wid().is_sign_positive());
-        assert!(interval!(0.0, -0.0).unwrap().wid().is_sign_positive());
-        assert!(interval!(-0.0, 0.0).unwrap().wid().is_sign_positive());
-        assert!(interval!(-0.0, -0.0).unwrap().wid().is_sign_positive());
+        assert!(const_interval!(0.0, 0.0).wid().is_sign_positive());
+        assert!(const_interval!(0.0, -0.0).wid().is_sign_positive());
+        assert!(const_interval!(-0.0, 0.0).wid().is_sign_positive());
+        assert!(const_interval!(-0.0, -0.0).wid().is_sign_positive());
 
         // Check if the result is rounded up.
         assert_eq!(
-            interval!(-f64::MIN_POSITIVE, f64::MAX).unwrap().wid(),
+            const_interval!(-f64::MIN_POSITIVE, f64::MAX).wid(),
             f64::INFINITY
         );
     }

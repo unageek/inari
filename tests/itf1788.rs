@@ -1,4 +1,28 @@
-use inari::{dec_interval, interval, DecoratedInterval, Decoration, Interval, OverlappingState};
+#![allow(clippy::approx_constant, clippy::eq_op, clippy::float_cmp)]
+
+use inari::*;
+
+mod itf1788_tests {
+    //mod abs_rev;
+    mod atan2;
+    mod c_xsc;
+    mod fi_lib;
+    mod ieee1788_constructors;
+    mod ieee1788_exceptions;
+    mod libieeep1788_bool;
+    //mod libieeep1788_cancel;
+    mod libieeep1788_class;
+    mod libieeep1788_elem;
+    //mod libieeep1788_mul_rev;
+    mod libieeep1788_num;
+    mod libieeep1788_overlap;
+    mod libieeep1788_rec_bool;
+    //mod libieeep1788_reduction;
+    //mod libieeep1788_rev;
+    mod libieeep1788_set;
+    mod mpfi;
+    //mod pow_rev;
+}
 
 pub fn n2i(a: f64, b: f64) -> Interval {
     match interval!(a, b) {
@@ -53,7 +77,6 @@ impl Eq2 for Interval {}
 impl Eq2 for OverlappingState {}
 
 impl Eq2 for f64 {
-    #[allow(clippy::float_cmp)]
     fn eq2(&self, rhs: &Self) -> bool {
         self.is_nan() && rhs.is_nan() || self == rhs
     }

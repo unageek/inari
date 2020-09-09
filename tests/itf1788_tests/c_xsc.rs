@@ -33,7 +33,7 @@
 //Arithmetic library imports
 
 //Preamble
-use crate::{*, util::*};
+use crate::*;
 type I = inari::Interval;
 
 // Tests A+B, B+A, A-B, B-A, -A, +A

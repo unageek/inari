@@ -658,8 +658,7 @@ impl Interval {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::{dec_interval, interval};
+    use crate::*;
     use hexf::*;
     type DI = DecoratedInterval;
     type I = Interval;
@@ -667,13 +666,10 @@ mod tests {
     #[test]
     fn parse() {
         // Integer significands without a dot are not covered by ITF1788.
-        assert_eq!(
-            interval!("[123]").unwrap(),
-            interval!(123.0, 123.0).unwrap()
-        );
+        assert_eq!(interval!("[123]").unwrap(), const_interval!(123.0, 123.0));
         assert_eq!(
             interval!("[0x123p0]").unwrap(),
-            interval!(291.0, 291.0).unwrap()
+            const_interval!(291.0, 291.0)
         );
 
         // Exponent == i32::MAX + 1.
@@ -712,7 +708,7 @@ mod tests {
         assert_eq!(interval!("[Entire]", exact).unwrap(), I::ENTIRE);
         assert_eq!(
             interval!("[0.0, 1.0]", exact).unwrap(),
-            interval!(0.0, 1.0).unwrap()
+            const_interval!(0.0, 1.0)
         );
         assert_eq!(
             interval!("[0.0, 0.1]", exact).unwrap_err().value(),

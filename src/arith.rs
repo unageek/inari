@@ -321,53 +321,52 @@ impl_op_assign!(DivAssign, div_assign, div);
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::{dec_interval, interval};
+    use crate::*;
     type DI = DecoratedInterval;
     type I = Interval;
 
     #[test]
     fn add_assign() {
-        let mut i = interval!(3.0, 4.0).unwrap();
-        i += interval!(1.0, 2.0).unwrap();
-        assert_eq!(i, interval!(4.0, 6.0).unwrap());
+        let mut i = const_interval!(3.0, 4.0);
+        i += const_interval!(1.0, 2.0);
+        assert_eq!(i, const_interval!(4.0, 6.0));
 
-        let mut i = dec_interval!(3.0, 4.0).unwrap();
-        i += dec_interval!(1.0, 2.0).unwrap();
-        assert_eq!(i, dec_interval!(4.0, 6.0).unwrap());
+        let mut i = const_dec_interval!(3.0, 4.0);
+        i += const_dec_interval!(1.0, 2.0);
+        assert_eq!(i, const_dec_interval!(4.0, 6.0));
     }
 
     #[test]
     fn sub_assign() {
-        let mut i = interval!(3.0, 4.0).unwrap();
-        i -= interval!(1.0, 2.0).unwrap();
-        assert_eq!(i, interval!(1.0, 3.0).unwrap());
+        let mut i = const_interval!(3.0, 4.0);
+        i -= const_interval!(1.0, 2.0);
+        assert_eq!(i, const_interval!(1.0, 3.0));
 
-        let mut i = dec_interval!(3.0, 4.0).unwrap();
-        i -= dec_interval!(1.0, 2.0).unwrap();
-        assert_eq!(i, dec_interval!(1.0, 3.0).unwrap());
+        let mut i = const_dec_interval!(3.0, 4.0);
+        i -= const_dec_interval!(1.0, 2.0);
+        assert_eq!(i, const_dec_interval!(1.0, 3.0));
     }
 
     #[test]
     fn mul_assign() {
-        let mut i = interval!(3.0, 4.0).unwrap();
-        i *= interval!(1.0, 2.0).unwrap();
-        assert_eq!(i, interval!(3.0, 8.0).unwrap());
+        let mut i = const_interval!(3.0, 4.0);
+        i *= const_interval!(1.0, 2.0);
+        assert_eq!(i, const_interval!(3.0, 8.0));
 
-        let mut i = dec_interval!(3.0, 4.0).unwrap();
-        i *= dec_interval!(1.0, 2.0).unwrap();
-        assert_eq!(i, dec_interval!(3.0, 8.0).unwrap());
+        let mut i = const_dec_interval!(3.0, 4.0);
+        i *= const_dec_interval!(1.0, 2.0);
+        assert_eq!(i, const_dec_interval!(3.0, 8.0));
     }
 
     #[test]
     fn div_assign() {
-        let mut i = interval!(3.0, 4.0).unwrap();
-        i /= interval!(1.0, 2.0).unwrap();
-        assert_eq!(i, interval!(1.5, 4.0).unwrap());
+        let mut i = const_interval!(3.0, 4.0);
+        i /= const_interval!(1.0, 2.0);
+        assert_eq!(i, const_interval!(1.5, 4.0));
 
-        let mut i = dec_interval!(3.0, 4.0).unwrap();
-        i /= dec_interval!(1.0, 2.0).unwrap();
-        assert_eq!(i, dec_interval!(1.5, 4.0).unwrap());
+        let mut i = const_dec_interval!(3.0, 4.0);
+        i /= const_dec_interval!(1.0, 2.0);
+        assert_eq!(i, const_dec_interval!(1.5, 4.0));
     }
 
     #[test]
