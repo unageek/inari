@@ -103,8 +103,7 @@ impl DecoratedInterval {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::{const_dec_interval, const_interval};
+    use crate::*;
     type D = Decoration;
     type DI = DecoratedInterval;
     type I = Interval;

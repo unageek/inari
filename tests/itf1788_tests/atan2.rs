@@ -19,7 +19,7 @@
 //Arithmetic library imports
 
 //Preamble
-use crate::{*, util::*};
+use crate::*;
 use hexf::*;
 type I = inari::Interval;
 

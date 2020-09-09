@@ -29,7 +29,7 @@
 //Arithmetic library imports
 
 //Preamble
-use crate::{*, util::*};
+use crate::*;
 use hexf::*;
 type D = inari::Decoration;
 type DI = inari::DecoratedInterval;

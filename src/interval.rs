@@ -330,7 +330,7 @@ macro_rules! const_dec_interval {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::*;
 
     #[test]
     fn decoration_order() {

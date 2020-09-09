@@ -103,8 +103,7 @@ impl fmt::LowerHex for DecoratedInterval {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::interval;
+    use crate::*;
     type D = Decoration;
     type DI = DecoratedInterval;
     type I = Interval;
@@ -112,28 +111,28 @@ mod tests {
     #[test]
     fn format() {
         assert_eq!(
-            format!("{}", interval!(f64::NEG_INFINITY, 0.0).unwrap()),
+            format!("{}", const_interval!(f64::NEG_INFINITY, 0.0)),
             "[-inf,0.000000]"
         );
         assert_eq!(
-            format!("{:e}", interval!(f64::NEG_INFINITY, 0.0).unwrap()),
+            format!("{:e}", const_interval!(f64::NEG_INFINITY, 0.0)),
             "[-inf,0.0000000000000000e+00]"
         );
         assert_eq!(
-            format!("{:x}", interval!(f64::NEG_INFINITY, 0.0).unwrap()),
+            format!("{:x}", const_interval!(f64::NEG_INFINITY, 0.0)),
             "[-inf,0x0p+0]"
         );
 
         assert_eq!(
-            format!("{}", interval!(0.0, f64::INFINITY).unwrap()),
+            format!("{}", const_interval!(0.0, f64::INFINITY)),
             "[-0.000000,inf]"
         );
         assert_eq!(
-            format!("{:e}", interval!(0.0, f64::INFINITY).unwrap()),
+            format!("{:e}", const_interval!(0.0, f64::INFINITY)),
             "[-0.0000000000000000e+00,inf]"
         );
         assert_eq!(
-            format!("{:x}", interval!(0.0, f64::INFINITY).unwrap()),
+            format!("{:x}", const_interval!(0.0, f64::INFINITY)),
             "[-0x0p+0,inf]"
         );
 
