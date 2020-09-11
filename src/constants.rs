@@ -5,7 +5,7 @@ use hexf::*;
 use std::mem::transmute;
 
 impl Interval {
-    /// The empty set ($∅$).
+    /// The empty interval ($∅$).
     pub const EMPTY: Self = unsafe { transmute([f64::NAN, f64::NAN]) };
 
     /// $[-∞, ∞]$.

@@ -23,6 +23,25 @@ pub enum OverlappingState {
 
 impl Interval {
     /// Returns the overlapping state of `self` and `rhs`.
+    ///
+    /// | State          | Description                                                                                              |
+    /// | -------------- | -------------------------------------------------------------------------------------------------------- |
+    /// | `BothEmpty`    | Both `self` and `rhs` are empty.                                                                         |
+    /// | `FirstEmpty`   | `self` is empty                                                                                          |
+    /// | `SecondEmpty`  | `rhs` is empty                                                                                           |
+    /// | `Before`       | $∀x ∈ \self\\ ∀y ∈ \rhs : x < y$                                                                         |
+    /// | `Meets`        | $(∀x ∈ \self\\ ∀y ∈ \rhs : x ≤ y) ∧ (∃x ∈ \self\\ ∀y ∈ \rhs : x < y) ∧ (∃x ∈ \self\\ ∃y ∈ \rhs : x = y)$ |
+    /// | `Overlaps`     | $(∃x ∈ \self\\ ∀y ∈ \rhs : x < y) ∧ (∃y ∈ \self\\ ∀x ∈ \rhs : x < y) ∧ (∃x ∈ \self\\ ∃y ∈ \rhs : y < x)$ |
+    /// | `Starts`       | $(∀y ∈ \self\\ ∃x ∈ \rhs : x ≤ y) ∧ (∀x ∈ \self\\ ∃y ∈ \rhs : y ≤ x) ∧ (∃y ∈ \self\\ ∀x ∈ \rhs : x < y)$ |
+    /// | `ContainedBy`  | $(∃y ∈ \self\\ ∀x ∈ \rhs : y < x) ∧ (∃y ∈ \self\\ ∀x ∈ \rhs : x < y)$                                    |
+    /// | `Finishes`     | $(∃y ∈ \self\\ ∀x ∈ \rhs : y < x) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : y ≤ x) ∧ (∀x ∈ \self\\ ∃y ∈ \rhs : x ≤ y)$ |
+    /// | `Equal`        | $(∀x ∈ \self\\ ∃y ∈ \rhs : x = y) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : y = x)$                                    |
+    /// | `FinishedBy`   | $(∃x ∈ \self\\ ∀y ∈ \rhs : x < y) ∧ (∀x ∈ \self\\ ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : y ≤ x)$ |
+    /// | `Contains`     | $(∃x ∈ \self\\ ∀y ∈ \rhs : x < y) ∧ (∃x ∈ \self\\ ∀y ∈ \rhs : y < x)$                                    |
+    /// | `StartedBy`    | $(∀x ∈ \self\\ ∃y ∈ \rhs : y ≤ x) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : x ≤ y) ∧ (∃x ∈ \self\\ ∀y ∈ \rhs : y < x)$ |
+    /// | `OverlappedBy` | $(∃y ∈ \self\\ ∀x ∈ \rhs : y < x) ∧ (∃x ∈ \self\\ ∀y ∈ \rhs : y < x) ∧ (∃y ∈ \self\\ ∃x ∈ \rhs : x < y)$ |
+    /// | `MetBy`        | $(∀y ∈ \self\\ ∀x ∈ \rhs : y ≤ x) ∧ (∃y ∈ \self\\ ∃x ∈ \rhs : y = x) ∧ (∃y ∈ \self\\ ∀x ∈ \rhs : y < x)$ |
+    /// | `After`        | $∀y ∈ \self\\ ∀x ∈ \rhs : y < x$                                                                         |
     pub fn overlap(self, rhs: Self) -> OverlappingState {
         use OverlappingState::*;
 

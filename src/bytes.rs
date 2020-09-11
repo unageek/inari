@@ -2,7 +2,8 @@ use crate::interval::*;
 use std::convert::TryFrom;
 
 macro_rules! impl_to_bytes {
-    ($to_xe_bytes:ident) => {
+    ($(#[$meta:meta])* $to_xe_bytes:ident) => {
+        $(#[$meta])*
         pub fn $to_xe_bytes(self) -> [u8; 16] {
             let mut bytes = [0u8; 16];
             bytes[..8].copy_from_slice(&f64::$to_xe_bytes(self.inf()));
@@ -13,7 +14,8 @@ macro_rules! impl_to_bytes {
 }
 
 macro_rules! impl_try_from_bytes {
-    ($try_from_xe_bytes:ident, $from_xe_bytes:ident) => {
+    ($(#[$meta:meta])* $try_from_xe_bytes:ident, $from_xe_bytes:ident) => {
+        $(#[$meta])*
         pub fn $try_from_xe_bytes(bytes: [u8; 16]) -> Result<Self> {
             let a = f64::$from_xe_bytes(<[u8; 8]>::try_from(&bytes[..8]).unwrap());
             let b = f64::$from_xe_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap());
@@ -35,13 +37,34 @@ macro_rules! impl_try_from_bytes {
 }
 
 impl Interval {
-    impl_to_bytes!(to_be_bytes);
-    impl_to_bytes!(to_le_bytes);
-    impl_to_bytes!(to_ne_bytes);
+    impl_to_bytes!(
+        /// Returns the big-endian interchange representation of `self`.
+        to_be_bytes
+    );
+    impl_to_bytes!(
+        /// Returns the little-endian interchange representation of `self`.
+        to_le_bytes
+    );
+    impl_to_bytes!(
+        /// Returns the native-byte-order interchange representation of `self`.
+        to_ne_bytes
+    );
 
-    impl_try_from_bytes!(try_from_be_bytes, from_be_bytes);
-    impl_try_from_bytes!(try_from_le_bytes, from_le_bytes);
-    impl_try_from_bytes!(try_from_ne_bytes, from_ne_bytes);
+    impl_try_from_bytes!(
+        /// Creates an interval from its big-endian interchange representation.
+        try_from_be_bytes,
+        from_be_bytes
+    );
+    impl_try_from_bytes!(
+        /// Creates an interval from its little-endian interchange representation.
+        try_from_le_bytes,
+        from_le_bytes
+    );
+    impl_try_from_bytes!(
+        /// Creates an interval from its native-byte-order interchange representation.
+        try_from_ne_bytes,
+        from_ne_bytes
+    );
 }
 
 macro_rules! impl_to_bytes {

@@ -2,23 +2,9 @@ use crate::interval::Interval;
 use std::arch::x86_64::*;
 
 impl Interval {
-    // For a given interval [a, b], returns the bit pattern
-    // that encodes [b ≤ 0, -a ≤ 0, b ≥ 0, -a ≥ 0].
-    //
-    // The following codes are used to represent the class of an interval:
-    //
-    //  Code | Description
-    // ------+---------------
-    //     E | Empty
-    //     M | a < 0 < b
-    //    N0 | a < 0 ∧ b = 0
-    //    N1 | b < 0
-    //    P0 | a = 0 ∧ 0 < b
-    //    P1 | 0 < a
-    //     Z | a = b = 0
-    //   (N) | a < 0 ∧ b ≤ 0
-    //   (P) | a = 0 ∧ 0 ≤ b
-    // Parenthesized codes are used only in comments.
+    /// For a given interval [a, b], returns the following bit pattern as an integer:
+    /// `[0, ..., 0, b ≤ 0, -a ≤ 0, b ≥ 0, -a ≥ 0]`.
+    /// If `self` is empty, returns `0`.
     pub(crate) fn classify(self) -> u32 {
         let zero = unsafe { _mm_setzero_pd() };
         let ge_zero = unsafe { _mm_movemask_pd(_mm_cmpge_pd(self.rep, zero)) };
@@ -31,13 +17,27 @@ impl Interval {
     }
 }
 
+// The following codes are used to represent the class of an interval:
+//
+//  Code | Description
+// ------+---------------
+//     E | Empty
+//     M | a < 0 < b
+//    N0 | a < 0 ∧ b = 0
+//    N1 | b < 0
+//    P0 | a = 0 ∧ 0 < b
+//    P1 | 0 < a
+//     Z | a = b = 0
+//    N* | a < 0 ∧ b ≤ 0
+//    P* | a = 0 ∧ 0 ≤ b
+// * These codes are used only in comments.
 pub(crate) const C_E: u32 = 0b0000; // empty
-pub(crate) const C_M: u32 = 0b0011; // b > 0 && -a > 0
-pub(crate) const C_N0: u32 = 0b1011; // b == 0 && -a > 0
-pub(crate) const C_N1: u32 = 0b1001; // b < 0 && -a > 0
-pub(crate) const C_P0: u32 = 0b0111; // b > 0 && -a == 0
-pub(crate) const C_P1: u32 = 0b0110; // b > 0 && -a < 0
-pub(crate) const C_Z: u32 = 0b1111; // b == 0 && -a == 0
+pub(crate) const C_M: u32 = 0b0011; // b > 0 ∧ -a > 0
+pub(crate) const C_N0: u32 = 0b1011; // b = 0 ∧ -a > 0
+pub(crate) const C_N1: u32 = 0b1001; // b < 0 ∧ -a > 0
+pub(crate) const C_P0: u32 = 0b0111; // b > 0 ∧ -a = 0
+pub(crate) const C_P1: u32 = 0b0110; // b > 0 ∧ -a < 0
+pub(crate) const C_Z: u32 = 0b1111; // b = 0 ∧ -a = 0
 
 pub(crate) const C_E_E: u32 = (C_E << 4) | C_E;
 pub(crate) const C_E_M: u32 = (C_E << 4) | C_M;

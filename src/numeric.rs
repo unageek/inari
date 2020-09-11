@@ -2,7 +2,7 @@ use crate::{interval::*, simd::*};
 use std::arch::x86_64::*;
 
 impl Interval {
-    /// Returns the lower bound of `self`. If `self` is empty, `f64::INFINITY` is returned.
+    /// Returns the lower bound of `self` if `self` is nonempty; otherwise, $+∞$.
     pub fn inf(self) -> f64 {
         let x = self.inf_raw();
         if x.is_nan() {
@@ -15,11 +15,13 @@ impl Interval {
         }
     }
 
+    /// Returns the magnitude of `self` if `self` is nonempty; otherwise, NaN.
     pub fn mag(self) -> f64 {
         let abs = abs(self.rep);
         unsafe { _mm_cvtsd_f64(_mm_max_sd(abs, swap(abs))) }
     }
 
+    /// Returns the midpoint of `self` if `self` is nonempty; otherwise, NaN.
     // See Table VII in https://doi.org/10.1145/2493882 for the definition.
     pub fn mid(self) -> f64 {
         let a = self.inf_raw();
@@ -42,6 +44,7 @@ impl Interval {
         }
     }
 
+    /// Returns the mignitude of `self` if `self` is nonempty; otherwise, NaN.
     pub fn mig(self) -> f64 {
         let zero = unsafe { _mm_setzero_pd() };
         let contains_zero = unsafe { _mm_movemask_pd(_mm_cmpge_pd(self.rep, zero)) == 3 };
@@ -53,12 +56,13 @@ impl Interval {
         unsafe { _mm_cvtsd_f64(_mm_min_sd(abs, swap(abs))) }
     }
 
+    /// Returns the radius of `self` if `self` is nonempty; otherwise, NaN.
     pub fn rad(self) -> f64 {
         let m = self.mid();
         f64::max(sub1_ru(m, self.inf_raw()), sub1_ru(self.sup_raw(), m))
     }
 
-    /// Returns the upper bound of `self`. If `self` is empty, `f64::NEG_INFINITY` is returned.
+    /// Returns the upper bound of `self` if `self` is nonempty; otherwise, $-∞$.
     pub fn sup(self) -> f64 {
         let x = self.sup_raw();
         if x.is_nan() {
@@ -71,6 +75,7 @@ impl Interval {
         }
     }
 
+    /// Returns the width of `self` if `self` is nonempty; otherwise, NaN.
     pub fn wid(self) -> f64 {
         let wid = sub1_ru(self.sup_raw(), self.inf_raw());
         if wid == 0.0 {
