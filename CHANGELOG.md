@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## Unreleased
+
+### Changed
+
+- ❗ Rename `OverlappingState::Equal` to `Equals`.
+
 ## v0.5.1 - 2020-08-31
 
 ### Fixed

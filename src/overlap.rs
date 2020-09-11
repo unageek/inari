@@ -12,7 +12,7 @@ pub enum OverlappingState {
     Starts,
     ContainedBy,
     Finishes,
-    Equal,
+    Equals,
     FinishedBy,
     Contains,
     StartedBy,
@@ -35,7 +35,7 @@ impl Interval {
     /// | `Starts`       | $(∀y ∈ \self\\ ∃x ∈ \rhs : x ≤ y) ∧ (∀x ∈ \self\\ ∃y ∈ \rhs : y ≤ x) ∧ (∃y ∈ \self\\ ∀x ∈ \rhs : x < y)$ |
     /// | `ContainedBy`  | $(∃y ∈ \self\\ ∀x ∈ \rhs : y < x) ∧ (∃y ∈ \self\\ ∀x ∈ \rhs : x < y)$                                    |
     /// | `Finishes`     | $(∃y ∈ \self\\ ∀x ∈ \rhs : y < x) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : y ≤ x) ∧ (∀x ∈ \self\\ ∃y ∈ \rhs : x ≤ y)$ |
-    /// | `Equal`        | $(∀x ∈ \self\\ ∃y ∈ \rhs : x = y) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : y = x)$                                    |
+    /// | `Equals`       | $(∀x ∈ \self\\ ∃y ∈ \rhs : x = y) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : y = x)$                                    |
     /// | `FinishedBy`   | $(∃x ∈ \self\\ ∀y ∈ \rhs : x < y) ∧ (∀x ∈ \self\\ ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : y ≤ x)$ |
     /// | `Contains`     | $(∃x ∈ \self\\ ∀y ∈ \rhs : x < y) ∧ (∃x ∈ \self\\ ∀y ∈ \rhs : y < x)$                                    |
     /// | `StartedBy`    | $(∀x ∈ \self\\ ∃y ∈ \rhs : y ≤ x) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : x ≤ y) ∧ (∃x ∈ \self\\ ∀y ∈ \rhs : y < x)$ |
@@ -99,7 +99,7 @@ impl Interval {
             if a > c {
                 Finishes
             } else if a == c {
-                Equal
+                Equals
             } else {
                 FinishedBy
             }
