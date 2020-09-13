@@ -58,11 +58,11 @@ The ❗ icon indicates a breaking change.
 
 - Added the macros `const_interval!` and `const_dec_interval!` which let you make intervals from `f64` numbers in const contexts.
 
-- Added the constants `(Decorated)Interval::EMPTY`, `(Decorated)Interval::ENTIRE` and `DecoratedInterval::NAI`.
+- Added the constants `(Decorated)Interval::EMPTY`, `ENTIRE` and `DecoratedInterval::NAI`.
 
 ### Removed
 
-- ❗ Removed functions `(Decorated)Interval::empty`, `(Decorated)Interval::entire` and `DecoratedInterval::nai` in favor of the new constants.
+- ❗ Removed the functions `(Decorated)Interval::empty`, `entire` and `DecoratedInterval::nai` in favor of the new constants.
 
 ### Changed
 
@@ -72,7 +72,7 @@ The ❗ icon indicates a breaking change.
 
 ### Fixed
 
-- Fixed methods `Interval::rad` and `wid` that were not rounding the result up.
+- Fixed the methods `Interval::rad` and `wid` to round the results up.
 
 ## v0.2.0 - 2020-07-09
 
@@ -88,10 +88,10 @@ The ❗ icon indicates a breaking change.
 
 ### Changed
 
-- ❗ Renamed the function `Interval::is_member` to `contains` and swapped the order of parameters.
+- ❗ Renamed the function `Interval::is_member` to `contains` and swapped the order of parameters to make it a method.
 - ❗ Changed the method `IntervalError<T>::value` to take `self` instead of `&self`.
-- ❗ Changed discriminants of enum `IntervalErrorKind`, while users must not rely on them.
-- ❗ Changed discriminants of enum `OverlappingState`, while users must not rely on them.
+- ❗ Changed discriminants of the enum `IntervalErrorKind`, while users must not rely on them.
+- ❗ Changed discriminants of the enum `OverlappingState`, while users must not rely on them.
 
 ## v0.1.0 - 2020-07-03
 
