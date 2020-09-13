@@ -19,6 +19,8 @@ There is one conditional feature:
 
 - [inari-graph](https://github.com/mizuno-gsinet/inari-graph)
 
+## [Changelog](CHANGELOG.md)
+
 ## TODO
 
 - AVX512F support (_mm512_add_round_pd, etc.)

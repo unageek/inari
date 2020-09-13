@@ -4,6 +4,10 @@ The ❗ icon indicates a breaking change.
 
 ## Unreleased
 
+### Added
+
+- Implement the trait `Eq` for the enum `OverlappingState`.
+
 ### Removed
 
 - ❗ Removed the enum variant `OverlappingState::Undefined`.
