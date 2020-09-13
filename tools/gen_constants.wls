@@ -19,7 +19,7 @@ toLiteral[x_] :=
 def[name_, value_] :=
     Module[ {inf, sup},
         {inf, sup} = toLiteral /@ toInterval[value];
-        Print["pub const " <> name <> ": Self = interval_unchecked!(" <> inf <> "," <> sup <> ");"];
+        Print["pub const " <> name <> ": Self = const_interval!(" <> inf <> "," <> sup <> ");"];
     ];
 
 def["E", E];
