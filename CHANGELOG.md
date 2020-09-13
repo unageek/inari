@@ -4,86 +4,94 @@ The ❗ icon indicates a breaking change.
 
 ## Unreleased
 
+### Removed
+
+- ❗ Removed the enum variant `OverlappingState::Undefined`.
+
 ### Changed
 
-- ❗ Rename `OverlappingState::Equal` to `Equals`.
+- ❗ Changed the return type of the method `DecoratedInterval::overlap` to `Option<OverlappingState>` instead of `OverlappingState`.
+  - Now it returns `None` if at least one of its arguments is NaI.
+- ❗ Renamed the enum variant `OverlappingState::Equal` to `Equals`.
+- ❗ Changed discriminants of the enum `OverlappingState`, while users must not rely on them.
 
 ## v0.5.1 - 2020-08-31
 
 ### Fixed
 
-- Fix `const_dec_interval!` macro to be usable without declaring `use inari::const_interval;`.
+- Fixed the macro `const_dec_interval!` to be usable without importing the macro `const_interval!`.
 
 ## v0.5.0 - 2020-08-31
 
 ### Changed
 
-- ❗ Rename `(Decorated)Interval::log` to `ln` to make them consistent with `f64::ln`.
+- ❗ Renamed the method `(Decorated)Interval::log` to `ln` to make them consistent with `f64::ln`.
 
 ## v0.4.0 - 2020-08-25
 
 ### Added
 
-- Add type conversions between intervals and byte arrays.
+- Added type conversions between intervals and byte arrays.
   - `(Decorated)Interval::to_be_bytes`, `to_le_bytes` and `to_ne_bytes` convert intervals into byte arrays.
   - `(Decorated)Interval::try_from_be_bytes`, `try_from_le_bytes` and `try_from_ne_bytes` convert byte arrays into intervals.
-- Add a type alias: `Result<T> = std::result::Result<T, IntervalError<T>>`.
+- Added the type alias `Result<T> = std::result::Result<T, IntervalError<T>>`.
 
 ### Fixed
 
-- Fix decoration returned by `atan2`; `Def` was returned instead of `Dac` in certain cases.
-- Fix Clippy warning `double_neg` caused by passing a negative value to the lower bound of `const_interval!` macro.
+- Fixed the decoration returned by `atan2`.
+  - Previously, `Def` was returned instead of `Dac` in certain cases.
+- Fixed the Clippy warning `double_neg` caused by passing a negative value as the lower bound to the macro `const_interval!`.
 
 ## v0.3.1 - 2020-08-14
 
 ### Fixed
 
-- Fix decoration returned by the constructors of `DecoratedInterval` and elementary functions `acos`, `acosh`, `asin`, `atan2`, `atanh`, `log`, `log2`, `log10` and `pow`.
-  - `atan2` is still under investigation, so use it with caution.
-  - Fix broken unit tests.
+- Fixed decorations returned by constructors of `DecoratedInterval` and elementary functions `acos`, `acosh`, `asin`, `atan2`, `atanh`, `log`, `log2`, `log10` and `pow`.
+  - `atan2` is still under investigation. so use it with caution.
+  - Fixed broken unit tests.
 
 ## v0.3.0 - 2020-08-03
 
 ### Added
 
-- Add elementary functions `pown`, `pow`, `exp`, `exp2`, `exp10`, `log`, `log2`, `log10`, `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh` and `atanh`.
+- Added the elementary functions `(Decorated)Interval::pown`, `pow`, `exp`, `exp2`, `exp10`, `log`, `log2`, `log10`, `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh` and `atanh`.
 
-- Add macros `const_interval!` and `const_dec_interval!` which let you make intervals from `f64` numbers in a const context.
+- Added the macros `const_interval!` and `const_dec_interval!` which let you make intervals from `f64` numbers in const contexts.
 
-- Add constants `(Decorated)Interval::EMPTY`, `(Decorated)Interval::ENTIRE` and `DecoratedInterval::NAI`.
+- Added the constants `(Decorated)Interval::EMPTY`, `ENTIRE` and `DecoratedInterval::NAI`.
 
 ### Removed
 
-- ❗ Remove functions `(Decorated)Interval::empty()`, `(Decorated)Interval::entire()` and `DecoratedInterval::nai()`.
+- ❗ Removed the functions `(Decorated)Interval::empty`, `entire` and `DecoratedInterval::nai` in favor of the new constants.
 
 ### Changed
 
-- ❗ Change the representation of struct `DecoratedInterval` from the default one to `#[repr(C)]`.
+- ❗ Changeed the representation of the struct `DecoratedInterval` to `#[repr(C)]` instead of the default one, while users must not rely on it.
 
 ## v0.2.1 - 2020-07-17
 
 ### Fixed
 
-- Fix interval methods `rad` and `wid` that were not rounding the result up.
+- Fixed the methods `Interval::rad` and `wid` to round the results up.
 
 ## v0.2.0 - 2020-07-09
 
 ### Added
 
-- Add the decoration system.
-  - Add a struct `DecoratedInterval`.
-  - Add a macro `dec_interval!` that constructs a decorated interval.
-  - Add an enum `Decoration`.
-  - ❗ Add an enum variant `IntervalErrorKind::IntvlPartOfNaI`.
-  - ❗ Add an enum variant `OverlappingState::Undefined`.
-- Add a macro rule `interval!("...", exact)` that constructs an interval from an exact interval literal (`exactToInterval` in the standard).
+- Added the decoration system.
+  - Added the struct `DecoratedInterval`.
+  - Added the macro `dec_interval!` that constructs a decorated interval.
+  - Added the enum `Decoration`.
+  - ❗ Added the enum variant `IntervalErrorKind::IntvlPartOfNaI`.
+  - ❗ Added the enum variant `OverlappingState::Undefined`.
+- Added the macro rule `interval!("...", exact)` that constructs an interval from an exact interval literal (`exactToInterval` in the standard).
 
 ### Changed
 
-- ❗ Rename interval method `is_member` to `contains` and swapped the order of the parameters.
-- ❗ Change discriminants of enum `IntervalErrorKind`.
-- ❗ Change discriminants of enum `OverlappingState`.
-- ❗ Make method `IntervalError<T>::value` to consume and return the value.
+- ❗ Renamed the function `Interval::is_member` to `contains` and swapped the order of parameters to make it a method.
+- ❗ Changed the method `IntervalError<T>::value` to take `self` instead of `&self`.
+- ❗ Changed discriminants of the enum `IntervalErrorKind`, while users must not rely on them.
+- ❗ Changed discriminants of the enum `OverlappingState`, while users must not rely on them.
 
 ## v0.1.0 - 2020-07-03
 

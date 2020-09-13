@@ -1,8 +1,7 @@
 use crate::interval::*;
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum OverlappingState {
-    Undefined,
     BothEmpty,
     FirstEmpty,
     SecondEmpty,
@@ -124,12 +123,12 @@ impl Interval {
 }
 
 impl DecoratedInterval {
-    pub fn overlap(self, rhs: Self) -> OverlappingState {
+    pub fn overlap(self, rhs: Self) -> Option<OverlappingState> {
         if self.is_nai() || rhs.is_nai() {
-            return OverlappingState::Undefined;
+            return None;
         }
 
-        self.x.overlap(rhs.x)
+        Some(self.x.overlap(rhs.x))
     }
 }
 
@@ -140,7 +139,18 @@ mod tests {
 
     #[test]
     fn nai() {
-        assert_eq!(DI::NAI.overlap(DI::PI), OverlappingState::Undefined);
-        assert_eq!(DI::PI.overlap(DI::NAI), OverlappingState::Undefined);
+        assert_eq!(DI::NAI.overlap(DI::PI), None);
+        assert_eq!(DI::PI.overlap(DI::NAI), None);
+    }
+
+    #[test]
+    fn pattern() {
+        use OverlappingState::*;
+        // Pattern matching results in a more efficient code than using bitmasks as the compiler
+        // can eliminate unnecessary comparisons.
+        assert!(matches!(
+            const_interval!(1.0, 2.0).overlap(const_interval!(3.0, 4.0)),
+            BothEmpty | FirstEmpty | SecondEmpty | Before | After
+        ))
     }
 }
