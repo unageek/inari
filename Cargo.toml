@@ -22,7 +22,7 @@ include = [
 
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = [ "--html-in-header", "doc-header.html" ]
+rustdoc-args = ["--html-in-header", "doc-header.html"]
 
 [profile.release]
 lto = true
@@ -31,12 +31,27 @@ lto = true
 default = ["gmp"]
 gmp = ["gmp-mpfr-sys", "nom", "rug"]
 
+[dependencies.gmp-mpfr-sys]
+version = "1.4"
+default-features = false
+features = ["mpfr"]
+optional = true
+
 [dependencies]
-gmp-mpfr-sys = { version = "1.3", default-features = false, features = ["mpfr"], optional = true }
-hexf = "0.1.0"
-nom = { version = "5", optional = true }
-rug = { version = "1.10", default-features = false, features = ["float", "integer", "rational"], optional = true }
+hexf = "0.1"
 static_assertions = "1.1"
+
+[dependencies.nom]
+version = "5.1"
+default-features = false
+features = ["std"]
+optional = true
+
+[dependencies.rug]
+version = "1.11"
+default-features = false
+features = ["float", "integer", "rational"]
+optional = true
 
 [[example]]
 name = "cancellation"
