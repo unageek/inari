@@ -10,7 +10,7 @@ impl Interval {
     }
 
     /// Returns `true` if `self` and `rhs` are disjoint, formally defined by
-    /// $∀x ∈ \self\\ ∀y ∈ \rhs : x ≠ y$.
+    /// $∀x ∈ \self, ∀y ∈ \rhs : x ≠ y$.
     pub fn disjoint(self, rhs: Self) -> bool {
         self.is_empty()
             || rhs.is_empty()
@@ -19,7 +19,7 @@ impl Interval {
     }
 
     /// Returns `true` if `self` is interior to `rhs`, formally defined by
-    /// $(∀x ∈ \self\\ ∃y ∈ \rhs : x < y) ∧ (∀x ∈ \self\\ ∃y ∈ \rhs : y < x)$.
+    /// $(∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀x ∈ \self, ∃y ∈ \rhs : y < x)$.
     pub fn interior(self, rhs: Self) -> bool {
         let l = self.is_empty()
             || self.sup_raw() < rhs.sup_raw()
@@ -51,7 +51,7 @@ impl Interval {
     }
 
     /// Returns `true` if `self` is weakly less than `rhs`, formally defined by
-    /// $(∀x ∈ \self\\ ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs\\ ∃x ∈ \self : x ≤ y)$.
+    /// $(∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y)$.
     pub fn less(self, rhs: Self) -> bool {
         let l = self.is_empty() || self.sup_raw() <= rhs.sup_raw();
         let r = rhs.is_empty() || self.inf_raw() <= rhs.inf_raw();
@@ -59,13 +59,13 @@ impl Interval {
     }
 
     /// Returns `true` if `self` is to left of but may touch `rhs`, formally defined by
-    /// $∀x ∈ \self\\ ∀y ∈ \rhs : x ≤ y$.
+    /// $∀x ∈ \self, ∀y ∈ \rhs : x ≤ y$.
     pub fn precedes(self, rhs: Self) -> bool {
         self.is_empty() || rhs.is_empty() || self.sup_raw() <= rhs.inf_raw()
     }
 
     /// Returns `true` if `self` is strictly less than `rhs`, formally defined by
-    /// $(∀x ∈ \self\\ ∃y ∈ \rhs : x < y) ∧ (∀y ∈ \self\\ ∃x ∈ \rhs : x < y)$.
+    /// $(∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀y ∈ \self, ∃x ∈ \rhs : x < y)$.
     pub fn strict_less(self, rhs: Self) -> bool {
         let l = self.is_empty()
             || self.sup_raw() < rhs.sup_raw()
@@ -77,12 +77,12 @@ impl Interval {
     }
 
     /// Returns `true` if `self` is strictly to left of `rhs`, formally defined by
-    /// $∀x ∈ \self\\ ∀y ∈ \rhs : x < y$.
+    /// $∀x ∈ \self, ∀y ∈ \rhs : x < y$.
     pub fn strict_precedes(self, rhs: Self) -> bool {
         self.is_empty() || rhs.is_empty() || self.sup_raw() < rhs.inf_raw()
     }
 
-    /// Returns `true` if $\self ⊆ \rhs$; equivalently, $∀x ∈ \self\\ ∃y ∈ \rhs : x = y$.
+    /// Returns `true` if $\self ⊆ \rhs$; equivalently, $∀x ∈ \self, ∃y ∈ \rhs : x = y$.
     pub fn subset(self, rhs: Self) -> bool {
         self.is_empty() || rhs.inf_raw() <= self.inf_raw() && self.sup_raw() <= rhs.sup_raw()
     }
