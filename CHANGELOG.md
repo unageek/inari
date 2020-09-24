@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.6.1 - 2020.09-25
+
+### Fixed
+
+- Fixed the build failure on docs.rs.
+
 ## v0.6.0 - 2020-09-24
 
 ### Added
