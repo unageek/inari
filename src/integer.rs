@@ -2,7 +2,7 @@ use crate::{interval::*, simd::*};
 use std::arch::x86_64::*;
 
 impl Interval {
-    /// Rounds the bounds of `self` towards $+∞$.
+    /// Rounds the bounds of `self` to integers using directed rounding toward $+∞$.
     ///
     /// Tightness: tightest
     ///
@@ -13,6 +13,8 @@ impl Interval {
     /// assert_eq!(const_interval!(1.2, 2.8).ceil(), const_interval!(2.0, 3.0));
     /// assert_eq!(const_interval!(-2.8, -1.2).ceil(), const_interval!(-2.0, -1.0));
     /// ```
+    ///
+    /// See also: [`Interval::floor`], [`Interval::trunc`].
     pub fn ceil(self) -> Self {
         // _mm_ceil_pd/_mm_floor_pd are slow, better to avoid shuffling them.
         // ceil([a, b]) = [ceil(b); -ceil(a)]
@@ -22,9 +24,11 @@ impl Interval {
         Self { rep: r }
     }
 
-    /// Rounds the bounds of `self` towards $-∞$.
+    /// Rounds the bounds of `self` to integers using directed rounding toward $-∞$.
     ///
     /// Tightness: tightest
+    ///
+    /// See also: [`Interval::ceil`], [`Interval::trunc`].
     pub fn floor(self) -> Self {
         // floor([a, b]) = [floor(b); -floor(a)]
         let r0 = negate_lo(self.rep); // [b; a]
@@ -37,6 +41,8 @@ impl Interval {
     /// with halfway cases rounded away from zero.
     ///
     /// Tightness: tightest
+    ///
+    /// See also: [`Interval::round_ties_to_even`].
     // This one is hard to implement correctly.
     // https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
     pub fn round_ties_to_away(self) -> Self {
@@ -47,6 +53,8 @@ impl Interval {
     /// with halfway cases rounded to even numbers.
     ///
     /// Tightness: tightest
+    ///
+    /// See also: [`Interval::round_ties_to_away`].
     pub fn round_ties_to_even(self) -> Self {
         Self {
             rep: unsafe { _mm_round_pd(self.rep, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC) },
@@ -55,8 +63,10 @@ impl Interval {
 
     /// Returns the sign of `self`.
     ///
+    /// Note the difference between the sign function and `f64::signum`; $\sgn(0)$ is always zero,
+    /// while the values of `+0.0_f64.signum()` and `-0.0_f64.signum()` are `+1.0` and `-1.0`, respectively.
+    ///
     /// Tightness: tightest
-    // NOTE: Returns 0.0 for 0.0, which is a different definition from `f64::signum`.
     pub fn sign(self) -> Self {
         if self.is_empty() {
             return Self::EMPTY;
@@ -76,9 +86,11 @@ impl Interval {
         }
     }
 
-    /// Rounds the bounds of `self` towards zero.
+    /// Rounds the bounds of `self` to integers using directed rounding toward zero.
     ///
     /// Tightness: tightest
+    ///
+    /// See also: [`Interval::ceil`], [`Interval::floor`].
     pub fn trunc(self) -> Self {
         Self {
             rep: unsafe { _mm_round_pd(self.rep, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC) },
