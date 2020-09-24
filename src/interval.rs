@@ -41,6 +41,7 @@ impl<T: fmt::Debug> Error for IntervalError<T> {}
 
 pub type Result<T> = result::Result<T, IntervalError<T>>;
 
+/// The bare inf-sup interval type with `f64` bounds.
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct Interval {
@@ -125,6 +126,7 @@ impl PartialOrd for Decoration {
     }
 }
 
+/// The decorated version of [`Interval`].
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct DecoratedInterval {
@@ -229,6 +231,7 @@ macro_rules! interval {
     };
 }
 
+/// Creates an [`Interval`] from `f64` bounds or a bare interval literal.
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! interval {
@@ -271,6 +274,7 @@ macro_rules! dec_interval {
     };
 }
 
+/// Creates a [`DecoratedInterval`] from `f64` bounds or a decorated interval literal.
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! dec_interval {
@@ -286,6 +290,7 @@ macro_rules! dec_interval {
     };
 }
 
+/// Creates an [`Interval`] from `f64` bounds in const contexts.
 #[macro_export]
 macro_rules! const_interval {
     ($a:expr, $b:expr) => {{
@@ -303,6 +308,7 @@ macro_rules! const_interval {
     }};
 }
 
+/// Creates a [`DecoratedInterval`] from `f64` bounds in const context.
 #[macro_export]
 macro_rules! const_dec_interval {
     ($a:expr, $b:expr) => {{

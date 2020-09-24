@@ -4,12 +4,17 @@ use std::arch::x86_64::*;
 // NOTE: `eq` is implemented in interval.rs
 
 impl Interval {
-    /// Returns `true` if $\rhs ∈ \self$.
+    /// Returns `true` if `rhs` is a member of `self` ($\rhs ∈ \self$).
+    ///
+    /// If `rhs` is not a real number, `false` is returned.
     pub fn contains(self, rhs: f64) -> bool {
         rhs.is_finite() && self.inf_raw() <= rhs && rhs <= self.sup_raw()
     }
 
-    /// Returns `true` if `self` and `rhs` are disjoint, formally defined by
+    /// Returns `true` if `self` and `rhs` are disjoint ($\self ∩ \rhs = ∅$).
+    ///
+    /// ### Formal Definition
+    ///
     /// $∀x ∈ \self, ∀y ∈ \rhs : x ≠ y$.
     pub fn disjoint(self, rhs: Self) -> bool {
         self.is_empty()
@@ -18,7 +23,10 @@ impl Interval {
             || rhs.sup_raw() < self.inf_raw()
     }
 
-    /// Returns `true` if `self` is interior to `rhs`, formally defined by
+    /// Returns `true` if `self` is interior to `rhs`.
+    ///
+    /// ### Formal Definition
+    ///
     /// $(∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀x ∈ \self, ∃y ∈ \rhs : y < x)$.
     pub fn interior(self, rhs: Self) -> bool {
         let l = self.is_empty()
@@ -40,7 +48,7 @@ impl Interval {
         unsafe { _mm_movemask_pd(_mm_cmpunord_pd(self.rep, self.rep)) == 3 }
     }
 
-    /// Returns `true` if $\self = [-∞, ∞]$.
+    /// Returns `true` if $\self = \[-∞, ∞\]$.
     pub fn is_entire(self) -> bool {
         unsafe { _mm_movemask_pd(_mm_cmpeq_pd(self.rep, _mm_set1_pd(f64::INFINITY))) == 3 }
     }
@@ -50,7 +58,10 @@ impl Interval {
         self.inf_raw() == self.sup_raw()
     }
 
-    /// Returns `true` if `self` is weakly less than `rhs`, formally defined by
+    /// Returns `true` if `self` is weakly less than `rhs`.
+    ///
+    /// ### Formal Definition
+    ///
     /// $(∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y)$.
     pub fn less(self, rhs: Self) -> bool {
         let l = self.is_empty() || self.sup_raw() <= rhs.sup_raw();
@@ -58,13 +69,19 @@ impl Interval {
         l && r
     }
 
-    /// Returns `true` if `self` is to left of but may touch `rhs`, formally defined by
+    /// Returns `true` if `self` is to the left of but may touch `rhs`.
+    ///
+    /// ### Formal Definition
+    ///
     /// $∀x ∈ \self, ∀y ∈ \rhs : x ≤ y$.
     pub fn precedes(self, rhs: Self) -> bool {
         self.is_empty() || rhs.is_empty() || self.sup_raw() <= rhs.inf_raw()
     }
 
-    /// Returns `true` if `self` is strictly less than `rhs`, formally defined by
+    /// Returns `true` if `self` is strictly less than `rhs`.
+    ///
+    /// ### Formal Definition
+    ///
     /// $(∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀y ∈ \self, ∃x ∈ \rhs : x < y)$.
     pub fn strict_less(self, rhs: Self) -> bool {
         let l = self.is_empty()
@@ -76,13 +93,20 @@ impl Interval {
         l && r
     }
 
-    /// Returns `true` if `self` is strictly to left of `rhs`, formally defined by
+    /// Returns `true` if `self` is strictly to the left of `rhs`.
+    ///
+    /// ### Formal Definition
+    ///
     /// $∀x ∈ \self, ∀y ∈ \rhs : x < y$.
     pub fn strict_precedes(self, rhs: Self) -> bool {
         self.is_empty() || rhs.is_empty() || self.sup_raw() < rhs.inf_raw()
     }
 
-    /// Returns `true` if $\self ⊆ \rhs$; equivalently, $∀x ∈ \self, ∃y ∈ \rhs : x = y$.
+    /// Returns `true` if `self` is a subset of `rhs` ($\self ⊆ \rhs$).
+    ///
+    /// ### Formal Definition
+    ///
+    /// $∀x ∈ \self, ∃y ∈ \rhs : x = y$.
     pub fn subset(self, rhs: Self) -> bool {
         self.is_empty() || rhs.inf_raw() <= self.inf_raw() && self.sup_raw() <= rhs.sup_raw()
     }

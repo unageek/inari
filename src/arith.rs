@@ -7,6 +7,7 @@ use std::{
 impl Neg for Interval {
     type Output = Self;
 
+    /// Tightness: tightest
     fn neg(self) -> Self {
         // [-b, -a] = [-a; b]
         Self {
@@ -18,6 +19,7 @@ impl Neg for Interval {
 impl Add for Interval {
     type Output = Self;
 
+    /// Tightness: tightest
     fn add(self, rhs: Self) -> Self {
         // [a + c, b + d] = [b + d; -a - c] = [b; -a] + [d; -c]
         let x = self.rep;
@@ -29,6 +31,7 @@ impl Add for Interval {
 impl Sub for Interval {
     type Output = Self;
 
+    /// Tightness: tightest
     fn sub(self, rhs: Self) -> Self {
         // [a - d, b - c] = [b - c; -a + d] = [b; -a] + [-c; d]
         let x = self.rep;
@@ -40,6 +43,7 @@ impl Sub for Interval {
 impl Mul for Interval {
     type Output = Self;
 
+    /// Tightness: tightest
     #[allow(clippy::many_single_char_names)]
     fn mul(self, rhs: Self) -> Self {
         // [a, b] * [c, d]
@@ -132,6 +136,7 @@ impl Mul for Interval {
 impl Div for Interval {
     type Output = Self;
 
+    /// Tightness: tightest
     fn div(self, rhs: Self) -> Self {
         // [a, b] / [c, d]
         //    |   E   |    M   |      N0     |     N1     |      P0     |     P1     |   Z

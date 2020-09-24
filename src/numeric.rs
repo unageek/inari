@@ -2,7 +2,9 @@ use crate::{interval::*, simd::*};
 use std::arch::x86_64::*;
 
 impl Interval {
-    /// Returns the lower bound of `self` if `self` is nonempty; otherwise, $+∞$.
+    /// Returns the (greatest) lower bound of `self`.
+    ///
+    /// If `self` is empty, $+∞$ is returned.
     pub fn inf(self) -> f64 {
         let x = self.inf_raw();
         if x.is_nan() {
@@ -62,7 +64,9 @@ impl Interval {
         f64::max(sub1_ru(m, self.inf_raw()), sub1_ru(self.sup_raw(), m))
     }
 
-    /// Returns the upper bound of `self` if `self` is nonempty; otherwise, $-∞$.
+    /// Returns the (least) upper bound of `self`.
+    ///
+    /// If `self` is empty, $-∞$ is returned.
     pub fn sup(self) -> f64 {
         let x = self.sup_raw();
         if x.is_nan() {

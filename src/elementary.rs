@@ -157,6 +157,8 @@ macro_rules! impl_mono_inc {
 
 impl Interval {
     /// Returns the inverse cosine of `self`.
+    ///
+    /// Tightness: tightest
     pub fn acos(self) -> Self {
         self.acos_impl().0
     }
@@ -179,6 +181,8 @@ impl Interval {
     }
 
     /// Returns the inverse hyperbolic cosine of `self`.
+    ///
+    /// Tightness: tightest
     pub fn acosh(self) -> Self {
         self.acosh_impl().0
     }
@@ -201,6 +205,8 @@ impl Interval {
     }
 
     /// Returns the inverse sine of `self`.
+    ///
+    /// Tightness: tightest
     pub fn asin(self) -> Self {
         self.asin_impl().0
     }
@@ -224,18 +230,25 @@ impl Interval {
 
     impl_mono_inc!(
         /// Returns the inverse hyperbolic sine of `self`.
+        ///
+        /// Tightness: tightest
         asinh,
         asinh_rd,
         asinh_ru
     );
     impl_mono_inc!(
         /// Returns the inverse tangent of `self`.
+        ///
+        /// Tightness: tightest
         atan,
         atan_rd,
         atan_ru
     );
 
-    /// Returns the counterclockwise angle of the point (`rhs`, `self`) measured from the positive x-axis in the Euclidean xy-plane.
+    /// Returns the angle of the point $(\rhs, \self)$ measured counterclockwise from the positive
+    /// $x$-axis in the Euclidean $xy$-plane.
+    ///
+    /// Tightness: tightest
     pub fn atan2(self, rhs: Self) -> Self {
         self.atan2_impl(rhs).0
     }
@@ -352,6 +365,8 @@ impl Interval {
     }
 
     /// Returns the inverse hyperbolic tangent of `self`.
+    ///
+    /// Tightness: tightest
     pub fn atanh(self) -> Self {
         self.atanh_impl().0
     }
@@ -380,6 +395,8 @@ impl Interval {
     }
 
     /// Returns the cosine of `self`.
+    ///
+    /// Tightness: tightest
     pub fn cos(self) -> Self {
         if self.is_empty() {
             return self;
@@ -422,6 +439,8 @@ impl Interval {
     }
 
     /// Returns the hyperbolic cosine of `self`.
+    ///
+    /// Tightness: tightest
     pub fn cosh(self) -> Self {
         if self.is_empty() {
             return self;
@@ -440,18 +459,24 @@ impl Interval {
 
     impl_mono_inc!(
         /// Returns the exponential of `self`.
+        ///
+        /// Tightness: tightest
         exp,
         exp_rd,
         exp_ru
     );
     impl_mono_inc!(
         /// Returns `self` raised to the power of 10.
+        ///
+        /// Tightness: tightest
         exp10,
         exp10_rd,
         exp10_ru
     );
     impl_mono_inc!(
         /// Returns `self` raised to the power of 2.
+        ///
+        /// Tightness: tightest
         exp2,
         exp2_rd,
         exp2_ru
@@ -459,6 +484,8 @@ impl Interval {
 
     impl_log!(
         /// Returns the natural logarithm of `self`.
+        ///
+        /// Tightness: tightest
         ln,
         ln_impl,
         ln_rd,
@@ -466,6 +493,8 @@ impl Interval {
     );
     impl_log!(
         /// Returns the base-10 logarithm of `self`.
+        ///
+        /// Tightness: tightest
         log10,
         log10_impl,
         log10_rd,
@@ -473,6 +502,8 @@ impl Interval {
     );
     impl_log!(
         /// Returns the base-2 logarithm of `self`.
+        ///
+        /// Tightness: tightest
         log2,
         log2_impl,
         log2_rd,
@@ -480,6 +511,8 @@ impl Interval {
     );
 
     /// Returns `self` raised to the power of `rhs`.
+    ///
+    /// Tightness: tightest
     pub fn pow(self, rhs: Self) -> Self {
         self.pow_impl(rhs).0
     }
@@ -550,6 +583,8 @@ impl Interval {
     }
 
     /// Returns `self` raised to the power of `rhs`, where `rhs` is an integer.
+    ///
+    /// Tightness: tightest
     pub fn pown(self, rhs: i32) -> Self {
         self.pown_impl(rhs).0
     }
@@ -610,6 +645,8 @@ impl Interval {
     }
 
     /// Returns the sine of `self`.
+    ///
+    /// Tightness: tightest
     pub fn sin(self) -> Self {
         if self.is_empty() {
             return self;
@@ -642,12 +679,16 @@ impl Interval {
 
     impl_mono_inc!(
         /// Returns the hyperbolic sine of `self`.
+        ///
+        /// Tightness: tightest
         sinh,
         sinh_rd,
         sinh_ru
     );
 
     /// Returns the tangent of `self`.
+    ///
+    /// Tightness: tightest
     pub fn tan(self) -> Self {
         self.tan_impl().0
     }
@@ -677,6 +718,8 @@ impl Interval {
 
     impl_mono_inc!(
         /// Returns the hyperbolic tangent of `self`.
+        ///
+        /// Tightness: tightest
         tanh,
         tanh_rd,
         tanh_ru

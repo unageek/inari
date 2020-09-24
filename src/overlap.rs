@@ -1,46 +1,194 @@
 use crate::interval::*;
 
+/// States returned by [`Interval::overlap`].
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum OverlappingState {
+    /// Both `self` and `rhs` are empty.
+    ///
+    /// Equivalently, $\self = \rhs = ∅$.
     BothEmpty,
+
+    /// `self` is empty while `rhs` is not.
+    ///
+    /// Equivalently, $\self = ∅ ∧ \rhs ≠ ∅$.
     FirstEmpty,
+
+    /// `rhs` is empty while `self` is not.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs = ∅$.
     SecondEmpty,
+
+    /// ```text
+    ///        a      b
+    /// self:  •——————•
+    ///  rhs:             •——————•
+    ///                   c      d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $b < c$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ ∀x ∈ \self, ∀y ∈ \rhs : x < y$.
     Before,
+
+    /// ```text
+    ///        a      b
+    /// self:  •——————•
+    ///  rhs:         •——————•
+    ///               c      d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $a < b ∧ b = c ∧ c < d$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀x ∈ \self, ∀y ∈ \rhs : x ≤ y)
+    /// ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y) ∧ (∃x ∈ \self, ∃y ∈ \rhs : x = y)$.
     Meets,
+
+    /// ```text
+    ///        a      b
+    /// self:  •——————•
+    ///  rhs:      •——————•
+    ///            c      d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $a < c ∧ c < b ∧ b < d$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y)
+    /// ∧ (∃y ∈ \rhs, ∀x ∈ \self : x < y) ∧ (∃x ∈ \self, ∃y ∈ \rhs : y < x)$.
     Overlaps,
+
+    /// ```text
+    ///        a    b                a,b
+    /// self:  •————•          self:  • (point)
+    ///  rhs:  •————————•       rhs:  •——————•
+    ///        c        d             c      d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $a = c ∧ b < d$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y)
+    /// ∧ (∀x ∈ \self, ∃y ∈ \rhs : y ≤ x) ∧ (∃y ∈ \rhs, ∀x ∈ \self : x < y)$.
     Starts,
+
+    /// ```text
+    ///          a    b
+    /// self:    •————•
+    ///  rhs:  •————————•
+    ///        c        d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $c < a ∧ b < d$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃y ∈ \rhs, ∀x ∈ \self : y < x)
+    /// ∧ (∃y ∈ \rhs, ∀x ∈ \self : x < y)$.
     ContainedBy,
+
+    /// ```text
+    ///            a    b                   a,b
+    /// self:      •————•      self:         • (point)
+    ///  rhs:  •————————•       rhs:  •——————•
+    ///        c        d             c      d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $c < a ∧ b = d$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃y ∈ \rhs, ∀x ∈ \self : y < x)
+    /// ∧ (∀y ∈ \rhs, ∃x ∈ \self : y ≤ x) ∧ (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y)$.
     Finishes,
+
+    /// ```text
+    ///        a      b            a,b
+    /// self:  •——————•      self:  • (point)
+    ///  rhs:  •——————•       rhs:  • (point)
+    ///        c      d            c,d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $a = c ∧ b = d$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀x ∈ \self, ∃y ∈ \rhs : x = y)
+    /// ∧ (∀y ∈ \rhs, ∃x ∈ \self : y = x)$.
     Equals,
+
+    /// ```text
+    ///        a        b             a      b
+    /// self:  •————————•      self:  •——————•
+    ///  rhs:      •————•       rhs:         • (point)
+    ///            c    d                   c,d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $a < c ∧ b = d$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y)
+    /// ∧ (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs, ∃x ∈ \self : y ≤ x)$.
     FinishedBy,
+
+    /// ```text
+    ///        a        b
+    /// self:  •————————•
+    ///  rhs:    •————•
+    ///          c    d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $a < c ∧ d < b$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y)
+    /// ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x)$.
     Contains,
+
+    /// ```text
+    ///        a        b             a      b
+    /// self:  •————————•      self:  •——————•
+    ///  rhs:  •————•           rhs:  • (point)
+    ///        c    d                c,d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $a = c ∧ d < b$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀x ∈ \self, ∃y ∈ \rhs : y ≤ x)
+    /// ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y) ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x)$.
     StartedBy,
+
+    /// ```text
+    ///            a      b
+    /// self:      •——————•
+    ///  rhs:  •——————•
+    ///        c      d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $c < a ∧ a < d ∧ d < b$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃y ∈ \rhs, ∀x ∈ \self : y < x)
+    /// ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x) ∧ (∃y ∈ \rhs, ∃x ∈ \self : x < y)$.
     OverlappedBy,
+
+    /// ```text
+    ///               a      b
+    /// self:         •——————•
+    ///  rhs:  •——————•
+    ///        c      d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $c < d ∧ a = d ∧ a < b$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀y ∈ \rhs, ∀x ∈ \self : y ≤ x)
+    /// ∧ (∃y ∈ \rhs, ∃x ∈ \self : y = x) ∧ (∃y ∈ \rhs, ∀x ∈ \self : y < x)$.
     MetBy,
+
+    /// ```text
+    ///                   a      b
+    /// self:             •——————•
+    ///  rhs:  •——————•
+    ///        c      d
+    /// ```
+    ///
+    /// Both `self` and `rhs` are nonempty and $d < a$.
+    ///
+    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ ∀y ∈ \rhs, ∀x ∈ \self : y < x$.
     After,
 }
 
 impl Interval {
-    /// Returns the overlapping state of `self` and `rhs`.
-    ///
-    /// | State          | Description                                                                                           |
-    /// | -------------- | ------------------------------------------------------------------------------------------------------|
-    /// | `BothEmpty`    | Both `self` and `rhs` are empty.                                                                      |
-    /// | `FirstEmpty`   | `self` is empty                                                                                       |
-    /// | `SecondEmpty`  | `rhs` is empty                                                                                        |
-    /// | `Before`       | $∀x ∈ \self, ∀y ∈ \rhs : x < y$                                                                       |
-    /// | `Meets`        | $(∀x ∈ \self, ∀y ∈ \rhs : x ≤ y) ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y) ∧ (∃x ∈ \self, ∃y ∈ \rhs : x = y)$ |
-    /// | `Overlaps`     | $(∃x ∈ \self, ∀y ∈ \rhs : x < y) ∧ (∃y ∈ \self, ∀x ∈ \rhs : x < y) ∧ (∃x ∈ \self, ∃y ∈ \rhs : y < x)$ |
-    /// | `Starts`       | $(∀y ∈ \self, ∃x ∈ \rhs : x ≤ y) ∧ (∀x ∈ \self, ∃y ∈ \rhs : y ≤ x) ∧ (∃y ∈ \self, ∀x ∈ \rhs : x < y)$ |
-    /// | `ContainedBy`  | $(∃y ∈ \self, ∀x ∈ \rhs : y < x) ∧ (∃y ∈ \self, ∀x ∈ \rhs : x < y)$                                   |
-    /// | `Finishes`     | $(∃y ∈ \self, ∀x ∈ \rhs : y < x) ∧ (∀y ∈ \self, ∃x ∈ \rhs : y ≤ x) ∧ (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y)$ |
-    /// | `Equals`       | $(∀x ∈ \self, ∃y ∈ \rhs : x = y) ∧ (∀y ∈ \self, ∃x ∈ \rhs : y = x)$                                   |
-    /// | `FinishedBy`   | $(∃x ∈ \self, ∀y ∈ \rhs : x < y) ∧ (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \self, ∃x ∈ \rhs : y ≤ x)$ |
-    /// | `Contains`     | $(∃x ∈ \self, ∀y ∈ \rhs : x < y) ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x)$                                   |
-    /// | `StartedBy`    | $(∀x ∈ \self, ∃y ∈ \rhs : y ≤ x) ∧ (∀y ∈ \self, ∃x ∈ \rhs : x ≤ y) ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x)$ |
-    /// | `OverlappedBy` | $(∃y ∈ \self, ∀x ∈ \rhs : y < x) ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x) ∧ (∃y ∈ \self, ∃x ∈ \rhs : x < y)$ |
-    /// | `MetBy`        | $(∀y ∈ \self, ∀x ∈ \rhs : y ≤ x) ∧ (∃y ∈ \self, ∃x ∈ \rhs : y = x) ∧ (∃y ∈ \self, ∀x ∈ \rhs : y < x)$ |
-    /// | `After`        | $∀y ∈ \self, ∀x ∈ \rhs : y < x$                                                                       |
+    /// Returns the overlapping state of `self` and `rhs`. See [`OverlappingState`]
+    /// for the possible values returned.
     pub fn overlap(self, rhs: Self) -> OverlappingState {
         use OverlappingState::*;
 

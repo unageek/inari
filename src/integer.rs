@@ -2,6 +2,17 @@ use crate::{interval::*, simd::*};
 use std::arch::x86_64::*;
 
 impl Interval {
+    /// Rounds the bounds of `self` towards $+∞$.
+    ///
+    /// Tightness: tightest
+    ///
+    /// ### Examples
+    ///
+    /// ```
+    /// # use inari::*;
+    /// assert_eq!(const_interval!(1.2, 2.8).ceil(), const_interval!(2.0, 3.0));
+    /// assert_eq!(const_interval!(-2.8, -1.2).ceil(), const_interval!(-2.0, -1.0));
+    /// ```
     pub fn ceil(self) -> Self {
         // _mm_ceil_pd/_mm_floor_pd are slow, better to avoid shuffling them.
         // ceil([a, b]) = [ceil(b); -ceil(a)]
@@ -11,6 +22,9 @@ impl Interval {
         Self { rep: r }
     }
 
+    /// Rounds the bounds of `self` towards $-∞$.
+    ///
+    /// Tightness: tightest
     pub fn floor(self) -> Self {
         // floor([a, b]) = [floor(b); -floor(a)]
         let r0 = negate_lo(self.rep); // [b; a]
@@ -19,18 +33,29 @@ impl Interval {
         Self { rep: r }
     }
 
+    /// Rounds the bounds of `self` to the nearest integers,
+    /// with halfway cases rounded away from zero.
+    ///
+    /// Tightness: tightest
     // This one is hard to implement correctly.
     // https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
     pub fn round_ties_to_away(self) -> Self {
         Self::with_infsup_raw(self.inf_raw().round(), self.sup_raw().round())
     }
 
+    /// Rounds the bounds of `self` to the nearest integers,
+    /// with halfway cases rounded to even numbers.
+    ///
+    /// Tightness: tightest
     pub fn round_ties_to_even(self) -> Self {
         Self {
             rep: unsafe { _mm_round_pd(self.rep, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC) },
         }
     }
 
+    /// Returns the sign of `self`.
+    ///
+    /// Tightness: tightest
     // NOTE: Returns 0.0 for 0.0, which is a different definition from `f64::signum`.
     pub fn sign(self) -> Self {
         if self.is_empty() {
@@ -51,6 +76,9 @@ impl Interval {
         }
     }
 
+    /// Rounds the bounds of `self` towards zero.
+    ///
+    /// Tightness: tightest
     pub fn trunc(self) -> Self {
         Self {
             rep: unsafe { _mm_round_pd(self.rep, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC) },

@@ -10,33 +10,15 @@
                     ['$', '$'],
                 ],
                 displayMath: [
-                    ['\\[', '\\]'],
+                    ['$$', '$$'],
                 ],
                 macros: {
+                    addend: '\\mathtt{addend}',
                     e: '\\mathrm{e}',
                     rhs: '\\mathtt{rhs}',
                     self: '\\mathtt{self}',
                 },
             },
-            options: {
-                renderActions: {
-                    preprocess: [10, // STATE.FINDMATH
-                        (doc) => {
-                            for (const math of doc.math) {
-                                preprocess(math);
-                            }
-                        },
-                        (math, doc) => {
-                            preprocess(math);
-                        }
-                    ]
-                }
-            }
-        };
-
-        function preprocess(math) {
-            // Add any substitutions you want.
-            //math.math = math.math.replace('α', '𝛼');
         };
     })();
 </script>
