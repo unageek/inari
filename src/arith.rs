@@ -139,13 +139,13 @@ impl Div for Interval {
     /// Tightness: tightest
     fn div(self, rhs: Self) -> Self {
         // [a, b] / [c, d]
-        //    |   E   |    M   |      N0     |     N1     |      P0     |     P1     |   Z
-        // ---+-------+--------+-------------+------------+-------------+------------+-------
-        //  E | empty |  empty |       empty |      empty |       empty |      empty | empty
-        //  M | empty | entire |      entire | [b/d, a/d] |      entire | [a/c, b/c] | empty
-        //  N | empty | entire | [ b/c, inf] | [b/c, a/d] | [-inf, b/d] | [a/c, b/d] | empty
-        //  P | empty | entire | [-inf, a/c] | [b/d, a/c] | [ a/d, inf] | [a/d, b/c] | empty
-        //  Z | empty |   zero |        zero |       zero |        zero |       zero | empty
+        //    |   E   |    M   |     N0    |     N1     |     P0    |     P1     |   Z
+        // ---+-------+--------+-----------+------------+-----------+------------+-------
+        //  E | empty |  empty |     empty |      empty |     empty |      empty | empty
+        //  M | empty | entire |    entire | [b/d, a/d] |    entire | [a/c, b/c] | empty
+        //  N | empty | entire | [b/c, +∞] | [b/c, a/d] | [-∞, b/d] | [a/c, b/d] | empty
+        //  P | empty | entire | [-∞, a/c] | [b/d, a/c] | [a/d, +∞] | [a/d, b/c] | empty
+        //  Z | empty |   zero |      zero |       zero |      zero |       zero | empty
 
         match self.classify2(rhs) {
             C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_M_Z | C_N0_E
@@ -170,7 +170,7 @@ impl Div for Interval {
                 Self { rep: div_ru(x, y) }
             }
             C_N0_N0 | C_N1_N0 => {
-                // N / N0 => [b/c, inf] = [inf; -b/c] = [_; b] / [_; -c]
+                // N / N0 => [b/c, +∞] = [+∞; -b/c] = [_; b] / [_; -c]
                 let x = swap(self.rep); // [-a; b]
                 let y = rhs.rep; // [d; -c]
                 Self {
@@ -185,7 +185,7 @@ impl Div for Interval {
                 Self { rep: div_ru(x, y) }
             }
             C_N0_P0 | C_N1_P0 => {
-                // N / P0 => [-inf, b/d] = [b/d; inf] = [b; _] / [d; _]
+                // N / P0 => [-∞, b/d] = [b/d; +∞] = [b; _] / [d; _]
                 let x = self.rep; // [b; -a]
                 let y = rhs.rep; // [d; -c]
                 Self {
@@ -199,7 +199,7 @@ impl Div for Interval {
                 Self { rep: div_ru(x, y) }
             }
             C_P0_N0 | C_P1_N0 => {
-                // P / N0 => [-inf, a/c] = [a/c; inf] = [-a; _] / [-c; _]
+                // P / N0 => [-∞, a/c] = [a/c; +∞] = [-a; _] / [-c; _]
                 // Swap after div would be better.
                 let x = swap(self.rep); // [-a; b]
                 let y = swap(rhs.rep); // [-c; d]
@@ -215,7 +215,7 @@ impl Div for Interval {
                 Self { rep: div_ru(x, y) }
             }
             C_P0_P0 | C_P1_P0 => {
-                // P / P0 => [a/d, inf] = [inf; -a/d] = [_; -a] / [_; d]
+                // P / P0 => [a/d, +∞] = [+∞; -a/d] = [_; -a] / [_; d]
                 let x = self.rep; // [b; -a]
                 let y = swap(rhs.rep); // [-c; d]
                 Self {

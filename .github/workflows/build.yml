@@ -21,7 +21,7 @@ jobs:
         profile: minimal
 
     - name: Run tests (Minimal)
-      run: cargo test --release --no-default-features
+      run: cargo test --release --no-default-features --tests
     - name: Run tests (All features)
       run: cargo test --release --all-features
     - name: Clippy
