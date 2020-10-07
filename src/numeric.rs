@@ -6,6 +6,15 @@ impl Interval {
     ///
     /// Equivalently, it returns $a$ if $\self = \[a, b\]$ is nonempty; otherwise, $+∞$.
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(-2.0, 3.0).inf(), -2.0);
+    /// assert_eq!(Interval::EMPTY.inf(), f64::INFINITY);
+    /// assert_eq!(Interval::ENTIRE.inf(), f64::NEG_INFINITY);
+    /// ```
+    ///
     /// See also: [`Interval::sup`].
     pub fn inf(self) -> f64 {
         let x = self.inf_raw();
@@ -27,6 +36,15 @@ impl Interval {
     /// \operatorname{mag}(𝒙) = \sup\\{|x| ∣ x ∈ 𝒙\\} = \max(|a|, |b|).
     /// $$
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(-2.0, 3.0).mag(), 3.0);
+    /// assert!(Interval::EMPTY.mag().is_nan());
+    /// assert_eq!(Interval::ENTIRE.mag(), f64::INFINITY);
+    /// ```
+    ///
     /// See also: [`Interval::mig`].
     pub fn mag(self) -> f64 {
         let abs = abs(self.rep);
@@ -46,6 +64,17 @@ impl Interval {
     /// $$
     /// \operatorname{mid}(𝒙) = \frac{1}{2}(a + b).
     /// $$
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(-2.0, 3.0).mid(), 0.5);
+    /// assert_eq!(const_interval!(f64::NEG_INFINITY, 3.0).mid(), f64::MIN);
+    /// assert_eq!(const_interval!(-2.0, f64::INFINITY).mid(), f64::MAX);
+    /// assert!(Interval::EMPTY.mid().is_nan());
+    /// assert_eq!(Interval::ENTIRE.mid(), 0.0);
+    /// ```
     ///
     /// See also: [`Interval::rad`].
     // See Table VII in https://doi.org/10.1145/2493882 for the implementation.
@@ -81,6 +110,16 @@ impl Interval {
     ///  \end{cases}
     /// $$
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(-2.0, 3.0).mig(), 0.0);
+    /// assert_eq!(const_interval!(2.0, 3.0).mig(), 2.0);
+    /// assert!(Interval::EMPTY.mig().is_nan());
+    /// assert_eq!(Interval::ENTIRE.mig(), 0.0);
+    /// ```
+    ///
     /// See also: [`Interval::mag`].
     pub fn mig(self) -> f64 {
         let zero = unsafe { _mm_setzero_pd() };
@@ -103,6 +142,15 @@ impl Interval {
     /// \operatorname{rad}(𝒙) = \frac{1}{2}(b - a).
     /// $$
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(-2.0, 3.0).rad(), 2.5);
+    /// assert!(Interval::EMPTY.rad().is_nan());
+    /// assert_eq!(Interval::ENTIRE.rad(), f64::INFINITY);
+    /// ```
+    ///
     /// See also: [`Interval::mid`].
     pub fn rad(self) -> f64 {
         let m = self.mid();
@@ -112,6 +160,15 @@ impl Interval {
     /// Returns the (least) upper bound of `self`.
     ///
     /// Equivalently, it returns $b$ if $\self = \[a, b\]$ is nonempty; otherwise, $-∞$.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(-2.0, 3.0).sup(), 3.0);
+    /// assert_eq!(Interval::EMPTY.sup(), f64::NEG_INFINITY);
+    /// assert_eq!(Interval::ENTIRE.sup(), f64::INFINITY);
+    /// ```
     ///
     /// See also: [`Interval::inf`].
     pub fn sup(self) -> f64 {
@@ -134,6 +191,16 @@ impl Interval {
     /// $$
     /// \operatorname{wid}(𝒙) = b - a.
     /// $$
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(-2.0, 3.0).wid(), 5.0);
+    /// assert_eq!(const_interval!(-1.0, f64::MAX).wid(), f64::INFINITY);
+    /// assert!(Interval::EMPTY.wid().is_nan());
+    /// assert_eq!(Interval::ENTIRE.wid(), f64::INFINITY);
+    /// ```
     pub fn wid(self) -> f64 {
         let wid = sub1_ru(self.sup_raw(), self.inf_raw());
         if wid == 0.0 {
