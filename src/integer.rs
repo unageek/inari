@@ -110,6 +110,8 @@ impl Interval {
     /// Note the difference between the sign function and `f64::signum`; $\sgn(0)$ is always zero,
     /// while the values of `+0.0_f64.signum()` and `-0.0_f64.signum()` are `+1.0` and `-1.0`, respectively.
     ///
+    /// Tightness: tightest
+    ///
     /// # Examples
     ///
     /// ```
@@ -120,8 +122,6 @@ impl Interval {
     /// assert_eq!(Interval::EMPTY.sign(), Interval::EMPTY);
     /// assert_eq!(Interval::ENTIRE.sign(), const_interval!(-1.0, 1.0));
     /// ```
-    ///
-    /// Tightness: tightest
     pub fn sign(self) -> Self {
         if self.is_empty() {
             return Self::EMPTY;
