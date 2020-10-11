@@ -129,11 +129,11 @@ macro_rules! impl_dec {
 
 // https://www.ocf.berkeley.edu/~horie/rounding.html
 impl DecoratedInterval {
-    // Discontinuous at x iff x ∈ ℤ.
+    // Discontinuities: ℤ.
     impl_dec!(ceil, x, y, x.sup_raw() == y.sup_raw()); // No need to check inf.
     impl_dec!(floor, x, y, x.inf_raw() == y.inf_raw()); // No need to check sup.
 
-    // Discontinuous at x iff x ∈ {x′ + 0.5 | x′ ∈ ℤ}.
+    // Discontinuities: {x + 0.5 | x ∈ ℤ}.
     impl_dec!(round_ties_to_away, x, y, {
         let abs_a = x.inf_raw().abs();
         let abs_b = x.sup_raw().abs();
@@ -145,10 +145,10 @@ impl DecoratedInterval {
         (abs_a - abs_a.trunc() == 0.5) || (abs_b - abs_b.trunc() == 0.5)
     });
 
-    // Discontinuous at 0.
+    // Discontinuities: {0}.
     impl_dec!(sign, x, y, x.inf_raw() == 0.0); // No need to check sup.
 
-    // Discontinuous at x iff x ∈ ℤ ∖ {0}.
+    // Discontinuities: ℤ ∖ {0}.
     impl_dec!(
         trunc,
         x,
