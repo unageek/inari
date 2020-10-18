@@ -2,8 +2,8 @@ use crate::interval::*;
 use std::arch::x86_64::*;
 
 impl Interval {
-    /// Returns $\[\\min(a, c), \\max(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
-    /// are nonempty.  If either interval is empty, the other is returned.
+    /// Returns $\[\min(a, c), \max(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
+    /// are nonempty. If either interval is empty, the other is returned.
     /// If both are empty, $∅$ is returned.
     ///
     /// This is equivalent to $\self ∪ \rhs$ if the intervals are not disjoint,
@@ -24,8 +24,8 @@ impl Interval {
     }
 
     /// Returns $\self ∩ \rhs$. If the result is nonempty, it is equivalent to
-    /// $\[\\max(a, c), \\min(b, d)\]$, where both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
-    /// are nonempty..
+    /// $\[\max(a, c), \min(b, d)\]$, where both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
+    /// are nonempty.
     ///
     /// Tightness: tightest
     pub fn intersection(self, rhs: Self) -> Self {

@@ -6,12 +6,16 @@ impl Interval {
     ///
     /// Tightness: tightest
     ///
-    /// ### Examples
+    /// # Examples
     ///
     /// ```
-    /// # use inari::*;
-    /// assert_eq!(const_interval!(1.2, 2.8).ceil(), const_interval!(2.0, 3.0));
-    /// assert_eq!(const_interval!(-2.8, -1.2).ceil(), const_interval!(-2.0, -1.0));
+    /// use inari::*;
+    /// assert_eq!(const_interval!(0.2, 1.2).ceil(), const_interval!(1.0, 2.0));
+    /// assert_eq!(const_interval!(0.8, 1.8).ceil(), const_interval!(1.0, 2.0));
+    /// assert_eq!(const_interval!(-1.2, -0.2).ceil(), const_interval!(-1.0, 0.0));
+    /// assert_eq!(const_interval!(-1.8, -0.8).ceil(), const_interval!(-1.0, 0.0));
+    /// assert_eq!(Interval::EMPTY.ceil(), Interval::EMPTY);
+    /// assert_eq!(Interval::ENTIRE.ceil(), Interval::ENTIRE);
     /// ```
     ///
     /// See also: [`Interval::floor`], [`Interval::trunc`].
@@ -28,6 +32,18 @@ impl Interval {
     ///
     /// Tightness: tightest
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(0.2, 1.2).floor(), const_interval!(0.0, 1.0));
+    /// assert_eq!(const_interval!(0.8, 1.8).floor(), const_interval!(0.0, 1.0));
+    /// assert_eq!(const_interval!(-1.2, -0.2).floor(), const_interval!(-2.0, -1.0));
+    /// assert_eq!(const_interval!(-1.8, -0.8).floor(), const_interval!(-2.0, -1.0));
+    /// assert_eq!(Interval::EMPTY.floor(), Interval::EMPTY);
+    /// assert_eq!(Interval::ENTIRE.floor(), Interval::ENTIRE);
+    /// ```
+    ///
     /// See also: [`Interval::ceil`], [`Interval::trunc`].
     pub fn floor(self) -> Self {
         // floor([a, b]) = [floor(b); -floor(a)]
@@ -42,6 +58,20 @@ impl Interval {
     ///
     /// Tightness: tightest
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(0.2, 1.2).round_ties_to_away(), const_interval!(0.0, 1.0));
+    /// assert_eq!(const_interval!(0.5, 1.5).round_ties_to_away(), const_interval!(1.0, 2.0));
+    /// assert_eq!(const_interval!(0.8, 1.8).round_ties_to_away(), const_interval!(1.0, 2.0));
+    /// assert_eq!(const_interval!(-1.2, -0.2).round_ties_to_away(), const_interval!(-1.0, 0.0));
+    /// assert_eq!(const_interval!(-1.5, -0.5).round_ties_to_away(), const_interval!(-2.0, -1.0));
+    /// assert_eq!(const_interval!(-1.8, -0.8).round_ties_to_away(), const_interval!(-2.0, -1.0));
+    /// assert_eq!(Interval::EMPTY.round_ties_to_away(), Interval::EMPTY);
+    /// assert_eq!(Interval::ENTIRE.round_ties_to_away(), Interval::ENTIRE);
+    /// ```
+    ///
     /// See also: [`Interval::round_ties_to_even`].
     // This one is hard to implement correctly.
     // https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
@@ -53,6 +83,20 @@ impl Interval {
     /// with halfway cases rounded to even numbers.
     ///
     /// Tightness: tightest
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(0.2, 1.2).round_ties_to_even(), const_interval!(0.0, 1.0));
+    /// assert_eq!(const_interval!(0.5, 1.5).round_ties_to_even(), const_interval!(0.0, 2.0));
+    /// assert_eq!(const_interval!(0.8, 1.8).round_ties_to_even(), const_interval!(1.0, 2.0));
+    /// assert_eq!(const_interval!(-1.2, -0.2).round_ties_to_even(), const_interval!(-1.0, 0.0));
+    /// assert_eq!(const_interval!(-1.5, -0.5).round_ties_to_even(), const_interval!(-2.0, 0.0));
+    /// assert_eq!(const_interval!(-1.8, -0.8).round_ties_to_even(), const_interval!(-2.0, -1.0));
+    /// assert_eq!(Interval::EMPTY.round_ties_to_even(), Interval::EMPTY);
+    /// assert_eq!(Interval::ENTIRE.round_ties_to_even(), Interval::ENTIRE);
+    /// ```
     ///
     /// See also: [`Interval::round_ties_to_away`].
     pub fn round_ties_to_even(self) -> Self {
@@ -67,6 +111,17 @@ impl Interval {
     /// while the values of `+0.0_f64.signum()` and `-0.0_f64.signum()` are `+1.0` and `-1.0`, respectively.
     ///
     /// Tightness: tightest
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(-10.0, -0.1).sign(), const_interval!(-1.0, -1.0));
+    /// assert_eq!(const_interval!(0.0, 0.0).sign(), const_interval!(0.0, 0.0));
+    /// assert_eq!(const_interval!(0.1, 10.0).sign(), const_interval!(1.0, 1.0));
+    /// assert_eq!(Interval::EMPTY.sign(), Interval::EMPTY);
+    /// assert_eq!(Interval::ENTIRE.sign(), const_interval!(-1.0, 1.0));
+    /// ```
     pub fn sign(self) -> Self {
         if self.is_empty() {
             return Self::EMPTY;
@@ -89,6 +144,18 @@ impl Interval {
     /// Rounds the bounds of `self` to integers using directed rounding toward zero.
     ///
     /// Tightness: tightest
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert_eq!(const_interval!(0.2, 1.2).trunc(), const_interval!(0.0, 1.0));
+    /// assert_eq!(const_interval!(0.8, 1.8).trunc(), const_interval!(0.0, 1.0));
+    /// assert_eq!(const_interval!(-1.2, -0.2).trunc(), const_interval!(-1.0, 0.0));
+    /// assert_eq!(const_interval!(-1.8, -0.8).trunc(), const_interval!(-1.0, 0.0));
+    /// assert_eq!(Interval::EMPTY.trunc(), Interval::EMPTY);
+    /// assert_eq!(Interval::ENTIRE.trunc(), Interval::ENTIRE);
+    /// ```
     ///
     /// See also: [`Interval::ceil`], [`Interval::floor`].
     pub fn trunc(self) -> Self {

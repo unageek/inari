@@ -4,7 +4,7 @@ use std::arch::x86_64::*;
 // NOTE: `neg`, `add`, `sub`, `mul` and `div` are implemented in arith.rs
 
 impl Interval {
-    /// Returns $\self × \rhs + \addend$.
+    /// Returns $(\self × \rhs) + \addend$.
     ///
     /// Tightness: tightest
     // Almost a copy-paste of mul. Additions/modifications are indicated with "// *".
