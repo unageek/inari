@@ -48,11 +48,11 @@ impl Mul for Interval {
     fn mul(self, rhs: Self) -> Self {
         // [a, b] * [c, d]
         //    |      M     |      N     |      P     |   Z
-        // ---+------------+------------+------------+-------
-        //  M |     *1     | [b*c, a*c] | [a*d, b*d] |  zero
-        //  N | [a*d, a*c] | [b*d, a*c] | [a*d, b*c] |  zero
-        //  P | [b*c, b*d] | [b*c, a*d] | [a*c, b*d] |  zero
-        //  Z |       zero |       zero |       zero |  zero
+        // ---+------------+------------+------------+------
+        //  M |     *1     | [b*c, a*c] | [a*d, b*d] | zero
+        //  N | [a*d, a*c] | [b*d, a*c] | [a*d, b*c] | zero
+        //  P | [b*c, b*d] | [b*c, a*d] | [a*c, b*d] | zero
+        //  Z |       zero |       zero |       zero | zero
         // *1 [min(a*d, b*c), max(a*c, b*d)]
 
         match self.classify2(rhs) {
