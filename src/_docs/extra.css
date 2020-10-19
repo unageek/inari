@@ -1,0 +1,23 @@
+.docblock table {
+  border: unset;
+  border-bottom: 2px solid;
+  border-top: 2px solid;
+  margin: 1em auto;
+  width: unset;
+}
+
+.docblock table th {
+  border: unset;
+  border-bottom: 1px solid;
+}
+
+.docblock table th[align="center"] {
+  text-align: center;
+}
+
+.docblock table td {
+  border: unset;
+  border-bottom: 1px dotted;
+  /* !important to cancel `.content td:first-child { margin-right: 20px; }` set in rustdoc.css. */
+  padding: 0.5em !important;
+}

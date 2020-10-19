@@ -1,0 +1,77 @@
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+></script>
+<script>
+  (function () {
+    "use strict";
+
+    // TODO: Bring \DeclarePairedDelimiter?
+    //   https://github.com/mathjax/MathJax/issues/2313
+    window.MathJax = {
+      tex: {
+        inlineMath: [["$", "$"]],
+        displayMath: [["$$", "$$"]],
+        macros: {
+          addend: "\\mathtt{addend}",
+          e: "\\mathrm{e}",
+          if: "\\text{if }",
+          nextDown: "\\operatorname{\\mathtt{nextDown}}",
+          nextOut: "\\operatorname{\\mathtt{nextOut}}",
+          nextUp: "\\operatorname{\\mathtt{nextUp}}",
+          otherwise: "\\text{otherwise}",
+          rhs: "\\mathtt{rhs}",
+          self: "\\mathtt{self}",
+          sgn: "\\operatorname{sgn}",
+          RD: "\\operatorname{\\raise{.4ex}{▽}_\\F}",
+          RDU: "\\operatorname{◊_\\IF}",
+          RU: "\\operatorname{△_\\F}",
+          // Sets
+          D: "𝔻",
+          DIF: "{𝔻𝕀𝔽}",
+          DIR: "{𝔻𝕀\\overline{ℝ}}\\vphantom{𝕏}",
+          F: "𝔽",
+          IF: "{𝕀𝔽}\\vphantom{𝕏}",
+          IR: "{𝕀\\overline{ℝ}}\\vphantom{𝕏}",
+          N: "ℕ",
+          R: "ℝ",
+          XR: "{\\overline{ℝ}}\\vphantom{𝕏}",
+          // Decorations
+          com: "\\mathtt{com}",
+          dac: "\\mathtt{dac}",
+          def: "\\mathtt{def}",
+          trv: "\\mathtt{trv}",
+          ill: "\\mathtt{ill}",
+        },
+      },
+      options: {
+        renderActions: {
+          preprocess: [
+            10, // MathJax._.core.MathItem.STATE.FINDMATH
+            (doc) => {
+              for (const math of doc.math) {
+                preprocess(math);
+              }
+            },
+            (math, doc) => {
+              preprocess(math);
+            },
+          ],
+        },
+      },
+    };
+
+    // NOTE: This does not work with surrogate pairs nor combining character sequences.
+    const charSubstitutions = {
+      π: "𝜋",
+    };
+
+    function preprocess(math) {
+      math.math = math.math.replace(/./g, (ch) => {
+        return charSubstitutions[ch] || ch;
+      });
+    }
+  })();
+</script>
