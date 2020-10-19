@@ -23,7 +23,12 @@ include = [
 
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--html-in-header", "doc-header.html"]
+rustdoc-args = [
+  "--extend-css",
+  "src/_docs/extra.css",
+  "--html-in-header",
+  "src/_docs/header.html",
+]
 
 [profile.release]
 lto = true

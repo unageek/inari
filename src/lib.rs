@@ -1,11 +1,17 @@
-//! A Rust implementation of set-based interval arithmetic.
+//! A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
+//!
+//! [Introduction to Interval Arithmetic][`_docs::intro`]
+
 #![feature(asm)]
+#![feature(external_doc)]
 #![allow(clippy::float_cmp)]
 
 pub use self::{
     interval::{DecoratedInterval, Decoration, Interval, IntervalError, IntervalErrorKind, Result},
     overlap::OverlappingState,
 };
+
+pub mod _docs;
 
 mod absmax;
 mod arith;
