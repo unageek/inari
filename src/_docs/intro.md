@@ -260,11 +260,11 @@ Let $n ∈ \N$ and $X ⊆ \R^n$. Let $f : X → \R$ be a real-valued function. L
 
 $$
 \begin{align}
-p\_\com(f, 𝒙, 𝒚) &⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f \text{ is continuous on } 𝒙) ∧ (\text{$𝒙$ and $𝒚$ are bounded}), \\\\
-p\_\dac(f, 𝒙, 𝒚) &⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f{↾\_𝒙} \text{ is continuous}), \\\\
-p\_\def(f, 𝒙, 𝒚) &⟺ ∅ ≠ 𝒙 ⊆ X, \\\\
-p\_\trv(f, 𝒙, 𝒚) &⟺ (\text{always true}), \\\\
-p\_\ill(f, 𝒙, 𝒚) &⟺ X = ∅,
+p\_\com(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f \text{ is continuous on } 𝒙) ∧ (\text{$𝒙$ and $𝒚$ are bounded}), \\\\
+p\_\dac(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f{↾\_𝒙} \text{ is continuous}), \\\\
+p\_\def(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X, \\\\
+p\_\trv(f, 𝒙, 𝒚) &:⟺ (\text{always true}), \\\\
+p\_\ill(f, 𝒙, 𝒚) &:⟺ X = ∅,
 \end{align}
 $$
 
@@ -291,7 +291,7 @@ We denote by $\DIR$ the set of all decorated intervals.
 - (Advanced) Fundamentally, a pair $(𝒚, dy)$ is said to be a decorated interval (member of $\DIR$) if and only if:
 
   $$
-  ∃n ∈ \N, X ⊆ \R^n, f ∈ \R^X, 𝒙 ∈ \IR^n : 𝒚 ⊇ f\[𝒙\] ∧ p_{dy}(f, 𝒙, 𝒚).
+  ∃n ∈ \N, X ⊆ \R^n, f ∈ \R^X, 𝒙 ∈ \IR^n : (𝒚 ⊇ f\[𝒙\] ∧ p_{dy}(f, 𝒙, 𝒚)).
   $$
 
   Let $f : ∅ → \R$ be the [empty function][emptymap]. By substituting $n = 0, X = ∅, f$ and $𝒙 = ∅$ into the above statement, one can show that for any $𝒚 ∈ \IR$, $(𝒚, \ill)$ is a decorated interval.
