@@ -2,45 +2,50 @@ name: build
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Install toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        components: clippy, rustfmt
-        profile: minimal
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          components: clippy, rustfmt
+          profile: minimal
 
-    - name: Run tests (Minimal)
-      run: cargo test --release --no-default-features --tests
-    - name: Run tests (All features)
-      run: cargo test --release --all-features
-    - name: Clippy
-      run: cargo clippy --all-targets --all-features -- -Dwarnings
-    - name: Check format
-      run: cargo fmt -- --check
-    - name: Coverage
-      env:
-        CARGO_INCREMENTAL: 0
-        RUSTFLAGS: "-Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
-        RUSTDOCFLAGS: "-Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
-      run: |
-        cargo clean
-        cargo test --all-features
-    - name: Gather coverage data
-      id: coverage
-      uses: actions-rs/grcov@v0.1
-    - name: Upload coverage to Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ${{ steps.coverage.outputs.report }}
+      - name: Run tests (--no-default-features)
+        run: cargo test --release --no-default-features
+
+      - name: Run tests (--all-features)
+        run: cargo test --release --all-features
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -Dwarnings
+
+      - name: Check format
+        run: cargo fmt -- --check
+
+      - name: Coverage
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
+          RUSTDOCFLAGS: "-Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
+        run: |
+          cargo clean
+          cargo test --all-features
+
+      - name: Gather coverage data
+        id: coverage
+        uses: actions-rs/grcov@v0.1
+
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ${{ steps.coverage.outputs.report }}

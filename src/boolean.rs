@@ -143,6 +143,7 @@ impl Interval {
     /// // The singleton set that consists of the nearest `f64` number to 0.1.
     /// assert!(const_interval!(0.1, 0.1).is_singleton());
     /// // The tightest interval that encloses 0.1.
+    /// #[cfg(feature = "gmp")]
     /// assert!(!interval!("[0.1, 0.1]").unwrap().is_singleton());
     /// ```
     pub fn is_singleton(self) -> bool {
