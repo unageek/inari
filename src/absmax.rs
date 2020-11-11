@@ -62,7 +62,7 @@ impl Interval {
     }
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     pub fn abs(self) -> Self {
         if self.is_nai() {
             return self;
@@ -91,7 +91,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]

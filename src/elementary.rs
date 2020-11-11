@@ -750,7 +750,7 @@ macro_rules! impl_dec2 {
     };
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     impl_dec!(acos, acos_impl);
     impl_dec!(acosh, acosh_impl);
     impl_dec!(asin, asin_impl);
@@ -782,7 +782,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]

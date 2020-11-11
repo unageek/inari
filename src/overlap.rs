@@ -270,7 +270,7 @@ impl Interval {
     }
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     pub fn overlap(self, rhs: Self) -> Option<OverlappingState> {
         if self.is_nai() || rhs.is_nai() {
             return None;
@@ -283,7 +283,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
 
     #[test]
     fn nai() {

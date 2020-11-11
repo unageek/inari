@@ -21,7 +21,7 @@
 //Preamble
 use crate::*;
 use hexf::*;
-type DI = inari::DecoratedInterval;
+type DI = inari::DecInterval;
 type I = inari::Interval;
 
 #[cfg(feature = "gmp")]

@@ -58,7 +58,7 @@ macro_rules! impl_dec {
     };
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     impl_dec!(convex_hull);
     impl_dec!(intersection);
 }
@@ -66,7 +66,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]

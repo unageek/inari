@@ -32,7 +32,7 @@
 use crate::*;
 use hexf::*;
 type D = inari::Decoration;
-type DI = inari::DecoratedInterval;
+type DI = inari::DecInterval;
 type I = inari::Interval;
 
 #[test]

@@ -39,7 +39,7 @@ pub fn t2i(s: &str) -> Interval {
     }
 }
 
-pub fn n2di(a: f64, b: f64) -> DecoratedInterval {
+pub fn n2di(a: f64, b: f64) -> DecInterval {
     match dec_interval!(a, b) {
         Ok(x) => x,
         Err(x) => x.value(),
@@ -47,18 +47,18 @@ pub fn n2di(a: f64, b: f64) -> DecoratedInterval {
 }
 
 #[cfg(feature = "gmp")]
-pub fn t2di(s: &str) -> DecoratedInterval {
+pub fn t2di(s: &str) -> DecInterval {
     match dec_interval!(s) {
         Ok(x) => x,
         Err(x) => x.value(),
     }
 }
 
-pub fn nd2di(a: f64, b: f64, d: Decoration) -> DecoratedInterval {
-    DecoratedInterval::set_dec(interval!(a, b).unwrap(), d)
+pub fn nd2di(a: f64, b: f64, d: Decoration) -> DecInterval {
+    DecInterval::set_dec(interval!(a, b).unwrap(), d)
 }
 
-pub fn interval_part(x: DecoratedInterval) -> Interval {
+pub fn interval_part(x: DecInterval) -> Interval {
     match x.interval_part() {
         Ok(x) => x,
         Err(x) => x.value(),
@@ -82,7 +82,7 @@ impl Eq2 for f64 {
     }
 }
 
-impl Eq2 for DecoratedInterval {
+impl Eq2 for DecInterval {
     fn eq2(&self, rhs: &Self) -> bool {
         self.is_nai() && rhs.is_nai()
             || self == rhs && self.decoration_part() == rhs.decoration_part()

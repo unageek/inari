@@ -232,7 +232,7 @@ impl Div for Interval {
     }
 }
 
-impl Neg for DecoratedInterval {
+impl Neg for DecInterval {
     type Output = Self;
 
     fn neg(self) -> Self {
@@ -244,7 +244,7 @@ impl Neg for DecoratedInterval {
     }
 }
 
-impl Add for DecoratedInterval {
+impl Add for DecInterval {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
@@ -257,7 +257,7 @@ impl Add for DecoratedInterval {
     }
 }
 
-impl Sub for DecoratedInterval {
+impl Sub for DecInterval {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
@@ -270,7 +270,7 @@ impl Sub for DecoratedInterval {
     }
 }
 
-impl Mul for DecoratedInterval {
+impl Mul for DecInterval {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
@@ -283,7 +283,7 @@ impl Mul for DecoratedInterval {
     }
 }
 
-impl Div for DecoratedInterval {
+impl Div for DecInterval {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self {
@@ -309,7 +309,7 @@ macro_rules! impl_op_assign {
             }
         }
 
-        impl $OpAssign for DecoratedInterval {
+        impl $OpAssign for DecInterval {
             fn $op_assign(&mut self, rhs: Self) {
                 *self = self.$op(rhs);
             }
@@ -325,7 +325,7 @@ impl_op_assign!(DivAssign, div_assign, div);
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]

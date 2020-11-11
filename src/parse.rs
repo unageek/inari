@@ -563,11 +563,11 @@ fn number_to_f64(n: &Number, infsup: InfSup) -> F64 {
 
 impl From<NInterval> for Interval {
     fn from(x: NInterval) -> Self {
-        DecoratedInterval::from(DNInterval::new(x)).x
+        DecInterval::from(DNInterval::new(x)).x
     }
 }
 
-impl From<DNInterval> for DecoratedInterval {
+impl From<DNInterval> for DecInterval {
     fn from(DNInterval { x, d }: DNInterval) -> Self {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
@@ -603,7 +603,7 @@ impl FromStr for Interval {
     }
 }
 
-impl FromStr for DecoratedInterval {
+impl FromStr for DecInterval {
     type Err = IntervalError<Self>;
 
     fn from_str(s: &str) -> Result<Self> {
@@ -660,7 +660,7 @@ impl Interval {
 mod tests {
     use crate::*;
     use hexf::*;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]

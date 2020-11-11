@@ -132,7 +132,7 @@ macro_rules! def_com {
     };
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     pub const EMPTY: Self = Self::new_unchecked(Interval::EMPTY, Decoration::Trv);
     pub const ENTIRE: Self = Self::new_unchecked(Interval::ENTIRE, Decoration::Dac);
     pub const NAI: Self = Self::new_unchecked(Interval::EMPTY, Decoration::Ill);
@@ -162,7 +162,7 @@ impl DecoratedInterval {
 mod tests {
     use crate::*;
     type I = Interval;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
 
     // This only works with positive numbers.
     fn succ(x: f64) -> f64 {
