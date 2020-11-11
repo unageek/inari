@@ -286,7 +286,7 @@ macro_rules! impl_dec {
     };
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     pub fn contains(self, rhs: f64) -> bool {
         if self.is_nai() {
             return false;

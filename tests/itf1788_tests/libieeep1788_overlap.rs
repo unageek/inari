@@ -31,7 +31,7 @@
 //Preamble
 use crate::*;
 type D = inari::Decoration;
-type DI = inari::DecoratedInterval;
+type DI = inari::DecInterval;
 type I = inari::Interval;
 type O = inari::OverlappingState;
 

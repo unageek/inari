@@ -22,7 +22,7 @@
 use crate::*;
 use hexf::*;
 type D = inari::Decoration;
-type DI = inari::DecoratedInterval;
+type DI = inari::DecInterval;
 type I = inari::Interval;
 
 // According to the examples in Section 7.4.2, unbounded intervals can be constructed with non-common inputs.

@@ -80,19 +80,19 @@ impl fmt::LowerHex for Interval {
     }
 }
 
-impl fmt::Display for DecoratedInterval {
+impl fmt::Display for DecInterval {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt_impl(self.x, Some(self.d), f, 'f')
     }
 }
 
-impl fmt::LowerExp for DecoratedInterval {
+impl fmt::LowerExp for DecInterval {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt_impl(self.x, Some(self.d), f, 'e')
     }
 }
 
-impl fmt::LowerHex for DecoratedInterval {
+impl fmt::LowerHex for DecInterval {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt_impl(self.x, Some(self.d), f, 'a')
     }
@@ -102,7 +102,7 @@ impl fmt::LowerHex for DecoratedInterval {
 mod tests {
     use crate::*;
     type D = Decoration;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]

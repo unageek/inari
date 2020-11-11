@@ -195,7 +195,7 @@ macro_rules! impl_dec {
 }
 
 // https://www.ocf.berkeley.edu/~horie/rounding.html
-impl DecoratedInterval {
+impl DecInterval {
     // Discontinuities: ℤ.
     impl_dec!(ceil, x, y, x.sup_raw() == y.sup_raw()); // No need to check inf.
     impl_dec!(floor, x, y, x.inf_raw() == y.inf_raw()); // No need to check sup.
@@ -228,7 +228,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]

@@ -223,7 +223,7 @@ macro_rules! impl_dec {
     };
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     impl_dec!(inf);
     impl_dec!(mag);
     impl_dec!(mid);

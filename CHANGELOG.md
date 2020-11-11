@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## Unreleased
+
+### Changed
+
+- ❗ Renamed `DecoratedInterval` to `DecInterval` so that it gets more consistent with `dec_interval!` macro.
+
 ## v0.6.1 - 2020.09-25
 
 ### Fixed

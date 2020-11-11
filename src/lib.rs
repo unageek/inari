@@ -7,7 +7,7 @@
 #![allow(clippy::float_cmp)]
 
 pub use self::{
-    interval::{DecoratedInterval, Decoration, Interval, IntervalError, IntervalErrorKind, Result},
+    interval::{DecInterval, Decoration, Interval, IntervalError, IntervalErrorKind, Result},
     overlap::OverlappingState,
 };
 

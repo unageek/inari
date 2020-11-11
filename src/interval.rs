@@ -129,12 +129,12 @@ impl PartialOrd for Decoration {
 /// The decorated version of [`Interval`].
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
-pub struct DecoratedInterval {
+pub struct DecInterval {
     pub(crate) x: Interval,
     pub(crate) d: Decoration,
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     pub fn new(x: Interval) -> Self {
         use Decoration::*;
 
@@ -185,7 +185,7 @@ impl DecoratedInterval {
     }
 }
 
-impl PartialEq for DecoratedInterval {
+impl PartialEq for DecInterval {
     fn eq(&self, rhs: &Self) -> bool {
         if self.is_nai() || rhs.is_nai() {
             return false;
@@ -195,9 +195,9 @@ impl PartialEq for DecoratedInterval {
     }
 }
 
-// `DecoratedInterval` is not a model of `Eq` as NaI ≠ NaI.
+// `DecInterval` is not a model of `Eq` as NaI ≠ NaI.
 
-impl TryFrom<(f64, f64)> for DecoratedInterval {
+impl TryFrom<(f64, f64)> for DecInterval {
     type Error = IntervalError<Self>;
 
     fn try_from(x: (f64, f64)) -> Result<Self> {
@@ -262,7 +262,7 @@ macro_rules! _dec_interval {
         fn is_f64(_: f64) {}
         is_f64($a);
         is_f64($b);
-        $crate::DecoratedInterval::try_from(($a, $b))
+        $crate::DecInterval::try_from(($a, $b))
     }};
 }
 
@@ -274,7 +274,7 @@ macro_rules! dec_interval {
     };
 }
 
-/// Creates a [`DecoratedInterval`] from `f64` bounds or a decorated interval literal.
+/// Creates a [`DecInterval`] from `f64` bounds or a decorated interval literal.
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! dec_interval {
@@ -282,7 +282,7 @@ macro_rules! dec_interval {
         use ::std::primitive::*;
         fn is_str(_: &str) {}
         is_str($text);
-        $text.parse::<$crate::DecoratedInterval>()
+        $text.parse::<$crate::DecInterval>()
     }};
 
     ($a:expr, $b:expr) => {
@@ -308,21 +308,21 @@ macro_rules! const_interval {
     }};
 }
 
-/// Creates a [`DecoratedInterval`] from `f64` bounds in const context.
+/// Creates a [`DecInterval`] from `f64` bounds in const context.
 #[macro_export]
 macro_rules! const_dec_interval {
     ($a:expr, $b:expr) => {{
         use ::std::{mem::transmute, primitive::*};
 
         #[repr(C)]
-        struct _DecoratedInterval {
+        struct _DecInterval {
             x: $crate::Interval,
             d: $crate::Decoration,
         }
 
         #[allow(unused_unsafe)]
         unsafe {
-            transmute::<_, $crate::DecoratedInterval>(_DecoratedInterval {
+            transmute::<_, $crate::DecInterval>(_DecInterval {
                 x: $crate::const_interval!($a, $b),
                 d: if $a == f64::NEG_INFINITY || $b == f64::INFINITY {
                     $crate::Decoration::Dac
@@ -351,7 +351,7 @@ mod tests {
     fn macros() {
         // Check that these macros are usable for constants.
         const _I: Interval = const_interval!(1.0, 2.0);
-        const _DI: DecoratedInterval = const_dec_interval!(1.0, 2.0);
+        const _DI: DecInterval = const_dec_interval!(1.0, 2.0);
 
         // Check that type inference works.
         let _i = const_interval!(1.0, 2.0);

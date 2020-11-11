@@ -114,7 +114,7 @@ macro_rules! impl_try_from_bytes {
     };
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     impl_to_bytes!(to_be_bytes);
     impl_to_bytes!(to_le_bytes);
     impl_to_bytes!(to_ne_bytes);
@@ -128,7 +128,7 @@ impl DecoratedInterval {
 mod tests {
     use crate::*;
     type D = Decoration;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]

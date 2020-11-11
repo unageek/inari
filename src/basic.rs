@@ -179,7 +179,7 @@ impl Interval {
     }
 }
 
-impl DecoratedInterval {
+impl DecInterval {
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
         if self.is_nai() || rhs.is_nai() || addend.is_nai() {
             return Self::NAI;
@@ -229,7 +229,7 @@ impl DecoratedInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecoratedInterval;
+    type DI = DecInterval;
     type I = Interval;
 
     #[test]
