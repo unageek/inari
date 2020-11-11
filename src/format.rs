@@ -33,10 +33,7 @@ fn mpfr_printf(template: &str, f: &Float) -> String {
 }
 
 fn fmt_impl(x: Interval, d: Option<Decoration>, f: &mut fmt::Formatter, conv: char) -> fmt::Result {
-    let width = match f.width() {
-        Some(w) => w,
-        None => 0,
-    };
+    let width = f.width().unwrap_or(0);
     let str_width = 2 * width + 1;
     if d == Some(Decoration::Ill) {
         return write!(f, "[{:^w$}]", "nai", w = str_width);
