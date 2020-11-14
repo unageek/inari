@@ -1,9 +1,9 @@
 # 🦊 inari
 
-[![Crate](https://img.shields.io/crates/v/inari.svg)](https://crates.io/crates/inari)
-[![Documentation](https://docs.rs/inari/badge.svg)](https://docs.rs/inari)
-[![Build Status](https://img.shields.io/github/workflow/status/mizuno-gsinet/inari/build)](https://github.com/mizuno-gsinet/inari/actions?query=workflow%3Abuild)
-[![Coverage Status](https://img.shields.io/coveralls/github/mizuno-gsinet/inari/master)](https://coveralls.io/github/mizuno-gsinet/inari?branch=master)
+[![crates.io](https://img.shields.io/crates/v/inari.svg)](https://crates.io/crates/inari)
+[![docs](https://docs.rs/inari/badge.svg)](https://docs.rs/inari)
+[![build](https://img.shields.io/github/workflow/status/mizuno-gsinet/inari/build/master)](https://github.com/mizuno-gsinet/inari/actions?query=branch%3Amaster+workflow%3Abuild)
+[![coverage](https://img.shields.io/coveralls/github/mizuno-gsinet/inari/master)](https://coveralls.io/github/mizuno-gsinet/inari?branch=master)
 
 A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 

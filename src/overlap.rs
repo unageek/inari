@@ -1,6 +1,6 @@
 use crate::interval::*;
 
-/// States returned by [`Interval::overlap`].
+/// An overlapping state returned by [`Interval::overlap`].
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum OverlappingState {
     /// Both `self` and `rhs` are empty.

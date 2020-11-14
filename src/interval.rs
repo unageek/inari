@@ -41,7 +41,9 @@ impl<T: fmt::Debug> Error for IntervalError<T> {}
 
 pub type Result<T> = result::Result<T, IntervalError<T>>;
 
-/// The bare inf-sup interval type with `f64` bounds.
+/// An interval with `f64` bounds.
+///
+/// It is sometimes referred to as a *bare* interval in contrast to a decorated interval ([`DecInterval`]).
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct Interval {
@@ -104,6 +106,7 @@ impl TryFrom<(f64, f64)> for Interval {
     }
 }
 
+/// The decoration of a [`DecInterval`].
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(u8)]
 pub enum Decoration {
@@ -126,7 +129,7 @@ impl PartialOrd for Decoration {
     }
 }
 
-/// The decorated version of [`Interval`].
+/// A decorated interval with `f64` bounds.
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct DecInterval {
@@ -290,7 +293,9 @@ macro_rules! dec_interval {
     };
 }
 
-/// Creates an [`Interval`] from `f64` bounds in const contexts.
+/// Creates an [`Interval`] from `f64` bounds.
+///
+/// It can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
 #[macro_export]
 macro_rules! const_interval {
     ($a:expr, $b:expr) => {{
@@ -308,7 +313,9 @@ macro_rules! const_interval {
     }};
 }
 
-/// Creates a [`DecInterval`] from `f64` bounds in const context.
+/// Creates a [`DecInterval`] from `f64` bounds.
+///
+/// It can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
 #[macro_export]
 macro_rules! const_dec_interval {
     ($a:expr, $b:expr) => {{

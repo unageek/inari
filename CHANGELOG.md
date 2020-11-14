@@ -6,9 +6,9 @@ The ❗ icon indicates a breaking change.
 
 ### Changed
 
-- ❗ Renamed `DecoratedInterval` to `DecInterval` so that it gets more consistent with `dec_interval!` macro.
+- ❗ Renamed `DecoratedInterval` to `DecInterval`. Now its name is consistent with the macro `(const_)dec_interval!`.
 
-## v0.6.1 - 2020.09-25
+## v0.6.1 - 2020-09-25
 
 ### Fixed
 

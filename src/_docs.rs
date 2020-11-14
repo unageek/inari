@@ -1,4 +1,4 @@
-//! This module is solely for serving additional documentations, and thus contains no code.
+//! This module is solely for serving additional documentations; thus, it contains no code.
 
 #[doc(include = "_docs/intro.md")]
 pub mod intro {}

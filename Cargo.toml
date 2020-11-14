@@ -37,15 +37,15 @@ lto = true
 default = ["gmp"]
 gmp = ["gmp-mpfr-sys", "nom", "rug"]
 
+[dependencies]
+hexf = "0.1"
+static_assertions = "1.1"
+
 [dependencies.gmp-mpfr-sys]
 version = "1.4"
 default-features = false
 features = ["mpfr"]
 optional = true
-
-[dependencies]
-hexf = "0.1"
-static_assertions = "1.1"
 
 [dependencies.nom]
 version = "6.0"
