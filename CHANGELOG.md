@@ -2,7 +2,7 @@
 
 The ❗ icon indicates a breaking change.
 
-## Unreleased
+## v0.7.0 - 2020-11-14
 
 ### Changed
 
