@@ -22,14 +22,19 @@ jobs:
           components: clippy, rustfmt
           profile: minimal
 
+      - name: Run tests (--no-default-features --features "avx512")
+        run: RUSTFLAGS="-C target-feature=+avx512f" cargo test --release --no-default-features --features "avx512"
+
+      - name: Run tests
+        run: cargo test --release
+
       - name: Run tests (--no-default-features)
         run: cargo test --release --no-default-features
 
-      - name: Run tests (--all-features)
-        run: cargo test --release --all-features
-
       - name: Clippy
-        run: cargo clippy --all-targets --all-features -- -Dwarnings
+        run: |
+          cargo clippy --all-targets -- -Dwarnings
+          cargo clippy --all-targets --features "avx512" -- -Dwarnings
 
       - name: Check format
         run: cargo fmt -- --check
@@ -41,7 +46,7 @@ jobs:
           RUSTDOCFLAGS: "-Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
         run: |
           cargo clean
-          cargo test --all-features
+          cargo test
 
       - name: Gather coverage data
         id: coverage
