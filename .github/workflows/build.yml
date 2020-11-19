@@ -26,6 +26,7 @@ jobs:
         run: cargo test --release --no-default-features --features "avx512"
         env:
           RUSTFLAGS: -Ctarget-feature=+avx512f
+          RUSTDOCFLAGS: -Ctarget-feature=+avx512f
 
       - name: Run tests
         run: cargo test --release
