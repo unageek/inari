@@ -1,4 +1,9 @@
-#![allow(clippy::approx_constant, clippy::eq_op, clippy::float_cmp)]
+#![allow(
+    clippy::approx_constant,
+    clippy::eq_op,
+    clippy::excessive_precision,
+    clippy::float_cmp
+)]
 
 use inari::*;
 
