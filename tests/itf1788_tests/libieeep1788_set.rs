@@ -30,7 +30,6 @@
 
 //Preamble
 use crate::*;
-use hexf::*;
 type D = inari::Decoration;
 type DI = inari::DecInterval;
 type I = inari::Interval;

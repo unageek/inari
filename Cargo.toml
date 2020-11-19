@@ -38,7 +38,6 @@ default = ["gmp"]
 gmp = ["gmp-mpfr-sys", "nom", "rug"]
 
 [dependencies]
-hexf = "0.1"
 static_assertions = "1.1"
 
 [dependencies.gmp-mpfr-sys]

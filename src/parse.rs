@@ -659,7 +659,6 @@ impl Interval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use hexf::*;
     type DI = DecInterval;
     type I = Interval;
 
@@ -704,6 +703,7 @@ mod tests {
 
     #[test]
     fn try_from_str_exact() {
+        assert_eq!(interval!("[]", exact).unwrap(), I::EMPTY);
         assert_eq!(interval!("[Empty]", exact).unwrap(), I::EMPTY);
         assert_eq!(interval!("[Entire]", exact).unwrap(), I::ENTIRE);
         assert_eq!(
@@ -720,19 +720,19 @@ mod tests {
         );
 
         // The smallest positive subnormal number.
-        let f = hexf64!("0x0.0000000000001p-1022");
+        let f = 5e-324;
         assert_eq!(
             interval!("[0x0.0000000000001p-1022]", exact).unwrap(),
             interval!(f, f).unwrap()
         );
         assert_eq!(
-            interval!("[0x0.0000000000000ffffp-1022]", exact)
+            interval!("[0x0.0000000000000ffp-1022]", exact)
                 .unwrap_err()
                 .value(),
             I::EMPTY
         );
         assert_eq!(
-            interval!("[0x0.00000000000010001p-1022]", exact)
+            interval!("[0x0.000000000000101p-1022]", exact)
                 .unwrap_err()
                 .value(),
             I::EMPTY
@@ -745,19 +745,19 @@ mod tests {
         );
 
         // The largest normal number.
-        let f = hexf64!("0x1.fffffffffffffp+1023");
+        let f = f64::MAX;
         assert_eq!(
             interval!("[0x1.fffffffffffffp+1023]", exact).unwrap(),
             interval!(f, f).unwrap()
         );
         assert_eq!(
-            interval!("[0x1.ffffffffffffeffffp+1023]", exact)
+            interval!("[0x1.ffffffffffffeffp+1023]", exact)
                 .unwrap_err()
                 .value(),
             I::EMPTY
         );
         assert_eq!(
-            interval!("[0x1.fffffffffffff0001p+1023]", exact)
+            interval!("[0x1.fffffffffffff01p+1023]", exact)
                 .unwrap_err()
                 .value(),
             I::EMPTY

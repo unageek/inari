@@ -1,5 +1,7 @@
 #!/usr/bin/env wolframscript
 
+(* Format the source code in Wolfram Workbench before committing. *)
+
 toInterval[x_] :=
     Module[ {ulp, inf, sup},
         ulp = 2^(Floor[Log2[x]] - 52);
@@ -9,12 +11,7 @@ toInterval[x_] :=
     ];
 
 toLiteral[x_] :=
-    Module[ {digits, expPlus1},
-        (* 14 == Ceiling[Log[16, 2^53]] *)
-        {digits, expPlus1} = RealDigits[x, 16, 14];
-        digits = IntegerString[digits, 16];
-        "hexf64!(\"0x" <> digits[[1]] <> "." <> digits[[2 ;;]] <> "p" <> ToString[4 (expPlus1 - 1)] <> "\")"
-    ];
+    ExportString[x, "JSON"];
 
 def[name_, value_] :=
     Module[ {inf, sup},

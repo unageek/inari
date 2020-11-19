@@ -17,7 +17,7 @@ impl Interval {
     /// assert!(Interval::ENTIRE.contains(1.0));
     /// ```
     ///
-    /// $+∞, -∞$ and NaN are not real numbers, thus do not belong to any interval:
+    /// $±∞$ and NaN are not real numbers, thus do not belong to any interval:
     ///
     /// ```
     /// use inari::*;
@@ -110,7 +110,7 @@ impl Interval {
         unsafe { _mm_movemask_pd(_mm_cmpunord_pd(self.rep, self.rep)) == 3 }
     }
 
-    /// Returns `true` if $\self = \[-∞, ∞\]$.
+    /// Returns `true` if $\self = \[-∞, +∞\]$.
     ///
     /// # Examples
     ///

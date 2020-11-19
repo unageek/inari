@@ -30,7 +30,6 @@
 
 //Preamble
 use crate::*;
-use hexf::*;
 type D = inari::Decoration;
 type DI = inari::DecInterval;
 type I = inari::Interval;
@@ -81,33 +80,33 @@ fn minimal_text_to_interval_test() {
     assert_eq2!(t2i("[-1.0, +infinity]"), n2i(-1.0, f64::INFINITY));
     assert_eq2!(t2i("[-Inf, 1.000 ]"), n2i(f64::NEG_INFINITY, 1.0));
     assert_eq2!(t2i("[-Infinity, 1.000 ]"), n2i(f64::NEG_INFINITY, 1.0));
-    assert_eq2!(t2i("[1.0E+400 ]"), n2i(hexf64!("0x1.fffffffffffffp+1023"), f64::INFINITY));
+    assert_eq2!(t2i("[1.0E+400 ]"), n2i(1.7976931348623157e+308, f64::INFINITY));
     assert_eq2!(t2i("[ -4/2, 10/5 ]"), n2i(-2.0, 2.0));
     assert_eq2!(t2i("[ -1/10, 1/10 ]"), n2i(-0.1, 0.1));
     assert_eq2!(t2i("0.0?"), n2i(-0.05, 0.05));
     assert_eq2!(t2i("0.0?u"), n2i(0.0, 0.05));
     assert_eq2!(t2i("0.0?d"), n2i(-0.05, 0.0));
-    assert_eq2!(t2i("2.5?"), n2i(hexf64!("0x1.3999999999999p+1"), hexf64!("0x1.4666666666667p+1")));
-    assert_eq2!(t2i("2.5?u"), n2i(2.5, hexf64!("0x1.4666666666667p+1")));
-    assert_eq2!(t2i("2.5?d"), n2i(hexf64!("0x1.3999999999999p+1"), 2.5));
+    assert_eq2!(t2i("2.5?"), n2i(2.4499999999999997, 2.5500000000000003));
+    assert_eq2!(t2i("2.5?u"), n2i(2.5, 2.5500000000000003));
+    assert_eq2!(t2i("2.5?d"), n2i(2.4499999999999997, 2.5));
     assert_eq2!(t2i("0.000?5"), n2i(-0.005, 0.005));
     assert_eq2!(t2i("0.000?5u"), n2i(0.0, 0.005));
     assert_eq2!(t2i("0.000?5d"), n2i(-0.005, 0.0));
-    assert_eq2!(t2i("2.500?5"), n2i(hexf64!("0x1.3f5c28f5c28f5p+1"), hexf64!("0x1.40a3d70a3d70bp+1")));
-    assert_eq2!(t2i("2.500?5u"), n2i(2.5, hexf64!("0x1.40a3d70a3d70bp+1")));
-    assert_eq2!(t2i("2.500?5d"), n2i(hexf64!("0x1.3f5c28f5c28f5p+1"), 2.5));
+    assert_eq2!(t2i("2.500?5"), n2i(2.4949999999999997, 2.5050000000000003));
+    assert_eq2!(t2i("2.500?5u"), n2i(2.5, 2.5050000000000003));
+    assert_eq2!(t2i("2.500?5d"), n2i(2.4949999999999997, 2.5));
     assert_eq2!(t2i("0.0??"), n2i(f64::NEG_INFINITY, f64::INFINITY));
     assert_eq2!(t2i("0.0??u"), n2i(0.0, f64::INFINITY));
     assert_eq2!(t2i("0.0??d"), n2i(f64::NEG_INFINITY, 0.0));
     assert_eq2!(t2i("2.5??"), n2i(f64::NEG_INFINITY, f64::INFINITY));
     assert_eq2!(t2i("2.5??u"), n2i(2.5, f64::INFINITY));
     assert_eq2!(t2i("2.5??d"), n2i(f64::NEG_INFINITY, 2.5));
-    assert_eq2!(t2i("2.500?5e+27"), n2i(hexf64!("0x1.01fa19a08fe7fp+91"), hexf64!("0x1.0302cc4352683p+91")));
-    assert_eq2!(t2i("2.500?5ue4"), n2i(hexf64!("0x1.86a0000000000p+14"), hexf64!("0x1.8768000000000p+14")));
-    assert_eq2!(t2i("2.500?5de-5"), n2i(hexf64!("0x1.a2976f1cee4d5p-16"), hexf64!("0x1.a36e2eb1c432dp-16")));
+    assert_eq2!(t2i("2.500?5e+27"), n2i(2.4949999999999995e+27, 2.5050000000000003e+27));
+    assert_eq2!(t2i("2.500?5ue4"), n2i(25000.0, 25050.0));
+    assert_eq2!(t2i("2.500?5de-5"), n2i(2.495e-05, 2.5e-05));
     assert_eq2!(t2i("10?3"), n2i(7.0, 13.0));
-    assert_eq2!(t2i("10?3e380"), n2i(hexf64!("0x1.fffffffffffffp+1023"), f64::INFINITY));
-    assert_eq2!(t2i("1.0000000000000001?1"), n2i(1.0, hexf64!("0x1.0000000000001p+0")));
+    assert_eq2!(t2i("10?3e380"), n2i(1.7976931348623157e+308, f64::INFINITY));
+    assert_eq2!(t2i("1.0000000000000001?1"), n2i(1.0, 1.0000000000000002));
     // 10?18 + 308 zeros
     assert_eq2!(t2i("10?1800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"), n2i(f64::NEG_INFINITY, f64::INFINITY));
     assert_eq2!(t2i("[ Nai  ]"), I::EMPTY);
@@ -157,35 +156,35 @@ fn minimal_text_to_decorated_interval_test() {
     assert_eq2!(t2di("[-1.0, +infinity]_def"), nd2di(-1.0, f64::INFINITY, D::Def));
     assert_eq2!(t2di("[-Inf, 1.000 ]"), nd2di(f64::NEG_INFINITY, 1.0, D::Dac));
     assert_eq2!(t2di("[-Infinity, 1.000 ]_trv"), nd2di(f64::NEG_INFINITY, 1.0, D::Trv));
-    assert_eq2!(t2di("[1.0E+400 ]_com"), nd2di(hexf64!("0x1.fffffffffffffp+1023"), f64::INFINITY, D::Dac));
+    assert_eq2!(t2di("[1.0E+400 ]_com"), nd2di(1.7976931348623157e+308, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("[ -4/2, 10/5 ]_com"), nd2di(-2.0, 2.0, D::Com));
     assert_eq2!(t2di("[ -1/10, 1/10 ]_com"), nd2di(-0.1, 0.1, D::Com));
     assert_eq2!(t2di("0.0?"), nd2di(-0.05, 0.05, D::Com));
     assert_eq2!(t2di("0.0?u_trv"), nd2di(0.0, 0.05, D::Trv));
     assert_eq2!(t2di("0.0?d_dac"), nd2di(-0.05, 0.0, D::Dac));
-    assert_eq2!(t2di("2.5?"), nd2di(hexf64!("0x1.3999999999999p+1"), hexf64!("0x1.4666666666667p+1"), D::Com));
-    assert_eq2!(t2di("2.5?u"), nd2di(2.5, hexf64!("0x1.4666666666667p+1"), D::Com));
-    assert_eq2!(t2di("2.5?d_trv"), nd2di(hexf64!("0x1.3999999999999p+1"), 2.5, D::Trv));
+    assert_eq2!(t2di("2.5?"), nd2di(2.4499999999999997, 2.5500000000000003, D::Com));
+    assert_eq2!(t2di("2.5?u"), nd2di(2.5, 2.5500000000000003, D::Com));
+    assert_eq2!(t2di("2.5?d_trv"), nd2di(2.4499999999999997, 2.5, D::Trv));
     assert_eq2!(t2di("0.000?5"), nd2di(-0.005, 0.005, D::Com));
     assert_eq2!(t2di("0.000?5u_def"), nd2di(0.0, 0.005, D::Def));
     assert_eq2!(t2di("0.000?5d"), nd2di(-0.005, 0.0, D::Com));
-    assert_eq2!(t2di("2.500?5"), nd2di(hexf64!("0x1.3f5c28f5c28f5p+1"), hexf64!("0x1.40a3d70a3d70bp+1"), D::Com));
-    assert_eq2!(t2di("2.500?5u"), nd2di(2.5, hexf64!("0x1.40a3d70a3d70bp+1"), D::Com));
-    assert_eq2!(t2di("2.500?5d"), nd2di(hexf64!("0x1.3f5c28f5c28f5p+1"), 2.5, D::Com));
+    assert_eq2!(t2di("2.500?5"), nd2di(2.4949999999999997, 2.5050000000000003, D::Com));
+    assert_eq2!(t2di("2.500?5u"), nd2di(2.5, 2.5050000000000003, D::Com));
+    assert_eq2!(t2di("2.500?5d"), nd2di(2.4949999999999997, 2.5, D::Com));
     assert_eq2!(t2di("0.0??_dac"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("0.0??u_trv"), nd2di(0.0, f64::INFINITY, D::Trv));
     assert_eq2!(t2di("0.0??d"), nd2di(f64::NEG_INFINITY, 0.0, D::Dac));
     assert_eq2!(t2di("2.5??"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("2.5??u_def"), nd2di(2.5, f64::INFINITY, D::Def));
     assert_eq2!(t2di("2.5??d_dac"), nd2di(f64::NEG_INFINITY, 2.5, D::Dac));
-    assert_eq2!(t2di("2.500?5e+27"), nd2di(hexf64!("0x1.01fa19a08fe7fp+91"), hexf64!("0x1.0302cc4352683p+91"), D::Com));
-    assert_eq2!(t2di("2.500?5ue4_def"), nd2di(hexf64!("0x1.86a0000000000p+14"), hexf64!("0x1.8768000000000p+14"), D::Def));
-    assert_eq2!(t2di("2.500?5de-5"), nd2di(hexf64!("0x1.a2976f1cee4d5p-16"), hexf64!("0x1.a36e2eb1c432dp-16"), D::Com));
+    assert_eq2!(t2di("2.500?5e+27"), nd2di(2.4949999999999995e+27, 2.5050000000000003e+27, D::Com));
+    assert_eq2!(t2di("2.500?5ue4_def"), nd2di(25000.0, 25050.0, D::Def));
+    assert_eq2!(t2di("2.500?5de-5"), nd2di(2.495e-05, 2.5e-05, D::Com));
     assert_eq2!(t2di("[ Nai  ]"), DI::NAI);
     // 10?18 + 308 zeros + _com
     assert_eq2!(t2di("10?1800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000_com"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("10?3_com"), nd2di(7.0, 13.0, D::Com));
-    assert_eq2!(t2di("10?3e380_com"), nd2di(hexf64!("0x1.fffffffffffffp+1023"), f64::INFINITY, D::Dac));
+    assert_eq2!(t2di("10?3e380_com"), nd2di(1.7976931348623157e+308, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("[ Nai  ]_ill"), DI::NAI);
     assert_eq2!(t2di("[ Nai  ]_trv"), DI::NAI);
     assert_eq2!(t2di("[ Empty  ]_ill"), DI::NAI);
@@ -215,54 +214,54 @@ fn minimal_text_to_decorated_interval_test() {
 
 #[test]
 fn minimal_interval_part_test() {
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.9999999999999p-4"), D::Trv)), n2i(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.9999999999999p-4")));
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4"), D::Com)), n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4")));
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.99999a0000000p-4"), D::Dac)), n2i(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.99999a0000000p-4")));
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.99999a0000000p-4"), D::Def)), n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.99999a0000000p-4")));
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x0.0000000000001p-1022"), hexf64!("-0x0.0000000000001p-1022"), D::Trv)), n2i(hexf64!("-0x0.0000000000001p-1022"), hexf64!("-0x0.0000000000001p-1022")));
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022"), D::Trv)), n2i(hexf64!("-0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022")));
-    assert_eq2!(interval_part(nd2di(hexf64!("0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022"), D::Trv)), n2i(hexf64!("0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022")));
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("-0x1.fffffffffffffp+1023"), D::Trv)), n2i(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("-0x1.fffffffffffffp+1023")));
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Trv)), n2i(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023")));
-    assert_eq2!(interval_part(nd2di(hexf64!("0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Trv)), n2i(hexf64!("0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023")));
+    assert_eq2!(interval_part(nd2di(-25.600000873750652, 0.09999999999999999, D::Trv)), n2i(-25.600000873750652, 0.09999999999999999));
+    assert_eq2!(interval_part(nd2di(-25.60000228881836, 0.09999999999999999, D::Com)), n2i(-25.60000228881836, 0.09999999999999999));
+    assert_eq2!(interval_part(nd2di(-25.600000873750652, 0.10000000149011612, D::Dac)), n2i(-25.600000873750652, 0.10000000149011612));
+    assert_eq2!(interval_part(nd2di(-25.60000228881836, 0.10000000149011612, D::Def)), n2i(-25.60000228881836, 0.10000000149011612));
+    assert_eq2!(interval_part(nd2di(-5e-324, -5e-324, D::Trv)), n2i(-5e-324, -5e-324));
+    assert_eq2!(interval_part(nd2di(-5e-324, 5e-324, D::Trv)), n2i(-5e-324, 5e-324));
+    assert_eq2!(interval_part(nd2di(5e-324, 5e-324, D::Trv)), n2i(5e-324, 5e-324));
+    assert_eq2!(interval_part(nd2di(-1.7976931348623157e+308, -1.7976931348623157e+308, D::Trv)), n2i(-1.7976931348623157e+308, -1.7976931348623157e+308));
+    assert_eq2!(interval_part(nd2di(-1.7976931348623157e+308, 1.7976931348623157e+308, D::Trv)), n2i(-1.7976931348623157e+308, 1.7976931348623157e+308));
+    assert_eq2!(interval_part(nd2di(1.7976931348623157e+308, 1.7976931348623157e+308, D::Trv)), n2i(1.7976931348623157e+308, 1.7976931348623157e+308));
     assert_eq2!(interval_part(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), n2i(f64::NEG_INFINITY, f64::INFINITY));
     assert_eq2!(interval_part(DI::EMPTY), I::EMPTY);
-    assert_eq2!(interval_part(nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4"), D::Com)), n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4")));
+    assert_eq2!(interval_part(nd2di(-25.60000228881836, 0.09999999999999999, D::Com)), n2i(-25.60000228881836, 0.09999999999999999));
     assert_eq2!(interval_part(DI::NAI), I::EMPTY);
 }
 
 #[test]
 fn minimal_new_dec_test() {
-    assert_eq2!(DI::new(n2i(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.9999999999999p-4"))), nd2di(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.9999999999999p-4"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4"))), nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.99999a0000000p-4"))), nd2di(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.99999a0000000p-4"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.99999a0000000p-4"))), nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.99999a0000000p-4"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("-0x0.0000000000001p-1022"), hexf64!("-0x0.0000000000001p-1022"))), nd2di(hexf64!("-0x0.0000000000001p-1022"), hexf64!("-0x0.0000000000001p-1022"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("-0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022"))), nd2di(hexf64!("-0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022"))), nd2di(hexf64!("0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("-0x1.fffffffffffffp+1023"))), nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("-0x1.fffffffffffffp+1023"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"))), nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Com));
-    assert_eq2!(DI::new(n2i(hexf64!("0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"))), nd2di(hexf64!("0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Com));
+    assert_eq2!(DI::new(n2i(-25.600000873750652, 0.09999999999999999)), nd2di(-25.600000873750652, 0.09999999999999999, D::Com));
+    assert_eq2!(DI::new(n2i(-25.60000228881836, 0.09999999999999999)), nd2di(-25.60000228881836, 0.09999999999999999, D::Com));
+    assert_eq2!(DI::new(n2i(-25.600000873750652, 0.10000000149011612)), nd2di(-25.600000873750652, 0.10000000149011612, D::Com));
+    assert_eq2!(DI::new(n2i(-25.60000228881836, 0.10000000149011612)), nd2di(-25.60000228881836, 0.10000000149011612, D::Com));
+    assert_eq2!(DI::new(n2i(-5e-324, -5e-324)), nd2di(-5e-324, -5e-324, D::Com));
+    assert_eq2!(DI::new(n2i(-5e-324, 5e-324)), nd2di(-5e-324, 5e-324, D::Com));
+    assert_eq2!(DI::new(n2i(5e-324, 5e-324)), nd2di(5e-324, 5e-324, D::Com));
+    assert_eq2!(DI::new(n2i(-1.7976931348623157e+308, -1.7976931348623157e+308)), nd2di(-1.7976931348623157e+308, -1.7976931348623157e+308, D::Com));
+    assert_eq2!(DI::new(n2i(-1.7976931348623157e+308, 1.7976931348623157e+308)), nd2di(-1.7976931348623157e+308, 1.7976931348623157e+308, D::Com));
+    assert_eq2!(DI::new(n2i(1.7976931348623157e+308, 1.7976931348623157e+308)), nd2di(1.7976931348623157e+308, 1.7976931348623157e+308, D::Com));
     assert_eq2!(DI::new(n2i(f64::NEG_INFINITY, f64::INFINITY)), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq2!(DI::new(I::EMPTY), DI::EMPTY);
-    assert_eq2!(DI::new(n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4"))), nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4"), D::Com));
+    assert_eq2!(DI::new(n2i(-25.60000228881836, 0.09999999999999999)), nd2di(-25.60000228881836, 0.09999999999999999, D::Com));
 }
 
 #[test]
 fn minimal_set_dec_test() {
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.9999999999999p-4")), D::Trv), nd2di(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.9999999999999p-4"), D::Trv));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4")), D::Com), nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4"), D::Com));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.99999a0000000p-4")), D::Dac), nd2di(hexf64!("-0x1.99999a842549ap+4"), hexf64!("0x1.99999a0000000p-4"), D::Dac));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.99999a0000000p-4")), D::Def), nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.99999a0000000p-4"), D::Def));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x0.0000000000001p-1022"), hexf64!("-0x0.0000000000001p-1022")), D::Trv), nd2di(hexf64!("-0x0.0000000000001p-1022"), hexf64!("-0x0.0000000000001p-1022"), D::Trv));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022")), D::Def), nd2di(hexf64!("-0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022"), D::Def));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022")), D::Dac), nd2di(hexf64!("0x0.0000000000001p-1022"), hexf64!("0x0.0000000000001p-1022"), D::Dac));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("-0x1.fffffffffffffp+1023")), D::Com), nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("-0x1.fffffffffffffp+1023"), D::Com));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023")), D::Def), nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Def));
-    assert_eq2!(DI::set_dec(n2i(hexf64!("0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023")), D::Trv), nd2di(hexf64!("0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Trv));
+    assert_eq2!(DI::set_dec(n2i(-25.600000873750652, 0.09999999999999999), D::Trv), nd2di(-25.600000873750652, 0.09999999999999999, D::Trv));
+    assert_eq2!(DI::set_dec(n2i(-25.60000228881836, 0.09999999999999999), D::Com), nd2di(-25.60000228881836, 0.09999999999999999, D::Com));
+    assert_eq2!(DI::set_dec(n2i(-25.600000873750652, 0.10000000149011612), D::Dac), nd2di(-25.600000873750652, 0.10000000149011612, D::Dac));
+    assert_eq2!(DI::set_dec(n2i(-25.60000228881836, 0.10000000149011612), D::Def), nd2di(-25.60000228881836, 0.10000000149011612, D::Def));
+    assert_eq2!(DI::set_dec(n2i(-5e-324, -5e-324), D::Trv), nd2di(-5e-324, -5e-324, D::Trv));
+    assert_eq2!(DI::set_dec(n2i(-5e-324, 5e-324), D::Def), nd2di(-5e-324, 5e-324, D::Def));
+    assert_eq2!(DI::set_dec(n2i(5e-324, 5e-324), D::Dac), nd2di(5e-324, 5e-324, D::Dac));
+    assert_eq2!(DI::set_dec(n2i(-1.7976931348623157e+308, -1.7976931348623157e+308), D::Com), nd2di(-1.7976931348623157e+308, -1.7976931348623157e+308, D::Com));
+    assert_eq2!(DI::set_dec(n2i(-1.7976931348623157e+308, 1.7976931348623157e+308), D::Def), nd2di(-1.7976931348623157e+308, 1.7976931348623157e+308, D::Def));
+    assert_eq2!(DI::set_dec(n2i(1.7976931348623157e+308, 1.7976931348623157e+308), D::Trv), nd2di(1.7976931348623157e+308, 1.7976931348623157e+308, D::Trv));
     assert_eq2!(DI::set_dec(n2i(f64::NEG_INFINITY, f64::INFINITY), D::Dac), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq2!(DI::set_dec(I::EMPTY, D::Trv), DI::EMPTY);
-    assert_eq2!(DI::set_dec(n2i(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4")), D::Com), nd2di(hexf64!("-0x1.99999c0000000p+4"), hexf64!("0x1.9999999999999p-4"), D::Com));
+    assert_eq2!(DI::set_dec(n2i(-25.60000228881836, 0.09999999999999999), D::Com), nd2di(-25.60000228881836, 0.09999999999999999, D::Com));
     assert_eq2!(DI::set_dec(I::EMPTY, D::Def), DI::EMPTY);
     assert_eq2!(DI::set_dec(I::EMPTY, D::Dac), DI::EMPTY);
     assert_eq2!(DI::set_dec(I::EMPTY, D::Com), DI::EMPTY);
