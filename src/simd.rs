@@ -29,6 +29,7 @@ pub(crate) fn swap(x: __m128d) -> __m128d {
     unsafe { _mm_shuffle_pd(x, x, 1) }
 }
 
+#[cfg(not(feature = "avx512"))]
 macro_rules! impl_op_round {
     ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
         impl_op_round!($t, $f ($x $(,$y)*), $inst, "16256"); // _MM_ROUND_DOWN | _MM_MASK_MASK
@@ -38,13 +39,13 @@ macro_rules! impl_op_round {
         impl_op_round!($t, $f ($x $(,$y)*), $inst, "24448"); // _MM_ROUND_UP | _MM_MASK_MASK
     };
 
-    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, $cw:literal) => {
-        pub(crate) fn $f(mut $x: $t $(,$y: $t)*) -> $t {
+    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, $mxcsr:literal) => {
+        pub(crate) fn $f(mut $x: $t, $($y: $t,)*) -> $t {
             unsafe {
                 asm!(
                     "sub rsp, 8",
                     "stmxcsr [rsp]",
-                    concat!("mov dword ptr [rsp + 4], ", $cw),
+                    concat!("mov dword ptr [rsp + 4], ", $mxcsr),
                     "ldmxcsr [rsp + 4]",
                     $inst,
                     "ldmxcsr [rsp]",
@@ -59,52 +60,81 @@ macro_rules! impl_op_round {
     };
 }
 
+#[cfg(feature = "avx512")]
+macro_rules! impl_op_round {
+    ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
+        impl_op_round!($t, $reg, $f ($x $(,$y)*), $inst, "{{rd-sae}}");
+    };
+
+    ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, ru) => {
+        impl_op_round!($t, $reg, $f ($x $(,$y)*), $inst, "{{ru-sae}}");
+    };
+
+    ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, $er:literal) => {
+        pub(crate) fn $f($x: $t, $($y: $t,)*) -> $t {
+            #[target_feature(enable = "avx512f")]
+            unsafe fn inner(mut $x: $t, $($y: $t,)*) -> $t {
+                asm!(
+                    concat!($inst, ", ", $er),
+                    $x = inout($reg) $x,
+                    $($y = in($reg) $y,)*
+                    options(pure, nomem, nostack, preserves_flags)
+                );
+                $x
+            }
+
+            unsafe { inner($x, $($y,)*) }
+        }
+    };
+}
+
 #[cfg(not(feature = "avx512"))]
 impl_op_round!(f64, sqrt1_rd(x), "sqrtpd {x}, {x}", rd);
+#[cfg(feature = "avx512")]
+impl_op_round!(f64, xmm_reg, sqrt1_rd(x), "vsqrtsd {x}, {x}, {x}", rd);
 
 #[cfg(not(feature = "avx512"))]
 impl_op_round!(f64, sqrt1_ru(x), "sqrtpd {x}, {x}", ru);
+#[cfg(feature = "avx512")]
+impl_op_round!(f64, xmm_reg, sqrt1_ru(x), "vsqrtsd {x}, {x}, {x}", ru);
 
+#[cfg(not(feature = "avx512"))]
 impl_op_round!(f64, sub1_ru(x, y), "subpd {x}, {y}", ru);
+#[cfg(feature = "avx512")]
+impl_op_round!(f64, xmm_reg, sub1_ru(x, y), "vsubsd {x}, {x}, {y}", ru);
 
 #[cfg(not(feature = "avx512"))]
 impl_op_round!(__m128d, add_ru(x, y), "addpd {x}, {y}", ru);
-
 #[cfg(feature = "avx512")]
-pub fn sqrt1_rd(x: f64) -> f64 {
-    #[target_feature(enable = "avx512f")]
-    unsafe fn inner(mut x: f64) -> f64 {
-        asm!(
-            "vsqrtpd {x:z}, {x:z}, {{rd-sae}}",
-            x = inout(zmm_reg) x,
-            options(pure, nomem)
-        );
-        x
-    }
-
-    unsafe { inner(x) }
-}
-
-#[cfg(feature = "avx512")]
-pub(crate) fn sqrt1_ru(x: f64) -> f64 {
-    #[target_feature(enable = "avx512f")]
-    unsafe fn inner(mut x: f64) -> f64 {
-        asm!(
-            "vsqrtpd {x:z}, {x:z}, {{ru-sae}}",
-            x = inout(zmm_reg) x,
-            options(pure, nomem)
-        );
-        x
-    }
-
-    unsafe { inner(x) }
-}
+impl_op_round!(
+    __m128d,
+    zmm_reg,
+    add_ru(x, y),
+    "vaddpd {x:z}, {x:z}, {y:z}",
+    ru
+);
 
 #[cfg(not(feature = "avx512"))]
 impl_op_round!(__m128d, mul_ru(x, y), "mulpd {x}, {y}", ru);
+#[cfg(feature = "avx512")]
+impl_op_round!(
+    __m128d,
+    zmm_reg,
+    mul_ru(x, y),
+    "vmulpd {x:z}, {x:z}, {y:z}",
+    ru
+);
 
 #[cfg(not(feature = "avx512"))]
 impl_op_round!(__m128d, div_ru(x, y), "divpd {x}, {y}", ru);
+#[cfg(feature = "avx512")]
+impl_op_round!(
+    __m128d,
+    zmm_reg,
+    div_ru(x, y),
+    "vdivpd {x:z}, {x:z}, {y:z}",
+    ru
+);
 
 #[cfg(not(feature = "avx512"))]
 impl_op_round!(
@@ -113,37 +143,11 @@ impl_op_round!(
     "vfmadd213pd {x}, {y}, {z}",
     ru
 );
-
 #[cfg(feature = "avx512")]
-macro_rules! impl_op_round_avx512 {
-    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $intrin:ident, rd) => {
-        impl_op_round_avx512!($t, $f ($x $(,$y)*), $intrin, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC);
-    };
-
-    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $intrin:ident, ru) => {
-        impl_op_round_avx512!($t, $f ($x $(,$y)*), $intrin, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
-    };
-
-    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $intrin:ident, $rounding:expr) => {
-        pub(crate) fn $f($x: $t $(,$y: $t)*) -> $t {
-            unsafe {
-                let $x = _mm512_castpd128_pd512($x);
-                $(let $y = _mm512_castpd128_pd512($y);)*
-                let r = $intrin($x, $($y,)* $rounding);
-                _mm512_castpd512_pd128(r)
-            }
-        }
-    };
-}
-
-#[cfg(feature = "avx512")]
-impl_op_round_avx512!(__m128d, add_ru(x, y), _mm512_add_round_pd, ru);
-
-#[cfg(feature = "avx512")]
-impl_op_round_avx512!(__m128d, mul_ru(x, y), _mm512_mul_round_pd, ru);
-
-#[cfg(feature = "avx512")]
-impl_op_round_avx512!(__m128d, div_ru(x, y), _mm512_div_round_pd, ru);
-
-#[cfg(feature = "avx512")]
-impl_op_round_avx512!(__m128d, mul_add_ru(x, y, z), _mm512_fmadd_round_pd, ru);
+impl_op_round!(
+    __m128d,
+    zmm_reg,
+    mul_add_ru(x, y, z),
+    "vfmadd213pd {x:z}, {y:z}, {z:z}",
+    ru
+);
