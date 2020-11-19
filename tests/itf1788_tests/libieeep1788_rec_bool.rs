@@ -30,7 +30,6 @@
 
 //Preamble
 use crate::*;
-use hexf::*;
 type D = inari::Decoration;
 type DI = inari::DecInterval;
 type I = inari::Interval;
@@ -44,7 +43,7 @@ fn minimal_is_common_interval_test() {
     assert!(n2i(-0.0, 0.0).is_common_interval());
     assert!(n2i(0.0, -0.0).is_common_interval());
     assert!(n2i(5.0, 12.4).is_common_interval());
-    assert!(n2i(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023")).is_common_interval());
+    assert!(n2i(-1.7976931348623157e+308, 1.7976931348623157e+308).is_common_interval());
     assert_eq2!(I::ENTIRE.is_common_interval(), false);
     assert_eq2!(I::EMPTY.is_common_interval(), false);
     assert_eq2!(n2i(f64::NEG_INFINITY, 0.0).is_common_interval(), false);
@@ -60,7 +59,7 @@ fn minimal_is_common_interval_dec_test() {
     assert!(nd2di(-0.0, 0.0, D::Com).is_common_interval());
     assert!(nd2di(0.0, -0.0, D::Com).is_common_interval());
     assert!(nd2di(5.0, 12.4, D::Com).is_common_interval());
-    assert!(nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Com).is_common_interval());
+    assert!(nd2di(-1.7976931348623157e+308, 1.7976931348623157e+308, D::Com).is_common_interval());
     assert!(nd2di(-27.0, -27.0, D::Trv).is_common_interval());
     assert!(nd2di(-27.0, 0.0, D::Def).is_common_interval());
     assert!(nd2di(0.0, 0.0, D::Dac).is_common_interval());
@@ -68,7 +67,7 @@ fn minimal_is_common_interval_dec_test() {
     assert!(nd2di(-0.0, 0.0, D::Def).is_common_interval());
     assert!(nd2di(0.0, -0.0, D::Dac).is_common_interval());
     assert!(nd2di(5.0, 12.4, D::Def).is_common_interval());
-    assert!(nd2di(hexf64!("-0x1.fffffffffffffp+1023"), hexf64!("0x1.fffffffffffffp+1023"), D::Trv).is_common_interval());
+    assert!(nd2di(-1.7976931348623157e+308, 1.7976931348623157e+308, D::Trv).is_common_interval());
     assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).is_common_interval(), false);
     assert_eq2!(DI::NAI.is_common_interval(), false);
     assert_eq2!(DI::EMPTY.is_common_interval(), false);
@@ -91,7 +90,7 @@ fn minimal_is_singleton_test() {
     assert_eq2!(n2i(-1.0, 0.0).is_singleton(), false);
     assert_eq2!(n2i(-1.0, -0.5).is_singleton(), false);
     assert_eq2!(n2i(1.0, 2.0).is_singleton(), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, hexf64!("-0x1.fffffffffffffp+1023")).is_singleton(), false);
+    assert_eq2!(n2i(f64::NEG_INFINITY, -1.7976931348623157e+308).is_singleton(), false);
     assert_eq2!(n2i(-1.0, f64::INFINITY).is_singleton(), false);
 }
 
@@ -111,7 +110,7 @@ fn minimal_is_singleton_dec_test() {
     assert_eq2!(nd2di(-1.0, 0.0, D::Dac).is_singleton(), false);
     assert_eq2!(nd2di(-1.0, -0.5, D::Com).is_singleton(), false);
     assert_eq2!(nd2di(1.0, 2.0, D::Def).is_singleton(), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, hexf64!("-0x1.fffffffffffffp+1023"), D::Dac).is_singleton(), false);
+    assert_eq2!(nd2di(f64::NEG_INFINITY, -1.7976931348623157e+308, D::Dac).is_singleton(), false);
     assert_eq2!(nd2di(-1.0, f64::INFINITY, D::Trv).is_singleton(), false);
 }
 
@@ -133,10 +132,10 @@ fn minimal_is_member_test() {
     assert!(I::ENTIRE.contains(5.0));
     assert!(I::ENTIRE.contains(6.3));
     assert!(I::ENTIRE.contains(12.4));
-    assert!(I::ENTIRE.contains(hexf64!("0x1.fffffffffffffp+1023")));
-    assert!(I::ENTIRE.contains(hexf64!("-0x1.fffffffffffffp+1023")));
-    assert!(I::ENTIRE.contains(hexf64!("0x1.0000000000000p-1022")));
-    assert!(I::ENTIRE.contains(hexf64!("-0x1.0000000000000p-1022")));
+    assert!(I::ENTIRE.contains(1.7976931348623157e+308));
+    assert!(I::ENTIRE.contains(-1.7976931348623157e+308));
+    assert!(I::ENTIRE.contains(2.2250738585072014e-308));
+    assert!(I::ENTIRE.contains(-2.2250738585072014e-308));
     assert_eq2!(n2i(-27.0, 0.0).contains(-71.0), false);
     assert_eq2!(n2i(-27.0, 0.0).contains(0.1), false);
     assert_eq2!(n2i(0.0, 0.0).contains(-0.01), false);
@@ -172,10 +171,10 @@ fn minimal_is_member_dec_test() {
     assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).contains(5.0));
     assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).contains(6.3));
     assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).contains(12.4));
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).contains(hexf64!("0x1.fffffffffffffp+1023")));
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).contains(hexf64!("-0x1.fffffffffffffp+1023")));
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).contains(hexf64!("0x1.0000000000000p-1022")));
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).contains(hexf64!("-0x1.0000000000000p-1022")));
+    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).contains(1.7976931348623157e+308));
+    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).contains(-1.7976931348623157e+308));
+    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).contains(2.2250738585072014e-308));
+    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).contains(-2.2250738585072014e-308));
     assert_eq2!(nd2di(-27.0, 0.0, D::Trv).contains(-71.0), false);
     assert_eq2!(nd2di(-27.0, 0.0, D::Def).contains(0.1), false);
     assert_eq2!(nd2di(0.0, 0.0, D::Dac).contains(-0.01), false);

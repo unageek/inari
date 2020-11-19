@@ -20,7 +20,6 @@
 
 //Preamble
 use crate::*;
-use hexf::*;
 type DI = inari::DecInterval;
 type I = inari::Interval;
 
@@ -30,5 +29,5 @@ fn exceptions() {
     assert_eq2!(t2i("[+infinity]"), I::EMPTY);
     assert_eq2!(n2i(f64::INFINITY, f64::NEG_INFINITY), I::EMPTY);
     assert_eq2!(interval_part(DI::NAI), I::EMPTY);
-    assert_eq2!(t2i("[1.0000000000000001, 1.0000000000000002]"), n2i(1.0, hexf64!("0x1.0000000000001p+0")));
+    assert_eq2!(t2i("[1.0000000000000001, 1.0000000000000002]"), n2i(1.0, 1.0000000000000002));
 }
