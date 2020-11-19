@@ -22,22 +22,27 @@ jobs:
           components: clippy, rustfmt
           profile: minimal
 
-      - name: Run tests (--no-default-features --features "avx512")
-        run: cargo test --release --no-default-features --features "avx512"
-        env:
-          RUSTFLAGS: -Ctarget-feature=+avx512f
-          RUSTDOCFLAGS: -Ctarget-feature=+avx512f
-
       - name: Run tests
         run: cargo test --release
 
       - name: Run tests (--no-default-features)
         run: cargo test --release --no-default-features
 
+      - name: Run tests (--no-default-features --features "avx512")
+        run: cargo test --release --no-default-features --features "avx512"
+        env:
+          RUSTFLAGS: -Ctarget-feature=+avx512f
+          RUSTDOCFLAGS: -Ctarget-feature=+avx512f
+
       - name: Clippy
         run: |
           cargo clippy --all-targets -- -Dwarnings
-          cargo clippy --all-targets --features "avx512" -- -Dwarnings
+
+      - name: Clippy (--no-default-features --features "avx512")
+        run: |
+          cargo clippy --lib --no-default-features --features "avx512" -- -Dwarnings
+        env:
+          RUSTFLAGS: -Ctarget-feature=+avx512f
 
       - name: Check format
         run: cargo fmt -- --check
