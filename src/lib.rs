@@ -4,7 +4,7 @@
 
 #![feature(asm)]
 #![feature(external_doc)]
-#![cfg_attr(feature = "avx512", feature(avx512_target_feature, stdsimd))]
+#![cfg_attr(feature = "avx512", feature(avx512_target_feature, target_feature_11))]
 #![allow(clippy::float_cmp)]
 
 pub use self::{

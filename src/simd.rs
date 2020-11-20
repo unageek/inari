@@ -72,9 +72,8 @@ macro_rules! impl_op_round {
     };
 
     ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, $er:literal) => {
-        pub(crate) fn $f($x: $t, $($y: $t,)*) -> $t {
-            #[target_feature(enable = "avx512f")]
-            unsafe fn inner(mut $x: $t, $($y: $t,)*) -> $t {
+        pub(crate) fn $f(mut $x: $t, $($y: $t,)*) -> $t {
+            unsafe {
                 asm!(
                     concat!($inst, ", ", $er),
                     $x = inout($reg) $x,
@@ -83,8 +82,6 @@ macro_rules! impl_op_round {
                 );
                 $x
             }
-
-            unsafe { inner($x, $($y,)*) }
         }
     };
 }
