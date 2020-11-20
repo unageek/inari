@@ -29,12 +29,12 @@ pub(crate) fn swap(x: __m128d) -> __m128d {
     unsafe { _mm_shuffle_pd(x, x, 1) }
 }
 
-#[cfg(target_feature = "avx512f")]
+#[cfg(all(target_arch = "x86_64", target_feature = "avx512f"))]
 mod avx512f;
-#[cfg(target_feature = "avx512f")]
+#[cfg(all(target_arch = "x86_64", target_feature = "avx512f"))]
 pub(crate) use avx512f::*;
 
-#[cfg(target_feature = "sse2")]
+#[cfg(all(target_arch = "x86_64", not(target_feature = "avx512f")))]
 mod sse2;
-#[cfg(target_feature = "sse2")]
+#[cfg(all(target_arch = "x86_64", not(target_feature = "avx512f")))]
 pub(crate) use sse2::*;
