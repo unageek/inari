@@ -9,7 +9,7 @@ A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.or
 
 ## Requirements
 
-The nightly Rust toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used in the crate.
+The nightly Rust toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used.
 
 ## Conditional features
 

@@ -29,123 +29,12 @@ pub(crate) fn swap(x: __m128d) -> __m128d {
     unsafe { _mm_shuffle_pd(x, x, 1) }
 }
 
-#[cfg(not(target_feature = "avx512f"))]
-macro_rules! impl_op_round {
-    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
-        impl_op_round!($t, $f ($x $(,$y)*), $inst, "16256"); // _MM_ROUND_DOWN | _MM_MASK_MASK
-    };
-
-    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, ru) => {
-        impl_op_round!($t, $f ($x $(,$y)*), $inst, "24448"); // _MM_ROUND_UP | _MM_MASK_MASK
-    };
-
-    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, $mxcsr:literal) => {
-        pub(crate) fn $f(mut $x: $t, $($y: $t,)*) -> $t {
-            unsafe {
-                asm!(
-                    "push {rax}", // Same as "sub rsp, 8", but does not modify flags.
-                    "stmxcsr [rsp]",
-                    concat!("mov dword ptr [rsp + 4], ", $mxcsr),
-                    "ldmxcsr [rsp + 4]",
-                    $inst,
-                    "ldmxcsr [rsp]",
-                    "pop {rax}", // Same as "add rsp, 8", but does not modify flags.
-                    $x = inout(xmm_reg) $x,
-                    $($y = in(xmm_reg) $y,)*
-                    rax = out(reg) _, // Any 64-bit general-purpose register.
-                    options(pure, nomem, preserves_flags)
-                );
-            }
-            $x
-        }
-    };
-}
-
 #[cfg(target_feature = "avx512f")]
-macro_rules! impl_op_round {
-    ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
-        impl_op_round!($t, $reg, $f ($x $(,$y)*), $inst, "{{rd-sae}}");
-    };
-
-    ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, ru) => {
-        impl_op_round!($t, $reg, $f ($x $(,$y)*), $inst, "{{ru-sae}}");
-    };
-
-    ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, $er:literal) => {
-        pub(crate) fn $f(mut $x: $t, $($y: $t,)*) -> $t {
-            unsafe {
-                asm!(
-                    concat!($inst, ", ", $er),
-                    $x = inout($reg) $x,
-                    $($y = in($reg) $y,)*
-                    options(pure, nomem, nostack, preserves_flags)
-                );
-                $x
-            }
-        }
-    };
-}
-
-#[cfg(not(target_feature = "avx512f"))]
-impl_op_round!(f64, sqrt1_rd(x), "sqrtpd {x}, {x}", rd);
+mod avx512f;
 #[cfg(target_feature = "avx512f")]
-impl_op_round!(f64, xmm_reg, sqrt1_rd(x), "vsqrtsd {x}, {x}, {x}", rd);
+pub(crate) use avx512f::*;
 
-#[cfg(not(target_feature = "avx512f"))]
-impl_op_round!(f64, sqrt1_ru(x), "sqrtpd {x}, {x}", ru);
-#[cfg(target_feature = "avx512f")]
-impl_op_round!(f64, xmm_reg, sqrt1_ru(x), "vsqrtsd {x}, {x}, {x}", ru);
-
-#[cfg(not(target_feature = "avx512f"))]
-impl_op_round!(f64, sub1_ru(x, y), "subpd {x}, {y}", ru);
-#[cfg(target_feature = "avx512f")]
-impl_op_round!(f64, xmm_reg, sub1_ru(x, y), "vsubsd {x}, {x}, {y}", ru);
-
-#[cfg(not(target_feature = "avx512f"))]
-impl_op_round!(__m128d, add_ru(x, y), "addpd {x}, {y}", ru);
-#[cfg(target_feature = "avx512f")]
-impl_op_round!(
-    __m128d,
-    zmm_reg,
-    add_ru(x, y),
-    "vaddpd {x:z}, {x:z}, {y:z}",
-    ru
-);
-
-#[cfg(not(target_feature = "avx512f"))]
-impl_op_round!(__m128d, mul_ru(x, y), "mulpd {x}, {y}", ru);
-#[cfg(target_feature = "avx512f")]
-impl_op_round!(
-    __m128d,
-    zmm_reg,
-    mul_ru(x, y),
-    "vmulpd {x:z}, {x:z}, {y:z}",
-    ru
-);
-
-#[cfg(not(target_feature = "avx512f"))]
-impl_op_round!(__m128d, div_ru(x, y), "divpd {x}, {y}", ru);
-#[cfg(target_feature = "avx512f")]
-impl_op_round!(
-    __m128d,
-    zmm_reg,
-    div_ru(x, y),
-    "vdivpd {x:z}, {x:z}, {y:z}",
-    ru
-);
-
-#[cfg(not(target_feature = "avx512f"))]
-impl_op_round!(
-    __m128d,
-    mul_add_ru(x, y, z),
-    "vfmadd213pd {x}, {y}, {z}",
-    ru
-);
-#[cfg(target_feature = "avx512f")]
-impl_op_round!(
-    __m128d,
-    zmm_reg,
-    mul_add_ru(x, y, z),
-    "vfmadd213pd {x:z}, {y:z}, {z:z}",
-    ru
-);
+#[cfg(target_feature = "sse2")]
+mod sse2;
+#[cfg(target_feature = "sse2")]
+pub(crate) use sse2::*;
