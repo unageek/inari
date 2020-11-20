@@ -43,16 +43,17 @@ macro_rules! impl_op_round {
         pub(crate) fn $f(mut $x: $t, $($y: $t,)*) -> $t {
             unsafe {
                 asm!(
-                    "sub rsp, 8",
+                    "push {rax}", // Same as "sub rsp, 8", but does not modify flags.
                     "stmxcsr [rsp]",
                     concat!("mov dword ptr [rsp + 4], ", $mxcsr),
                     "ldmxcsr [rsp + 4]",
                     $inst,
                     "ldmxcsr [rsp]",
-                    "add rsp, 8",
+                    "pop {rax}", // Same as "add rsp, 8", but does not modify flags.
                     $x = inout(xmm_reg) $x,
                     $($y = in(xmm_reg) $y,)*
-                    options(pure, nomem)
+                    rax = out(reg) _, // Any 64-bit general-purpose register.
+                    options(pure, nomem, preserves_flags)
                 );
             }
             $x
