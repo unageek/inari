@@ -35,7 +35,6 @@ lto = true
 
 [features]
 default = ["gmp"]
-avx512 = []
 gmp = ["gmp-mpfr-sys", "nom", "rug"]
 
 [dependencies]

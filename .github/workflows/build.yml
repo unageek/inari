@@ -28,22 +28,20 @@ jobs:
       - name: Run tests (--no-default-features)
         run: cargo test --release --no-default-features
 
-      - name: Run tests (--no-default-features --features "avx512")
+      - name: Run tests with AVX-512F enabled (if available)
         run: |
-          lscpu
-          cargo test --release --no-default-features --features "avx512"
+          if lscpu | grep --quiet avx512f; then cargo test --release; fi
         env:
           RUSTFLAGS: -Ctarget-feature=+avx512f
           RUSTDOCFLAGS: -Ctarget-feature=+avx512f
-        continue-on-error: true
 
       - name: Clippy
         run: |
           cargo clippy --all-targets -- -Dwarnings
 
-      - name: Clippy (--no-default-features --features "avx512")
+      - name: Clippy (AVX-512F path)
         run: |
-          cargo clippy --lib --no-default-features --features "avx512" -- -Dwarnings
+          cargo clippy --lib --no-default-features -- -Dwarnings
         env:
           RUSTFLAGS: -Ctarget-feature=+avx512f
 
@@ -53,8 +51,8 @@ jobs:
       - name: Coverage
         env:
           CARGO_INCREMENTAL: 0
-          RUSTFLAGS: "-Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
-          RUSTDOCFLAGS: "-Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
+          RUSTFLAGS: -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
+          RUSTDOCFLAGS: -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
         run: |
           cargo clean
           cargo test

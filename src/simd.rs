@@ -29,7 +29,7 @@ pub(crate) fn swap(x: __m128d) -> __m128d {
     unsafe { _mm_shuffle_pd(x, x, 1) }
 }
 
-#[cfg(not(feature = "avx512"))]
+#[cfg(not(target_feature = "avx512f"))]
 macro_rules! impl_op_round {
     ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
         impl_op_round!($t, $f ($x $(,$y)*), $inst, "16256"); // _MM_ROUND_DOWN | _MM_MASK_MASK
@@ -61,7 +61,7 @@ macro_rules! impl_op_round {
     };
 }
 
-#[cfg(feature = "avx512")]
+#[cfg(target_feature = "avx512f")]
 macro_rules! impl_op_round {
     ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
         impl_op_round!($t, $reg, $f ($x $(,$y)*), $inst, "{{rd-sae}}");
@@ -86,24 +86,24 @@ macro_rules! impl_op_round {
     };
 }
 
-#[cfg(not(feature = "avx512"))]
+#[cfg(not(target_feature = "avx512f"))]
 impl_op_round!(f64, sqrt1_rd(x), "sqrtpd {x}, {x}", rd);
-#[cfg(feature = "avx512")]
+#[cfg(target_feature = "avx512f")]
 impl_op_round!(f64, xmm_reg, sqrt1_rd(x), "vsqrtsd {x}, {x}, {x}", rd);
 
-#[cfg(not(feature = "avx512"))]
+#[cfg(not(target_feature = "avx512f"))]
 impl_op_round!(f64, sqrt1_ru(x), "sqrtpd {x}, {x}", ru);
-#[cfg(feature = "avx512")]
+#[cfg(target_feature = "avx512f")]
 impl_op_round!(f64, xmm_reg, sqrt1_ru(x), "vsqrtsd {x}, {x}, {x}", ru);
 
-#[cfg(not(feature = "avx512"))]
+#[cfg(not(target_feature = "avx512f"))]
 impl_op_round!(f64, sub1_ru(x, y), "subpd {x}, {y}", ru);
-#[cfg(feature = "avx512")]
+#[cfg(target_feature = "avx512f")]
 impl_op_round!(f64, xmm_reg, sub1_ru(x, y), "vsubsd {x}, {x}, {y}", ru);
 
-#[cfg(not(feature = "avx512"))]
+#[cfg(not(target_feature = "avx512f"))]
 impl_op_round!(__m128d, add_ru(x, y), "addpd {x}, {y}", ru);
-#[cfg(feature = "avx512")]
+#[cfg(target_feature = "avx512f")]
 impl_op_round!(
     __m128d,
     zmm_reg,
@@ -112,9 +112,9 @@ impl_op_round!(
     ru
 );
 
-#[cfg(not(feature = "avx512"))]
+#[cfg(not(target_feature = "avx512f"))]
 impl_op_round!(__m128d, mul_ru(x, y), "mulpd {x}, {y}", ru);
-#[cfg(feature = "avx512")]
+#[cfg(target_feature = "avx512f")]
 impl_op_round!(
     __m128d,
     zmm_reg,
@@ -123,9 +123,9 @@ impl_op_round!(
     ru
 );
 
-#[cfg(not(feature = "avx512"))]
+#[cfg(not(target_feature = "avx512f"))]
 impl_op_round!(__m128d, div_ru(x, y), "divpd {x}, {y}", ru);
-#[cfg(feature = "avx512")]
+#[cfg(target_feature = "avx512f")]
 impl_op_round!(
     __m128d,
     zmm_reg,
@@ -134,14 +134,14 @@ impl_op_round!(
     ru
 );
 
-#[cfg(not(feature = "avx512"))]
+#[cfg(not(target_feature = "avx512f"))]
 impl_op_round!(
     __m128d,
     mul_add_ru(x, y, z),
     "vfmadd213pd {x}, {y}, {z}",
     ru
 );
-#[cfg(feature = "avx512")]
+#[cfg(target_feature = "avx512f")]
 impl_op_round!(
     __m128d,
     zmm_reg,
