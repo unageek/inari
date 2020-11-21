@@ -2,7 +2,11 @@ use std::arch::x86_64::*;
 
 pub(crate) fn abs(x: __m128d) -> __m128d {
     // Drop sign bits.
-    unsafe { _mm_andnot_pd(_mm_set1_pd(-0.0), x) }
+    unsafe { _mm_andnot_pd(constant(-0.0), x) }
+}
+
+pub(crate) fn constant(x: f64) -> __m128d {
+    unsafe { _mm_set1_pd(x) }
 }
 
 pub(crate) fn dup_hi(x: __m128d) -> __m128d {
@@ -26,11 +30,11 @@ pub(crate) fn negate_lo(x: __m128d) -> __m128d {
 }
 
 pub(crate) fn set_hi_inf(x: __m128d) -> __m128d {
-    unsafe { _mm_move_sd(_mm_set1_pd(f64::INFINITY), x) }
+    unsafe { _mm_move_sd(constant(f64::INFINITY), x) }
 }
 
 pub(crate) fn set_lo_inf(x: __m128d) -> __m128d {
-    unsafe { _mm_move_sd(x, _mm_set1_pd(f64::INFINITY)) }
+    unsafe { _mm_move_sd(x, constant(f64::INFINITY)) }
 }
 
 pub(crate) fn swap(x: __m128d) -> __m128d {

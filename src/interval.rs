@@ -1,3 +1,4 @@
+use crate::simd::*;
 use std::{
     arch::x86_64::*, cmp::Ordering, convert::TryFrom, error::Error, fmt, mem::transmute, result,
 };
@@ -77,8 +78,8 @@ impl Interval {
         }
     }
 
-    pub(crate) fn zero() -> Self {
-        unsafe { transmute([0.0, 0.0]) }
+    pub fn zero() -> Self {
+        Self { rep: constant(0.0) }
     }
 }
 

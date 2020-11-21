@@ -102,25 +102,25 @@ impl Interval {
             C_N0 => {
                 // 1 / N0 => [-inf, 1/a] = [-1/-a; inf]
                 let x = swap(self.rep); // [-a; b]
-                let r = unsafe { set_lo_inf(div_ru(_mm_set1_pd(-1.0), x)) };
+                let r = set_lo_inf(div_ru(constant(-1.0), x));
                 Self { rep: r }
             }
             C_N1 => {
                 // 1 / N1 => [1/b, 1/a] = [1/a; -1/b] = [-1; -1] / [-a; b]
                 let x = swap(self.rep); // [-a; b]
-                let r = unsafe { div_ru(_mm_set1_pd(-1.0), x) };
+                let r = div_ru(constant(-1.0), x);
                 Self { rep: r }
             }
             C_P0 => {
                 // 1 / P0 => [1/b, inf] = [inf; -1/b]
                 let x = swap(self.rep); // [-a; b]
-                let r = unsafe { set_hi_inf(div_ru(_mm_set1_pd(-1.0), x)) };
+                let r = set_hi_inf(div_ru(constant(-1.0), x));
                 Self { rep: r }
             }
             C_P1 => {
                 // 1 / P1 => [1/b, 1/a] = [1/a; -1/b] = [-1; -1] / [-a; b]
                 let x = swap(self.rep); // [-a; b]
-                let r = unsafe { div_ru(_mm_set1_pd(-1.0), x) };
+                let r = div_ru(constant(-1.0), x);
                 Self { rep: r }
             }
             _ => unreachable!(),
@@ -139,7 +139,7 @@ impl Interval {
                 let r0 = self.rep; // [b; -a]
                 let r1 = mul_ru(r0, r0); // [b^2; a^2]
                 let r2 = max(r1, swap(r1)); // [_; max(a^2, b^2)]
-                let r = unsafe { _mm_unpacklo_pd(_mm_setzero_pd(), r2) };
+                let r = unsafe { _mm_unpacklo_pd(constant(0.0), r2) };
                 Self { rep: r }
             }
             C_N0 | C_N1 => {

@@ -1,4 +1,4 @@
-use crate::interval::*;
+use crate::{interval::*, simd::*};
 use std::arch::x86_64::*;
 
 // NOTE: `eq` is implemented in interval.rs
@@ -93,7 +93,7 @@ impl Interval {
     /// assert!(!Interval::ENTIRE.is_common_interval());
     /// ```
     pub fn is_common_interval(self) -> bool {
-        unsafe { _mm_movemask_pd(_mm_cmplt_pd(self.rep, _mm_set1_pd(f64::INFINITY))) == 3 }
+        unsafe { _mm_movemask_pd(_mm_cmplt_pd(self.rep, constant(f64::INFINITY))) == 3 }
     }
 
     /// Returns `true` if `self` is empty ($\self = ∅$).
@@ -121,7 +121,7 @@ impl Interval {
     /// assert!(Interval::ENTIRE.is_entire());
     /// ```
     pub fn is_entire(self) -> bool {
-        unsafe { _mm_movemask_pd(_mm_cmpeq_pd(self.rep, _mm_set1_pd(f64::INFINITY))) == 3 }
+        unsafe { _mm_movemask_pd(_mm_cmpeq_pd(self.rep, constant(f64::INFINITY))) == 3 }
     }
 
     /// Returns `true` if `self` consists of a single real number.

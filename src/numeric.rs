@@ -122,7 +122,7 @@ impl Interval {
     ///
     /// See also: [`Interval::mag`].
     pub fn mig(self) -> f64 {
-        let zero = unsafe { _mm_setzero_pd() };
+        let zero = constant(0.0);
         let contains_zero = unsafe { _mm_movemask_pd(_mm_cmpge_pd(self.rep, zero)) == 3 };
         if contains_zero {
             return 0.0;

@@ -12,7 +12,7 @@ impl Interval {
                 // [0, max(-a, b)] = [max(-a, b); 0]
                 let r0 = self.rep; // [b; -a]
                 let r1 = max(r0, swap(r0)); // [_; max(-a, b)]
-                let r = unsafe { _mm_unpacklo_pd(_mm_setzero_pd(), r1) };
+                let r = unsafe { _mm_unpacklo_pd(constant(0.0), r1) };
                 Self { rep: r }
             }
             C_N0 | C_N1 => {

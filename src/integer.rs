@@ -128,13 +128,13 @@ impl Interval {
         }
 
         unsafe {
-            let zero = _mm_setzero_pd();
+            let zero = constant(0.0);
             let gt_zero_mask = _mm_cmpgt_pd(self.rep, zero);
             let lt_zero_mask = _mm_cmplt_pd(self.rep, zero);
             // [-(a ≤ 0), b ≥ 0] = [b ≥ 0; -a ≥ 0]
-            let one_or_zero = _mm_and_pd(_mm_set1_pd(1.0), gt_zero_mask);
+            let one_or_zero = _mm_and_pd(constant(1.0), gt_zero_mask);
             // [a ≥ 0, -(b ≤ 0)] = [-(b ≤ 0); -(-a ≤ 0)]
-            let m_one_or_zero = _mm_and_pd(_mm_set1_pd(-1.0), lt_zero_mask);
+            let m_one_or_zero = _mm_and_pd(constant(-1.0), lt_zero_mask);
             // Gives the same result as addition, but faster.
             let r = _mm_or_pd(one_or_zero, m_one_or_zero);
             Self { rep: r }
