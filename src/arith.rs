@@ -95,7 +95,7 @@ impl Mul for Interval {
                 // N * N => [b*d, a*c] = [a*c; -b*d] = [a; -b] * [c; d] = [-a; -b] * [-c; d]
                 let x0 = swap(self.rep); // [-a; b]
                 let x = negate_lo(x0); // [-a; -b]
-                let y = swap(rhs.rep); // [d; -c]
+                let y = swap(rhs.rep); // [-c; d]
                 Self { rep: mul_ru(x, y) }
             }
             C_N0_P0 | C_N0_P1 | C_N1_P0 | C_N1_P1 => {
