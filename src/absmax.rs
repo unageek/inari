@@ -11,7 +11,7 @@ impl Interval {
             C_M => {
                 // [0, max(-a, b)] = [max(-a, b); 0]
                 let r0 = self.rep; // [b; -a]
-                let r1 = unsafe { _mm_max_sd(r0, swap(r0)) }; // [_; max(-a, b)]
+                let r1 = max(r0, swap(r0)); // [_; max(-a, b)]
                 let r = unsafe { _mm_unpacklo_pd(_mm_setzero_pd(), r1) };
                 Self { rep: r }
             }
@@ -37,8 +37,8 @@ impl Interval {
         }
 
         unsafe {
-            let max = _mm_max_pd(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
-            let min = _mm_min_pd(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
+            let max = max(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
+            let min = min(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
             let r = _mm_move_sd(max, min); // [max(b, d); min(-a, -c)]
             Self { rep: r }
         }
@@ -54,8 +54,8 @@ impl Interval {
         }
 
         unsafe {
-            let min = _mm_min_pd(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
-            let max = _mm_max_pd(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
+            let min = min(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
+            let max = max(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
             let r = _mm_move_sd(min, max); // [min(b, d); max(-a, -c)]
             Self { rep: r }
         }

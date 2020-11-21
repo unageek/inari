@@ -1,8 +1,5 @@
 use crate::{classify::*, interval::*, simd::*};
-use std::{
-    arch::x86_64::*,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
-};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 impl Neg for Interval {
     type Output = Self;
@@ -73,7 +70,7 @@ impl Mul for Interval {
                 let z = dup_hi(self.rep); // [b; b]
                 let w = rhs.rep;
                 let zw = mul_ru(z, w);
-                let r = unsafe { _mm_max_pd(xy, zw) };
+                let r = max(xy, zw);
                 Self { rep: r }
             }
             C_M_N0 | C_M_N1 => {

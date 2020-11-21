@@ -13,6 +13,14 @@ pub(crate) fn dup_lo(x: __m128d) -> __m128d {
     unsafe { _mm_unpacklo_pd(x, x) }
 }
 
+pub(crate) fn max(x: __m128d, y: __m128d) -> __m128d {
+    unsafe { _mm_max_pd(x, y) }
+}
+
+pub(crate) fn min(x: __m128d, y: __m128d) -> __m128d {
+    unsafe { _mm_min_pd(x, y) }
+}
+
 pub(crate) fn negate_lo(x: __m128d) -> __m128d {
     unsafe { _mm_xor_pd(x, _mm_set_sd(-0.0)) }
 }

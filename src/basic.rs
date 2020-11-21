@@ -26,7 +26,7 @@ impl Interval {
                 let z = dup_hi(self.rep);
                 let w = rhs.rep;
                 let zw = mul_add_ru(z, w, addend.rep); // *
-                let r = unsafe { _mm_max_pd(xy, zw) };
+                let r = max(xy, zw);
                 Self { rep: r }
             }
             C_M_N0 | C_M_N1 => {
@@ -138,7 +138,7 @@ impl Interval {
                 // [0, max(a^2, b^2)] = [max(a^2, b^2); 0]
                 let r0 = self.rep; // [b; -a]
                 let r1 = mul_ru(r0, r0); // [b^2; a^2]
-                let r2 = unsafe { _mm_max_sd(r1, swap(r1)) }; // [_; max(a^2, b^2)]
+                let r2 = max(r1, swap(r1)); // [_; max(a^2, b^2)]
                 let r = unsafe { _mm_unpacklo_pd(_mm_setzero_pd(), r2) };
                 Self { rep: r }
             }

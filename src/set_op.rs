@@ -1,5 +1,4 @@
-use crate::interval::*;
-use std::arch::x86_64::*;
+use crate::{interval::*, simd::*};
 
 impl Interval {
     /// Returns $\[\min(a, c), \max(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
@@ -19,7 +18,7 @@ impl Interval {
 
         // [min(a, c), max(b, d)] = [max(b, d); max(-a, -c)] = simd_max([b; -a], [d; -c])
         Self {
-            rep: unsafe { _mm_max_pd(self.rep, rhs.rep) },
+            rep: max(self.rep, rhs.rep),
         }
     }
 
@@ -35,7 +34,7 @@ impl Interval {
 
         // [max(a, c), min(b, d)] = [min(b, d); min(-a, -c)] = simd_min([b; -a], [d; -c])
         let i = Self {
-            rep: unsafe { _mm_min_pd(self.rep, rhs.rep) },
+            rep: min(self.rep, rhs.rep),
         };
 
         if i.inf_raw() > i.sup_raw() {

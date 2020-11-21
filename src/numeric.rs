@@ -48,7 +48,7 @@ impl Interval {
     /// See also: [`Interval::mig`].
     pub fn mag(self) -> f64 {
         let abs = abs(self.rep);
-        unsafe { _mm_cvtsd_f64(_mm_max_sd(abs, swap(abs))) }
+        unsafe { _mm_cvtsd_f64(max(abs, swap(abs))) }
     }
 
     /// Returns the midpoint of `self` if `self` is nonempty; otherwise, NaN.
@@ -129,7 +129,7 @@ impl Interval {
         }
 
         let abs = abs(self.rep);
-        unsafe { _mm_cvtsd_f64(_mm_min_sd(abs, swap(abs))) }
+        unsafe { _mm_cvtsd_f64(min(abs, swap(abs))) }
     }
 
     /// Returns the radius of `self` if `self` is nonempty; otherwise, NaN.
