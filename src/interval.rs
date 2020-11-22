@@ -5,7 +5,6 @@ use std::{
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IntervalErrorKind {
-    IntvlPartOfNaI,
     PossiblyUndefinedOperation,
     UndefinedOperation,
 }
@@ -29,7 +28,6 @@ impl<T: fmt::Debug> IntervalError<T> {
 impl<T: fmt::Debug> fmt::Display for IntervalError<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.kind {
-            IntervalErrorKind::IntvlPartOfNaI => write!(f, "interval part of nai"),
             IntervalErrorKind::PossiblyUndefinedOperation => {
                 write!(f, "possibly undefined operation")
             }
@@ -157,35 +155,30 @@ impl DecInterval {
         Self { x, d }
     }
 
-    pub fn decoration_part(self) -> Decoration {
+    pub fn decoration(self) -> Decoration {
         self.d
     }
 
-    pub fn interval_part(self) -> Result<Interval> {
+    pub fn interval(self) -> Option<Interval> {
         if self.is_nai() {
-            return Err(IntervalError {
-                kind: IntervalErrorKind::IntvlPartOfNaI,
-                value: Interval::EMPTY,
-            });
+            return None;
         }
 
-        Ok(self.x)
+        Some(self.x)
     }
 
     pub fn set_dec(x: Interval, d: Decoration) -> Self {
         use Decoration::*;
 
         if d == Ill {
-            return Self::NAI;
+            Self::NAI
+        } else if x.is_empty() {
+            Self::EMPTY
+        } else if d == Com && !x.is_common_interval() {
+            Self::new_unchecked(x, Dac)
+        } else {
+            Self::new_unchecked(x, d)
         }
-        if x.is_empty() {
-            return Self::EMPTY;
-        }
-        if d == Com && !x.is_common_interval() {
-            return Self::new_unchecked(x, Dac);
-        }
-
-        Self::new_unchecked(x, d)
     }
 }
 

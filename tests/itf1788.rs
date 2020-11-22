@@ -63,13 +63,6 @@ pub fn nd2di(a: f64, b: f64, d: Decoration) -> DecInterval {
     DecInterval::set_dec(interval!(a, b).unwrap(), d)
 }
 
-pub fn interval_part(x: DecInterval) -> Interval {
-    match x.interval_part() {
-        Ok(x) => x,
-        Err(x) => x.value(),
-    }
-}
-
 pub trait Eq2: PartialEq {
     fn eq2(&self, rhs: &Self) -> bool {
         self == rhs
@@ -89,8 +82,7 @@ impl Eq2 for f64 {
 
 impl Eq2 for DecInterval {
     fn eq2(&self, rhs: &Self) -> bool {
-        self.is_nai() && rhs.is_nai()
-            || self == rhs && self.decoration_part() == rhs.decoration_part()
+        self.is_nai() && rhs.is_nai() || self == rhs && self.decoration() == rhs.decoration()
     }
 }
 
