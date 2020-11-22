@@ -61,20 +61,20 @@ impl Interval {
     ///
     /// ```
     /// use inari::*;
-    /// assert_eq!(const_interval!(0.2, 1.2).round_ties_to_away(), const_interval!(0.0, 1.0));
-    /// assert_eq!(const_interval!(0.5, 1.5).round_ties_to_away(), const_interval!(1.0, 2.0));
-    /// assert_eq!(const_interval!(0.8, 1.8).round_ties_to_away(), const_interval!(1.0, 2.0));
-    /// assert_eq!(const_interval!(-1.2, -0.2).round_ties_to_away(), const_interval!(-1.0, 0.0));
-    /// assert_eq!(const_interval!(-1.5, -0.5).round_ties_to_away(), const_interval!(-2.0, -1.0));
-    /// assert_eq!(const_interval!(-1.8, -0.8).round_ties_to_away(), const_interval!(-2.0, -1.0));
-    /// assert_eq!(Interval::EMPTY.round_ties_to_away(), Interval::EMPTY);
-    /// assert_eq!(Interval::ENTIRE.round_ties_to_away(), Interval::ENTIRE);
+    /// assert_eq!(const_interval!(0.2, 1.2).round(), const_interval!(0.0, 1.0));
+    /// assert_eq!(const_interval!(0.5, 1.5).round(), const_interval!(1.0, 2.0));
+    /// assert_eq!(const_interval!(0.8, 1.8).round(), const_interval!(1.0, 2.0));
+    /// assert_eq!(const_interval!(-1.2, -0.2).round(), const_interval!(-1.0, 0.0));
+    /// assert_eq!(const_interval!(-1.5, -0.5).round(), const_interval!(-2.0, -1.0));
+    /// assert_eq!(const_interval!(-1.8, -0.8).round(), const_interval!(-2.0, -1.0));
+    /// assert_eq!(Interval::EMPTY.round(), Interval::EMPTY);
+    /// assert_eq!(Interval::ENTIRE.round(), Interval::ENTIRE);
     /// ```
     ///
     /// See also: [`Interval::round_ties_to_even`].
     // This one is hard to implement correctly.
     // https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
-    pub fn round_ties_to_away(self) -> Self {
+    pub fn round(self) -> Self {
         Self::with_infsup_raw(self.inf_raw().round(), self.sup_raw().round())
     }
 
@@ -97,7 +97,7 @@ impl Interval {
     /// assert_eq!(Interval::ENTIRE.round_ties_to_even(), Interval::ENTIRE);
     /// ```
     ///
-    /// See also: [`Interval::round_ties_to_away`].
+    /// See also: [`Interval::round`].
     pub fn round_ties_to_even(self) -> Self {
         Self {
             rep: round_ties_to_even(self.rep),
@@ -198,7 +198,7 @@ impl DecInterval {
     impl_dec!(floor, x, y, x.inf_raw() == y.inf_raw()); // No need to check sup.
 
     // Discontinuities: {x + 0.5 | x ∈ ℤ}.
-    impl_dec!(round_ties_to_away, x, y, {
+    impl_dec!(round, x, y, {
         let abs_a = x.inf_raw().abs();
         let abs_b = x.sup_raw().abs();
         (abs_a - abs_a.trunc() == 0.5) || (abs_b - abs_b.trunc() == 0.5)
@@ -232,14 +232,14 @@ mod tests {
     fn empty() {
         assert!(I::EMPTY.ceil().is_empty());
         assert!(I::EMPTY.floor().is_empty());
-        assert!(I::EMPTY.round_ties_to_away().is_empty());
+        assert!(I::EMPTY.round().is_empty());
         assert!(I::EMPTY.round_ties_to_even().is_empty());
         assert!(I::EMPTY.sign().is_empty());
         assert!(I::EMPTY.trunc().is_empty());
 
         assert!(DI::EMPTY.ceil().is_empty());
         assert!(DI::EMPTY.floor().is_empty());
-        assert!(DI::EMPTY.round_ties_to_away().is_empty());
+        assert!(DI::EMPTY.round().is_empty());
         assert!(DI::EMPTY.round_ties_to_even().is_empty());
         assert!(DI::EMPTY.sign().is_empty());
         assert!(DI::EMPTY.trunc().is_empty());
@@ -249,7 +249,7 @@ mod tests {
     fn nai() {
         assert!(DI::NAI.ceil().is_nai());
         assert!(DI::NAI.floor().is_nai());
-        assert!(DI::NAI.round_ties_to_away().is_nai());
+        assert!(DI::NAI.round().is_nai());
         assert!(DI::NAI.round_ties_to_even().is_nai());
         assert!(DI::NAI.sign().is_nai());
         assert!(DI::NAI.trunc().is_nai());

@@ -4089,35 +4089,35 @@ fn minimal_round_ties_to_even_dec_test() {
 
 #[test]
 fn minimal_round_ties_to_away_test() {
-    assert_eq2!(I::EMPTY.round_ties_to_away(), I::EMPTY);
-    assert_eq2!(I::ENTIRE.round_ties_to_away(), I::ENTIRE);
-    assert_eq2!(n2i(1.1, 2.1).round_ties_to_away(), n2i(1.0, 2.0));
-    assert_eq2!(n2i(-1.1, 2.0).round_ties_to_away(), n2i(-1.0, 2.0));
-    assert_eq2!(n2i(-1.1, 0.0).round_ties_to_away(), n2i(-1.0, 0.0));
-    assert_eq2!(n2i(-1.1, -0.0).round_ties_to_away(), n2i(-1.0, -0.0));
-    assert_eq2!(n2i(-1.1, -0.4).round_ties_to_away(), n2i(-1.0, 0.0));
-    assert_eq2!(n2i(-1.9, 2.2).round_ties_to_away(), n2i(-2.0, 2.0));
-    assert_eq2!(n2i(-1.0, 2.2).round_ties_to_away(), n2i(-1.0, 2.0));
-    assert_eq2!(n2i(0.5, 2.1).round_ties_to_away(), n2i(1.0, 2.0));
-    assert_eq2!(n2i(-2.5, 2.0).round_ties_to_away(), n2i(-3.0, 2.0));
-    assert_eq2!(n2i(-1.1, -0.5).round_ties_to_away(), n2i(-1.0, -1.0));
-    assert_eq2!(n2i(-1.9, 2.5).round_ties_to_away(), n2i(-2.0, 3.0));
-    assert_eq2!(n2i(-1.5, 2.5).round_ties_to_away(), n2i(-2.0, 3.0));
-    assert_eq2!(n2i(0.0, 2.5).round_ties_to_away(), n2i(0.0, 3.0));
-    assert_eq2!(n2i(-0.0, 2.5).round_ties_to_away(), n2i(0.0, 3.0));
-    assert_eq2!(n2i(-1.5, f64::INFINITY).round_ties_to_away(), n2i(-2.0, f64::INFINITY));
-    assert_eq2!(n2i(f64::NEG_INFINITY, 2.2).round_ties_to_away(), n2i(f64::NEG_INFINITY, 2.0));
+    assert_eq2!(I::EMPTY.round(), I::EMPTY);
+    assert_eq2!(I::ENTIRE.round(), I::ENTIRE);
+    assert_eq2!(n2i(1.1, 2.1).round(), n2i(1.0, 2.0));
+    assert_eq2!(n2i(-1.1, 2.0).round(), n2i(-1.0, 2.0));
+    assert_eq2!(n2i(-1.1, 0.0).round(), n2i(-1.0, 0.0));
+    assert_eq2!(n2i(-1.1, -0.0).round(), n2i(-1.0, -0.0));
+    assert_eq2!(n2i(-1.1, -0.4).round(), n2i(-1.0, 0.0));
+    assert_eq2!(n2i(-1.9, 2.2).round(), n2i(-2.0, 2.0));
+    assert_eq2!(n2i(-1.0, 2.2).round(), n2i(-1.0, 2.0));
+    assert_eq2!(n2i(0.5, 2.1).round(), n2i(1.0, 2.0));
+    assert_eq2!(n2i(-2.5, 2.0).round(), n2i(-3.0, 2.0));
+    assert_eq2!(n2i(-1.1, -0.5).round(), n2i(-1.0, -1.0));
+    assert_eq2!(n2i(-1.9, 2.5).round(), n2i(-2.0, 3.0));
+    assert_eq2!(n2i(-1.5, 2.5).round(), n2i(-2.0, 3.0));
+    assert_eq2!(n2i(0.0, 2.5).round(), n2i(0.0, 3.0));
+    assert_eq2!(n2i(-0.0, 2.5).round(), n2i(0.0, 3.0));
+    assert_eq2!(n2i(-1.5, f64::INFINITY).round(), n2i(-2.0, f64::INFINITY));
+    assert_eq2!(n2i(f64::NEG_INFINITY, 2.2).round(), n2i(f64::NEG_INFINITY, 2.0));
 }
 
 #[test]
 fn minimal_round_ties_to_away_dec_test() {
-    assert_eq2!(nd2di(1.1, 2.1, D::Com).round_ties_to_away(), nd2di(1.0, 2.0, D::Def));
-    assert_eq2!(nd2di(-1.9, 2.2, D::Com).round_ties_to_away(), nd2di(-2.0, 2.0, D::Def));
-    assert_eq2!(nd2di(1.9, 2.2, D::Com).round_ties_to_away(), nd2di(2.0, 2.0, D::Com));
-    assert_eq2!(nd2di(-1.0, 2.2, D::Trv).round_ties_to_away(), nd2di(-1.0, 2.0, D::Trv));
-    assert_eq2!(nd2di(2.5, 2.6, D::Com).round_ties_to_away(), nd2di(3.0, 3.0, D::Dac));
-    assert_eq2!(nd2di(-1.5, f64::INFINITY, D::Dac).round_ties_to_away(), nd2di(-2.0, f64::INFINITY, D::Def));
-    assert_eq2!(nd2di(f64::NEG_INFINITY, 2.2, D::Def).round_ties_to_away(), nd2di(f64::NEG_INFINITY, 2.0, D::Def));
+    assert_eq2!(nd2di(1.1, 2.1, D::Com).round(), nd2di(1.0, 2.0, D::Def));
+    assert_eq2!(nd2di(-1.9, 2.2, D::Com).round(), nd2di(-2.0, 2.0, D::Def));
+    assert_eq2!(nd2di(1.9, 2.2, D::Com).round(), nd2di(2.0, 2.0, D::Com));
+    assert_eq2!(nd2di(-1.0, 2.2, D::Trv).round(), nd2di(-1.0, 2.0, D::Trv));
+    assert_eq2!(nd2di(2.5, 2.6, D::Com).round(), nd2di(3.0, 3.0, D::Dac));
+    assert_eq2!(nd2di(-1.5, f64::INFINITY, D::Dac).round(), nd2di(-2.0, f64::INFINITY, D::Def));
+    assert_eq2!(nd2di(f64::NEG_INFINITY, 2.2, D::Def).round(), nd2di(f64::NEG_INFINITY, 2.0, D::Def));
 }
 
 #[test]
