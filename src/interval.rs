@@ -1,7 +1,5 @@
 use crate::simd::*;
-use std::{
-    arch::x86_64::*, cmp::Ordering, convert::TryFrom, error::Error, fmt, mem::transmute, result,
-};
+use std::{cmp::Ordering, convert::TryFrom, error::Error, fmt, result};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IntervalErrorKind {
@@ -57,22 +55,21 @@ pub struct Interval {
     //   |127           64|63             0|
     //
     // The value of `rep` is Formatted as `__m128d(-a, b)` in Debug formatting.
-    pub(crate) rep: __m128d,
+    pub(crate) rep: F64X2,
 }
 
 impl Interval {
     pub(crate) fn inf_raw(self) -> f64 {
-        unsafe { -transmute::<_, [f64; 2]>(self)[0] }
+        -extract0(self.rep)
     }
 
     pub(crate) fn sup_raw(self) -> f64 {
-        unsafe { transmute::<_, [f64; 2]>(self)[1] }
+        extract1(self.rep)
     }
 
     pub(crate) fn with_infsup_raw(a: f64, b: f64) -> Self {
-        // More optimized code is generated than by `transmute([-a, b])`.
         Self {
-            rep: unsafe { _mm_set_pd(b, -a) },
+            rep: constants(-a, b),
         }
     }
 
@@ -83,8 +80,7 @@ impl Interval {
 
 impl PartialEq for Interval {
     fn eq(&self, rhs: &Self) -> bool {
-        self.is_empty() && rhs.is_empty()
-            || unsafe { _mm_movemask_pd(_mm_cmpeq_pd(self.rep, rhs.rep)) == 3 }
+        self.is_empty() && rhs.is_empty() || all(eq(self.rep, rhs.rep))
     }
 }
 

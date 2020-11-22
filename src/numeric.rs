@@ -1,5 +1,4 @@
 use crate::{interval::*, simd::*};
-use std::arch::x86_64::*;
 
 impl Interval {
     /// Returns the (greatest) lower bound of `self`.
@@ -48,7 +47,7 @@ impl Interval {
     /// See also: [`Interval::mig`].
     pub fn mag(self) -> f64 {
         let abs = abs(self.rep);
-        unsafe { _mm_cvtsd_f64(max(abs, swap(abs))) }
+        extract0(max(abs, swap(abs)))
     }
 
     /// Returns the midpoint of `self` if `self` is nonempty; otherwise, NaN.
@@ -123,13 +122,13 @@ impl Interval {
     /// See also: [`Interval::mag`].
     pub fn mig(self) -> f64 {
         let zero = constant(0.0);
-        let contains_zero = unsafe { _mm_movemask_pd(_mm_cmpge_pd(self.rep, zero)) == 3 };
+        let contains_zero = all(ge(self.rep, zero));
         if contains_zero {
             return 0.0;
         }
 
         let abs = abs(self.rep);
-        unsafe { _mm_cvtsd_f64(min(abs, swap(abs))) }
+        extract0(min(abs, swap(abs)))
     }
 
     /// Returns the radius of `self` if `self` is nonempty; otherwise, NaN.

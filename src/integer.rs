@@ -1,5 +1,4 @@
 use crate::{interval::*, simd::*};
-use std::arch::x86_64::*;
 
 impl Interval {
     /// Rounds the bounds of `self` to integers using directed rounding toward $+∞$.
@@ -22,9 +21,9 @@ impl Interval {
     pub fn ceil(self) -> Self {
         // _mm_ceil_pd/_mm_floor_pd are slow, better to avoid shuffling them.
         // ceil([a, b]) = [ceil(b); -ceil(a)]
-        let r0 = negate_lo(self.rep); // [b; a]
-        let r1 = unsafe { _mm_ceil_pd(r0) }; // [ceil(b); ceil(a)]
-        let r = negate_lo(r1);
+        let r0 = negate0(self.rep); // [b; a]
+        let r1 = ceil(r0); // [ceil(b); ceil(a)]
+        let r = negate0(r1);
         Self { rep: r }
     }
 
@@ -47,9 +46,9 @@ impl Interval {
     /// See also: [`Interval::ceil`], [`Interval::trunc`].
     pub fn floor(self) -> Self {
         // floor([a, b]) = [floor(b); -floor(a)]
-        let r0 = negate_lo(self.rep); // [b; a]
-        let r1 = unsafe { _mm_floor_pd(r0) }; // [floor(b); floor(a)]
-        let r = negate_lo(r1);
+        let r0 = negate0(self.rep); // [b; a]
+        let r1 = floor(r0); // [floor(b); floor(a)]
+        let r = negate0(r1);
         Self { rep: r }
     }
 
@@ -101,7 +100,7 @@ impl Interval {
     /// See also: [`Interval::round_ties_to_away`].
     pub fn round_ties_to_even(self) -> Self {
         Self {
-            rep: unsafe { _mm_round_pd(self.rep, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC) },
+            rep: round_ties_to_even(self.rep),
         }
     }
 
@@ -127,18 +126,16 @@ impl Interval {
             return Self::EMPTY;
         }
 
-        unsafe {
-            let zero = constant(0.0);
-            let gt_zero_mask = _mm_cmpgt_pd(self.rep, zero);
-            let lt_zero_mask = _mm_cmplt_pd(self.rep, zero);
-            // [-(a ≤ 0), b ≥ 0] = [b ≥ 0; -a ≥ 0]
-            let one_or_zero = _mm_and_pd(constant(1.0), gt_zero_mask);
-            // [a ≥ 0, -(b ≤ 0)] = [-(b ≤ 0); -(-a ≤ 0)]
-            let m_one_or_zero = _mm_and_pd(constant(-1.0), lt_zero_mask);
-            // Gives the same result as addition, but faster.
-            let r = _mm_or_pd(one_or_zero, m_one_or_zero);
-            Self { rep: r }
-        }
+        let zero = constant(0.0);
+        let gt_zero_mask = gt(self.rep, zero);
+        let lt_zero_mask = lt(self.rep, zero);
+        // [-(a ≤ 0), b ≥ 0] = [b ≥ 0; -a ≥ 0]
+        let one_or_zero = and(constant(1.0), gt_zero_mask);
+        // [a ≥ 0, -(b ≤ 0)] = [-(b ≤ 0); -(-a ≤ 0)]
+        let m_one_or_zero = and(constant(-1.0), lt_zero_mask);
+        // Gives the same result as addition, but faster.
+        let r = or(one_or_zero, m_one_or_zero);
+        Self { rep: r }
     }
 
     /// Rounds the bounds of `self` to integers using directed rounding toward zero.
@@ -160,7 +157,7 @@ impl Interval {
     /// See also: [`Interval::ceil`], [`Interval::floor`].
     pub fn trunc(self) -> Self {
         Self {
-            rep: unsafe { _mm_round_pd(self.rep, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC) },
+            rep: trunc(self.rep),
         }
     }
 }

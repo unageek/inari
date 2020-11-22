@@ -1,5 +1,4 @@
 use crate::{interval::Interval, simd::*};
-use std::arch::x86_64::*;
 
 impl Interval {
     /// For a given interval [a, b], returns the following bit pattern as an integer:
@@ -7,9 +6,9 @@ impl Interval {
     /// If `self` is empty, returns `0`.
     pub(crate) fn classify(self) -> u32 {
         let zero = constant(0.0);
-        let ge_zero = unsafe { _mm_movemask_pd(_mm_cmpge_pd(self.rep, zero)) };
-        let le_zero = unsafe { _mm_movemask_pd(_mm_cmple_pd(self.rep, zero)) };
-        ((le_zero << 2) | ge_zero) as u32
+        let ge_zero = bitmask(ge(self.rep, zero));
+        let le_zero = bitmask(le(self.rep, zero));
+        (le_zero << 2) | ge_zero
     }
 
     pub(crate) fn classify2(self, rhs: Self) -> u32 {
