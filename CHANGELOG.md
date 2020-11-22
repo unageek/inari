@@ -4,8 +4,14 @@ The ❗ icon indicates a breaking change.
 
 ## Unreleased
 
+### Removed
+
+- ❗ Removed the enum variant `IntervalErrorKind::IntvlPartOfNaI`.
+
 ### Changed
 
+- ❗ Renamed the methods `DecInterval::interval_part` and `decoration_part` to `interval` and `decoration`, respectively.
+- ❗ Changed the return type of the method `DecInterval::interval` (former `interval_part`) to `Option<Interval>` from `Result<Interval>`.
 - ❗ Renamed the enum `OverlappingState` to `Overlap`.
 
 ## v0.7.0 - 2020-11-14
@@ -32,10 +38,9 @@ The ❗ icon indicates a breaking change.
 
 ### Changed
 
-- ❗ Changed the return type of the method `DecoratedInterval::overlap` to `Option<OverlappingState>` instead of `OverlappingState`.
+- ❗ Changed the return type of the method `DecoratedInterval::overlap` to `Option<OverlappingState>` from `OverlappingState`.
   - Now it returns `None` if at least one of its arguments is NaI.
 - ❗ Renamed the enum variant `OverlappingState::Equal` to `Equals`.
-- ❗ Changed discriminants of the enum `OverlappingState`, while users must not rely on them.
 
 ## v0.5.1 - 2020-08-31
 
@@ -88,7 +93,7 @@ The ❗ icon indicates a breaking change.
 
 ### Changed
 
-- ❗ Changeed the representation of the struct `DecoratedInterval` to `#[repr(C)]` instead of the default one, while users must not rely on it.
+- ❗ Changeed the representation of the struct `DecoratedInterval` to `#[repr(C)]` from the default one, while users must not rely on it.
 
 ## v0.2.1 - 2020-07-17
 
@@ -112,8 +117,6 @@ The ❗ icon indicates a breaking change.
 
 - ❗ Renamed the function `Interval::is_member` to `contains` and swapped the order of parameters to make it a method.
 - ❗ Changed the method `IntervalError<T>::value` to take `self` instead of `&self`.
-- ❗ Changed discriminants of the enum `IntervalErrorKind`, while users must not rely on them.
-- ❗ Changed discriminants of the enum `OverlappingState`, while users must not rely on them.
 
 ## v0.1.0 - 2020-07-03
 

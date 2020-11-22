@@ -214,20 +214,20 @@ fn minimal_text_to_decorated_interval_test() {
 
 #[test]
 fn minimal_interval_part_test() {
-    assert_eq2!(interval_part(nd2di(-25.600000873750652, 0.09999999999999999, D::Trv)), n2i(-25.600000873750652, 0.09999999999999999));
-    assert_eq2!(interval_part(nd2di(-25.60000228881836, 0.09999999999999999, D::Com)), n2i(-25.60000228881836, 0.09999999999999999));
-    assert_eq2!(interval_part(nd2di(-25.600000873750652, 0.10000000149011612, D::Dac)), n2i(-25.600000873750652, 0.10000000149011612));
-    assert_eq2!(interval_part(nd2di(-25.60000228881836, 0.10000000149011612, D::Def)), n2i(-25.60000228881836, 0.10000000149011612));
-    assert_eq2!(interval_part(nd2di(-5e-324, -5e-324, D::Trv)), n2i(-5e-324, -5e-324));
-    assert_eq2!(interval_part(nd2di(-5e-324, 5e-324, D::Trv)), n2i(-5e-324, 5e-324));
-    assert_eq2!(interval_part(nd2di(5e-324, 5e-324, D::Trv)), n2i(5e-324, 5e-324));
-    assert_eq2!(interval_part(nd2di(-1.7976931348623157e+308, -1.7976931348623157e+308, D::Trv)), n2i(-1.7976931348623157e+308, -1.7976931348623157e+308));
-    assert_eq2!(interval_part(nd2di(-1.7976931348623157e+308, 1.7976931348623157e+308, D::Trv)), n2i(-1.7976931348623157e+308, 1.7976931348623157e+308));
-    assert_eq2!(interval_part(nd2di(1.7976931348623157e+308, 1.7976931348623157e+308, D::Trv)), n2i(1.7976931348623157e+308, 1.7976931348623157e+308));
-    assert_eq2!(interval_part(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), n2i(f64::NEG_INFINITY, f64::INFINITY));
-    assert_eq2!(interval_part(DI::EMPTY), I::EMPTY);
-    assert_eq2!(interval_part(nd2di(-25.60000228881836, 0.09999999999999999, D::Com)), n2i(-25.60000228881836, 0.09999999999999999));
-    assert_eq2!(interval_part(DI::NAI), I::EMPTY);
+    assert_eq2!(nd2di(-25.600000873750652, 0.09999999999999999, D::Trv).interval().unwrap_or(I::EMPTY), n2i(-25.600000873750652, 0.09999999999999999));
+    assert_eq2!(nd2di(-25.60000228881836, 0.09999999999999999, D::Com).interval().unwrap_or(I::EMPTY), n2i(-25.60000228881836, 0.09999999999999999));
+    assert_eq2!(nd2di(-25.600000873750652, 0.10000000149011612, D::Dac).interval().unwrap_or(I::EMPTY), n2i(-25.600000873750652, 0.10000000149011612));
+    assert_eq2!(nd2di(-25.60000228881836, 0.10000000149011612, D::Def).interval().unwrap_or(I::EMPTY), n2i(-25.60000228881836, 0.10000000149011612));
+    assert_eq2!(nd2di(-5e-324, -5e-324, D::Trv).interval().unwrap_or(I::EMPTY), n2i(-5e-324, -5e-324));
+    assert_eq2!(nd2di(-5e-324, 5e-324, D::Trv).interval().unwrap_or(I::EMPTY), n2i(-5e-324, 5e-324));
+    assert_eq2!(nd2di(5e-324, 5e-324, D::Trv).interval().unwrap_or(I::EMPTY), n2i(5e-324, 5e-324));
+    assert_eq2!(nd2di(-1.7976931348623157e+308, -1.7976931348623157e+308, D::Trv).interval().unwrap_or(I::EMPTY), n2i(-1.7976931348623157e+308, -1.7976931348623157e+308));
+    assert_eq2!(nd2di(-1.7976931348623157e+308, 1.7976931348623157e+308, D::Trv).interval().unwrap_or(I::EMPTY), n2i(-1.7976931348623157e+308, 1.7976931348623157e+308));
+    assert_eq2!(nd2di(1.7976931348623157e+308, 1.7976931348623157e+308, D::Trv).interval().unwrap_or(I::EMPTY), n2i(1.7976931348623157e+308, 1.7976931348623157e+308));
+    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).interval().unwrap_or(I::EMPTY), n2i(f64::NEG_INFINITY, f64::INFINITY));
+    assert_eq2!(DI::EMPTY.interval().unwrap_or(I::EMPTY), I::EMPTY);
+    assert_eq2!(nd2di(-25.60000228881836, 0.09999999999999999, D::Com).interval().unwrap_or(I::EMPTY), n2i(-25.60000228881836, 0.09999999999999999));
+    assert_eq2!(DI::NAI.interval().unwrap_or(I::EMPTY), I::EMPTY);
 }
 
 #[test]
@@ -275,10 +275,10 @@ fn minimal_set_dec_test() {
 
 #[test]
 fn minimal_decoration_part_test() {
-    assert_eq2!(DI::NAI.decoration_part(), D::Ill);
-    assert_eq2!(DI::EMPTY.decoration_part(), D::Trv);
-    assert_eq2!(nd2di(-1.0, 3.0, D::Trv).decoration_part(), D::Trv);
-    assert_eq2!(nd2di(-1.0, 3.0, D::Def).decoration_part(), D::Def);
-    assert_eq2!(nd2di(-1.0, 3.0, D::Dac).decoration_part(), D::Dac);
-    assert_eq2!(nd2di(-1.0, 3.0, D::Com).decoration_part(), D::Com);
+    assert_eq2!(DI::NAI.decoration(), D::Ill);
+    assert_eq2!(DI::EMPTY.decoration(), D::Trv);
+    assert_eq2!(nd2di(-1.0, 3.0, D::Trv).decoration(), D::Trv);
+    assert_eq2!(nd2di(-1.0, 3.0, D::Def).decoration(), D::Def);
+    assert_eq2!(nd2di(-1.0, 3.0, D::Dac).decoration(), D::Dac);
+    assert_eq2!(nd2di(-1.0, 3.0, D::Com).decoration(), D::Com);
 }
