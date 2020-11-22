@@ -53,6 +53,9 @@ jobs:
       - name: Check format
         run: cargo fmt -- --check
 
+      - name: Check docs
+        run: cargo rustdoc --all-features -- -Dwarnings
+
       - name: Coverage
         env:
           CARGO_INCREMENTAL: 0
