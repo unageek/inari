@@ -33,7 +33,7 @@ use crate::*;
 type D = inari::Decoration;
 type DI = inari::DecInterval;
 type I = inari::Interval;
-type O = inari::OverlappingState;
+type O = inari::Overlap;
 
 #[test]
 fn minimal_overlap_test() {

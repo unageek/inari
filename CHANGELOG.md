@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## Unreleased
+
+### Changed
+
+- ❗ Renamed the enum `OverlappingState` to `Overlap`.
+
 ## v0.7.0 - 2020-11-14
 
 ### Changed

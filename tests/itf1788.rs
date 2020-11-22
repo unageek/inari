@@ -79,7 +79,7 @@ pub trait Eq2: PartialEq {
 impl Eq2 for bool {}
 impl Eq2 for Decoration {}
 impl Eq2 for Interval {}
-impl Eq2 for OverlappingState {}
+impl Eq2 for Overlap {}
 
 impl Eq2 for f64 {
     fn eq2(&self, rhs: &Self) -> bool {
