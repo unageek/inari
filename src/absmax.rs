@@ -1,5 +1,4 @@
 use crate::{classify::*, interval::*, simd::*};
-use std::arch::x86_64::*;
 
 impl Interval {
     /// Returns the absolute value of `self`.
@@ -12,7 +11,7 @@ impl Interval {
                 // [0, max(-a, b)] = [max(-a, b); 0]
                 let r0 = self.rep; // [b; -a]
                 let r1 = max(r0, swap(r0)); // [_; max(-a, b)]
-                let r = unsafe { _mm_unpacklo_pd(constant(0.0), r1) };
+                let r = shuffle13(r1, constant(0.0));
                 Self { rep: r }
             }
             C_N0 | C_N1 => {
@@ -36,12 +35,10 @@ impl Interval {
             return Self::EMPTY;
         }
 
-        unsafe {
-            let max = max(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
-            let min = min(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
-            let r = _mm_move_sd(max, min); // [max(b, d); min(-a, -c)]
-            Self { rep: r }
-        }
+        let max = max(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
+        let min = min(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
+        let r = shuffle03(max, min); // [max(b, d); min(-a, -c)]
+        Self { rep: r }
     }
 
     /// Returns $\[\min(a, c), \min(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
@@ -53,12 +50,10 @@ impl Interval {
             return Self::EMPTY;
         }
 
-        unsafe {
-            let min = min(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
-            let max = max(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
-            let r = _mm_move_sd(min, max); // [min(b, d); max(-a, -c)]
-            Self { rep: r }
-        }
+        let min = min(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
+        let max = max(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
+        let r = shuffle03(min, max); // [min(b, d); max(-a, -c)]
+        Self { rep: r }
     }
 }
 

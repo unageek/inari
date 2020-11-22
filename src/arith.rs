@@ -64,10 +64,10 @@ impl Mul for Interval {
                 //   = simd_max([a*c; -a*d], [b*d; -b*c])
                 //   = simd_max([a; -a] * [c; d], [b; -b] * [d; c])
                 //   = simd_max([-a; -a] * [-c; d], [b; b] * [d; -c])
-                let x = dup_lo(self.rep); // [-a; -a]
+                let x = shuffle13(self.rep, self.rep); // [-a; -a]
                 let y = swap(rhs.rep); // [-c; d]
                 let xy = mul_ru(x, y);
-                let z = dup_hi(self.rep); // [b; b]
+                let z = shuffle02(self.rep, self.rep); // [b; b]
                 let w = rhs.rep;
                 let zw = mul_ru(z, w);
                 let r = max(xy, zw);
@@ -76,44 +76,44 @@ impl Mul for Interval {
             C_M_N0 | C_M_N1 => {
                 // M * N => [b*c, a*c] = [a*c; -b*c] = [a; -b] * [c; c] = [-a; b] * [-c; -c]
                 let x = swap(self.rep); // [-a; b]
-                let y = dup_lo(rhs.rep); // [-c; -c]
+                let y = shuffle13(rhs.rep, rhs.rep); // [-c; -c]
                 Self { rep: mul_ru(x, y) }
             }
             C_M_P0 | C_M_P1 => {
                 // M * P => [a*d, b*d] = [b*d; -a*d] = [b; -a] * [d; d]
                 let x = self.rep;
-                let y = dup_hi(rhs.rep); // [d; d]
+                let y = shuffle02(rhs.rep, rhs.rep); // [d; d]
                 Self { rep: mul_ru(x, y) }
             }
             C_N0_M | C_N1_M => {
                 // N * M => [a*d, a*c] = [a*c; -a*d] = [a; -a] * [c; d] = [-a; -a] * [-c; d]
-                let x = dup_lo(self.rep); // [-a; -a]
+                let x = shuffle13(self.rep, self.rep); // [-a; -a]
                 let y = swap(rhs.rep); // [-c; d]
                 Self { rep: mul_ru(x, y) }
             }
             C_N0_N0 | C_N0_N1 | C_N1_N0 | C_N1_N1 => {
                 // N * N => [b*d, a*c] = [a*c; -b*d] = [a; -b] * [c; d] = [-a; -b] * [-c; d]
                 let x0 = swap(self.rep); // [-a; b]
-                let x = negate_lo(x0); // [-a; -b]
+                let x = negate0(x0); // [-a; -b]
                 let y = swap(rhs.rep); // [-c; d]
                 Self { rep: mul_ru(x, y) }
             }
             C_N0_P0 | C_N0_P1 | C_N1_P0 | C_N1_P1 => {
                 // N * P => [a*d, b*c] = [b*c; -a*d] = [b; -a] * [c; d]
                 let x = self.rep;
-                let y0 = negate_lo(rhs.rep); // [d; c]
+                let y0 = negate0(rhs.rep); // [d; c]
                 let y = swap(y0); // [c; d]
                 Self { rep: mul_ru(x, y) }
             }
             C_P0_M | C_P1_M => {
                 // P * M => [b*c, b*d] = [b*d; -b*c] = [b; -b] * [d; c] = [b; b] * [d; -c]
-                let x = dup_hi(self.rep); // [b; b]
+                let x = shuffle02(self.rep, self.rep); // [b; b]
                 let y = rhs.rep;
                 Self { rep: mul_ru(x, y) }
             }
             C_P0_N0 | C_P0_N1 | C_P1_N0 | C_P1_N1 => {
                 // P * N => [b*c, a*d] = [a*d; -b*c] = [a; -b] * [d; c] = [a; b] * [d; -c]
-                let x0 = negate_lo(self.rep); // [b; a]
+                let x0 = negate0(self.rep); // [b; a]
                 let x = swap(x0); // [a; b]
                 let y = rhs.rep; // [d; -c]
                 Self { rep: mul_ru(x, y) }
@@ -121,7 +121,7 @@ impl Mul for Interval {
             C_P0_P0 | C_P0_P1 | C_P1_P0 | C_P1_P1 => {
                 // P * P => [a*c, b*d] = [b*d; -a*c] = [b; -a] * [d; c]
                 let x = self.rep;
-                let y = negate_lo(rhs.rep); // [d; c]
+                let y = negate0(rhs.rep); // [d; c]
                 Self { rep: mul_ru(x, y) }
             }
             _ => unreachable!(),
@@ -153,15 +153,15 @@ impl Div for Interval {
                 // M / N1 => [b/d, a/d] = [a/d; -b/d] = [a; -b] / [d; d] = [-a; b] / [-d; -d]
                 let x = swap(self.rep); // [-a; b]
                 let y0 = swap(rhs.rep); // [-c; d]
-                let y1 = negate_lo(y0); // [-c; -d]
-                let y = dup_lo(y1); // [-d; -d]
+                let y1 = negate0(y0); // [-c; -d]
+                let y = shuffle13(y1, y1); // [-d; -d]
                 Self { rep: div_ru(x, y) }
             }
             C_M_P1 => {
                 // M / P1 => [a/c, b/c] = [b/c; -a/c] = [b; -a] / [c; c]
                 let x = self.rep; // [b; -a]
-                let y0 = negate_lo(rhs.rep); // [d; c]
-                let y = dup_lo(y0); // [c; c]
+                let y0 = negate0(rhs.rep); // [d; c]
+                let y = shuffle13(y0, y0); // [c; c]
                 Self { rep: div_ru(x, y) }
             }
             C_N0_N0 | C_N1_N0 => {
@@ -169,12 +169,12 @@ impl Div for Interval {
                 let x = swap(self.rep); // [-a; b]
                 let y = rhs.rep; // [d; -c]
                 Self {
-                    rep: set_hi_inf(div_ru(x, y)),
+                    rep: shuffle03(constant(f64::INFINITY), div_ru(x, y)),
                 }
             }
             C_N0_N1 | C_N1_N1 => {
                 // N / N1 => [b/c, a/d] = [a/d; -b/c] = [a; -b] / [d; c] = [a; b] / [d; -c]
-                let x0 = negate_lo(self.rep); // [b; a]
+                let x0 = negate0(self.rep); // [b; a]
                 let x = swap(x0); // [a; b]
                 let y = rhs.rep; // [d; -c]
                 Self { rep: div_ru(x, y) }
@@ -184,13 +184,13 @@ impl Div for Interval {
                 let x = self.rep; // [b; -a]
                 let y = rhs.rep; // [d; -c]
                 Self {
-                    rep: set_lo_inf(div_ru(x, y)),
+                    rep: shuffle03(div_ru(x, y), constant(f64::INFINITY)),
                 }
             }
             C_N0_P1 | C_N1_P1 => {
                 // N / P1 => [a/c, b/d] = [b/d; -a/c] = [b; -a] / [d; c]
                 let x = self.rep; // [b; -a]
-                let y = negate_lo(rhs.rep); // [d, c]
+                let y = negate0(rhs.rep); // [d, c]
                 Self { rep: div_ru(x, y) }
             }
             C_P0_N0 | C_P1_N0 => {
@@ -199,13 +199,13 @@ impl Div for Interval {
                 let x = swap(self.rep); // [-a; b]
                 let y = swap(rhs.rep); // [-c; d]
                 Self {
-                    rep: set_lo_inf(div_ru(x, y)),
+                    rep: shuffle03(div_ru(x, y), constant(f64::INFINITY)),
                 }
             }
             C_P0_N1 | C_P1_N1 => {
                 // P / N1 => [b/d, a/c] = [a/c; -b/d] = [a; -b] / [c; d] = [-a; -b] / [-c; d]
                 let x0 = swap(self.rep); // [-a; b]
-                let x = negate_lo(x0); // [-a; -b]
+                let x = negate0(x0); // [-a; -b]
                 let y = swap(rhs.rep); // [-c; d]
                 Self { rep: div_ru(x, y) }
             }
@@ -214,13 +214,13 @@ impl Div for Interval {
                 let x = self.rep; // [b; -a]
                 let y = swap(rhs.rep); // [-c; d]
                 Self {
-                    rep: set_hi_inf(div_ru(x, y)),
+                    rep: shuffle03(constant(f64::INFINITY), div_ru(x, y)),
                 }
             }
             C_P0_P1 | C_P1_P1 => {
                 // P / P1 => [a/d, b/c] = [b/c; -a/d] = [b; -a] / [c; d]
                 let x = self.rep; // [b; -a]
-                let y0 = negate_lo(rhs.rep); // [d; c]
+                let y0 = negate0(rhs.rep); // [d; c]
                 let y = swap(y0); // [c; d]
                 Self { rep: div_ru(x, y) }
             }
