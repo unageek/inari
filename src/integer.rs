@@ -100,7 +100,7 @@ impl Interval {
     /// See also: [`Interval::round_ties_to_away`].
     pub fn round_ties_to_even(self) -> Self {
         Self {
-            rep: round(self.rep),
+            rep: round_ties_to_even(self.rep),
         }
     }
 

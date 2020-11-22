@@ -99,7 +99,7 @@ impl Interval {
             C_E | C_Z => Self::EMPTY,
             C_M => Self::ENTIRE,
             C_N0 => {
-                // 1 / N0 => [-inf, 1/a] = [-1/-a; inf]
+                // 1 / N0 => [-∞, 1/a] = [-1/-a; +∞] = [-1; _] / [-a; _]
                 let x = swap(self.rep); // [-a; b]
                 let r = shuffle03(div_ru(constant(-1.0), x), constant(f64::INFINITY));
                 Self { rep: r }
@@ -111,7 +111,7 @@ impl Interval {
                 Self { rep: r }
             }
             C_P0 => {
-                // 1 / P0 => [1/b, inf] = [inf; -1/b]
+                // 1 / P0 => [1/b, +∞] = [+∞; -1/b] = [_; -1] / [_, b]
                 let x = swap(self.rep); // [-a; b]
                 let r = shuffle03(constant(f64::INFINITY), div_ru(constant(-1.0), x));
                 Self { rep: r }

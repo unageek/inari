@@ -80,7 +80,7 @@ pub(crate) fn or(x: __m128d, y: __m128d) -> __m128d {
     unsafe { _mm_or_pd(x, y) }
 }
 
-pub(crate) fn round(x: __m128d) -> __m128d {
+pub(crate) fn round_ties_to_even(x: __m128d) -> __m128d {
     unsafe { _mm_round_pd(x, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC) }
 }
 
