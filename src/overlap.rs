@@ -2,7 +2,7 @@ use crate::interval::*;
 
 /// An overlapping state returned by [`Interval::overlap`].
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum OverlappingState {
+pub enum Overlap {
     /// Both `self` and `rhs` are empty.
     ///
     /// Equivalently, $\self = \rhs = ∅$.
@@ -187,10 +187,10 @@ pub enum OverlappingState {
 }
 
 impl Interval {
-    /// Returns the overlapping state of `self` and `rhs`. See [`OverlappingState`]
-    /// for the possible values returned.
-    pub fn overlap(self, rhs: Self) -> OverlappingState {
-        use OverlappingState::*;
+    /// Returns the overlapping state of `self` and `rhs`.
+    /// See [`Overlap`] for the possible values returned.
+    pub fn overlap(self, rhs: Self) -> Overlap {
+        use Overlap::*;
 
         if self.is_empty() {
             if rhs.is_empty() {
@@ -271,7 +271,7 @@ impl Interval {
 }
 
 impl DecInterval {
-    pub fn overlap(self, rhs: Self) -> Option<OverlappingState> {
+    pub fn overlap(self, rhs: Self) -> Option<Overlap> {
         if self.is_nai() || rhs.is_nai() {
             return None;
         }
@@ -293,7 +293,7 @@ mod tests {
 
     #[test]
     fn pattern() {
-        use OverlappingState::*;
+        use Overlap::*;
         // Pattern matching results in a more efficient code than using bitmasks as the compiler
         // can eliminate unnecessary comparisons.
         assert!(matches!(

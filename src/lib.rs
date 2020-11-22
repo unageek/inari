@@ -8,7 +8,7 @@
 
 pub use self::{
     interval::{DecInterval, Decoration, Interval, IntervalError, IntervalErrorKind, Result},
-    overlap::OverlappingState,
+    overlap::Overlap,
 };
 
 pub mod _docs;
