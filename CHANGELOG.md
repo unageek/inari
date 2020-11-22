@@ -10,6 +10,7 @@ The ❗ icon indicates a breaking change.
 
 ### Changed
 
+- ❗ Renamed the method `(Dec)Interval::round_ties_to_away` to `round`.
 - ❗ Renamed the methods `DecInterval::interval_part` and `decoration_part` to `interval` and `decoration`, respectively.
 - ❗ Changed the return type of the method `DecInterval::interval` (former `interval_part`) to `Option<Interval>` from `Result<Interval>`.
 - ❗ Renamed the enum `OverlappingState` to `Overlap`.
