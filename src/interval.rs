@@ -76,7 +76,7 @@ impl Interval {
         }
     }
 
-    pub fn zero() -> Self {
+    pub(crate) fn zero() -> Self {
         Self { rep: constant(0.0) }
     }
 }
