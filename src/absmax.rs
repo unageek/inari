@@ -9,10 +9,11 @@ impl Interval {
             C_E | C_P0 | C_P1 | C_Z => self,
             C_M => {
                 // [0, max(-a, b)] = [0; max(-a, b)]
-                let r0 = self.rep; // [-a; b]
-                let r1 = max(r0, swap(r0)); // [max(-a, b); _]
-                let r = shuffle02(constant(0.0), r1);
-                Self { rep: r }
+                let x = self.rep; // [-a; b]
+                let r = max(x, swap(x)); // [max(-a, b); _]
+                Self {
+                    rep: shuffle02(constant(0.0), r),
+                }
             }
             C_N0 | C_N1 => {
                 // [-b, -a] = [b; -a]
@@ -35,10 +36,12 @@ impl Interval {
             return Self::EMPTY;
         }
 
+        // [max(a, c), max(b, d)] = [-max(a, c); max(b, d)] = [min(-a, -c); max(b, d)]
         let min = min(self.rep, rhs.rep); // [min(-a, -c); min(b, d)]
         let max = max(self.rep, rhs.rep); // [max(-a, -c); max(b, d)]
-        let r = shuffle03(min, max); // [min(-a, -c); max(b, d)]
-        Self { rep: r }
+        Self {
+            rep: shuffle03(min, max),
+        }
     }
 
     /// Returns $\[\min(a, c), \min(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
@@ -50,10 +53,12 @@ impl Interval {
             return Self::EMPTY;
         }
 
+        // [min(a, c), min(b, d)] = [-min(a, c); min(b, d)] = [max(-a, -c); min(b, d)]
         let max = max(self.rep, rhs.rep); // [max(-a, -c); max(b, d)]
         let min = min(self.rep, rhs.rep); // [min(-a, -c); min(b, d)]
-        let r = shuffle03(max, min); // [max(-a, -c); min(b, d)]
-        Self { rep: r }
+        Self {
+            rep: shuffle03(max, min),
+        }
     }
 }
 

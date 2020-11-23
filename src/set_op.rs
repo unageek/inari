@@ -16,7 +16,8 @@ impl Interval {
             return self;
         }
 
-        // [min(a, c), max(b, d)] = [max(-a, -c); max(b, d)] = simd_max([-a; b], [-c; d])
+        // [min(a, c), max(b, d)]
+        //   = [-min(a, c); max(b, d)] = [max(-a, -c); max(b, d)] = .max([-a; b], [-c; d])
         Self {
             rep: max(self.rep, rhs.rep),
         }
@@ -32,7 +33,8 @@ impl Interval {
             return Self::EMPTY;
         }
 
-        // [max(a, c), min(b, d)] = [min(-a, -c); min(b, d)] = simd_min([-a; b], [-c; d])
+        // [max(a, c), min(b, d)]
+        //   = [-max(a, c); min(b, d)] = [min(-a, -c); min(b, d)] = .min([-a; b], [-c; d])
         let i = Self {
             rep: min(self.rep, rhs.rep),
         };
