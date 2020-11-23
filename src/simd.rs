@@ -91,15 +91,15 @@ pub(crate) fn round_ties_to_even(x: __m128d) -> __m128d {
 }
 
 pub(crate) fn shuffle02(x: __m128d, y: __m128d) -> __m128d {
-    unsafe { _mm_shuffle_pd(y, x, 3) }
+    unsafe { _mm_shuffle_pd(x, y, 0) }
 }
 
 pub(crate) fn shuffle03(x: __m128d, y: __m128d) -> __m128d {
-    unsafe { _mm_shuffle_pd(y, x, 2) }
+    unsafe { _mm_shuffle_pd(x, y, 2) }
 }
 
 pub(crate) fn shuffle13(x: __m128d, y: __m128d) -> __m128d {
-    unsafe { _mm_shuffle_pd(y, x, 0) }
+    unsafe { _mm_shuffle_pd(x, y, 3) }
 }
 
 pub(crate) fn swap(x: __m128d) -> __m128d {

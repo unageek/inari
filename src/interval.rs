@@ -44,15 +44,21 @@ pub type Result<T> = result::Result<T, IntervalError<T>>;
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct Interval {
-    // The neginf-sup-nan form is used to represent an interval.
-    // Zero can be stored as either 0.0 or -0.0.
-    // NaN can be stored in any representation.
+    // We store intervals in the neginf-sup-nan form:
+    // an interval [a, b] is stored as an array [-a; b].
+    // Note that we use ; to separate array elements to distinguish from the interval notation.
+    // When [-a; b] is stored in a XMM register r, it is often depicted as follows:
     //
-    // An interval [a, b] is stored as [b; -a]:
     //   +----------------+----------------+
     //   |        b       |       -a       |
     //   +----------------+----------------+
     //   |127           64|63             0|
+    //
+    //   r[63:0] = -a, r[127:64] = b.
+    //
+    // The encoding of zeros and NaNs are arbitrary,
+    // zero can be stored as either +0.0 or -0.0
+    // and NaN can be stored as either qNaN or sNaN with an arbitrary payload.
     //
     // The value of `rep` is Formatted as `__m128d(-a, b)` in Debug formatting.
     pub(crate) rep: F64X2,
