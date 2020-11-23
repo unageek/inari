@@ -124,13 +124,13 @@ impl Interval {
             return Self::EMPTY;
         }
 
-        let zero = constant(0.0);
+        let zero = splat(0.0);
         let gt_zero_mask = gt(self.rep, zero);
         let lt_zero_mask = lt(self.rep, zero);
         // [-(a ≤ 0), b ≥ 0] = [-a ≥ 0; b ≥ 0]
-        let one_or_zero = and(constant(1.0), gt_zero_mask);
+        let one_or_zero = and(splat(1.0), gt_zero_mask);
         // [a ≥ 0, -(b ≤ 0)] = [-(-a ≤ 0); -(b ≤ 0)]
-        let m_one_or_zero = and(constant(-1.0), lt_zero_mask);
+        let m_one_or_zero = and(splat(-1.0), lt_zero_mask);
         // Gives the same result as addition, but faster.
         let r = or(one_or_zero, m_one_or_zero);
         Self { rep: r }

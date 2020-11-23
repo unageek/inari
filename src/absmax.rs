@@ -12,7 +12,7 @@ impl Interval {
                 let x = self.rep; // [-a; b]
                 let r = max(x, swap(x)); // [max(-a, b); _]
                 Self {
-                    rep: shuffle02(constant(0.0), r),
+                    rep: shuffle02(splat(0.0), r),
                 }
             }
             C_N0 | C_N1 => {

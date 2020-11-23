@@ -75,12 +75,12 @@ impl Interval {
 
     pub(crate) fn with_infsup_raw(a: f64, b: f64) -> Self {
         Self {
-            rep: constants(-a, b),
+            rep: constant(-a, b),
         }
     }
 
     pub(crate) fn zero() -> Self {
-        Self { rep: constant(0.0) }
+        Self { rep: splat(0.0) }
     }
 }
 

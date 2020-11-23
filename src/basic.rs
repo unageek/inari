@@ -100,29 +100,29 @@ impl Interval {
             C_M => Self::ENTIRE,
             C_N0 => {
                 // 1 / N0 => [-∞, 1/a] = [+∞; -1/-a]
-                let x = constant(-1.0);
+                let x = splat(-1.0);
                 let y = self.rep; // [-a; b]
                 Self {
-                    rep: shuffle02(constant(f64::INFINITY), div_ru(x, y)),
+                    rep: shuffle02(splat(f64::INFINITY), div_ru(x, y)),
                 }
             }
             C_N1 => {
                 // 1 / N1 => [1/b, 1/a] = [-1/b; 1/a] = [-1/b; -1/-a] = [-1; -1] ./ [b; -a]
-                let x = constant(-1.0);
+                let x = splat(-1.0);
                 let y = swap(self.rep); // [b; -a]
                 Self { rep: div_ru(x, y) }
             }
             C_P0 => {
                 // 1 / P0 => [1/b, +∞] = [-1/b; +∞]
-                let x = constant(-1.0);
+                let x = splat(-1.0);
                 let y = self.rep; // [-a; b]
                 Self {
-                    rep: shuffle13(div_ru(x, y), constant(f64::INFINITY)),
+                    rep: shuffle13(div_ru(x, y), splat(f64::INFINITY)),
                 }
             }
             C_P1 => {
                 // 1 / P1 => [1/b, 1/a] = [-1/b; 1/a] = [-1/b; -1/-a] = [-1; -1] ./ [b; -a]
-                let x = constant(-1.0);
+                let x = splat(-1.0);
                 let y = swap(self.rep); // [b; -a]
                 Self { rep: div_ru(x, y) }
             }
@@ -143,7 +143,7 @@ impl Interval {
                 let r = mul_ru(x, x); // [a^2; b^2]
                 let r = max(r, swap(r)); // [max(a^2, b^2); _]
                 Self {
-                    rep: shuffle02(constant(0.0), r),
+                    rep: shuffle02(splat(0.0), r),
                 }
             }
             C_N0 | C_N1 => {

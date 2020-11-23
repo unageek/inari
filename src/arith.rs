@@ -169,7 +169,7 @@ impl Div for Interval {
                 let x = swap(self.rep); // [b; -a]
                 let y = rhs.rep; // [-c; d]
                 Self {
-                    rep: shuffle02(div_ru(x, y), constant(f64::INFINITY)),
+                    rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)),
                 }
             }
             C_N0_N1 | C_N1_N1 => {
@@ -184,7 +184,7 @@ impl Div for Interval {
                 let x = self.rep; // [-a; b]
                 let y = rhs.rep; // [-c; d]
                 Self {
-                    rep: shuffle03(constant(f64::INFINITY), div_ru(x, y)),
+                    rep: shuffle03(splat(f64::INFINITY), div_ru(x, y)),
                 }
             }
             C_N0_P1 | C_N1_P1 => {
@@ -198,7 +198,7 @@ impl Div for Interval {
                 let x = self.rep; // [-a; b]
                 let y = rhs.rep; // [-c; d]
                 Self {
-                    rep: shuffle02(constant(f64::INFINITY), div_ru(x, y)),
+                    rep: shuffle02(splat(f64::INFINITY), div_ru(x, y)),
                 }
             }
             C_P0_N1 | C_P1_N1 => {
@@ -213,7 +213,7 @@ impl Div for Interval {
                 let x = self.rep; // [-a; b]
                 let y = swap(rhs.rep); // [d; -c]
                 Self {
-                    rep: shuffle02(div_ru(x, y), constant(f64::INFINITY)),
+                    rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)),
                 }
             }
             C_P0_P1 | C_P1_P1 => {
