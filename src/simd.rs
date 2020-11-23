@@ -98,12 +98,16 @@ pub(crate) fn shuffle03(x: __m128d, y: __m128d) -> __m128d {
     unsafe { _mm_shuffle_pd(x, y, 2) }
 }
 
+pub(crate) fn shuffle12(x: __m128d, y: __m128d) -> __m128d {
+    unsafe { _mm_shuffle_pd(x, y, 1) }
+}
+
 pub(crate) fn shuffle13(x: __m128d, y: __m128d) -> __m128d {
     unsafe { _mm_shuffle_pd(x, y, 3) }
 }
 
 pub(crate) fn swap(x: __m128d) -> __m128d {
-    unsafe { _mm_shuffle_pd(x, x, 1) }
+    shuffle12(x, x)
 }
 
 pub(crate) fn trunc(x: __m128d) -> __m128d {
