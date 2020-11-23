@@ -72,10 +72,10 @@ impl Interval {
     /// ```
     ///
     /// See also: [`Interval::round_ties_to_even`].
-    // This one is hard to implement correctly.
-    // https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
     pub fn round(self) -> Self {
-        Self::with_infsup_raw(self.inf_raw().round(), self.sup_raw().round())
+        Self {
+            rep: round(self.rep),
+        }
     }
 
     /// Rounds the bounds of `self` to the nearest integers,
