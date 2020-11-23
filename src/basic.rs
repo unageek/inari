@@ -111,7 +111,7 @@ impl Interval {
                 Self { rep: r }
             }
             C_P0 => {
-                // 1 / P0 => [1/b, +∞] = [+∞; -1/b] = [_; -1] / [_, b]
+                // 1 / P0 => [1/b, +∞] = [+∞; -1/b] = [_; -1] / [_; b]
                 let x = swap(self.rep); // [-a; b]
                 let r = shuffle03(constant(f64::INFINITY), div_ru(constant(-1.0), x));
                 Self { rep: r }

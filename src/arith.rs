@@ -190,7 +190,7 @@ impl Div for Interval {
             C_N0_P1 | C_N1_P1 => {
                 // N / P1 => [a/c, b/d] = [b/d; -a/c] = [b; -a] / [d; c]
                 let x = self.rep; // [b; -a]
-                let y = negate0(rhs.rep); // [d, c]
+                let y = negate0(rhs.rep); // [d; c]
                 Self { rep: div_ru(x, y) }
             }
             C_P0_N0 | C_P1_N0 => {
