@@ -92,7 +92,7 @@ impl Interval {
     /// assert!(!Interval::ENTIRE.is_common_interval());
     /// ```
     pub fn is_common_interval(self) -> bool {
-        all(lt(self.rep, constant(f64::INFINITY)))
+        all(lt(self.rep, splat(f64::INFINITY)))
     }
 
     /// Returns `true` if `self` is empty ($\self = ∅$).
@@ -120,7 +120,7 @@ impl Interval {
     /// assert!(Interval::ENTIRE.is_entire());
     /// ```
     pub fn is_entire(self) -> bool {
-        all(eq(self.rep, constant(f64::INFINITY)))
+        all(eq(self.rep, splat(f64::INFINITY)))
     }
 
     /// Returns `true` if `self` consists of a single real number.

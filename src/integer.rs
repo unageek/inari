@@ -20,11 +20,10 @@ impl Interval {
     /// See also: [`Interval::floor`], [`Interval::trunc`].
     pub fn ceil(self) -> Self {
         // _mm_ceil_pd/_mm_floor_pd are slow, better to avoid shuffling them.
-        // ceil([a, b]) = [ceil(b); -ceil(a)]
-        let r0 = negate0(self.rep); // [b; a]
-        let r1 = ceil(r0); // [ceil(b); ceil(a)]
-        let r = negate0(r1);
-        Self { rep: r }
+        // ceil([a, b]) = [-ceil(a); ceil(b)]
+        let x = negate0(self.rep); // [a; b]
+        let r = ceil(x); // [ceil(a); ceil(b)]
+        Self { rep: negate0(r) }
     }
 
     /// Rounds the bounds of `self` to integers using directed rounding toward $-∞$.
@@ -45,11 +44,10 @@ impl Interval {
     ///
     /// See also: [`Interval::ceil`], [`Interval::trunc`].
     pub fn floor(self) -> Self {
-        // floor([a, b]) = [floor(b); -floor(a)]
-        let r0 = negate0(self.rep); // [b; a]
-        let r1 = floor(r0); // [floor(b); floor(a)]
-        let r = negate0(r1);
-        Self { rep: r }
+        // floor([a, b]) = [-floor(a); floor(b)]
+        let x = negate0(self.rep); // [a; b]
+        let r = floor(x); // [floor(a); floor(b)]
+        Self { rep: negate0(r) }
     }
 
     /// Rounds the bounds of `self` to the nearest integers,
@@ -126,13 +124,13 @@ impl Interval {
             return Self::EMPTY;
         }
 
-        let zero = constant(0.0);
+        let zero = splat(0.0);
         let gt_zero_mask = gt(self.rep, zero);
         let lt_zero_mask = lt(self.rep, zero);
-        // [-(a ≤ 0), b ≥ 0] = [b ≥ 0; -a ≥ 0]
-        let one_or_zero = and(constant(1.0), gt_zero_mask);
-        // [a ≥ 0, -(b ≤ 0)] = [-(b ≤ 0); -(-a ≤ 0)]
-        let m_one_or_zero = and(constant(-1.0), lt_zero_mask);
+        // [-(a ≤ 0), b ≥ 0] = [-a ≥ 0; b ≥ 0]
+        let one_or_zero = and(splat(1.0), gt_zero_mask);
+        // [a ≥ 0, -(b ≤ 0)] = [-(-a ≤ 0); -(b ≤ 0)]
+        let m_one_or_zero = and(splat(-1.0), lt_zero_mask);
         // Gives the same result as addition, but faster.
         let r = or(one_or_zero, m_one_or_zero);
         Self { rep: r }

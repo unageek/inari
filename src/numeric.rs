@@ -121,7 +121,7 @@ impl Interval {
     ///
     /// See also: [`Interval::mag`].
     pub fn mig(self) -> f64 {
-        let zero = constant(0.0);
+        let zero = splat(0.0);
         let contains_zero = all(ge(self.rep, zero));
         if contains_zero {
             return 0.0;

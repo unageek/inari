@@ -5,7 +5,7 @@ impl Interval {
     /// `[0, ..., 0, b ≤ 0, -a ≤ 0, b ≥ 0, -a ≥ 0]`.
     /// If `self` is empty, returns `0`.
     pub(crate) fn classify(self) -> u32 {
-        let zero = constant(0.0);
+        let zero = splat(0.0);
         let ge_zero = bitmask(ge(self.rep, zero));
         let le_zero = bitmask(le(self.rep, zero));
         (le_zero << 2) | ge_zero

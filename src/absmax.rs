@@ -8,14 +8,15 @@ impl Interval {
         match self.classify() {
             C_E | C_P0 | C_P1 | C_Z => self,
             C_M => {
-                // [0, max(-a, b)] = [max(-a, b); 0]
-                let r0 = self.rep; // [b; -a]
-                let r1 = max(r0, swap(r0)); // [_; max(-a, b)]
-                let r = shuffle13(r1, constant(0.0));
-                Self { rep: r }
+                // [0, max(-a, b)] = [0; max(-a, b)]
+                let x = self.rep; // [-a; b]
+                let r = max(x, swap(x)); // [max(-a, b); _]
+                Self {
+                    rep: shuffle02(splat(0.0), r),
+                }
             }
             C_N0 | C_N1 => {
-                // [-b, -a] = [-a; b]
+                // [-b, -a] = [b; -a]
                 Self {
                     rep: swap(self.rep),
                 }
@@ -35,10 +36,12 @@ impl Interval {
             return Self::EMPTY;
         }
 
-        let max = max(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
-        let min = min(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
-        let r = shuffle03(max, min); // [max(b, d); min(-a, -c)]
-        Self { rep: r }
+        // [max(a, c), max(b, d)] = [-max(a, c); max(b, d)] = [min(-a, -c); max(b, d)]
+        let min = min(self.rep, rhs.rep); // [min(-a, -c); min(b, d)]
+        let max = max(self.rep, rhs.rep); // [max(-a, -c); max(b, d)]
+        Self {
+            rep: shuffle03(min, max),
+        }
     }
 
     /// Returns $\[\min(a, c), \min(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
@@ -50,10 +53,12 @@ impl Interval {
             return Self::EMPTY;
         }
 
-        let min = min(self.rep, rhs.rep); // [min(b, d); min(-a, -c)]
-        let max = max(self.rep, rhs.rep); // [max(b, d); max(-a, -c)]
-        let r = shuffle03(min, max); // [min(b, d); max(-a, -c)]
-        Self { rep: r }
+        // [min(a, c), min(b, d)] = [-min(a, c); min(b, d)] = [max(-a, -c); min(b, d)]
+        let max = max(self.rep, rhs.rep); // [max(-a, -c); max(b, d)]
+        let min = min(self.rep, rhs.rep); // [min(-a, -c); min(b, d)]
+        Self {
+            rep: shuffle03(max, min),
+        }
     }
 }
 

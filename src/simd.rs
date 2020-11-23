@@ -4,7 +4,7 @@ pub(crate) type F64X2 = __m128d;
 
 pub(crate) fn abs(x: __m128d) -> __m128d {
     // Drop sign bits.
-    unsafe { _mm_andnot_pd(constant(-0.0), x) }
+    unsafe { _mm_andnot_pd(splat(-0.0), x) }
 }
 
 pub(crate) fn all(x: __m128d) -> bool {
@@ -23,11 +23,7 @@ pub(crate) fn ceil(x: __m128d) -> __m128d {
     unsafe { _mm_ceil_pd(x) }
 }
 
-pub(crate) fn constant(x: f64) -> __m128d {
-    unsafe { transmute([x, x]) }
-}
-
-pub(crate) fn constants(x: f64, y: f64) -> __m128d {
+pub(crate) fn constant(x: f64, y: f64) -> __m128d {
     unsafe { transmute([x, y]) }
 }
 
@@ -39,7 +35,7 @@ pub(crate) fn extract0(x: __m128d) -> f64 {
     unsafe { transmute::<_, [f64; 2]>(x)[0] }
 }
 
-// This is slower than extract0, which usually will be no-op.
+// This is slower than extract0, which usually turns into a no-op.
 pub(crate) fn extract1(x: __m128d) -> f64 {
     unsafe { transmute::<_, [f64; 2]>(x)[1] }
 }
@@ -83,7 +79,7 @@ pub(crate) fn or(x: __m128d, y: __m128d) -> __m128d {
 // This one is hard to implement correctly.
 // https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
 pub(crate) fn round(x: __m128d) -> __m128d {
-    constants(extract0(x).round(), extract1(x).round())
+    constant(extract0(x).round(), extract1(x).round())
 }
 
 pub(crate) fn round_ties_to_even(x: __m128d) -> __m128d {
@@ -91,19 +87,27 @@ pub(crate) fn round_ties_to_even(x: __m128d) -> __m128d {
 }
 
 pub(crate) fn shuffle02(x: __m128d, y: __m128d) -> __m128d {
-    unsafe { _mm_shuffle_pd(y, x, 3) }
+    unsafe { _mm_shuffle_pd(x, y, 0) }
 }
 
 pub(crate) fn shuffle03(x: __m128d, y: __m128d) -> __m128d {
-    unsafe { _mm_shuffle_pd(y, x, 2) }
+    unsafe { _mm_shuffle_pd(x, y, 2) }
+}
+
+pub(crate) fn shuffle12(x: __m128d, y: __m128d) -> __m128d {
+    unsafe { _mm_shuffle_pd(x, y, 1) }
 }
 
 pub(crate) fn shuffle13(x: __m128d, y: __m128d) -> __m128d {
-    unsafe { _mm_shuffle_pd(y, x, 0) }
+    unsafe { _mm_shuffle_pd(x, y, 3) }
+}
+
+pub(crate) fn splat(x: f64) -> __m128d {
+    unsafe { transmute([x, x]) }
 }
 
 pub(crate) fn swap(x: __m128d) -> __m128d {
-    unsafe { _mm_shuffle_pd(x, x, 1) }
+    shuffle12(x, x)
 }
 
 pub(crate) fn trunc(x: __m128d) -> __m128d {
