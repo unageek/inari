@@ -29,7 +29,7 @@ impl Interval {
     ///
     /// Tightness: tightest
     pub fn intersection(self, rhs: Self) -> Self {
-        if self.is_empty() || rhs.is_empty() {
+        if self.either_empty(rhs) {
             return Self::EMPTY;
         }
 

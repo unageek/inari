@@ -25,7 +25,12 @@ impl Interval {
     /// assert!(!Interval::ENTIRE.contains(f64::NAN));
     /// ```
     pub fn contains(self, rhs: f64) -> bool {
-        rhs.is_finite() && self.inf_raw() <= rhs && rhs <= self.sup_raw()
+        rhs.is_finite() & {
+            // a ≤ c ∧ c ≤ b
+            //   = all([a; c] .≤ [c; b])
+            //   = all([-c; c] .≤ [-a; b])
+            all(le(neg0(splat(rhs)), self.rep))
+        }
     }
 
     /// Returns `true` if `self` and `rhs` are disjoint ($\self ∩ \rhs = ∅$).
@@ -47,10 +52,14 @@ impl Interval {
     /// assert!(Interval::EMPTY.disjoint(Interval::ENTIRE));
     /// ```
     pub fn disjoint(self, rhs: Self) -> bool {
-        self.is_empty()
-            || rhs.is_empty()
-            || self.sup_raw() < rhs.inf_raw()
-            || rhs.sup_raw() < self.inf_raw()
+        self.either_empty(rhs) | {
+            // b < c ∨ d < a
+            //   = any([b; d] .< [c; a])
+            any(lt(
+                shuffle13(self.rep, rhs.rep),
+                neg(shuffle02(rhs.rep, self.rep)),
+            ))
+        }
     }
 
     /// Returns `true` if `self` is interior to `rhs`.
@@ -73,10 +82,10 @@ impl Interval {
     pub fn interior(self, rhs: Self) -> bool {
         let l = self.is_empty()
             || self.sup_raw() < rhs.sup_raw()
-            || self.sup_raw() == f64::INFINITY && rhs.sup_raw() == f64::INFINITY;
+            || all(eq(shuffle13(self.rep, rhs.rep), splat(f64::INFINITY)));
         let r = self.is_empty()
             || rhs.inf_raw() < self.inf_raw()
-            || rhs.inf_raw() == f64::NEG_INFINITY && self.inf_raw() == f64::NEG_INFINITY;
+            || all(eq(shuffle02(self.rep, rhs.rep), splat(f64::INFINITY)));
         l && r
     }
 
@@ -106,7 +115,7 @@ impl Interval {
     /// assert!(!Interval::ENTIRE.is_empty());
     /// ```
     pub fn is_empty(self) -> bool {
-        all(unord(self.rep, self.rep))
+        self.either_empty(self)
     }
 
     /// Returns `true` if $\self = \[-∞, +∞\]$.
@@ -196,7 +205,7 @@ impl Interval {
     /// assert!(!Interval::ENTIRE.precedes(Interval::ENTIRE));
     /// ```
     pub fn precedes(self, rhs: Self) -> bool {
-        self.is_empty() || rhs.is_empty() || self.sup_raw() <= rhs.inf_raw()
+        self.either_empty(rhs) | (self.sup_raw() <= rhs.inf_raw())
     }
 
     /// Returns `true` if `self` is strictly less than `rhs`.
@@ -223,10 +232,10 @@ impl Interval {
     pub fn strict_less(self, rhs: Self) -> bool {
         let l = self.is_empty()
             || self.sup_raw() < rhs.sup_raw()
-            || self.sup_raw() == f64::INFINITY && rhs.sup_raw() == f64::INFINITY;
+            || all(eq(shuffle13(self.rep, rhs.rep), splat(f64::INFINITY)));
         let r = rhs.is_empty()
             || self.inf_raw() < rhs.inf_raw()
-            || self.inf_raw() == f64::NEG_INFINITY && rhs.inf_raw() == f64::NEG_INFINITY;
+            || all(eq(shuffle02(self.rep, rhs.rep), splat(f64::INFINITY)));
         l && r
     }
 
@@ -238,7 +247,7 @@ impl Interval {
     /// ∀x ∈ \self, ∀y ∈ \rhs : x < y.
     /// $$
     pub fn strict_precedes(self, rhs: Self) -> bool {
-        self.is_empty() || rhs.is_empty() || self.sup_raw() < rhs.inf_raw()
+        self.either_empty(rhs) | (self.sup_raw() < rhs.inf_raw())
     }
 
     /// Returns `true` if `self` is a subset of `rhs` ($\self ⊆ \rhs$).
@@ -259,7 +268,21 @@ impl Interval {
     /// assert!(Interval::ENTIRE.subset(Interval::ENTIRE));
     /// ```
     pub fn subset(self, rhs: Self) -> bool {
-        self.is_empty() || rhs.inf_raw() <= self.inf_raw() && self.sup_raw() <= rhs.sup_raw()
+        self.is_empty() | {
+            // c <= a && b <= d
+            //   = all([c; b] .<= [a; d])
+            //   = all([-a; b] .<= [-c; d])
+            all(le(self.rep, rhs.rep))
+        }
+    }
+
+    pub(crate) fn both_empty(self, rhs: Self) -> bool {
+        let x = shuffle02(self.rep, rhs.rep); // [-a; -c]
+        all(unord(x, x))
+    }
+
+    pub(crate) fn either_empty(self, rhs: Self) -> bool {
+        any(unord(self.rep, rhs.rep))
     }
 }
 

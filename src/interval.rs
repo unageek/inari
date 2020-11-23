@@ -86,7 +86,7 @@ impl Interval {
 
 impl PartialEq for Interval {
     fn eq(&self, rhs: &Self) -> bool {
-        self.is_empty() && rhs.is_empty() || all(eq(self.rep, rhs.rep))
+        self.both_empty(*rhs) | all(eq(self.rep, rhs.rep))
     }
 }
 

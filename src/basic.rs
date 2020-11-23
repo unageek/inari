@@ -51,7 +51,7 @@ impl Interval {
             }
             C_N0_N0 | C_N0_N1 | C_N1_N0 | C_N1_N1 => {
                 let x = swap(self.rep);
-                let x = negate0(x);
+                let x = neg0(x);
                 let y = swap(rhs.rep);
                 Self {
                     rep: mul_add_ru(x, y, addend.rep), // *
@@ -59,7 +59,7 @@ impl Interval {
             }
             C_N0_P0 | C_N0_P1 | C_N1_P0 | C_N1_P1 => {
                 let x = self.rep;
-                let y = negate0(rhs.rep);
+                let y = neg0(rhs.rep);
                 let y = swap(y);
                 Self {
                     rep: mul_add_ru(x, y, addend.rep), // *
@@ -73,7 +73,7 @@ impl Interval {
                 }
             }
             C_P0_N0 | C_P0_N1 | C_P1_N0 | C_P1_N1 => {
-                let x = negate0(self.rep);
+                let x = neg0(self.rep);
                 let x = swap(x);
                 let y = rhs.rep;
                 Self {
@@ -82,7 +82,7 @@ impl Interval {
             }
             C_P0_P0 | C_P0_P1 | C_P1_P0 | C_P1_P1 => {
                 let x = self.rep;
-                let y = negate0(rhs.rep);
+                let y = neg0(rhs.rep);
                 Self {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
@@ -149,13 +149,13 @@ impl Interval {
             C_N0 | C_N1 => {
                 // [b^2, a^2] = [-b^2; a^2] = [-b; -a] .* [b; -a]
                 let x = swap(self.rep); // [b; -a]
-                let y = negate0(x); // [-b; -a]
+                let y = neg0(x); // [-b; -a]
                 Self { rep: mul_ru(x, y) }
             }
             C_P0 | C_P1 => {
                 // [a^2, b^2] = [-a^2; b^2] = [-a; b] .* [a; b]
                 let x = self.rep; // [-a; b]
-                let y = negate0(x); // [a; b]
+                let y = neg0(x); // [a; b]
                 Self { rep: mul_ru(x, y) }
             }
             _ => unreachable!(),

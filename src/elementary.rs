@@ -522,7 +522,7 @@ impl Interval {
         let dom = Self::with_infsup_raw(0.0, f64::INFINITY);
         let x = self.intersection(dom);
 
-        if x.is_empty() || rhs.is_empty() {
+        if x.either_empty(rhs) {
             return (Self::EMPTY, Decoration::Trv);
         }
 

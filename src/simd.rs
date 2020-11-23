@@ -11,6 +11,10 @@ pub(crate) fn all(x: __m128d) -> bool {
     bitmask(x) == 3
 }
 
+pub(crate) fn any(x: __m128d) -> bool {
+    bitmask(x) != 0
+}
+
 pub(crate) fn and(x: __m128d, y: __m128d) -> __m128d {
     unsafe { _mm_and_pd(x, y) }
 }
@@ -60,6 +64,9 @@ pub(crate) fn lt(x: __m128d, y: __m128d) -> __m128d {
     unsafe { _mm_cmplt_pd(x, y) }
 }
 
+// This is a vector version of maxNum (IEEE 754-2008) or maximumNumber (IEEE 754-2019)
+// operation, which does not propagate NaN.
+// https://www.agner.org/optimize/blog/read.php?i=1012
 pub(crate) fn max(x: __m128d, y: __m128d) -> __m128d {
     unsafe { _mm_max_pd(x, y) }
 }
@@ -68,7 +75,11 @@ pub(crate) fn min(x: __m128d, y: __m128d) -> __m128d {
     unsafe { _mm_min_pd(x, y) }
 }
 
-pub(crate) fn negate0(x: __m128d) -> __m128d {
+pub(crate) fn neg(x: __m128d) -> __m128d {
+    xor(splat(-0.0), x)
+}
+
+pub(crate) fn neg0(x: __m128d) -> __m128d {
     unsafe { xor(x, _mm_set_sd(-0.0)) }
 }
 

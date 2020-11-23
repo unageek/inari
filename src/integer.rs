@@ -21,9 +21,9 @@ impl Interval {
     pub fn ceil(self) -> Self {
         // _mm_ceil_pd/_mm_floor_pd are slow, better to avoid shuffling them.
         // ceil([a, b]) = [-ceil(a); ceil(b)]
-        let x = negate0(self.rep); // [a; b]
+        let x = neg0(self.rep); // [a; b]
         let r = ceil(x); // [ceil(a); ceil(b)]
-        Self { rep: negate0(r) }
+        Self { rep: neg0(r) }
     }
 
     /// Rounds the bounds of `self` to integers using directed rounding toward $-∞$.
@@ -45,9 +45,9 @@ impl Interval {
     /// See also: [`Interval::ceil`], [`Interval::trunc`].
     pub fn floor(self) -> Self {
         // floor([a, b]) = [-floor(a); floor(b)]
-        let x = negate0(self.rep); // [a; b]
+        let x = neg0(self.rep); // [a; b]
         let r = floor(x); // [floor(a); floor(b)]
-        Self { rep: negate0(r) }
+        Self { rep: neg0(r) }
     }
 
     /// Rounds the bounds of `self` to the nearest integers,

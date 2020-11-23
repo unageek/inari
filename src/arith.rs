@@ -94,14 +94,14 @@ impl Mul for Interval {
             C_N0_N0 | C_N0_N1 | C_N1_N0 | C_N1_N1 => {
                 // N * N => [b*d, a*c] = [-b*d; a*c] = [-b*d; -a*-c] = [-b; -a] .* [d; -c]
                 let x = swap(self.rep); // [b; -a]
-                let x = negate0(x); // [-b; -a]
+                let x = neg0(x); // [-b; -a]
                 let y = swap(rhs.rep); // [d; -c]
                 Self { rep: mul_ru(x, y) }
             }
             C_N0_P0 | C_N0_P1 | C_N1_P0 | C_N1_P1 => {
                 // N * P => [a*d, b*c] = [-a*d; b*c] = [-a; b] .* [d; c]
                 let x = self.rep; // [-a; b]
-                let y = negate0(rhs.rep); // [c; d]
+                let y = neg0(rhs.rep); // [c; d]
                 let y = swap(y); // [d; c]
                 Self { rep: mul_ru(x, y) }
             }
@@ -113,7 +113,7 @@ impl Mul for Interval {
             }
             C_P0_N0 | C_P0_N1 | C_P1_N0 | C_P1_N1 => {
                 // P * N => [b*c, a*d] = [-b*c; a*d] = [b*-c; a*d] = [b; a] .* [-c; d]
-                let x = negate0(self.rep); // [a; b]
+                let x = neg0(self.rep); // [a; b]
                 let x = swap(x); // [b; a]
                 let y = rhs.rep; // [-c; d]
                 Self { rep: mul_ru(x, y) }
@@ -121,7 +121,7 @@ impl Mul for Interval {
             C_P0_P0 | C_P0_P1 | C_P1_P0 | C_P1_P1 => {
                 // P * P => [a*c, b*d] = [-a*c; b*d] = [-a; b] .* [c; d]
                 let x = self.rep; // [-a; b]
-                let y = negate0(rhs.rep); // [c; d]
+                let y = neg0(rhs.rep); // [c; d]
                 Self { rep: mul_ru(x, y) }
             }
             _ => unreachable!(),
@@ -153,14 +153,14 @@ impl Div for Interval {
                 // M / N1 => [b/d, a/d] = [-b/d; a/d] = [b/-d; -a/-d]  = [b; -a] ./ [-d; -d]
                 let x = swap(self.rep); // [b; -a]
                 let y = swap(rhs.rep); // [d; -c]
-                let y = negate0(y); // [-d; -c]
+                let y = neg0(y); // [-d; -c]
                 let y = shuffle02(y, y); // [-d; -d]
                 Self { rep: div_ru(x, y) }
             }
             C_M_P1 => {
                 // M / P1 => [a/c, b/c] = [-a/c; b/c] = [-a; b] ./ [c; c]
                 let x = self.rep; // [-a; b]
-                let y = negate0(rhs.rep); // [c; d]
+                let y = neg0(rhs.rep); // [c; d]
                 let y = shuffle02(y, y); // [c; c]
                 Self { rep: div_ru(x, y) }
             }
@@ -174,7 +174,7 @@ impl Div for Interval {
             }
             C_N0_N1 | C_N1_N1 => {
                 // N / N1 => [b/c, a/d] = [-b/c; a/d] = [b/-c; a/d] = [b; a] ./ [-c; d]
-                let x = negate0(self.rep); // [a; b]
+                let x = neg0(self.rep); // [a; b]
                 let x = swap(x); // [b; a]
                 let y = rhs.rep; // [-c; d]
                 Self { rep: div_ru(x, y) }
@@ -190,7 +190,7 @@ impl Div for Interval {
             C_N0_P1 | C_N1_P1 => {
                 // N / P1 => [a/c, b/d] = [-a/c; b/d] = [-a; b] ./ [c; d]
                 let x = self.rep; // [-a; b]
-                let y = negate0(rhs.rep); // [c; d]
+                let y = neg0(rhs.rep); // [c; d]
                 Self { rep: div_ru(x, y) }
             }
             C_P0_N0 | C_P1_N0 => {
@@ -204,7 +204,7 @@ impl Div for Interval {
             C_P0_N1 | C_P1_N1 => {
                 // P / N1 => [b/d, a/c] = [-b/d; a/c] = [-b/d; -a/-c] = [-b; -a] ./ [d; -c]
                 let x = swap(self.rep); // [b; -a]
-                let x = negate0(x); // [-b; -a]
+                let x = neg0(x); // [-b; -a]
                 let y = swap(rhs.rep); // [d; -c]
                 Self { rep: div_ru(x, y) }
             }
@@ -219,7 +219,7 @@ impl Div for Interval {
             C_P0_P1 | C_P1_P1 => {
                 // P / P1 => [a/d, b/c] = [-a/d; b/c] = [-a; b] ./ [d; c]
                 let x = self.rep; // [-a; b]
-                let y = negate0(rhs.rep); // [c; d]
+                let y = neg0(rhs.rep); // [c; d]
                 let y = swap(y); // [d; c]
                 Self { rep: div_ru(x, y) }
             }

@@ -30,9 +30,7 @@ impl Interval {
     ///
     /// Tightness: tightest
     pub fn max(self, rhs: Self) -> Self {
-        // IEEE 754's min/max do not propagate nan.
-        // https://www.agner.org/optimize/blog/read.php?i=1012
-        if self.is_empty() || rhs.is_empty() {
+        if self.either_empty(rhs) {
             return Self::EMPTY;
         }
 
@@ -49,7 +47,7 @@ impl Interval {
     ///
     /// Tightness: tightest
     pub fn min(self, rhs: Self) -> Self {
-        if self.is_empty() || rhs.is_empty() {
+        if self.either_empty(rhs) {
             return Self::EMPTY;
         }
 
