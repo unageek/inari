@@ -39,7 +39,7 @@ pub(crate) fn extract0(x: __m128d) -> f64 {
     unsafe { transmute::<_, [f64; 2]>(x)[0] }
 }
 
-// This is slower than extract0, which usually will be no-op.
+// This is slower than extract0, which usually turns into a no-op.
 pub(crate) fn extract1(x: __m128d) -> f64 {
     unsafe { transmute::<_, [f64; 2]>(x)[1] }
 }
