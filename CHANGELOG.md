@@ -2,7 +2,13 @@
 
 The ❗ icon indicates a breaking change.
 
-## Unreleased
+## v0.8.0 - 2020-11-24
+
+### Added
+
+- Experimental support for AVX-512F.
+  - To try it out, run cargo with `RUSTFLAGS='-C target-feature=+avx512f'`.
+  - Basic arithmetic operations are expected to get faster, but it is not benchmarked yet.
 
 ### Removed
 
