@@ -59,8 +59,8 @@ jobs:
       - name: Coverage
         env:
           CARGO_INCREMENTAL: 0
-          RUSTFLAGS: -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
-          RUSTDOCFLAGS: -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
+          RUSTFLAGS: -Ctarget-cpu=haswell -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
+          RUSTDOCFLAGS: -Ctarget-cpu=haswell -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
         run: |
           cargo clean
           cargo test --all-features
