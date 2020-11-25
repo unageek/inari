@@ -14,11 +14,11 @@ macro_rules! impl_op_round {
             unsafe {
                 asm!(
                     "push {rax}", // Same as "sub rsp, 8", but does not modify flags.
-                    "stmxcsr [rsp]",
+                    "vstmxcsr [rsp]",
                     concat!("mov dword ptr [rsp + 4], ", $mxcsr),
-                    "ldmxcsr [rsp + 4]",
+                    "vldmxcsr [rsp + 4]",
                     $inst,
-                    "ldmxcsr [rsp]",
+                    "vldmxcsr [rsp]",
                     "pop {rax}", // Same as "add rsp, 8", but does not modify flags.
                     $x = inout(xmm_reg) $x,
                     $($y = in(xmm_reg) $y,)*
@@ -31,12 +31,12 @@ macro_rules! impl_op_round {
     };
 }
 
-impl_op_round!(f64, sqrt1_rd(x), "sqrtpd {x}, {x}", rd);
-impl_op_round!(f64, sqrt1_ru(x), "sqrtpd {x}, {x}", ru);
-impl_op_round!(f64, sub1_ru(x, y), "subpd {x}, {y}", ru);
-impl_op_round!(__m128d, add_ru(x, y), "addpd {x}, {y}", ru);
-impl_op_round!(__m128d, mul_ru(x, y), "mulpd {x}, {y}", ru);
-impl_op_round!(__m128d, div_ru(x, y), "divpd {x}, {y}", ru);
+impl_op_round!(f64, sqrt1_rd(x), "vsqrtsd {x}, {x}, {x}", rd);
+impl_op_round!(f64, sqrt1_ru(x), "vsqrtsd {x}, {x}, {x}", ru);
+impl_op_round!(f64, sub1_ru(x, y), "vsubsd {x}, {x}, {y}", ru);
+impl_op_round!(__m128d, add_ru(x, y), "vaddpd {x}, {x}, {y}", ru);
+impl_op_round!(__m128d, mul_ru(x, y), "vmulpd {x}, {x}, {y}", ru);
+impl_op_round!(__m128d, div_ru(x, y), "vdivpd {x}, {x}, {y}", ru);
 impl_op_round!(
     __m128d,
     mul_add_ru(x, y, z),

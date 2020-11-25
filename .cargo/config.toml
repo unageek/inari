@@ -1,0 +1,3 @@
+[build]
+rustflags = ["-Ctarget-cpu=haswell"]
+rustdocflags = ["-Ctarget-cpu=haswell"]

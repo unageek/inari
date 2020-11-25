@@ -133,12 +133,14 @@ pub(crate) fn xor(x: __m128d, y: __m128d) -> __m128d {
     unsafe { _mm_xor_pd(x, y) }
 }
 
-#[cfg(all(target_arch = "x86_64", target_feature = "avx512f"))]
-mod avx512f;
-#[cfg(all(target_arch = "x86_64", target_feature = "avx512f"))]
-pub(crate) use avx512f::*;
-
-#[cfg(all(target_arch = "x86_64", not(target_feature = "avx512f")))]
-mod sse2;
-#[cfg(all(target_arch = "x86_64", not(target_feature = "avx512f")))]
-pub(crate) use sse2::*;
+cfg_if::cfg_if! {
+    if #[cfg(target_feature = "avx512f")] {
+        mod avx512f;
+        pub(crate) use avx512f::*;
+    } else if #[cfg(all(target_feature = "avx", target_feature = "fma"))] {
+        mod avx_fma;
+        pub(crate) use avx_fma::*;
+    } else {
+        compile_error!("RUSTFLAGS='-C target-cpu=haswell' or later is required. See https://doc.rust-lang.org/rustc/codegen-options/#target-cpu");
+    }
+}

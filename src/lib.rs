@@ -31,4 +31,11 @@ mod overlap;
 #[cfg(feature = "gmp")]
 mod parse;
 mod set_op;
-mod simd;
+
+cfg_if::cfg_if! {
+    if #[cfg(target_arch = "x86_64")] {
+        mod simd;
+    } else {
+        compile_error!("Only x86-64 architecture is supported by this crate.");
+    }
+}
