@@ -305,13 +305,13 @@ fn parse_dec_float(mant: &str, exp: &str) -> result::Result<Rational, ParseNumbe
     parse_dec_float_with_ulp(mant, exp).map(|(r, _)| r)
 }
 
-fn parse_rational(s: &str) -> result::Result<Rational, ParseNumberError> {
+fn parse_rational(s: &str) -> Rational {
     unsafe {
         let mut r = Rational::new();
         let c_string = std::ffi::CString::new(s).unwrap();
         gmp::mpq_set_str(r.as_raw_mut(), c_string.as_ptr(), 10);
         gmp::mpq_canonicalize(r.as_raw_mut());
-        Ok(r)
+        r
     }
 }
 
@@ -322,7 +322,7 @@ fn parse_unsigned_number(n: UnsignedNumberLiteral) -> result::Result<Number, Par
         DecFloat(m, e) => Number::Rational(parse_dec_float(m, e)?),
         HexFloat(m, e) => Number::Rational(parse_hex_float(m, e)?),
         Infinity => Number::Infinity,
-        Rational(s) => Number::Rational(parse_rational(s)?),
+        Rational(s) => Number::Rational(parse_rational(s)),
     })
 }
 
