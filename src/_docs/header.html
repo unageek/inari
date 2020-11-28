@@ -63,11 +63,11 @@
       },
     };
 
-    // NOTE: This does not work with surrogate pairs nor combining character sequences.
+    // NOTE: This does not work for surrogate pairs nor combining character sequences.
     const charSubstitutions = {
       π: "𝜋",
-      "∧": "\\mathrel{\\textstyle{⋀}}", // logical AND
-      "∨": "\\mathrel{\\textstyle{⋁}}", // logical OR
+      "∧": "\\mathrel{∧}", // logical AND
+      "∨": "\\mathrel{∨}", // logical OR
     };
 
     function preprocess(math) {
