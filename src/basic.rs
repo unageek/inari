@@ -13,12 +13,13 @@ impl Interval {
             return Self::EMPTY; // *
         }
 
+        use IntervalClass2::*;
         match self.classify2(rhs) {
-            C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_N0_E | C_N1_E
-            | C_P0_E | C_P1_E | C_Z_E => Self::EMPTY,
-            C_M_Z | C_N0_Z | C_N1_Z | C_P0_Z | C_P1_Z | C_Z_M | C_Z_N0 | C_Z_N1 | C_Z_P0
-            | C_Z_P1 | C_Z_Z => addend, // *
-            C_M_M => {
+            E_E | E_M | E_N0 | E_N1 | E_P0 | E_P1 | E_Z | M_E | N0_E | N1_E | P0_E | P1_E | Z_E => {
+                Self::EMPTY
+            }
+            M_Z | N0_Z | N1_Z | P0_Z | P1_Z | Z_M | Z_N0 | Z_N1 | Z_P0 | Z_P1 | Z_Z => addend, // *
+            M_M => {
                 let x = shuffle02(self.rep, self.rep);
                 let y = swap(rhs.rep);
                 let xy = mul_add_ru(x, y, addend.rep); // *
@@ -28,28 +29,28 @@ impl Interval {
                 let r = max(xy, zw);
                 Self { rep: r }
             }
-            C_M_N0 | C_M_N1 => {
+            M_N0 | M_N1 => {
                 let x = swap(self.rep);
                 let y = shuffle02(rhs.rep, rhs.rep);
                 Self {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
             }
-            C_M_P0 | C_M_P1 => {
+            M_P0 | M_P1 => {
                 let x = self.rep;
                 let y = shuffle13(rhs.rep, rhs.rep);
                 Self {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
             }
-            C_N0_M | C_N1_M => {
+            N0_M | N1_M => {
                 let x = shuffle02(self.rep, self.rep);
                 let y = swap(rhs.rep);
                 Self {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
             }
-            C_N0_N0 | C_N0_N1 | C_N1_N0 | C_N1_N1 => {
+            N0_N0 | N0_N1 | N1_N0 | N1_N1 => {
                 let x = swap(self.rep);
                 let x = neg0(x);
                 let y = swap(rhs.rep);
@@ -57,7 +58,7 @@ impl Interval {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
             }
-            C_N0_P0 | C_N0_P1 | C_N1_P0 | C_N1_P1 => {
+            N0_P0 | N0_P1 | N1_P0 | N1_P1 => {
                 let x = self.rep;
                 let y = neg0(rhs.rep);
                 let y = swap(y);
@@ -65,14 +66,14 @@ impl Interval {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
             }
-            C_P0_M | C_P1_M => {
+            P0_M | P1_M => {
                 let x = shuffle13(self.rep, self.rep);
                 let y = rhs.rep;
                 Self {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
             }
-            C_P0_N0 | C_P0_N1 | C_P1_N0 | C_P1_N1 => {
+            P0_N0 | P0_N1 | P1_N0 | P1_N1 => {
                 let x = neg0(self.rep);
                 let x = swap(x);
                 let y = rhs.rep;
@@ -80,14 +81,13 @@ impl Interval {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
             }
-            C_P0_P0 | C_P0_P1 | C_P1_P0 | C_P1_P1 => {
+            P0_P0 | P0_P1 | P1_P0 | P1_P1 => {
                 let x = self.rep;
                 let y = neg0(rhs.rep);
                 Self {
                     rep: mul_add_ru(x, y, addend.rep), // *
                 }
             }
-            _ => unreachable!(),
         }
     }
 
@@ -95,10 +95,11 @@ impl Interval {
     ///
     /// Tightness: tightest
     pub fn recip(self) -> Self {
+        use IntervalClass::*;
         match self.classify() {
-            C_E | C_Z => Self::EMPTY,
-            C_M => Self::ENTIRE,
-            C_N0 => {
+            E | Z => Self::EMPTY,
+            M => Self::ENTIRE,
+            N0 => {
                 // 1 / N0 => [-∞, 1/a] = [+∞; -1/-a]
                 let x = splat(-1.0);
                 let y = self.rep; // [-a; b]
@@ -106,13 +107,13 @@ impl Interval {
                     rep: shuffle02(splat(f64::INFINITY), div_ru(x, y)),
                 }
             }
-            C_N1 => {
+            N1 => {
                 // 1 / N1 => [1/b, 1/a] = [-1/b; 1/a] = [-1/b; -1/-a] = [-1; -1] ./ [b; -a]
                 let x = splat(-1.0);
                 let y = swap(self.rep); // [b; -a]
                 Self { rep: div_ru(x, y) }
             }
-            C_P0 => {
+            P0 => {
                 // 1 / P0 => [1/b, +∞] = [-1/b; +∞]
                 let x = splat(-1.0);
                 let y = self.rep; // [-a; b]
@@ -120,13 +121,12 @@ impl Interval {
                     rep: shuffle13(div_ru(x, y), splat(f64::INFINITY)),
                 }
             }
-            C_P1 => {
+            P1 => {
                 // 1 / P1 => [1/b, 1/a] = [-1/b; 1/a] = [-1/b; -1/-a] = [-1; -1] ./ [b; -a]
                 let x = splat(-1.0);
                 let y = swap(self.rep); // [b; -a]
                 Self { rep: div_ru(x, y) }
             }
-            _ => unreachable!(),
         }
     }
 
@@ -134,10 +134,11 @@ impl Interval {
     ///
     /// Tightness: tightest
     pub fn sqr(self) -> Self {
+        use IntervalClass::*;
         match self.classify() {
-            C_E => Self::EMPTY,
-            C_Z => Self::zero(),
-            C_M => {
+            E => Self::EMPTY,
+            Z => Self::zero(),
+            M => {
                 // [0, max(a^2, b^2)] = [0; max(a^2, b^2)]
                 let x = self.rep; // [-a; b]
                 let r = mul_ru(x, x); // [a^2; b^2]
@@ -146,19 +147,18 @@ impl Interval {
                     rep: shuffle02(splat(0.0), r),
                 }
             }
-            C_N0 | C_N1 => {
+            N0 | N1 => {
                 // [b^2, a^2] = [-b^2; a^2] = [-b; -a] .* [b; -a]
                 let x = swap(self.rep); // [b; -a]
                 let y = neg0(x); // [-b; -a]
                 Self { rep: mul_ru(x, y) }
             }
-            C_P0 | C_P1 => {
+            P0 | P1 => {
                 // [a^2, b^2] = [-a^2; b^2] = [-a; b] .* [a; b]
                 let x = self.rep; // [-a; b]
                 let y = neg0(x); // [a; b]
                 Self { rep: mul_ru(x, y) }
             }
-            _ => unreachable!(),
         }
     }
 

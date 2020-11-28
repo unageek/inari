@@ -5,9 +5,10 @@ impl Interval {
     ///
     /// Tightness: tightest
     pub fn abs(self) -> Self {
+        use IntervalClass::*;
         match self.classify() {
-            C_E | C_P0 | C_P1 | C_Z => self,
-            C_M => {
+            E | P0 | P1 | Z => self,
+            M => {
                 // [0, max(-a, b)] = [0; max(-a, b)]
                 let x = self.rep; // [-a; b]
                 let r = max(x, swap(x)); // [max(-a, b); _]
@@ -15,13 +16,12 @@ impl Interval {
                     rep: shuffle02(splat(0.0), r),
                 }
             }
-            C_N0 | C_N1 => {
+            N0 | N1 => {
                 // [-b, -a] = [b; -a]
                 Self {
                     rep: swap(self.rep),
                 }
             }
-            _ => unreachable!(),
         }
     }
 

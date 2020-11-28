@@ -261,106 +261,106 @@ impl Interval {
         let c = y.inf_raw();
         let d = y.sup_raw();
 
+        use IntervalClass2::*;
         match x.classify2(y) {
-            C_E_E | C_E_M | C_E_N0 | C_E_N1 | C_E_P0 | C_E_P1 | C_E_Z | C_M_E | C_N0_E | C_N1_E
-            | C_P0_E | C_P1_E | C_Z_E | C_Z_Z => (Self::EMPTY, Decoration::Trv),
-            C_M_M | C_M_N0 | C_N0_M | C_N0_N0 => (
+            E_E | E_M | E_N0 | E_N1 | E_P0 | E_P1 | E_Z | M_E | N0_E | N1_E | P0_E | P1_E | Z_E
+            | Z_Z => (Self::EMPTY, Decoration::Trv),
+            M_M | M_N0 | N0_M | N0_N0 => (
                 Self::with_infsup_raw(-Self::PI.sup_raw(), Self::PI.sup_raw()),
                 Decoration::Trv,
             ),
 
             // First quadrant
-            C_P0_P0 => (
+            P0_P0 => (
                 Self::with_infsup_raw(0.0, Self::FRAC_PI_2.sup_raw()),
                 Decoration::Trv,
             ),
-            C_P0_P1 | C_P1_P0 | C_P1_P1 | C_P1_Z | C_Z_P1 => (
+            P0_P1 | P1_P0 | P1_P1 | P1_Z | Z_P1 => (
                 Self::with_infsup_raw(atan2_rd(c, b), atan2_ru(d, a)),
                 Decoration::Com,
             ),
 
             // First & second quadrant
-            C_M_P0 | C_M_Z => (
+            M_P0 | M_Z => (
                 Self::with_infsup_raw(0.0, Self::PI.sup_raw()),
                 Decoration::Trv,
             ),
-            C_M_P1 => (
+            M_P1 => (
                 Self::with_infsup_raw(atan2_rd(c, b), atan2_ru(c, a)),
                 Decoration::Com,
             ),
 
             // Second quadrant
-            C_N0_P0 => (
+            N0_P0 => (
                 Self::with_infsup_raw(Self::FRAC_PI_2.inf_raw(), Self::PI.sup_raw()),
                 Decoration::Trv,
             ),
-            C_N0_P1 | C_N1_P1 => (
+            N0_P1 | N1_P1 => (
                 Self::with_infsup_raw(atan2_rd(d, b), atan2_ru(c, a)),
                 Decoration::Com,
             ),
-            C_N1_P0 => (
+            N1_P0 => (
                 Self::with_infsup_raw(atan2_rd(d, b), Self::PI.sup_raw()),
                 Decoration::Dac,
             ),
 
             // Second & third quadrant
-            //C_N0_M => See above.
-            C_N1_M | C_N1_N0 => (
+            //N0_M => See above.
+            N1_M | N1_N0 => (
                 Self::with_infsup_raw(-Self::PI.sup_raw(), Self::PI.sup_raw()),
                 Decoration::Def,
             ),
 
             // Third quadrant
-            //C_N0_N0 => See above.
-            C_N0_N1 | C_N1_N1 => (
+            //N0_N0 => See above.
+            N0_N1 | N1_N1 => (
                 Self::with_infsup_raw(atan2_rd(d, a), atan2_ru(c, b)),
                 Decoration::Com,
             ),
-            //C_N1_N0 => See above.
+            //N1_N0 => See above.
 
             // Third & fourth quadrant
-            //C_M_N0 => See above.
-            C_M_N1 => (
+            //M_N0 => See above.
+            M_N1 => (
                 Self::with_infsup_raw(atan2_rd(d, a), atan2_ru(d, b)),
                 Decoration::Com,
             ),
 
             // Fourth quadrant
-            C_P0_N0 => (
+            P0_N0 => (
                 Self::with_infsup_raw(-Self::FRAC_PI_2.sup_raw(), 0.0),
                 Decoration::Trv,
             ),
-            C_P0_N1 | C_P1_N0 | C_P1_N1 | C_Z_N1 => (
+            P0_N1 | P1_N0 | P1_N1 | Z_N1 => (
                 Self::with_infsup_raw(atan2_rd(c, a), atan2_ru(d, b)),
                 Decoration::Com,
             ),
 
             // Fourth & first quadrant
-            C_P0_M | C_Z_M => (
+            P0_M | Z_M => (
                 Self::with_infsup_raw(-Self::FRAC_PI_2.sup_raw(), Self::FRAC_PI_2.sup_raw()),
                 Decoration::Trv,
             ),
-            C_P1_M => (
+            P1_M => (
                 Self::with_infsup_raw(atan2_rd(c, a), atan2_ru(d, a)),
                 Decoration::Com,
             ),
 
             // X axis
-            //C_M_Z => See above.
-            C_N0_Z => (Self::PI, Decoration::Trv),
-            // This case cannot be merged with C_N1_Z since IEEE 754/MPFR's atan2
-            // returns ±π for y = ±0.0, x < 0.0, while we want +π.
-            C_N1_Z => (Self::PI, Decoration::Dac),
-            C_P0_Z => (Self::zero(), Decoration::Trv),
-            //C_P1_Z => See above.
+            //M_Z => See above.
+            N0_Z => (Self::PI, Decoration::Trv),
+            // The next case cannot be merged with N1_P0 unless we replace -0.0 with +0.0
+            // since IEEE 754/MPFR's atan2 returns ±π for y = ±0.0, x < 0.0, while we want only +π.
+            N1_Z => (Self::PI, Decoration::Dac),
+            P0_Z => (Self::zero(), Decoration::Trv),
+            //P1_Z => See above.
 
             // Y axis
-            //C_Z_M => See above.
-            C_Z_N0 => (-Self::FRAC_PI_2, Decoration::Trv),
-            //C_Z_N1 => See above.
-            C_Z_P0 => (Self::FRAC_PI_2, Decoration::Trv),
-            //C_Z_P1 => See above.
-            _ => unreachable!(),
+            //Z_M => See above.
+            Z_N0 => (-Self::FRAC_PI_2, Decoration::Trv),
+            //Z_N1 => See above.
+            Z_P0 => (Self::FRAC_PI_2, Decoration::Trv),
+            //Z_P1 => See above.
         }
     }
 
