@@ -1,4 +1,4 @@
-use crate::{classify::*, interval::*};
+use crate::{classify::*, const_interval, interval::*};
 use gmp_mpfr_sys::mpfr;
 use rug::Float;
 
@@ -122,8 +122,8 @@ macro_rules! impl_log {
         #[allow(clippy::many_single_char_names)]
         fn $f_impl(self) -> (Self, Decoration) {
             // See the comment in atanh_impl.
-            let dom = Self::with_infsup_raw(0.0, f64::INFINITY);
-            let x = self.intersection(dom);
+            const DOM: Interval = const_interval!(0.0, f64::INFINITY);
+            let x = self.intersection(DOM);
 
             let a = x.inf_raw();
             let b = x.sup_raw();
@@ -132,7 +132,7 @@ macro_rules! impl_log {
             }
 
             let y = Self::with_infsup_raw($f_rd(a), $f_ru(b));
-            let d = if self.interior(dom) {
+            let d = if self.interior(DOM) {
                 Decoration::Com
             } else {
                 Decoration::Trv
@@ -164,15 +164,15 @@ impl Interval {
     }
 
     fn acos_impl(self) -> (Self, Decoration) {
-        let dom = Self::with_infsup_raw(-1.0, 1.0);
-        let x = self.intersection(dom);
+        const DOM: Interval = const_interval!(-1.0, 1.0);
+        let x = self.intersection(DOM);
 
         if x.is_empty() {
             return (x, Decoration::Trv);
         }
 
         let y = Self::with_infsup_raw(acos_rd(x.sup_raw()), acos_ru(x.inf_raw()));
-        let d = if self.subset(dom) {
+        let d = if self.subset(DOM) {
             Decoration::Com
         } else {
             Decoration::Trv
@@ -188,15 +188,15 @@ impl Interval {
     }
 
     fn acosh_impl(self) -> (Self, Decoration) {
-        let dom = Self::with_infsup_raw(1.0, f64::INFINITY);
-        let x = self.intersection(dom);
+        const DOM: Interval = const_interval!(1.0, f64::INFINITY);
+        let x = self.intersection(DOM);
 
         if x.is_empty() {
             return (x, Decoration::Trv);
         }
 
         let y = Self::with_infsup_raw(acosh_rd(x.inf_raw()), acosh_ru(x.sup_raw()));
-        let d = if self.subset(dom) {
+        let d = if self.subset(DOM) {
             Decoration::Com
         } else {
             Decoration::Trv
@@ -212,15 +212,15 @@ impl Interval {
     }
 
     fn asin_impl(self) -> (Self, Decoration) {
-        let dom = Self::with_infsup_raw(-1.0, 1.0);
-        let x = self.intersection(dom);
+        const DOM: Interval = const_interval!(-1.0, 1.0);
+        let x = self.intersection(DOM);
 
         if x.is_empty() {
             return (x, Decoration::Trv);
         }
 
         let y = Self::with_infsup_raw(asin_rd(x.inf_raw()), asin_ru(x.sup_raw()));
-        let d = if self.subset(dom) {
+        let d = if self.subset(DOM) {
             Decoration::Com
         } else {
             Decoration::Trv
@@ -376,8 +376,8 @@ impl Interval {
         // Mathematically, the domain of atanh is (-1.0, 1.0), not [-1.0, 1.0].
         // However, IEEE 754/MPFR's atanh returns ±infinity for ±1.0,
         // (and signals the divide-by-zero exception), so we will make use of that.
-        let dom = Self::with_infsup_raw(-1.0, 1.0);
-        let x = self.intersection(dom);
+        const DOM: Interval = const_interval!(-1.0, 1.0);
+        let x = self.intersection(DOM);
 
         let a = x.inf_raw();
         let b = x.sup_raw();
@@ -386,7 +386,7 @@ impl Interval {
         }
 
         let y = Self::with_infsup_raw(atanh_rd(a), atanh_ru(b));
-        let d = if self.interior(dom) {
+        let d = if self.interior(DOM) {
             Decoration::Com
         } else {
             Decoration::Trv
@@ -434,7 +434,7 @@ impl Interval {
                 Self::with_infsup_raw(cos_rd(a).min(cos_rd(b)), 1.0)
             }
         } else {
-            Self::with_infsup_raw(-1.0, 1.0)
+            const_interval!(-1.0, 1.0)
         }
     }
 
@@ -519,8 +519,8 @@ impl Interval {
 
     #[allow(clippy::many_single_char_names)]
     fn pow_impl(self, rhs: Self) -> (Self, Decoration) {
-        let dom = Self::with_infsup_raw(0.0, f64::INFINITY);
-        let x = self.intersection(dom);
+        const DOM: Interval = const_interval!(0.0, f64::INFINITY);
+        let x = self.intersection(DOM);
 
         if x.either_empty(rhs) {
             return (Self::EMPTY, Decoration::Trv);
@@ -536,7 +536,7 @@ impl Interval {
                 return (Self::EMPTY, Decoration::Trv);
             }
 
-            let dec = if self.interior(dom) {
+            let dec = if self.interior(DOM) {
                 Decoration::Com
             } else {
                 Decoration::Trv
@@ -550,7 +550,7 @@ impl Interval {
                 (Self::with_infsup_raw(pow_rd(b, c), pow_ru(a, c)), dec)
             }
         } else if c > 0.0 {
-            let dec = if self.subset(dom) {
+            let dec = if self.subset(DOM) {
                 Decoration::Com
             } else {
                 Decoration::Trv
@@ -572,7 +572,7 @@ impl Interval {
             let z_ad = pow_rd(a, d);
             let z_bc = pow_rd(b, c);
             let z_bd = pow_ru(b, d);
-            let dec = if self.interior(dom) {
+            let dec = if self.interior(DOM) {
                 Decoration::Com
             } else {
                 Decoration::Trv
@@ -673,7 +673,7 @@ impl Interval {
             // decreasing, then increasing
             Self::with_infsup_raw(-1.0, sin_ru(a).max(sin_ru(b)))
         } else {
-            Self::with_infsup_raw(-1.0, 1.0)
+            const_interval!(-1.0, 1.0)
         }
     }
 
