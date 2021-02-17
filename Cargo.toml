@@ -1,12 +1,12 @@
 [package]
 name = "inari"
 version = "0.8.0"
-authors = ["Masashi Mizuno <mizuno@gsinet.co.jp>"]
+authors = ["Masashi Mizuno"]
 edition = "2018"
 description = "A Rust implementation of set-based interval arithmetic."
 documentation = "https://docs.rs/inari"
 readme = "README.md"
-repository = "https://github.com/mizuno-gsinet/inari"
+repository = "https://github.com/unageek/inari"
 license = "MIT"
 keywords = ["arithmetic", "interval", "math", "numerics"]
 categories = ["mathematics", "science"]
