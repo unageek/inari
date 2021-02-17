@@ -297,7 +297,7 @@ macro_rules! const_interval {
     ($a:expr, $b:expr) => {{
         use ::std::{mem::transmute, primitive::*};
 
-        static_assertions::const_assert!(
+        ::static_assertions::const_assert!(
             $a <= $b && $a != f64::INFINITY && $b != f64::NEG_INFINITY
         );
 
