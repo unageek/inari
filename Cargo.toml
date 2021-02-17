@@ -29,9 +29,6 @@ rustdoc-args = [
   "src/_docs/header.html",
 ]
 
-[profile.release]
-lto = true
-
 [features]
 default = ["gmp"]
 gmp = ["gmp-mpfr-sys", "nom", "rug"]
