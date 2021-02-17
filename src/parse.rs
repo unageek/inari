@@ -79,12 +79,12 @@ impl NInterval {
 }
 
 #[derive(Debug, Eq, PartialEq)]
-struct DNInterval {
+struct DecNInterval {
     x: NInterval,
     d: Decoration,
 }
 
-impl DNInterval {
+impl DecNInterval {
     const EMPTY: Self = Self {
         x: NInterval::EMPTY,
         d: Decoration::Trv,
@@ -463,42 +463,42 @@ fn decoration(s: &str) -> IResult<&str, Decoration> {
     ))(s)
 }
 
-fn decorated_interval(s: &str) -> IResult<&str, Result<DNInterval>> {
+fn decorated_interval(s: &str) -> IResult<&str, Result<DecNInterval>> {
     alt((
         map(
             tuple((char('['), space0, tag_no_case("nai"), space0, char(']'))),
-            |_| Ok(DNInterval::NAI),
+            |_| Ok(DecNInterval::NAI),
         ),
         map(
             pair(interval, opt(preceded(char('_'), decoration))),
             |pair| match pair {
-                (Ok(x), None) => Ok(DNInterval::new(x)),
+                (Ok(x), None) => Ok(DecNInterval::new(x)),
                 (Ok(x), Some(d)) => {
-                    let xd = DNInterval::set_dec(x, d);
+                    let xd = DecNInterval::set_dec(x, d);
                     if xd.d == d {
                         Ok(xd)
                     } else {
                         Err(IntervalError {
                             kind: IntervalErrorKind::UndefinedOperation,
-                            value: DNInterval::NAI,
+                            value: DecNInterval::NAI,
                         })
                     }
                 }
                 (Err(e), None) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
                     Err(IntervalError {
                         kind: e.kind,
-                        value: DNInterval::new(e.value),
+                        value: DecNInterval::new(e.value),
                     })
                 }
                 (Err(e), Some(d)) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
                     Err(IntervalError {
                         kind: e.kind,
-                        value: DNInterval::set_dec(e.value, d),
+                        value: DecNInterval::set_dec(e.value, d),
                     })
                 }
                 _ => Err(IntervalError {
                     kind: IntervalErrorKind::UndefinedOperation,
-                    value: DNInterval::NAI,
+                    value: DecNInterval::NAI,
                 }),
             },
         ),
@@ -563,12 +563,12 @@ fn number_to_f64(n: &Number, infsup: InfSup) -> F64 {
 
 impl From<NInterval> for Interval {
     fn from(x: NInterval) -> Self {
-        DecInterval::from(DNInterval::new(x)).x
+        DecInterval::from(DecNInterval::new(x)).x
     }
 }
 
-impl From<DNInterval> for DecInterval {
-    fn from(DNInterval { x, d }: DNInterval) -> Self {
+impl From<DecNInterval> for DecInterval {
+    fn from(DecNInterval { x, d }: DecNInterval) -> Self {
         let a = number_to_f64(&x.0, InfSup::Inf);
         let b = number_to_f64(&x.1, InfSup::Sup);
         // Fails on the empty interval.

@@ -225,7 +225,7 @@ impl Interval {
         //  Mb |     x |   x   |     x |     x
         //   A |     x |     x |     x |     x
 
-        #[allow(clippy::collapsible_if)]
+        #[allow(clippy::collapsible_else_if, clippy::collapsible_if)]
         if b < d {
             if a < c {
                 if b < c {

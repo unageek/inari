@@ -597,7 +597,7 @@ impl Interval {
         let mut a = self.inf_raw();
         let mut b = self.sup_raw();
 
-        #[allow(clippy::collapsible_if)]
+        #[allow(clippy::collapsible_else_if, clippy::collapsible_if)]
         if rhs < 0 {
             let d = if a <= 0.0 && b >= 0.0 {
                 Decoration::Trv
