@@ -1,6 +1,6 @@
 [package]
 name = "inari"
-version = "0.9.0"
+version = "0.9.1"
 authors = ["Masashi Mizuno"]
 edition = "2018"
 description = "A Rust implementation of set-based interval arithmetic."
@@ -11,6 +11,7 @@ license = "MIT"
 keywords = ["arithmetic", "interval", "math", "numerics"]
 categories = ["mathematics", "science"]
 include = [
+  "/.cargo/**",
   "/examples/**",
   "/src/**",
   "/tests/**",
@@ -18,6 +19,7 @@ include = [
   "/CHANGELOG.md",
   "/LICENSE",
   "/README.md",
+  "/rust-toolchain",
 ]
 
 [package.metadata.docs.rs]
