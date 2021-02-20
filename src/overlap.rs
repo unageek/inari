@@ -283,7 +283,7 @@ impl DecInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecInterval;
+    use DecInterval as DI;
 
     #[test]
     fn nai() {

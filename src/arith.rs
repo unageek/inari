@@ -319,8 +319,8 @@ impl_op_assign!(DivAssign, div_assign, div);
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecInterval;
-    type I = Interval;
+    use DecInterval as DI;
+    use Interval as I;
 
     #[test]
     fn add_assign() {

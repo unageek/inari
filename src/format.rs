@@ -101,9 +101,9 @@ impl fmt::LowerHex for DecInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type D = Decoration;
-    type DI = DecInterval;
-    type I = Interval;
+    use DecInterval as DI;
+    use Decoration as D;
+    use Interval as I;
 
     #[test]
     fn format() {

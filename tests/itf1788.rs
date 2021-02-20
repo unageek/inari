@@ -1,12 +1,13 @@
-#![allow(
+use inari::*;
+
+#[allow(
+    unused_attributes,
+    unused_imports,
     clippy::approx_constant,
     clippy::eq_op,
     clippy::excessive_precision,
     clippy::float_cmp
 )]
-
-use inari::*;
-
 mod itf1788_tests {
     //mod abs_rev;
     mod atan2;
@@ -75,6 +76,7 @@ impl Eq2 for Interval {}
 impl Eq2 for Overlap {}
 
 impl Eq2 for f64 {
+    #[allow(clippy::float_cmp)]
     fn eq2(&self, rhs: &Self) -> bool {
         self.is_nan() && rhs.is_nan() || self == rhs
     }

@@ -89,8 +89,8 @@ impl DecInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type DI = DecInterval;
-    type I = Interval;
+    use DecInterval as DI;
+    use Interval as I;
 
     #[test]
     fn empty() {
