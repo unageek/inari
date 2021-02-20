@@ -103,8 +103,8 @@ impl DecInterval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    type I = Interval;
-    type DI = DecInterval;
+    use DecInterval as DI;
+    use Interval as I;
 
     // This only works with positive numbers.
     fn succ(x: f64) -> f64 {

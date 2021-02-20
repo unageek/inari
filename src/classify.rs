@@ -114,7 +114,7 @@ pub(crate) enum IntervalClass2 {
 mod tests {
     use super::*;
     use crate::*;
-    type I = Interval;
+    use Interval as I;
 
     #[test]
     fn classify() {

@@ -22,7 +22,6 @@
  */
 //Language imports
 #![rustfmt::skip]
-#![allow(unused_attributes, unused_imports)]
 
 //Test library imports
 
@@ -30,10 +29,7 @@
 
 //Preamble
 use crate::*;
-type D = inari::Decoration;
-type DI = inari::DecInterval;
-type I = inari::Interval;
-type O = inari::Overlap;
+use inari::{DecInterval as DI, Decoration as D, Interval as I, Overlap as O};
 
 #[test]
 fn minimal_overlap_test() {

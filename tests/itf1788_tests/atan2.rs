@@ -12,7 +12,6 @@
  */
 //Language imports
 #![rustfmt::skip]
-#![allow(unused_attributes, unused_imports)]
 
 //Test library imports
 
@@ -20,7 +19,7 @@
 
 //Preamble
 use crate::*;
-type I = inari::Interval;
+use inari::{DecInterval as DI, Decoration as D, Interval as I, Overlap as O};
 
 #[cfg(feature = "gmp")]
 #[test]
