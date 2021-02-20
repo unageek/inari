@@ -15,7 +15,7 @@ A recent version of the nightly toolchain is required, since the [new `asm!` mac
 
 ### Target CPU
 
-Haswell or newer microarchitecture is required. You need to specify the target CPU by, for example, the [Cargo configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/.cargo/config.toml)).
+Haswell or newer microarchitecture is required. You need to specify the target CPU by, for example, the [Cargo configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/.cargo/config.toml); you may want to change `native` to `haswell` for maximum compatibility if you are planning to distribute your binary).
 
 ## Conditional features
 

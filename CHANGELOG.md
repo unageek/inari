@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.9.0 - 2021-02-20
+
+### Changed
+
+- ❗ Explicitly check the target CPU features during compilation. From this version, you need to specify `RUSTFLAGS='-C target-cpu=<CPU>'`, where `<CPU>` must be `haswell` or a newer microarchitecture; otherwise, build fails.
+
 ## v0.8.0 - 2020-11-24
 
 ### Added
