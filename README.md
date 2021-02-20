@@ -9,11 +9,17 @@ A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.or
 
 ## Requirements
 
-The nightly Rust toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used.
+### `rustc` version
+
+A recent version of the nightly toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used. You need to specify the toolchain by, for example, the [toolchain file](https://rust-lang.github.io/rustup/overrides.html#the-toolchain-file) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/rust-toolchain)).
+
+### Target CPU
+
+Haswell or newer microarchitecture is required. You need to specify the target CPU by, for example, the [Cargo configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/.cargo/config.toml)).
 
 ## Conditional features
 
-- `gmp` (enabled by default) - Enables operations that depend on GMP and MPFR, namely transcendental functions and conversion between texts and intervals. You can opt-out the feature to reduce dependency. Even in that case, you can still access to basic arithmetic operations that are required for writing filters for geometric predicates.
+- `gmp` (enabled by default) - Enables operations that depend on GMP and MPFR, namely, transcendental functions and conversion between texts and intervals. You can opt-out the feature to reduce dependencies. Even in that case, you still have access to all arithmetic operations that are required for writing filters for robust geometric predicates.
 
 ## Made with inari
 
@@ -26,7 +32,7 @@ The nightly Rust toolchain is required, since the [new `asm!` macro](https://blo
 - Improve conformance to the standard
 - More formatting options
   - https://octave.sourceforge.io/interval/function/intervaltotext.html
-  - https://en.cppreference.com/w/cpp/utility/format/formatter
+  - https://docs.python.org/3/library/string.html#formatspec
 
 ## References
 
