@@ -404,7 +404,7 @@ impl Interval {
 
         let a = self.inf_raw();
         let b = self.sup_raw();
-        let q_nowrap = (self / Interval::PI).floor();
+        let q_nowrap = (self / Self::PI).floor();
         let qa = q_nowrap.inf_raw();
         let qb = q_nowrap.sup_raw();
         // n and q are valid for small values.
@@ -654,7 +654,7 @@ impl Interval {
 
         let a = self.inf_raw();
         let b = self.sup_raw();
-        let q_nowrap = (self / Interval::FRAC_PI_2).floor();
+        let q_nowrap = (self / Self::FRAC_PI_2).floor();
         let qa = q_nowrap.inf_raw();
         let qb = q_nowrap.sup_raw();
         let n = if a == b { 0.0 } else { qb - qa };
@@ -700,14 +700,14 @@ impl Interval {
 
         let a = self.inf_raw();
         let b = self.sup_raw();
-        let q_nowrap = (self / Interval::FRAC_PI_2).floor();
+        let q_nowrap = (self / Self::FRAC_PI_2).floor();
         let qa = q_nowrap.inf_raw();
         let qb = q_nowrap.sup_raw();
         let n = if a == b { 0.0 } else { qb - qa };
         let q = rem_euclid_2(qa);
 
-        let cont = qb != f64::INFINITY
-            && b <= (Self::with_infsup_raw(qb, qb) * Interval::FRAC_PI_2).inf_raw();
+        let cont =
+            qb != f64::INFINITY && b <= (Self::with_infsup_raw(qb, qb) * Self::FRAC_PI_2).inf_raw();
         if q == 0.0 && (n < 1.0 || n == 1.0 && cont) || q == 1.0 && (n < 2.0 || n == 2.0 && cont) {
             // In case of overflow, the decoration must be corrected by the caller.
             (Self::with_infsup_raw(tan_rd(a), tan_ru(b)), Decoration::Com)
