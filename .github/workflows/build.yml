@@ -5,6 +5,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -29,26 +30,35 @@ jobs:
 
       - name: Run tests
         run: cargo test --release --all-features
+        env:
+          RUSTFLAGS: -Ctarget-cpu=haswell
+          RUSTDOCFLAGS: -Ctarget-cpu=haswell
 
       - name: Run tests w/ AVX-512F enabled
         run: cargo test --release --all-features
         if: ${{ steps.avx512f.outcome == 'success' }}
         env:
-          RUSTFLAGS: -Ctarget-feature=+avx512f
-          RUSTDOCFLAGS: -Ctarget-feature=+avx512f
+          RUSTFLAGS: -Ctarget-cpu=haswell -Ctarget-feature=+avx512f
+          RUSTDOCFLAGS: -Ctarget-cpu=haswell -Ctarget-feature=+avx512f
 
       - name: Run tests (--no-default-features)
         run: cargo test --release --no-default-features
+        env:
+          RUSTFLAGS: -Ctarget-cpu=haswell
+          RUSTDOCFLAGS: -Ctarget-cpu=haswell
 
       - name: Clippy
         run: cargo clippy --all-targets --all-features -- -Dwarnings
+        env:
+          RUSTFLAGS: -Ctarget-cpu=haswell
+          RUSTDOCFLAGS: -Ctarget-cpu=haswell
 
       - name: Clippy w/ AVX-512F enabled
         run: cargo clippy --all-targets --all-features -- -Dwarnings
         if: ${{ steps.avx512f.outcome == 'success' }}
         env:
-          RUSTFLAGS: -Ctarget-feature=+avx512f
-          RUSTDOCFLAGS: -Ctarget-feature=+avx512f
+          RUSTFLAGS: -Ctarget-cpu=haswell -Ctarget-feature=+avx512f
+          RUSTDOCFLAGS: -Ctarget-cpu=haswell -Ctarget-feature=+avx512f
 
       - name: Check format
         run: cargo fmt -- --check
