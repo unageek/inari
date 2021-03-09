@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.9.2 - 2021-03-09
+
+### Added
+
+- Experimental support for AArch64.
+
 ## v0.9.0 - 2021-02-20
 
 ### Changed
