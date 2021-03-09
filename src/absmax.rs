@@ -30,15 +30,23 @@ impl Interval {
     ///
     /// Tightness: tightest
     pub fn max(self, rhs: Self) -> Self {
-        if self.either_empty(rhs) {
-            return Self::EMPTY;
-        }
+        if HAS_MAXIMUM {
+            // [max(a, c), max(b, d)] = [-max(a, c); max(b, d)] = [min(-a, -c); max(b, d)]
+            let min = minimum(self.rep, rhs.rep); // [min(-a, -c); min(b, d)]
+            let max = maximum(self.rep, rhs.rep); // [max(-a, -c); max(b, d)]
+            Self {
+                rep: shuffle03(min, max),
+            }
+        } else {
+            if self.either_empty(rhs) {
+                return Self::EMPTY;
+            }
 
-        // [max(a, c), max(b, d)] = [-max(a, c); max(b, d)] = [min(-a, -c); max(b, d)]
-        let min = min(self.rep, rhs.rep); // [min(-a, -c); min(b, d)]
-        let max = max(self.rep, rhs.rep); // [max(-a, -c); max(b, d)]
-        Self {
-            rep: shuffle03(min, max),
+            let min = min(self.rep, rhs.rep);
+            let max = max(self.rep, rhs.rep);
+            Self {
+                rep: shuffle03(min, max),
+            }
         }
     }
 
@@ -47,15 +55,23 @@ impl Interval {
     ///
     /// Tightness: tightest
     pub fn min(self, rhs: Self) -> Self {
-        if self.either_empty(rhs) {
-            return Self::EMPTY;
-        }
+        if HAS_MAXIMUM {
+            // [min(a, c), min(b, d)] = [-min(a, c); min(b, d)] = [max(-a, -c); min(b, d)]
+            let max = maximum(self.rep, rhs.rep); // [max(-a, -c); max(b, d)]
+            let min = minimum(self.rep, rhs.rep); // [min(-a, -c); min(b, d)]
+            Self {
+                rep: shuffle03(max, min),
+            }
+        } else {
+            if self.either_empty(rhs) {
+                return Self::EMPTY;
+            }
 
-        // [min(a, c), min(b, d)] = [-min(a, c); min(b, d)] = [max(-a, -c); min(b, d)]
-        let max = max(self.rep, rhs.rep); // [max(-a, -c); max(b, d)]
-        let min = min(self.rep, rhs.rep); // [min(-a, -c); min(b, d)]
-        Self {
-            rep: shuffle03(max, min),
+            let max = max(self.rep, rhs.rep);
+            let min = min(self.rep, rhs.rep);
+            Self {
+                rep: shuffle03(max, min),
+            }
         }
     }
 }

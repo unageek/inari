@@ -4,6 +4,7 @@
 
 #![feature(asm)]
 #![feature(external_doc)]
+#![feature(stdsimd)]
 #![allow(clippy::float_cmp)]
 
 pub use self::{
@@ -33,9 +34,9 @@ mod parse;
 mod set_op;
 
 cfg_if::cfg_if! {
-    if #[cfg(target_arch = "x86_64")] {
+    if #[cfg(any(target_arch="aarch64", target_arch = "x86_64"))] {
         mod simd;
     } else {
-        compile_error!("Only x86-64 architecture is supported by this crate.");
+        compile_error!("Only x86-64 and AArch64 (experimental) architectures are supported by this crate.");
     }
 }
