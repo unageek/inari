@@ -6,14 +6,14 @@ The ❗ icon indicates a breaking change.
 
 ### Changed
 
-- ❗ Explicitly check the target CPU features during compilation. From this version, you need to specify `RUSTFLAGS='-C target-cpu=<CPU>'`, where `<CPU>` must be `haswell` or a newer microarchitecture; otherwise, build fails.
+- ❗ Explicitly check the target CPU features during compilation. From this version, you need to specify `RUSTFLAGS='-Ctarget-cpu=<CPU>'`, where `<CPU>` must be `haswell` or a newer microarchitecture; otherwise, build fails.
 
 ## v0.8.0 - 2020-11-24
 
 ### Added
 
 - Experimental support for AVX-512F.
-  - To try it out, run cargo with `RUSTFLAGS='-C target-feature=+avx512f'`.
+  - To try it out, run cargo with `RUSTFLAGS='-Ctarget-feature=+avx512f'`.
   - Basic arithmetic operations are expected to get faster, but it is not benchmarked yet.
 
 ### Removed

@@ -1,5 +1,3 @@
-use std::arch::x86_64::__m128d;
-
 macro_rules! impl_op_round {
     ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
         impl_op_round!($t, $f ($x $(,$y)*), $inst, "16256"); // _MM_ROUND_DOWN | _MM_MASK_MASK
@@ -34,11 +32,11 @@ macro_rules! impl_op_round {
 impl_op_round!(f64, sqrt1_rd(x), "vsqrtsd {x}, {x}, {x}", rd);
 impl_op_round!(f64, sqrt1_ru(x), "vsqrtsd {x}, {x}, {x}", ru);
 impl_op_round!(f64, sub1_ru(x, y), "vsubsd {x}, {x}, {y}", ru);
-impl_op_round!(__m128d, add_ru(x, y), "vaddpd {x}, {x}, {y}", ru);
-impl_op_round!(__m128d, mul_ru(x, y), "vmulpd {x}, {x}, {y}", ru);
-impl_op_round!(__m128d, div_ru(x, y), "vdivpd {x}, {x}, {y}", ru);
+impl_op_round!(super::F64X2, add_ru(x, y), "vaddpd {x}, {x}, {y}", ru);
+impl_op_round!(super::F64X2, mul_ru(x, y), "vmulpd {x}, {x}, {y}", ru);
+impl_op_round!(super::F64X2, div_ru(x, y), "vdivpd {x}, {x}, {y}", ru);
 impl_op_round!(
-    __m128d,
+    super::F64X2,
     mul_add_ru(x, y, z),
     "vfmadd213pd {x}, {y}, {z}",
     ru
