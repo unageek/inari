@@ -152,6 +152,6 @@ cfg_if::cfg_if! {
         mod avx_fma;
         pub(crate) use avx_fma::*;
     } else {
-        compile_error!("RUSTFLAGS='-C target-cpu=haswell' or later is required. See https://doc.rust-lang.org/rustc/codegen-options/#target-cpu");
+        compile_error!("RUSTFLAGS='-Ctarget-cpu=haswell' or later is required. See https://doc.rust-lang.org/rustc/codegen-options/#target-cpu");
     }
 }
