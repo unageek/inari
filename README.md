@@ -13,9 +13,15 @@ A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.or
 
 A recent version of the nightly toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used. You need to specify the toolchain by, for example, the [toolchain file](https://rust-lang.github.io/rustup/overrides.html#the-toolchain-file) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/rust-toolchain)).
 
-### Target CPU
+### Target CPUs
 
-Haswell or newer microarchitecture is required. You need to specify the target CPU by, for example, the [Cargo configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/.cargo/config.toml); you may want to change `native` to `haswell` for maximum compatibility if you are planning to distribute your binary).
+- x86-64
+
+  Haswell-based or newer processors are supported. You need to specify the target CPU by, for example, the [Cargo configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/.cargo/config.toml); you may want to change `native` to `haswell` for maximum compatibility if you are going to distribute your binary).
+
+- AArch64 (a.k.a. ARM64)
+
+  Experimental, it is not tested continuously.
 
 ## Conditional features
 
