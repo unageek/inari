@@ -17,7 +17,9 @@ A recent version of the nightly toolchain is required, since the [new `asm!` mac
 
 - x86-64
 
-  Haswell-based or newer processors are supported. You need to specify the target CPU by, for example, the [Cargo configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/.cargo/config.toml); you may want to change `native` to `haswell` for maximum compatibility if you are going to distribute your binary).
+  Haswell-based and newer processors are supported.
+
+  You need to specify the target CPU when building a crate that depends on inari. One way to do that is to add a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) to the consuming crate (see [example](https://github.com/unageek/inari-graph/blob/master/.cargo/config.toml); you may want to change `native` to `haswell` for maximum compatibility if you are going to distribute your binary).
 
 - AArch64 (a.k.a. ARM64)
 
