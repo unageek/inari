@@ -89,10 +89,6 @@ pub(crate) fn neg0(x: F64X2) -> F64X2 {
     constant(-extract0(x), extract1(x))
 }
 
-pub(crate) fn not(x: F64X2) -> F64X2 {
-    unsafe { transmute(vmvnq_u32(transmute(x))) }
-}
-
 pub(crate) fn or(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { transmute(vorrq_u64(transmute(x), transmute(y))) }
 }
@@ -131,10 +127,6 @@ pub(crate) fn swap(x: F64X2) -> F64X2 {
 
 pub(crate) fn trunc(x: F64X2) -> F64X2 {
     vrndq_f64(x)
-}
-
-pub(crate) fn unord(x: F64X2, y: F64X2) -> F64X2 {
-    not(or(le(x, y), le(y, x)))
 }
 
 macro_rules! impl_op {

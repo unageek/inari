@@ -118,7 +118,7 @@ impl Interval {
     /// assert!(!Interval::ENTIRE.is_empty());
     /// ```
     pub fn is_empty(self) -> bool {
-        self.either_empty(self)
+        extract0(self.rep).is_nan()
     }
 
     /// Returns `true` if $\self = \[-∞, +∞\]$.
@@ -287,12 +287,11 @@ impl Interval {
     }
 
     pub(crate) fn both_empty(self, rhs: Self) -> bool {
-        let x = shuffle02(self.rep, rhs.rep); // [-a; -c]
-        all(unord(x, x))
+        self.is_empty() & rhs.is_empty()
     }
 
     pub(crate) fn either_empty(self, rhs: Self) -> bool {
-        any(unord(self.rep, rhs.rep))
+        self.is_empty() | rhs.is_empty()
     }
 }
 
