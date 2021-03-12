@@ -136,10 +136,6 @@ pub(crate) fn trunc(x: F64X2) -> F64X2 {
     unsafe { _mm_round_pd(x, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC) }
 }
 
-pub(crate) fn unord(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { _mm_cmpunord_pd(x, y) }
-}
-
 pub(crate) fn xor(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_xor_pd(x, y) }
 }
