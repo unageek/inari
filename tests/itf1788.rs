@@ -1,3 +1,6 @@
+// To allow `#![rustfmt::skip]`.
+#![feature(custom_inner_attributes)]
+
 use inari::*;
 
 #[allow(
