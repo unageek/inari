@@ -260,10 +260,10 @@ fn pow(base: u32, exp: i32) -> Rational {
 
 fn parse_hex_float(mant: &str, exp: &str) -> result::Result<Rational, ParseNumberError> {
     let e = exp.parse::<i32>()?;
-    let splitted = mant.split('.').collect::<Vec<_>>();
-    let int_part = splitted[0];
-    let frac_part = match splitted.get(1) {
-        Some(s) => *s,
+    let mut parts = mant.split('.');
+    let int_part = parts.next().unwrap();
+    let frac_part = match parts.next() {
+        Some(s) => s,
         _ => "",
     };
 
@@ -283,10 +283,10 @@ fn parse_dec_float_with_ulp(
     exp: &str,
 ) -> result::Result<(Rational, Rational), ParseNumberError> {
     let e = exp.parse::<i32>()?;
-    let splitted = mant.split('.').collect::<Vec<_>>();
-    let int_part = splitted[0];
-    let frac_part = match splitted.get(1) {
-        Some(s) => *s,
+    let mut parts = mant.split('.');
+    let int_part = parts.next().unwrap();
+    let frac_part = match parts.next() {
+        Some(s) => s,
         _ => "",
     };
 
