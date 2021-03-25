@@ -26,6 +26,16 @@ enum InfSup {
     Sup,
 }
 
+impl InfSup {
+    fn to_rnd_t(&self) -> mpfr::rnd_t {
+        match self {
+            Self::Inf => mpfr::rnd_t::RNDD,
+            Self::Sup => mpfr::rnd_t::RNDU,
+        }
+    }
+}
+
+/// An extended rational number.
 #[derive(Clone, Debug, Eq, PartialEq)]
 enum Number {
     NegInfinity,
@@ -71,11 +81,35 @@ impl std::ops::Neg for Number {
 }
 
 #[derive(Debug, Eq, PartialEq)]
-struct NInterval(Number, Number);
+enum NInterval {
+    InfSup(Number, Number),
+    Point(Number),
+}
 
 impl NInterval {
-    const EMPTY: Self = Self(Number::Infinity, Number::NegInfinity);
-    const ENTIRE: Self = Self(Number::NegInfinity, Number::Infinity);
+    const EMPTY: Self = Self::InfSup(Number::Infinity, Number::NegInfinity);
+    const ENTIRE: Self = Self::InfSup(Number::NegInfinity, Number::Infinity);
+
+    fn inf(&self) -> &Number {
+        match self {
+            Self::InfSup(x, _) => x,
+            Self::Point(x) => x,
+        }
+    }
+
+    fn is_common_interval(&self) -> bool {
+        matches!(
+            (self.inf(), self.sup()),
+            (Number::Rational(_), Number::Rational(_))
+        )
+    }
+
+    fn sup(&self) -> &Number {
+        match self {
+            Self::InfSup(_, x) => x,
+            Self::Point(x) => x,
+        }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -100,7 +134,7 @@ impl DecNInterval {
 
         let d = if x == NInterval::EMPTY {
             Trv
-        } else if x.0 == Number::NegInfinity || x.1 == Number::Infinity {
+        } else if !x.is_common_interval() {
             Dac
         } else {
             Com
@@ -113,16 +147,14 @@ impl DecNInterval {
         use Decoration::*;
 
         if d == Ill {
-            return Self::NAI;
+            Self::NAI
+        } else if x == NInterval::EMPTY {
+            Self::EMPTY
+        } else if d == Com && !x.is_common_interval() {
+            Self { x, d: Dac }
+        } else {
+            Self { x, d }
         }
-        if x == NInterval::EMPTY {
-            return Self::EMPTY;
-        }
-        if d == Com && (x.0 == Number::NegInfinity || x.1 == Number::Infinity) {
-            return Self { x, d: Dac };
-        }
-
-        Self { x, d }
     }
 }
 
@@ -229,7 +261,7 @@ fn number(s: &str) -> IResult<&str, NumberLiteral> {
     map(pair(sign, unsigned_number), |(s, n)| NumberLiteral(s, n))(s)
 }
 
-fn uc_radius(s: &str) -> IResult<&str, UncertainRadius> {
+fn uncertain_radius(s: &str) -> IResult<&str, UncertainRadius> {
     map(
         opt(alt((
             map(digit1, UncertainRadius::MultipleOfUlp),
@@ -239,7 +271,7 @@ fn uc_radius(s: &str) -> IResult<&str, UncertainRadius> {
     )(s)
 }
 
-fn uc_direction(s: &str) -> IResult<&str, UncertainDirection> {
+fn uncertain_direction(s: &str) -> IResult<&str, UncertainDirection> {
     map(
         opt(alt((
             value(UncertainDirection::Down, tag_no_case("d")),
@@ -344,7 +376,7 @@ fn parse_opt_number(
     }
 }
 
-fn infsup(s: &str) -> IResult<&str, Result<NInterval>> {
+fn infsup_interval(s: &str) -> IResult<&str, Result<NInterval>> {
     map(
         separated_pair(
             opt(number),
@@ -355,7 +387,7 @@ fn infsup(s: &str) -> IResult<&str, Result<NInterval>> {
             let a = parse_opt_number(na, InfSup::Inf)?;
             let b = parse_opt_number(nb, InfSup::Sup)?;
             if a <= b && a != Number::Infinity && b != Number::NegInfinity {
-                Ok(NInterval(a, b))
+                Ok(NInterval::InfSup(a, b))
             } else {
                 Err(IntervalError {
                     kind: IntervalErrorKind::UndefinedOperation,
@@ -366,14 +398,11 @@ fn infsup(s: &str) -> IResult<&str, Result<NInterval>> {
     )(s)
 }
 
-fn point(s: &str) -> IResult<&str, Result<NInterval>> {
+fn point_interval(s: &str) -> IResult<&str, Result<NInterval>> {
     map(number, |n| {
         let a = parse_number(n)?;
         match a {
-            Number::Rational(_) => {
-                let b = a.clone();
-                Ok(NInterval(a, b))
-            }
+            Number::Rational(_) => Ok(NInterval::Point(a)),
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
                 value: NInterval::EMPTY,
@@ -382,15 +411,15 @@ fn point(s: &str) -> IResult<&str, Result<NInterval>> {
     })(s)
 }
 
-fn bracket(s: &str) -> IResult<&str, Result<NInterval>> {
+fn bracket_interval(s: &str) -> IResult<&str, Result<NInterval>> {
     delimited(
         pair(char('['), space0),
         map(
             opt(alt((
                 map(tag_no_case("empty"), |_| Ok(NInterval::EMPTY)),
                 map(tag_no_case("entire"), |_| Ok(NInterval::ENTIRE)),
-                infsup,
-                point,
+                infsup_interval,
+                point_interval,
             ))),
             |x| x.unwrap_or(Ok(NInterval::EMPTY)),
         ),
@@ -424,12 +453,12 @@ fn uncertain_bound(
     }
 }
 
-fn uncertain(s: &str) -> IResult<&str, Result<NInterval>> {
+fn uncertain_interval(s: &str) -> IResult<&str, Result<NInterval>> {
     map(
         separated_pair(
             recognize(pair(sign, dec_significand)),
             char('?'),
-            tuple((uc_radius, uc_direction, dec_exponent)),
+            tuple((uncertain_radius, uncertain_direction, dec_exponent)),
         ),
         |(n, (rad, dir, exp))| {
             let (center, ulp) = parse_dec_float_with_ulp(n, exp)?;
@@ -443,13 +472,13 @@ fn uncertain(s: &str) -> IResult<&str, Result<NInterval>> {
             };
             let a = uncertain_bound(&center, &radius_or_unbounded, dir, InfSup::Inf);
             let b = uncertain_bound(&center, &radius_or_unbounded, dir, InfSup::Sup);
-            Ok(NInterval(a, b))
+            Ok(NInterval::InfSup(a, b))
         },
     )(s)
 }
 
 fn interval(s: &str) -> IResult<&str, Result<NInterval>> {
-    alt((bracket, uncertain))(s)
+    alt((bracket_interval, uncertain_interval))(s)
 }
 
 fn decoration(s: &str) -> IResult<&str, Decoration> {
@@ -512,19 +541,12 @@ struct F64 {
     overflow: bool,
 }
 
-fn infsup_to_rnd_t(infsup: InfSup) -> mpfr::rnd_t {
-    match infsup {
-        InfSup::Inf => mpfr::rnd_t::RNDD,
-        InfSup::Sup => mpfr::rnd_t::RNDU,
-    }
-}
-
-fn ternary_to_ordering(t: i32) -> Ordering {
-    t.cmp(&0)
-}
-
 fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
-    let rnd = infsup_to_rnd_t(infsup);
+    fn ternary_to_ordering(t: i32) -> Ordering {
+        t.cmp(&0)
+    }
+
+    let rnd = infsup.to_rnd_t();
     let mut f = Float::new(f64::MANTISSA_DIGITS);
 
     unsafe {
@@ -569,9 +591,9 @@ impl From<NInterval> for Interval {
 
 impl From<DecNInterval> for DecInterval {
     fn from(DecNInterval { x, d }: DecNInterval) -> Self {
-        let a = number_to_f64(&x.0, InfSup::Inf);
-        let b = number_to_f64(&x.1, InfSup::Sup);
-        // Fails on the empty interval.
+        let a = number_to_f64(x.inf(), InfSup::Inf);
+        let b = number_to_f64(x.sup(), InfSup::Sup);
+        // The empty interval cannot be constructed with `Interval::try_from`.
         let x = Interval::try_from((a.f, b.f)).unwrap_or(Interval::EMPTY);
         let d = if a.overflow || b.overflow {
             d.min(Decoration::Dac)
@@ -625,8 +647,8 @@ impl FromStr for DecInterval {
 
 impl Interval {
     fn try_from_ninterval_exact(x: NInterval) -> Result<Self> {
-        let a = number_to_f64(&x.0, InfSup::Inf);
-        let b = number_to_f64(&x.1, InfSup::Sup);
+        let a = number_to_f64(x.inf(), InfSup::Inf);
+        let b = number_to_f64(x.sup(), InfSup::Sup);
         let x = Self::try_from((a.f, b.f)).unwrap_or(Self::EMPTY);
         if a.inexact || b.inexact {
             Err(IntervalError {
