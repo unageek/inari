@@ -27,7 +27,7 @@ enum InfSup {
 }
 
 impl InfSup {
-    fn to_rnd_t(&self) -> mpfr::rnd_t {
+    fn as_rnd_t(self) -> mpfr::rnd_t {
         match self {
             Self::Inf => mpfr::rnd_t::RNDD,
             Self::Sup => mpfr::rnd_t::RNDU,
@@ -546,7 +546,7 @@ fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
         t.cmp(&0)
     }
 
-    let rnd = infsup.to_rnd_t();
+    let rnd = infsup.as_rnd_t();
     let mut f = Float::new(f64::MANTISSA_DIGITS);
 
     unsafe {
