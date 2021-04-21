@@ -11,7 +11,7 @@ A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.or
 
 ### `rustc` version
 
-A recent version of the nightly toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used. You need to specify the toolchain by, for example, the [toolchain file](https://rust-lang.github.io/rustup/overrides.html#the-toolchain-file) in your crate (see [example](https://github.com/unageek/inari-graph/blob/master/rust-toolchain)).
+A recent version of the nightly toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used. You need to specify the toolchain by, for example, the [toolchain file](https://rust-lang.github.io/rustup/overrides.html#the-toolchain-file) in your crate (see [example](https://github.com/unageek/graphest/blob/master/rust/rust-toolchain).
 
 ### Target CPUs
 
@@ -19,7 +19,7 @@ A recent version of the nightly toolchain is required, since the [new `asm!` mac
 
   Haswell-based and newer processors are supported.
 
-  You need to specify the target CPU when building a crate that depends on inari. One way to do that is to add a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) to the consuming crate (see [example](https://github.com/unageek/inari-graph/blob/master/.cargo/config.toml); you may want to change `native` to `haswell` for maximum compatibility if you are going to distribute your binary).
+  You need to specify the target CPU when building a crate that depends on inari. One way to do that is to add a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) to the consuming crate (see [example](https://github.com/unageek/graphest/blob/master/rust/.cargo/config.toml); you may want to change `native` to `haswell` for maximum compatibility if you are going to distribute your binary).
 
 - AArch64 (a.k.a. ARM64)
 
@@ -31,7 +31,7 @@ A recent version of the nightly toolchain is required, since the [new `asm!` mac
 
 ## Made with inari
 
-- [inari-graph](https://github.com/unageek/inari-graph)
+- [Graphest](https://github.com/unageek/graphest)
 
 ## [Changelog](CHANGELOG.md)
 
