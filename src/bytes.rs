@@ -144,6 +144,7 @@ mod tests {
     #[test]
     fn interval() {
         fn test_roundtrip(x: I) {
+            #[allow(clippy::type_complexity)]
             let fs: [(fn(_) -> _, fn(_) -> _); 3] = [
                 (I::try_from_be_bytes, I::to_be_bytes),
                 (I::try_from_le_bytes, I::to_le_bytes),
@@ -179,6 +180,7 @@ mod tests {
     #[test]
     fn dec_interval() {
         fn test_roundtrip(x: DI) {
+            #[allow(clippy::type_complexity)]
             let fs: [(fn(_) -> _, fn(_) -> _); 3] = [
                 (DI::try_from_be_bytes, DI::to_be_bytes),
                 (DI::try_from_le_bytes, DI::to_le_bytes),
