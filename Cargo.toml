@@ -1,6 +1,6 @@
 [package]
 name = "inari"
-version = "0.9.4"
+version = "0.9.5"
 authors = ["Masashi Mizuno"]
 edition = "2018"
 description = "A Rust implementation of set-based interval arithmetic."
