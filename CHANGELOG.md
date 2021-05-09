@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.9.4 - 2021-05-09
+
+### Fixed
+
+- Fixed the functions `(Dec)Interval::try_from_be_bytes`, `try_from_le_bytes` and `try_from_ne_bytes` to correctly deserialize the empty interval.
+
 ## v0.9.2 - 2021-03-09
 
 ### Added
