@@ -13,12 +13,12 @@ pub(crate) fn all(x: F64X2) -> bool {
     bitmask(x) == 3
 }
 
-pub(crate) fn any(x: F64X2) -> bool {
-    bitmask(x) != 0
-}
-
 pub(crate) fn and(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_and_pd(x, y) }
+}
+
+pub(crate) fn any(x: F64X2) -> bool {
+    bitmask(x) != 0
 }
 
 pub(crate) fn bitmask(x: F64X2) -> u32 {

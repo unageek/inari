@@ -14,11 +14,11 @@ pub(crate) fn all(_: F64X2) -> bool {
     unimplemented!()
 }
 
-pub(crate) fn any(_: F64X2) -> bool {
+pub(crate) fn and(_: F64X2, _: F64X2) -> F64X2 {
     unimplemented!()
 }
 
-pub(crate) fn and(_: F64X2, _: F64X2) -> F64X2 {
+pub(crate) fn any(_: F64X2) -> bool {
     unimplemented!()
 }
 

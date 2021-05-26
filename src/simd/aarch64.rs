@@ -12,12 +12,12 @@ pub(crate) fn all(x: F64X2) -> bool {
     unsafe { transmute::<_, u64>(vmovn_u64(transmute(x))) == !0u64 }
 }
 
-pub(crate) fn any(x: F64X2) -> bool {
-    unsafe { transmute::<_, u64>(vmovn_u64(transmute(x))) != 0u64 }
-}
-
 pub(crate) fn and(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { transmute(vandq_u64(transmute(x), transmute(y))) }
+}
+
+pub(crate) fn any(x: F64X2) -> bool {
+    unsafe { transmute::<_, u64>(vmovn_u64(transmute(x))) != 0u64 }
 }
 
 pub(crate) fn bitmask(x: F64X2) -> u32 {
