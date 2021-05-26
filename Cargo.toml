@@ -26,6 +26,8 @@ include = [
 all-features = true
 rustc-args = ["--cfg", "docsrs"]
 rustdoc-args = [
+  "--cfg",
+  "docsrs",
   "--extend-css",
   "src/_docs/extra.css",
   "--html-in-header",
