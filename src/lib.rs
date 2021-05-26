@@ -34,7 +34,7 @@ mod parse;
 mod set_op;
 
 cfg_if::cfg_if! {
-    if #[cfg(any(target_arch = "aarch64", target_arch = "x86_64"))] {
+    if #[cfg(any(target_arch = "aarch64", target_arch = "x86_64", docsrs))] {
         mod simd;
     } else {
         compile_error!("Only x86-64 and AArch64 (experimental) architectures are supported by this crate.");

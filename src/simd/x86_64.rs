@@ -116,10 +116,6 @@ pub(crate) fn shuffle03(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_shuffle_pd(x, y, 2) }
 }
 
-pub(crate) fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { _mm_shuffle_pd(x, y, 1) }
-}
-
 pub(crate) fn shuffle13(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_shuffle_pd(x, y, 3) }
 }
@@ -136,7 +132,11 @@ pub(crate) fn trunc(x: F64X2) -> F64X2 {
     unsafe { _mm_round_pd(x, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC) }
 }
 
-pub(crate) fn xor(x: F64X2, y: F64X2) -> F64X2 {
+fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { _mm_shuffle_pd(x, y, 1) }
+}
+
+fn xor(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_xor_pd(x, y) }
 }
 

@@ -109,10 +109,6 @@ pub(crate) fn shuffle03(x: F64X2, y: F64X2) -> F64X2 {
     constant(extract0(x), extract1(y))
 }
 
-pub(crate) fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
-    constant(extract1(x), extract0(y))
-}
-
 pub(crate) fn shuffle13(x: F64X2, y: F64X2) -> F64X2 {
     constant(extract1(x), extract1(y))
 }
@@ -127,6 +123,10 @@ pub(crate) fn swap(x: F64X2) -> F64X2 {
 
 pub(crate) fn trunc(x: F64X2) -> F64X2 {
     vrndq_f64(x)
+}
+
+fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
+    constant(extract1(x), extract0(y))
 }
 
 macro_rules! impl_op {
