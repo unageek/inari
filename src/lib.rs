@@ -3,7 +3,6 @@
 //! [Introduction to Interval Arithmetic][`_docs::intro`]
 
 #![feature(asm)]
-#![feature(external_doc)]
 #![cfg_attr(target_arch = "aarch64", feature(stdsimd))]
 #![allow(clippy::float_cmp)]
 
