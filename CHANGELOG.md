@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.9.8 - 2021-06-06
+
+### Fixed
+
+- Fixed build failure with the latest nightly rust compiler: `rustc 1.54.0-nightly (6c2dd251b 2021-06-05)`.
+
 ## v0.9.4 - 2021-05-09
 
 ### Fixed
