@@ -20,6 +20,12 @@ impl From<std::num::ParseIntError> for ParseNumberError {
     }
 }
 
+impl From<std::num::TryFromIntError> for ParseNumberError {
+    fn from(_: std::num::TryFromIntError) -> Self {
+        Self
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum InfSup {
     Inf,
@@ -300,10 +306,11 @@ fn parse_hex_float(mant: &str, exp: &str) -> result::Result<Rational, ParseNumbe
     };
 
     // 1 hex digit encodes 4 bin digits.
-    let lg_ulp = e
-        .checked_sub(4 * frac_part.len() as i32)
+    let frac_bits = i32::try_from(frac_part.len())?
+        .checked_mul(4)
         .ok_or(ParseNumberError)?;
-    let ulp = pow(2, lg_ulp);
+    let log2_ulp = e.checked_sub(frac_bits).ok_or(ParseNumberError)?;
+    let ulp = pow(2, log2_ulp);
 
     let i_str = [int_part, frac_part].concat();
     let i = Integer::parse_radix(i_str, 16).unwrap();
@@ -323,10 +330,9 @@ fn parse_dec_float_with_ulp(
     };
 
     // 123.456e7 -> 123456e4 (ulp == 1e4)
-    let log_ulp = e
-        .checked_sub(frac_part.len() as i32)
-        .ok_or(ParseNumberError)?;
-    let ulp = pow(10, log_ulp);
+    let frac_digits = i32::try_from(frac_part.len())?;
+    let log10_ulp = e.checked_sub(frac_digits).ok_or(ParseNumberError)?;
+    let ulp = pow(10, log10_ulp);
 
     let i_str = [int_part, frac_part].concat();
     let i = Integer::parse_radix(i_str, 10).unwrap();
