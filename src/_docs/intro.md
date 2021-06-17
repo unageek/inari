@@ -1,4 +1,4 @@
-# Introduction to Interval Arithmetic
+# Introduction to interval arithmetic
 
 This is an introduction to interval arithmetic (IA) provided by the crate. There are other variations on IA, which are not mentioned in this documentation. The variation here is called the _set-based_ flavor in the IEEE 1788 standard.
 

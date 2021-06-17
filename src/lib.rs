@@ -1,6 +1,8 @@
 //! A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 //!
-//! [Introduction to Interval Arithmetic][`_docs::intro`]
+//! [Introduction to interval arithmetic][`_docs::intro`]
+//!
+//! [Conformance to the standard][`_docs::conformance`]
 
 #![feature(asm)]
 #![cfg_attr(target_arch = "aarch64", feature(stdsimd))]
