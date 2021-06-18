@@ -4,7 +4,9 @@ inari implements a subset of the IEEE 1788-2015 standard. This page describes th
 
 ## Implemented operations
 
-This section lists the interval operations defined in the standard along with their implementations. The column "Requires `gmp`" indicates whether the conditional feature `gmp` is required for the operation.
+This section lists the interval operations defined in the standard along with their implementations. Most of the operations are implemented in the same manner for [`Interval`] (bare intervals) and [`DecInterval`] (decorated intervals). Any differences in the API for these types is noted explicitly.
+
+Some operations are only available when the crate is built with the conditional feature `gmp`, which is enabled by default.
 
 ### Required operations
 
@@ -150,7 +152,7 @@ Not implemented.
 | decorationPart(_x_) | [`x.decoration()`](`DecInterval::decoration`)           | No             |
 | setDec(_x_, _dx_)   | [`DecInterval::set_dec(x, dx)`](`DecInterval::set_dec`) | No             |
 
-Comparison of decorations is implemented as stated in the standard.
+Comparison of decorations is implemented as defined in the standard.
 
 ### Input and output (I/O) of intervals
 

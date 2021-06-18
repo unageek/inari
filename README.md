@@ -5,15 +5,15 @@
 [![build](https://img.shields.io/github/workflow/status/unageek/inari/build/master)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
 [![coverage](https://img.shields.io/coveralls/github/unageek/inari/master)](https://coveralls.io/github/unageek/inari?branch=master)
 
-A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
+A Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 
 ## Requirements
 
-### `rustc` version
+### Rust version
 
-A recent version of the nightly toolchain is required, since the [new `asm!` macro](https://blog.rust-lang.org/inside-rust/2020/06/08/new-inline-asm.html) is used. You need to specify the toolchain by, for example, the [toolchain file](https://rust-lang.github.io/rustup/overrides.html#the-toolchain-file) in your crate (see [example](https://github.com/unageek/graphest/blob/master/rust/rust-toolchain).
+A recent version of the nightly toolchain is required since some unstable features ([asm](https://github.com/rust-lang/rust/issues/72016), [stdsimd](https://github.com/rust-lang/rust/issues/48556)) are used in the crate. You need to specify the toolchain by, for example, the [toolchain file](https://rust-lang.github.io/rustup/overrides.html#the-toolchain-file) in your crate (see [example](https://github.com/unageek/graphest/blob/master/rust/rust-toolchain).
 
-### Target CPUs
+### Target CPU
 
 - x86-64
 
@@ -29,9 +29,9 @@ A recent version of the nightly toolchain is required, since the [new `asm!` mac
 
 - `gmp` (enabled by default) - Enables operations that depend on GMP and MPFR, namely, transcendental functions and conversion between texts and intervals. You can opt-out the feature to reduce dependencies. Even in that case, you still have access to all arithmetic operations that are required for writing filters for robust geometric predicates.
 
-## Made with inari
+## Related projects
 
-- [Graphest](https://github.com/unageek/graphest)
+- [Graphest](https://github.com/unageek/graphest) - a faithful graphing calculator
 
 ## [Changelog](CHANGELOG.md)
 

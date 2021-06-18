@@ -14,10 +14,12 @@ pub struct IntervalError<T: fmt::Debug> {
 }
 
 impl<T: fmt::Debug> IntervalError<T> {
+    /// Returns the type of the error.
     pub fn kind(&self) -> IntervalErrorKind {
         self.kind
     }
 
+    /// Returns a reasonable fallback value for the error.
     pub fn value(self) -> T {
         self.value
     }
@@ -36,6 +38,7 @@ impl<T: fmt::Debug> fmt::Display for IntervalError<T> {
 
 impl<T: fmt::Debug> Error for IntervalError<T> {}
 
+/// An alias for `Result` with [`IntervalError`].
 pub type Result<T> = result::Result<T, IntervalError<T>>;
 
 /// An interval with `f64` bounds.
