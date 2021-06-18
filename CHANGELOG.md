@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.9.9 - 2021-06-18
+
+### Fixed
+
+- Fixed the macros `interval!(s)` and `dec_interval!(s)` to return an `Err` with `IntervalErrorKind::PossiblyUndefinedOperation` when the mantissa has too many digits after the decimal point.
+
 ## v0.9.8 - 2021-06-06
 
 ### Fixed

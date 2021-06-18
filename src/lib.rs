@@ -1,4 +1,4 @@
-//! A Rust implementation of set-based [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
+//! A Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 //!
 //! [Introduction to interval arithmetic][`_docs::intro`]
 //!
