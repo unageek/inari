@@ -250,7 +250,7 @@ $$
 \D = \\{\com, \dac, \def, \trv, \ill\\}.
 $$
 
-They are abbreviations of **com**mon, **d**efined **a**nd **c**ontinuous, **def**ined, **tri**vial and **ill**-formed, respectively. $\D$ is a totally ordered set with the following ordering rules:
+Their names are abbreviations of **com**mon, **d**efined **a**nd **c**ontinuous, **def**ined, **tr**i**v**ial and **ill**-formed, respectively. $\D$ is a totally ordered set with the following ordering rules:
 
 $$
 \com > \dac > \def > \trv > \ill.
@@ -314,7 +314,7 @@ $$
 
 where $𝒚_{dy} = 𝒇(𝒙\_{dx})$.
 
-Any interval decorated with $\ill$ is called _NaI_ (_Not an Interval_). NaI is produced by an invalid construction of a (decorated) interval, and it is propagated through calculations.
+Any interval decorated with $\ill$ is said to be _NaI_ (_Not an Interval_). A NaI is produced by an invalid construction of a (decorated) interval, and it is propagated through calculations.
 
 In all functions in the crate, unless otherwise mentioned, $d$ in the above statement is chosen to be the _strongest decoration_ for $(f, 𝒙, 𝒚)$:
 

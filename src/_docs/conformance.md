@@ -77,7 +77,7 @@ Not implemented.
 
 | Operation                | Implementation                                                                                                                                                                       | Requires `gmp` |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
-| numsToInterval(_l_, _u_) | [`interval!(l, u)`](`interval!`)<br>[`const_interval!(l, u)`](`const_interval!`)<br>[`dec_interval!(l, u)`](`dec_interval!`)<br>[`const_dec_interval!(l, u)`](`const_dec_interval!`) | No             |
+| numsToInterval(_a_, _b_) | [`interval!(a, b)`](`interval!`)<br>[`const_interval!(a, b)`](`const_interval!`)<br>[`dec_interval!(a, b)`](`dec_interval!`)<br>[`const_dec_interval!(a, b)`](`const_dec_interval!`) | No             |
 | textToInterval(_s_)      | [`interval!(s)`](`interval!`)<br>[`dec_interval!(s)`](`dec_interval!`)                                                                                                               | Yes            |
 
 #### Set operations
@@ -199,7 +199,7 @@ b. Documentation of behavior
 
 3. Under what conditions is a constructor unable to determine whether a Level 1 value exists that corresponds to the supplied inputs?
 
-   [`interval!(s)`](`interval!`) and [`dec_interval!(s)`](`dec_interval!`) return an `Error` with [`IntervalErrorKind::PossiblyUndefinedOperation`] when the exponent does not fit within the range of `i32`, or the mantissa has impractically many digits after the decimal point.
+   [`interval!(s)`](`interval!`) and [`dec_interval!(s)`](`dec_interval!`) return an [`Err`] with [`IntervalErrorKind::PossiblyUndefinedOperation`] when the exponent does not fit within the range of [`i32`], or the mantissa has impractically many digits after the decimal point.
 
 4. How are cases for rounding a Level 1 value to an F-number handled that are not covered by the rules given in 12.12.8?
 
@@ -213,7 +213,7 @@ c. Implementation-defined behavior
 
 1. Does the implementation include the interval overlapping function? If so, how is it made available to the user?
 
-   Yes, it is provided by [`Interval::overlap`] and [`DecInterval::overlap`]. Note that the former returns [`Overlap`], while the latter returns `Option<Overlap>`.
+   Yes, it is provided by [`Interval::overlap`] and [`DecInterval::overlap`]. Note that the former returns [`Overlap`], while the latter returns [`Option<Overlap>`].
 
 2. Does the implementation store additional information in a NaI? What functions are provided for the user to set and read this information?
 
@@ -229,7 +229,7 @@ c. Implementation-defined behavior
 
 5. What mechanisms of exception handling are used in exception handlers provided by the implementation? What additional exception handling is provided by the implementation?
 
-   Some operations that may fail return `Option<T>` or `Result<T, IntervalErrorKind>`, which can be handled with the standard library of Rust.
+   Some operations that may fail return [`Option<T>`] or [`Result<T>`], which can be handled with the Rust's standard library.
 
 6. What is the tie-breaking method used in rounding of supported number formats F that are not IEEE 754 conforming?
 
@@ -241,7 +241,7 @@ c. Implementation-defined behavior
 
 8. What combinations of formats are supported in interval constructors?
 
-   [`interval!(l, u)`](`interval!`), [`dec_interval!(l, u)`](`dec_interval!`) and their `const_*` versions take two `f64` values. [`interval!(s)`](`interval!`) and [`dec_interval!(s)`](`dec_interval!`) take a string slice.
+   [`interval!(a, b)`](`interval!`), [`dec_interval!(a, b)`](`dec_interval!`) and their `const_*` versions take two [`f64`] values. [`interval!(s)`](`interval!`) and [`dec_interval!(s)`](`dec_interval!`) take a string slice.
 
 9. What is the tightness of the result of constructor calls in cases where the standard does not specify it?
 
@@ -257,7 +257,7 @@ c. Implementation-defined behavior
 
 12. What is the result of Level 3 operations for invalid inputs?
 
-    inari prevents creation of invalid interval datums. For invalid inputs, bare interval constructors return `Err` with the empty interval, and decorated interval constructors return `Err` with a NaI. See also the answer to c.5.
+    inari prevents creation of invalid interval datums. For invalid inputs, bare interval constructors return an [`Err`] with the empty interval, and decorated interval constructors return an [`Err`] with a NaI. See also the answer to c.5.
 
 13. What are the interchange representations of the fields of the standard Level 3 representation listed in 14.4?
 

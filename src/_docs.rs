@@ -1,4 +1,4 @@
-//! This module is solely for serving additional documentations; thus, it contains no code.
+//! This module serves additional documentations and no code.
 
 #[allow(unused_imports)]
 use crate::*;

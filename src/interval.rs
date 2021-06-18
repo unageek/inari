@@ -38,10 +38,10 @@ impl<T: fmt::Debug> fmt::Display for IntervalError<T> {
 
 impl<T: fmt::Debug> Error for IntervalError<T> {}
 
-/// An alias for `Result` with [`IntervalError`].
+/// An alias for [`Result<T, E>`](`result::Result`) with [`E = IntervalError`](`IntervalError`).
 pub type Result<T> = result::Result<T, IntervalError<T>>;
 
-/// An interval with `f64` bounds.
+/// An interval with [`f64`] bounds.
 ///
 /// It is sometimes referred to as a *bare* interval in contrast to a decorated interval ([`DecInterval`]).
 #[derive(Clone, Copy, Debug)]
@@ -133,7 +133,7 @@ impl PartialOrd for Decoration {
     }
 }
 
-/// A decorated interval with `f64` bounds.
+/// A decorated interval with [`f64`] bounds.
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct DecInterval {
@@ -197,7 +197,7 @@ impl PartialEq for DecInterval {
     }
 }
 
-// `DecInterval` is not a model of `Eq` as NaI ≠ NaI.
+// `DecInterval` does not implement `Eq` as a NaI is not equal to itself.
 
 impl TryFrom<(f64, f64)> for DecInterval {
     type Error = IntervalError<Self>;
@@ -233,22 +233,47 @@ macro_rules! interval {
     };
 }
 
-/// Creates an [`Interval`] from `f64` bounds or a bare interval literal.
+/// Creates an [`Interval`] from [`f64`] bounds or from a bare interval literal.
+///
+/// In case of a failure, it returns a [`Result<Interval>`] instead of an [`Interval`].
+///
+/// If the construction is invalid,
+/// an [`Err`] with [`IntervalErrorKind::UndefinedOperation`] is returned.
+/// If it cannot determine whether the construction is valid or not,
+/// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
+/// In both cases, the error contains the empty interval as a reasonable fallback value.
+///
+/// - `interval!(a, b)`
+///
+///   Creates an interval $\[a, b\]$, where `a` and `b` are [`f64`] values.
+///
+///   The conditions $a ≤ b$, $a < +∞$ and $b > -∞$ must be held.
+///
+/// - `interval!(s)`
+///
+///   Creates an interval from a bare interval literal. `s` must be a string slice ([`&str`]).
+///
+/// - `interval!(s, exact)`
+///
+///   Creates an interval $𝒙$ from the bare interval literal obtained by `format!("{:x}", x)`.
+///   `s` must be a string slice ([`&str`]).
+///
+/// For creating a constant, the macro [`const_interval!`] should be preferred over this one.
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! interval {
-    ($text:expr) => {{
+    ($s:expr) => {{
         use ::std::primitive::*;
         fn is_str(_: &str) {}
-        is_str($text);
-        $text.parse::<$crate::Interval>()
+        is_str($s);
+        $s.parse::<$crate::Interval>()
     }};
 
-    ($text:expr, exact) => {{
+    ($s:expr, exact) => {{
         use ::std::primitive::*;
         fn is_str(_: &str) {}
-        is_str($text);
-        $crate::Interval::_try_from_str_exact($text)
+        is_str($s);
+        $crate::Interval::_try_from_str_exact($s)
     }};
 
     ($a:expr, $b:expr) => {
@@ -276,15 +301,37 @@ macro_rules! dec_interval {
     };
 }
 
-/// Creates a [`DecInterval`] from `f64` bounds or a decorated interval literal.
+/// Creates a [`DecInterval`] from [`f64`] bounds or from a decorated interval literal.
+///
+/// In case of a failure, it returns a [`Result<DecInterval>`] instead of a [`DecInterval`].
+///
+/// If the construction is invalid,
+/// an [`Err`] with [`IntervalErrorKind::UndefinedOperation`] is returned.
+/// If it cannot determine whether the construction is valid or not,
+/// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
+/// In both cases, the error contains a NaI as a reasonable fallback value.
+///
+/// - `dec_interval!(a, b)`
+///
+///   Creates a decorated interval $\[a, b\]$ with the strongest decoration,
+///   where `a` and `b` are [`f64`] values.
+///
+///   The conditions $a ≤ b$, $a < +∞$ and $b > -∞$ must be held.
+///
+/// - `dec_interval!(s)`
+///
+///   Creates a decorated interval from a decorated interval literal.
+///   `s` must be a string slice ([`&str`]).
+///
+/// For creating a constant, the macro [`const_dec_interval!`] should be preferred over this one.
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! dec_interval {
-    ($text:expr) => {{
+    ($s:expr) => {{
         use ::std::primitive::*;
         fn is_str(_: &str) {}
-        is_str($text);
-        $text.parse::<$crate::DecInterval>()
+        is_str($s);
+        $s.parse::<$crate::DecInterval>()
     }};
 
     ($a:expr, $b:expr) => {
@@ -292,9 +339,13 @@ macro_rules! dec_interval {
     };
 }
 
-/// Creates an [`Interval`] from `f64` bounds.
+/// Creates an [`Interval`] from [`f64`] bounds.
 ///
 /// It can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
+///
+/// The usage is almost the same as the macro [`interval!(a, b)`](`interval!`),
+/// except that `const_interval!(a, b)` returns an [`Interval`]
+/// or results in a compilation error if the construction is invalid.
 #[macro_export]
 macro_rules! const_interval {
     ($a:expr, $b:expr) => {{
@@ -312,9 +363,13 @@ macro_rules! const_interval {
     }};
 }
 
-/// Creates a [`DecInterval`] from `f64` bounds.
+/// Creates a [`DecInterval`] from [`f64`] bounds.
 ///
 /// It can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
+///
+/// The usage is almost the same as the macro [`dec_interval!(a, b)`](`dec_interval!`),
+/// except that `const_dec_interval!(a, b)` returns a [`DecInterval`]
+/// or results in a compilation error if the construction is invalid.
 #[macro_export]
 macro_rules! const_dec_interval {
     ($a:expr, $b:expr) => {{
