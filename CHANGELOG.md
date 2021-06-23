@@ -6,7 +6,7 @@ The ❗ icon indicates a breaking change.
 
 ### Added
 
-- Implemented the trait `Hash` for `Interval` and `Decoration`.
+- Implemented the trait `Hash` for `Interval`, `Decoration` and `Overlap`.
 
 ## v0.9.9 - 2021-06-18
 
