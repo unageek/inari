@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## Unreleased
+
+### Added
+
+- Implemented the trait `Hash` for `Interval` and `Decoration`.
+
 ## v0.9.9 - 2021-06-18
 
 ### Fixed
@@ -67,7 +73,7 @@ The ❗ icon indicates a breaking change.
 
 ### Added
 
-- Implement the trait `Eq` for the enum `OverlappingState`.
+- Implemented the trait `Eq` for the enum `OverlappingState`.
 
 ### Removed
 

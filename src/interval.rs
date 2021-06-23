@@ -1,5 +1,12 @@
 use crate::simd::*;
-use std::{cmp::Ordering, convert::TryFrom, error::Error, fmt, result};
+use std::{
+    cmp::Ordering,
+    convert::TryFrom,
+    error::Error,
+    fmt,
+    hash::{Hash, Hasher},
+    result,
+};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IntervalErrorKind {
@@ -95,6 +102,13 @@ impl PartialEq for Interval {
 
 impl Eq for Interval {}
 
+impl Hash for Interval {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.inf().to_bits().hash(state);
+        self.sup().to_bits().hash(state);
+    }
+}
+
 impl TryFrom<(f64, f64)> for Interval {
     type Error = IntervalError<Self>;
 
@@ -111,7 +125,7 @@ impl TryFrom<(f64, f64)> for Interval {
 }
 
 /// The decoration of a [`DecInterval`].
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 #[repr(u8)]
 pub enum Decoration {
     Ill = 0,
@@ -134,6 +148,15 @@ impl PartialOrd for Decoration {
 }
 
 /// A decorated interval with [`f64`] bounds.
+///
+/// Note that by definition, a NaI is not equal to itself:
+///
+/// ```
+/// use inari::*;
+/// assert_ne!(DecInterval::NAI, DecInterval::NAI);
+/// ```
+///
+/// For this reason, the traits [`Eq`] and [`Hash`] are not implemented for the type.
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
 pub struct DecInterval {
@@ -196,8 +219,6 @@ impl PartialEq for DecInterval {
         self.x == rhs.x
     }
 }
-
-// `DecInterval` does not implement `Eq` as a NaI is not equal to itself.
 
 impl TryFrom<(f64, f64)> for DecInterval {
     type Error = IntervalError<Self>;
