@@ -36,7 +36,8 @@ mod itf1788_tests {
 pub fn n2i(a: f64, b: f64) -> Interval {
     match interval!(a, b) {
         Ok(x) => x,
-        Err(x) => x.value(),
+        Err(e) if e.kind() == IntervalErrorKind::UndefinedOperation => Interval::EMPTY,
+        _ => panic!(),
     }
 }
 
@@ -44,14 +45,16 @@ pub fn n2i(a: f64, b: f64) -> Interval {
 pub fn t2i(s: &str) -> Interval {
     match interval!(s) {
         Ok(x) => x,
-        Err(x) => x.value(),
+        Err(e) if e.kind() == IntervalErrorKind::UndefinedOperation => Interval::EMPTY,
+        _ => panic!(),
     }
 }
 
 pub fn n2di(a: f64, b: f64) -> DecInterval {
     match dec_interval!(a, b) {
         Ok(x) => x,
-        Err(x) => x.value(),
+        Err(e) if e.kind() == IntervalErrorKind::UndefinedOperation => DecInterval::NAI,
+        _ => panic!(),
     }
 }
 
@@ -59,7 +62,8 @@ pub fn n2di(a: f64, b: f64) -> DecInterval {
 pub fn t2di(s: &str) -> DecInterval {
     match dec_interval!(s) {
         Ok(x) => x,
-        Err(x) => x.value(),
+        Err(e) if e.kind() == IntervalErrorKind::UndefinedOperation => DecInterval::NAI,
+        _ => panic!(),
     }
 }
 

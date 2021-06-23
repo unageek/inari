@@ -10,7 +10,7 @@ fn prec(x: Interval) -> f64 {
     -(x.rad() / x.mid().abs()).log10()
 }
 
-fn main() -> Result<(), IntervalError<Interval>> {
+fn main() -> Result<(), IntervalError> {
     let two = interval!("[2]")?;
     let eleven = interval!("[11]")?;
     let mut x = interval!("[0.2]")?;

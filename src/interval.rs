@@ -15,24 +15,18 @@ pub enum IntervalErrorKind {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct IntervalError<T: fmt::Debug> {
+pub struct IntervalError {
     pub(crate) kind: IntervalErrorKind,
-    pub(crate) value: T,
 }
 
-impl<T: fmt::Debug> IntervalError<T> {
+impl IntervalError {
     /// Returns the type of the error.
     pub fn kind(&self) -> IntervalErrorKind {
         self.kind
     }
-
-    /// Returns a reasonable fallback value for the error.
-    pub fn value(self) -> T {
-        self.value
-    }
 }
 
-impl<T: fmt::Debug> fmt::Display for IntervalError<T> {
+impl fmt::Display for IntervalError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.kind {
             IntervalErrorKind::PossiblyUndefinedOperation => {
@@ -43,10 +37,10 @@ impl<T: fmt::Debug> fmt::Display for IntervalError<T> {
     }
 }
 
-impl<T: fmt::Debug> Error for IntervalError<T> {}
+impl Error for IntervalError {}
 
 /// An alias for [`Result<T, E>`](`result::Result`) with [`E = IntervalError`](`IntervalError`).
-pub type Result<T> = result::Result<T, IntervalError<T>>;
+pub type Result<T> = result::Result<T, IntervalError>;
 
 /// An interval with [`f64`] bounds.
 ///
@@ -110,7 +104,7 @@ impl Hash for Interval {
 }
 
 impl TryFrom<(f64, f64)> for Interval {
-    type Error = IntervalError<Self>;
+    type Error = IntervalError;
 
     fn try_from((a, b): (f64, f64)) -> Result<Self> {
         if a <= b && a != f64::INFINITY && b != f64::NEG_INFINITY {
@@ -118,7 +112,6 @@ impl TryFrom<(f64, f64)> for Interval {
         } else {
             Err(Self::Error {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::EMPTY,
             })
         }
     }
@@ -221,14 +214,13 @@ impl PartialEq for DecInterval {
 }
 
 impl TryFrom<(f64, f64)> for DecInterval {
-    type Error = IntervalError<Self>;
+    type Error = IntervalError;
 
     fn try_from(x: (f64, f64)) -> Result<Self> {
         match Interval::try_from(x) {
             Ok(x) => Ok(Self::new(x)),
             _ => Err(Self::Error {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::NAI,
             }),
         }
     }
@@ -262,7 +254,6 @@ macro_rules! interval {
 /// an [`Err`] with [`IntervalErrorKind::UndefinedOperation`] is returned.
 /// If it cannot determine whether the construction is valid or not,
 /// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
-/// In both cases, the error contains the empty interval as a reasonable fallback value.
 ///
 /// - `interval!(a, b)`
 ///
@@ -330,7 +321,6 @@ macro_rules! dec_interval {
 /// an [`Err`] with [`IntervalErrorKind::UndefinedOperation`] is returned.
 /// If it cannot determine whether the construction is valid or not,
 /// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
-/// In both cases, the error contains a NaI as a reasonable fallback value.
 ///
 /// - `dec_interval!(a, b)`
 ///

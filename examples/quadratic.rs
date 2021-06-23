@@ -1,8 +1,8 @@
 // Solves the quadratic equation a x^2 + b x + c == 0.
 
-use inari::{interval, Interval, IntervalError};
+use inari::{interval, IntervalError};
 
-fn main() -> Result<(), IntervalError<Interval>> {
+fn main() -> Result<(), IntervalError> {
     let a = interval!("[1]")?;
     let b = interval!("[1e15]")?;
     let c = interval!("[1e14]")?;

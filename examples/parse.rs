@@ -1,8 +1,8 @@
 // Parses and displays interval literals.
 
-use inari::{interval, Interval, IntervalError};
+use inari::{interval, IntervalError};
 
-fn main() -> Result<(), IntervalError<Interval>> {
+fn main() -> Result<(), IntervalError> {
     println!("{}", interval!("[  ]")?);
     println!("{}", interval!("[  empty  ]")?);
     println!("{}", interval!("[  1.0  ]")?);
