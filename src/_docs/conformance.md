@@ -229,7 +229,7 @@ c. Implementation-defined behavior
 
 5. What mechanisms of exception handling are used in exception handlers provided by the implementation? What additional exception handling is provided by the implementation?
 
-   Some operations that may fail return [`Option<T>`] or [`Result<T>`], which can be handled with the Rust's standard library.
+   Some operations that may fail return [`Option<T>`] or [`Result<T>`], which can be handled with the Rust's standard error handling mechanism.
 
 6. What is the tie-breaking method used in rounding of supported number formats F that are not IEEE 754 conforming?
 
@@ -257,7 +257,7 @@ c. Implementation-defined behavior
 
 12. What is the result of Level 3 operations for invalid inputs?
 
-    inari prevents creation of invalid interval datums. For invalid inputs, bare interval constructors return an [`Err`] with the empty interval, and decorated interval constructors return an [`Err`] with a NaI. See also the answer to c.5.
+    inari prevents creation of invalid interval datums. For invalid inputs, bare interval constructors return an [`Err`] with either [`IntervalErrorKind::UndefinedOperation`] or [`IntervalErrorKind::PossiblyUndefinedOperation`]. See also the answers to b.3 and c.5.
 
 13. What are the interchange representations of the fields of the standard Level 3 representation listed in 14.4?
 

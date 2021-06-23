@@ -8,6 +8,16 @@ The ❗ icon indicates a breaking change.
 
 - Implemented the trait `Hash` for `Interval`, `Decoration` and `Overlap`.
 
+### Removed
+
+- ❗ Removed the method `IntervalError::value`.
+
+### Changed
+
+- ❗ Changed the return type of the functions `Interval::try_from_be_bytes`, `try_from_le_bytes` and `try_from_ne_bytes`  to `Option<Interval>`.
+- ❗ The same change have been made to the functions of  `DecInterval`.
+- ❗ Changed the struct `IntervalError`  to be non-generic by the removal of the `value` method
+
 ## v0.9.9 - 2021-06-18
 
 ### Fixed

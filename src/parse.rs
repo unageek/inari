@@ -164,11 +164,10 @@ impl DecNInterval {
     }
 }
 
-impl From<ParseNumberError> for IntervalError<NInterval> {
+impl From<ParseNumberError> for IntervalError {
     fn from(_: ParseNumberError) -> Self {
         Self {
             kind: IntervalErrorKind::PossiblyUndefinedOperation,
-            value: NInterval::ENTIRE,
         }
     }
 }
@@ -397,7 +396,6 @@ fn infsup_interval(s: &str) -> IResult<&str, Result<NInterval>> {
             } else {
                 Err(IntervalError {
                     kind: IntervalErrorKind::UndefinedOperation,
-                    value: NInterval::EMPTY,
                 })
             }
         },
@@ -411,7 +409,6 @@ fn point_interval(s: &str) -> IResult<&str, Result<NInterval>> {
             Number::Rational(_) => Ok(NInterval::Point(a)),
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: NInterval::EMPTY,
             }),
         }
     })(s)
@@ -515,25 +512,14 @@ fn decorated_interval(s: &str) -> IResult<&str, Result<DecNInterval>> {
                     } else {
                         Err(IntervalError {
                             kind: IntervalErrorKind::UndefinedOperation,
-                            value: DecNInterval::NAI,
                         })
                     }
                 }
-                (Err(e), None) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
-                    Err(IntervalError {
-                        kind: e.kind,
-                        value: DecNInterval::new(e.value),
-                    })
-                }
-                (Err(e), Some(d)) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
-                    Err(IntervalError {
-                        kind: e.kind,
-                        value: DecNInterval::set_dec(e.value, d),
-                    })
+                (Err(e), _) if e.kind == IntervalErrorKind::PossiblyUndefinedOperation => {
+                    Err(IntervalError { kind: e.kind })
                 }
                 _ => Err(IntervalError {
                     kind: IntervalErrorKind::UndefinedOperation,
-                    value: DecNInterval::NAI,
                 }),
             },
         ),
@@ -611,41 +597,33 @@ impl From<DecNInterval> for DecInterval {
 }
 
 impl FromStr for Interval {
-    type Err = IntervalError<Self>;
+    type Err = IntervalError;
 
     fn from_str(s: &str) -> Result<Self> {
         match interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Ok(Self::from(x)),
-                Err(e) => Err(IntervalError {
-                    kind: e.kind,
-                    value: Self::from(e.value),
-                }),
+                Err(e) => Err(IntervalError { kind: e.kind }),
             },
             // Invalid syntax.
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::EMPTY,
             }),
         }
     }
 }
 
 impl FromStr for DecInterval {
-    type Err = IntervalError<Self>;
+    type Err = IntervalError;
 
     fn from_str(s: &str) -> Result<Self> {
         match decorated_interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Ok(Self::from(x)),
-                Err(e) => Err(IntervalError {
-                    kind: e.kind,
-                    value: Self::from(e.value),
-                }),
+                Err(e) => Err(IntervalError { kind: e.kind }),
             },
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::NAI,
             }),
         }
     }
@@ -659,7 +637,6 @@ impl Interval {
         if a.inexact || b.inexact {
             Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::EMPTY,
             })
         } else {
             Ok(x)
@@ -671,14 +648,10 @@ impl Interval {
         match interval(s) {
             Ok(("", x)) => match x {
                 Ok(x) => Self::try_from_ninterval_exact(x),
-                Err(e) => Err(IntervalError {
-                    kind: e.kind,
-                    value: Self::EMPTY,
-                }),
+                Err(e) => Err(IntervalError { kind: e.kind }),
             },
             _ => Err(IntervalError {
                 kind: IntervalErrorKind::UndefinedOperation,
-                value: Self::EMPTY,
             }),
         }
     }
@@ -687,8 +660,8 @@ impl Interval {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use DecInterval as DI;
     use Interval as I;
+    use IntervalErrorKind::*;
 
     #[test]
     fn parse() {
@@ -701,31 +674,31 @@ mod tests {
 
         // Exponent == i32::MAX + 1.
         assert_eq!(
-            interval!("[123e2147483648]").unwrap_err().value(),
-            I::ENTIRE
+            interval!("[123e2147483648]").unwrap_err().kind(),
+            PossiblyUndefinedOperation
         );
         assert_eq!(
-            interval!("[0x123p2147483648]").unwrap_err().value(),
-            I::ENTIRE
+            interval!("[0x123p2147483648]").unwrap_err().kind(),
+            PossiblyUndefinedOperation
         );
 
         // Exponent == i32::MIN - 1.
         assert_eq!(
-            interval!("[123e-2147483649]").unwrap_err().value(),
-            I::ENTIRE
+            interval!("[123e-2147483649]").unwrap_err().kind(),
+            PossiblyUndefinedOperation
         );
         assert_eq!(
-            interval!("[0x123p-2147483649]").unwrap_err().value(),
-            I::ENTIRE
+            interval!("[0x123p-2147483649]").unwrap_err().kind(),
+            PossiblyUndefinedOperation
         );
 
         assert_eq!(
-            dec_interval!("[123e2147483648]").unwrap_err().value(),
-            DI::ENTIRE
+            dec_interval!("[123e2147483648]").unwrap_err().kind(),
+            PossiblyUndefinedOperation
         );
         assert_eq!(
-            dec_interval!("[123e2147483648]_com").unwrap_err().value(),
-            DI::ENTIRE
+            dec_interval!("[123e2147483648]_com").unwrap_err().kind(),
+            PossiblyUndefinedOperation
         );
     }
 
@@ -739,12 +712,12 @@ mod tests {
             const_interval!(0.0, 1.0)
         );
         assert_eq!(
-            interval!("[0.0, 0.1]", exact).unwrap_err().value(),
-            I::EMPTY
+            interval!("[0.0, 0.1]", exact).unwrap_err().kind(),
+            UndefinedOperation
         );
         assert_eq!(
-            interval!("[0.1, 1.0]", exact).unwrap_err().value(),
-            I::EMPTY
+            interval!("[0.1, 1.0]", exact).unwrap_err().kind(),
+            UndefinedOperation
         );
 
         // The smallest positive subnormal number.
@@ -756,20 +729,20 @@ mod tests {
         assert_eq!(
             interval!("[0x0.0000000000000ffp-1022]", exact)
                 .unwrap_err()
-                .value(),
-            I::EMPTY
+                .kind(),
+            UndefinedOperation
         );
         assert_eq!(
             interval!("[0x0.000000000000101p-1022]", exact)
                 .unwrap_err()
-                .value(),
-            I::EMPTY
+                .kind(),
+            UndefinedOperation
         );
         assert_eq!(
             interval!("[0x0.0000000000001p-1023]", exact)
                 .unwrap_err()
-                .value(),
-            I::EMPTY
+                .kind(),
+            UndefinedOperation
         );
 
         // The largest normal number.
@@ -781,25 +754,25 @@ mod tests {
         assert_eq!(
             interval!("[0x1.ffffffffffffeffp+1023]", exact)
                 .unwrap_err()
-                .value(),
-            I::EMPTY
+                .kind(),
+            UndefinedOperation
         );
         assert_eq!(
             interval!("[0x1.fffffffffffff01p+1023]", exact)
                 .unwrap_err()
-                .value(),
-            I::EMPTY
+                .kind(),
+            UndefinedOperation
         );
         assert_eq!(
             interval!("[0x1.fffffffffffffp+1024]", exact)
                 .unwrap_err()
-                .value(),
-            I::EMPTY
+                .kind(),
+            UndefinedOperation
         );
 
         assert_eq!(
-            interval!("[123e2147483648]", exact).unwrap_err().value(),
-            I::EMPTY
+            interval!("[123e2147483648]", exact).unwrap_err().kind(),
+            PossiblyUndefinedOperation
         );
     }
 }

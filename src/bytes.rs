@@ -16,7 +16,7 @@ macro_rules! impl_to_bytes {
 macro_rules! impl_try_from_bytes {
     ($(#[$meta:meta])* $try_from_bytes:ident, $from_bytes:ident) => {
         $(#[$meta])*
-        pub fn $try_from_bytes(bytes: [u8; 16]) -> Result<Self> {
+        pub fn $try_from_bytes(bytes: [u8; 16]) -> Option<Self> {
             let a = f64::$from_bytes(<[u8; 8]>::try_from(&bytes[..8]).unwrap());
             let b = f64::$from_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap());
 
@@ -26,14 +26,11 @@ macro_rules! impl_try_from_bytes {
                 && (a != 0.0 || a.is_sign_negative())
                 && (b != 0.0 || b.is_sign_positive())
             {
-                Ok(Self::with_infsup_raw(a, b))
+                Some(Self::with_infsup_raw(a, b))
             } else if a == f64::INFINITY && b == f64::NEG_INFINITY {
-                Ok(Self::EMPTY)
+                Some(Self::EMPTY)
             } else {
-                Err(IntervalError {
-                    kind: IntervalErrorKind::UndefinedOperation,
-                    value: Self::EMPTY,
-                })
+                None
             }
         }
     };
@@ -84,7 +81,7 @@ macro_rules! impl_to_bytes {
 
 macro_rules! impl_try_from_bytes {
     ($try_from_bytes:ident, $from_bytes:ident) => {
-        pub fn $try_from_bytes(bytes: [u8; 17]) -> Result<Self> {
+        pub fn $try_from_bytes(bytes: [u8; 17]) -> Option<Self> {
             use Decoration::*;
             let a = f64::$from_bytes(<[u8; 8]>::try_from(&bytes[..8]).unwrap());
             let b = f64::$from_bytes(<[u8; 8]>::try_from(&bytes[8..16]).unwrap());
@@ -94,12 +91,7 @@ macro_rules! impl_try_from_bytes {
                 8 => Def,
                 12 => Dac,
                 16 => Com,
-                _ => {
-                    return Err(IntervalError {
-                        kind: IntervalErrorKind::UndefinedOperation,
-                        value: Self::NAI,
-                    })
-                }
+                _ => return None,
             };
 
             if a <= b
@@ -109,16 +101,13 @@ macro_rules! impl_try_from_bytes {
                 && (b != 0.0 || b.is_sign_positive())
                 && (dec != Com || a != f64::NEG_INFINITY && b != f64::INFINITY)
             {
-                Ok(Self::new_unchecked(Interval::with_infsup_raw(a, b), dec))
+                Some(Self::new_unchecked(Interval::with_infsup_raw(a, b), dec))
             } else if a == f64::INFINITY && b == f64::NEG_INFINITY && dec == Trv {
-                Ok(Self::EMPTY)
+                Some(Self::EMPTY)
             } else if a.is_nan() && b.is_nan() && dec == Ill {
-                Ok(Self::NAI)
+                Some(Self::NAI)
             } else {
-                Err(IntervalError {
-                    kind: IntervalErrorKind::UndefinedOperation,
-                    value: Self::NAI,
-                })
+                None
             }
         }
     };
@@ -170,11 +159,11 @@ mod tests {
             bytes
         }
 
-        assert!(I::try_from_ne_bytes(make_bytes(3.0, -2.0)).is_err());
-        assert!(I::try_from_ne_bytes(make_bytes(f64::INFINITY, f64::INFINITY)).is_err());
-        assert!(I::try_from_ne_bytes(make_bytes(f64::NEG_INFINITY, f64::NEG_INFINITY)).is_err());
-        assert!(I::try_from_ne_bytes(make_bytes(0.0, 0.0)).is_err());
-        assert!(I::try_from_ne_bytes(make_bytes(-0.0, -0.0)).is_err());
+        assert!(I::try_from_ne_bytes(make_bytes(3.0, -2.0)).is_none());
+        assert!(I::try_from_ne_bytes(make_bytes(f64::INFINITY, f64::INFINITY)).is_none());
+        assert!(I::try_from_ne_bytes(make_bytes(f64::NEG_INFINITY, f64::NEG_INFINITY)).is_none());
+        assert!(I::try_from_ne_bytes(make_bytes(0.0, 0.0)).is_none());
+        assert!(I::try_from_ne_bytes(make_bytes(-0.0, -0.0)).is_none());
     }
 
     #[test]
@@ -217,18 +206,18 @@ mod tests {
             bytes
         }
 
-        assert!(DI::try_from_ne_bytes(make_bytes(3.0, -2.0, Trv)).is_err());
-        assert!(DI::try_from_ne_bytes(make_bytes(f64::INFINITY, f64::INFINITY, Trv)).is_err());
+        assert!(DI::try_from_ne_bytes(make_bytes(3.0, -2.0, Trv)).is_none());
+        assert!(DI::try_from_ne_bytes(make_bytes(f64::INFINITY, f64::INFINITY, Trv)).is_none());
         assert!(
-            DI::try_from_ne_bytes(make_bytes(f64::NEG_INFINITY, f64::NEG_INFINITY, Trv)).is_err()
+            DI::try_from_ne_bytes(make_bytes(f64::NEG_INFINITY, f64::NEG_INFINITY, Trv)).is_none()
         );
-        assert!(DI::try_from_ne_bytes(make_bytes(0.0, 0.0, Trv)).is_err());
-        assert!(DI::try_from_ne_bytes(make_bytes(-0.0, -0.0, Trv)).is_err());
+        assert!(DI::try_from_ne_bytes(make_bytes(0.0, 0.0, Trv)).is_none());
+        assert!(DI::try_from_ne_bytes(make_bytes(-0.0, -0.0, Trv)).is_none());
 
-        assert!(DI::try_from_ne_bytes(make_bytes(-2.0, f64::NAN, Ill)).is_err());
-        assert!(DI::try_from_ne_bytes(make_bytes(f64::NAN, 3.0, Ill)).is_err());
+        assert!(DI::try_from_ne_bytes(make_bytes(-2.0, f64::NAN, Ill)).is_none());
+        assert!(DI::try_from_ne_bytes(make_bytes(f64::NAN, 3.0, Ill)).is_none());
 
-        assert!(DI::try_from_ne_bytes(make_bytes(f64::NEG_INFINITY, 3.0, Com)).is_err());
-        assert!(DI::try_from_ne_bytes(make_bytes(-2.0, f64::INFINITY, Com)).is_err());
+        assert!(DI::try_from_ne_bytes(make_bytes(f64::NEG_INFINITY, 3.0, Com)).is_none());
+        assert!(DI::try_from_ne_bytes(make_bytes(-2.0, f64::INFINITY, Com)).is_none());
     }
 }
