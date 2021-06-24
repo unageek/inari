@@ -12,11 +12,18 @@ The ❗ icon indicates a breaking change.
 
 - ❗ Removed the method `IntervalError::value`.
 
+  Previously, the following values were returned by the method:
+
+  | `err.kind()`                                    | `err.value()`                           |
+  | ----------------------------------------------- | --------------------------------------- |
+  | `IntervalErrorKind::UndefinedOperation`         | `Interval::EMPTY` or `DecInterval::NAI` |
+  | `IntervalErrorKind::PossiblyUndefinedOperation` | `(Dec)Interval::ENTIRE`                 |
+  
+
 ### Changed
 
-- ❗ Changed the return type of the functions `Interval::try_from_be_bytes`, `try_from_le_bytes` and `try_from_ne_bytes`  to `Option<Interval>`.
-- ❗ The same change have been made to the functions of  `DecInterval`.
-- ❗ Changed the struct `IntervalError`  to be non-generic by the removal of the `value` method
+- ❗ Changed the return type of the functions `(Dec)Interval::try_from_be_bytes`, `try_from_le_bytes` and `try_from_ne_bytes` to `Option<(Dec)Interval>`.
+- ❗ Changed the struct `IntervalError` to be non-generic due to the removal of the `value` method.
 
 ## v0.9.9 - 2021-06-18
 
