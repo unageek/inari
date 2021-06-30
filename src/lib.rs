@@ -2,6 +2,8 @@
 //!
 //! [Introduction to interval arithmetic][`_docs::intro`]
 //!
+//! [Formal introduction to interval arithmetic][`_docs::formal_intro`]
+//!
 //! inari implements a subset of the following standards for interval arithmetic:
 //!
 //! - [IEEE 1788-2015](https://doi.org/10.1109/IEEESTD.2015.7140721)

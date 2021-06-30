@@ -60,17 +60,9 @@ features = ["float", "integer", "rational"]
 optional = true
 
 [[example]]
-name = "cancellation"
-required-features = ["gmp"]
-
-[[example]]
 name = "exact"
 required-features = ["gmp"]
 
 [[example]]
 name = "parse"
-required-features = ["gmp"]
-
-[[example]]
-name = "quadratic"
 required-features = ["gmp"]
