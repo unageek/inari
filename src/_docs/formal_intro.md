@@ -40,7 +40,7 @@ An interval is denoted by a bold letter such as $𝒙$ or $𝒚$. Furthermore, a
 
 Every interval is a [closed][closed] subset of $\R$.
 
-## Interval Extensions of Functions
+## Interval extensions of functions
 
 Let $n ∈ \N = \\{0, 1, 2, …\\}$ and $X ⊆ \R^n$. Let $f : X → \R$ be a real-valued function. A function $𝒇 : \IR^n → \IR$ is said to be an _interval extension_ of $f$ if and only if:
 
@@ -149,7 +149,7 @@ Here are some examples of the natural interval extension. The cases where any of
 
    For this reason, we define the natural interval extension of an real constant $c$ as $[c, c]$.
 
-## $\IF$-Interval Extensions of Functions
+## $\IF$-interval extensions of functions
 
 Floating-point arithmetic (FA) is an approximation of the extended real numbers designed to be efficiently implemented at hardware level. The crate provides an efficient implementation of IA by using `f64` numbers to represent and compute with intervals. See the IEEE 754 standards for the details of FA.
 
@@ -240,7 +240,7 @@ $$
 
 Note that $⊆$ is used instead of $=$ because $\F$ numbers are often too long to be written in decimal.
 
-## The Decoration System
+## The decoration system
 
 The decoration system gives us some additional information on the underlying function of an interval extension being evaluated, such as whether it is defined or [continuous][cont] on the input interval.
 

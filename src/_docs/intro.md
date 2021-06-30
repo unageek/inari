@@ -1,6 +1,6 @@
 # Introduction to interval arithmetic
 
-## Cumulative effect of cancellation
+## Cumulative effect of numerical errors
 
 Consider the following sequence:
 
@@ -111,7 +111,7 @@ x20 ∈ [-10066329.500000,6710886.500000]
 
 As you can see, every interval contains the exact value, 0.1.
 
-## Solving a quadratic equation
+## Solving quadratic equations
 
 In this section, we solve the quadratic equation $ax^2 + bx + c = 0$. The solutions are given by:
 
@@ -182,7 +182,7 @@ x1 ∈ [0.099999,0.100001]_com
 x2 ∈ [999999999999999.750000,1000000000000000.000000]_com
 ```
 
-The suffix `_com` is called a _decoration_ of the interval, which will be explained later.
+The suffix `com` is called a _decoration_ of the interval. We will see another decoration and the difference will be made clear.
 
 What if the equation does not have solutions in real numbers?
 
@@ -199,9 +199,9 @@ x1 ∈ [empty]_trv
 x2 ∈ [empty]_trv
 ```
 
-`[empty]` is a special value that represents the empty set. Thus, the result implies that there is no real number that satisfies the equation.
+`[empty]` is a special interval that represents the empty set. Thus, the result implies that there is no real number that satisfies the equation. The empty interval is always decorated with `trv`.
 
-There are problematic cases where the program cannot decide if the equation has solutions in real numbers.
+There are problematic cases where the program cannot decide if the equation has solutions in real numbers:
 
 ```ignore
 let a = dec_interval!("[1]").unwrap();
@@ -216,8 +216,8 @@ x1 ∈ [-0.000000,0.000000]_trv
 x2 ∈ [-0.000000,0.000000]_trv
 ```
 
-The `_trv` suffix means that the value of the expression is possibly undefined for a subset of the input. In this case, division by zero and the square root of a negative number are undefined. So they return intervals decorated with `_trv` for such inputs.
+The decoration `trv` means that the value of the expression is possibly undefined for a certain subset of the input. In this case, division by zero and the square root of a negative number are undefined. So the above result implies that the equation has zeros as the solutions, or it does not have solutions in real numbers.
 
-`x1 ∈ [1.414213,1.414214]_trv` indicates that $x_1 ∈ [1.414213,1.414214]$ ori t does not have a solution in real numbers.
+On the other hand, decorations `com`, `dac` and `def` means that the interval certainly contains the exact value. You can find the details of the decoration system in [Formal introduction to interval arithmetic][`crate::_docs::formal_intro`].
 
-Whenever using a function that is possibly undefined, such as division or square root, it is recommended to use [`DecInterval`].
+Whenever evaluating an expression that contains a function that is not defined for all real numbers, it is recommended to use [`DecInterval`] instead of [`Interval`].
