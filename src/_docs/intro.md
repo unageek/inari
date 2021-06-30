@@ -218,6 +218,6 @@ x2 ∈ [-0.000000,0.000000]_trv
 
 The decoration `trv` means that the value of the expression is possibly undefined for a certain subset of the input. In this case, division by zero and the square root of a negative number are undefined. So the above result implies that the equation has zeros as the solutions, or it does not have solutions in real numbers.
 
-On the other hand, decorations `com`, `dac` and `def` means that the interval certainly contains the exact value. You can find the details of the decoration system in [Formal introduction to interval arithmetic][`crate::_docs::formal_intro`].
+On the other hand, decorations `com`, `dac` and `def` means that the interval certainly contains the exact value. You can find the details of the decoration system in [Formal introduction to interval arithmetic][`formal_intro`].
 
 Whenever evaluating an expression that contains a function that is not defined for all real numbers, it is recommended to use [`DecInterval`] instead of [`Interval`].

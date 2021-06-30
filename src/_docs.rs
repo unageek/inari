@@ -9,5 +9,5 @@ pub mod conformance {}
 #[doc = include_str!("_docs/formal_intro.md")]
 pub mod formal_intro {}
 
-#[doc = include_str!("_docs/intro.md")]
+#[cfg_attr(feature = "gmp", doc = include_str!("_docs/intro.md"))]
 pub mod intro {}
