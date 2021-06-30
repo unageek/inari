@@ -2,7 +2,7 @@
 
 The ❗ icon indicates a breaking change.
 
-## Unreleased
+## v0.10.0 - 2021-06-30
 
 ### Added
 
@@ -18,7 +18,6 @@ The ❗ icon indicates a breaking change.
   | ----------------------------------------------- | --------------------------------------- |
   | `IntervalErrorKind::UndefinedOperation`         | `Interval::EMPTY` or `DecInterval::NAI` |
   | `IntervalErrorKind::PossiblyUndefinedOperation` | `(Dec)Interval::ENTIRE`                 |
-  
 
 ### Changed
 

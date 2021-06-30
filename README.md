@@ -5,7 +5,7 @@
 [![build](https://img.shields.io/github/workflow/status/unageek/inari/build/master)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
 [![coverage](https://img.shields.io/coveralls/github/unageek/inari/master)](https://coveralls.io/github/unageek/inari?branch=master)
 
-A Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
+**inari** is a Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 
 ## Requirements
 
