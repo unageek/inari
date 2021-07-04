@@ -64,5 +64,9 @@ name = "exact"
 required-features = ["gmp"]
 
 [[example]]
+name = "exp"
+required-features = ["gmp"]
+
+[[example]]
 name = "parse"
 required-features = ["gmp"]
