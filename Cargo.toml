@@ -47,6 +47,10 @@ default-features = false
 features = ["mpfr"]
 optional = true
 
+[dependencies.libm]
+version = "0.2"
+optional = true
+
 [dependencies.nom]
 version = "6.0"
 default-features = false
@@ -66,6 +70,10 @@ required-features = ["gmp"]
 [[example]]
 name = "exp"
 required-features = ["gmp"]
+
+[[example]]
+name = "log"
+required-features = ["gmp", "libm"]
 
 [[example]]
 name = "parse"

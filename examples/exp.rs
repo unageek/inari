@@ -6,7 +6,7 @@ use inari::*;
 
 // To compute exp(x), change the base to 2 using the relation:
 //
-//   exp(x) = 2^(x log_2 e).
+//   exp(x) = 2^(lg(e) x).
 //
 // Now consider computing 2^x. Let D = [-1/2, 1/2].
 // Decompose x into an integer and a fractional parts:
@@ -16,30 +16,31 @@ use inari::*;
 // where a ∈ ℤ, b ∈ D. Therefore, 2^x = 2^a 2^b. The f64-interval extension of 2^a is trivial.
 // From the Taylor series about b = 0, 2^b is enclosed by:
 //
-//           N-1 (ln 2)^n       (ln 2)^N
-//   2^b ∈ {  ∑  -------- b^n + -------- 2^β b^N | β ∈ D}, ∀b ∈ D.
-//           n=0    n!             N!
+//           N-1 ln(2)^n       ln(2)^N
+//   2^b ∈ {  ∑  ------- b^n + ------- b^N 2^β | β ∈ D}, ∀b ∈ D.
+//           n=0   n!            N!
 //
 // From the following relations, N = 14 would be sufficient:
 //
-//         | (ln 2)^N         |   (ln 2)^N
-//    max  | -------- 2^β b^N | ≤ -------- 2^(1/2) (1/2)^N,
-//   b,β∈D |    N!            |      N!
+//         | ln(2)^N         |   ln(2)^N
+//    max  | ------- b^N 2^β | = -------- (1/2)^N √2,
+//   b,β∈D |   N!            |     N!
 //
-//   (ln 2)^N                 |
-//   -------- 2^(1/2) (1/2)^N |     ≤ 2^-53.
-//      N!                    |N=14
+//   ln(2)^N            |
+//   ------- (1/2)^N √2 |     ≤ 2^-53.
+//     N!               |N=14
 //
 // References:
 //
-// - 大石 進一 (2018), 精度保証付き数値計算の基礎, コロナ社, ISBN 978-4-339-02887-4.
+// - 大石 進一 et al., (2018), 精度保証付き数値計算の基礎, コロナ社, ISBN 978-4-339-02887-4.
 // - https://en.wikipedia.org/wiki/Taylor%27s_theorem#Explicit_formulas_for_the_remainder
 
 fn exp2_point_reduced(x: f64) -> Interval {
-    assert!(x.abs() <= 0.5);
+    let x = interval!(x, x).unwrap();
+    assert!(x.subset(const_interval!(-0.5, 0.5)));
 
     const N: usize = 14;
-    /// C[n] = (ln 2)^n / n! for n = 0, …, N - 1.
+    /// C[n] = ln(2)^n / n! for n = 0, …, N - 1.
     const C: [Interval; N] = [
         const_interval!(1.0, 1.0),
         const_interval!(0.6931471805599453, 0.6931471805599454),
@@ -57,8 +58,7 @@ fn exp2_point_reduced(x: f64) -> Interval {
         const_interval!(1.3691488853904128e-12, 1.369148885390413e-12),
     ];
 
-    let x = interval!(x, x).unwrap();
-    // Initially, y = 2^[-1/2, 1/2] (ln 2)^N / N!.
+    // Initially, y = 2^D ln(2)^N / N!.
     let mut y = const_interval!(4.7932833733029885e-14, 9.586566746605978e-14);
     for n in (0..N).rev() {
         y = y.mul_add(x, C[n]);
@@ -81,7 +81,8 @@ fn exp2_point(x: f64) -> Interval {
     } else if a > 1023.0 {
         const_interval!(f64::MAX, f64::INFINITY)
     } else {
-        interval!(a.exp2(), a.exp2()).unwrap()
+        let exp2_a = a.exp2();
+        interval!(exp2_a, exp2_a).unwrap()
     };
 
     let exp2_b = exp2_point_reduced(b);
@@ -90,6 +91,10 @@ fn exp2_point(x: f64) -> Interval {
 }
 
 fn exp2(x: Interval) -> Interval {
+    if x.is_empty() {
+        return x;
+    }
+
     let inf = if x.inf() == f64::NEG_INFINITY {
         0.0
     } else {
@@ -114,6 +119,9 @@ fn exp10(x: Interval) -> Interval {
 fn main() {
     let x = interval!("[1.234567]").unwrap();
     println!("2^x ⊆ {:.15}", exp2(x));
+    println!("2^x ⊆ {:.15} (MPFR)", x.exp2());
     println!("e^x ⊆ {:.15}", exp(x));
-    println!("10^x ⊆ {:.15}", exp10(x));
+    println!("e^x ⊆ {:.15} (MPFR)", x.exp());
+    println!("10^x ⊆ {:.15}", x.exp10());
+    println!("10^x ⊆ {:.15} (MPFR)", exp10(x));
 }
