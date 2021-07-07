@@ -32,6 +32,10 @@ use inari::*;
 //      1     √2 - 1    |
 //   ------- (------)^N |     ≤ 2^-53.
 //   N ln(2)    2       |N=22
+//
+// References:
+//
+// - Oishi, S., & Kashiwagi M. (2018). 数学関数の精度保証. In S. Oishi (Ed.), 精度保証付き数値計算の基礎 (pp. 91-107). コロナ社.
 
 fn log2_point_reduced(x: f64) -> Interval {
     let x = interval!(x, x).unwrap();

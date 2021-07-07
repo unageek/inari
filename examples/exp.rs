@@ -32,8 +32,7 @@ use inari::*;
 //
 // References:
 //
-// - 大石 進一 et al., (2018), 精度保証付き数値計算の基礎, コロナ社, ISBN 978-4-339-02887-4.
-// - https://en.wikipedia.org/wiki/Taylor%27s_theorem#Explicit_formulas_for_the_remainder
+// - Oishi, S., & Kashiwagi M. (2018). 数学関数の精度保証. In S. Oishi (Ed.), 精度保証付き数値計算の基礎 (pp. 91-107). コロナ社.
 
 fn exp2_point_reduced(x: f64) -> Interval {
     let x = interval!(x, x).unwrap();
