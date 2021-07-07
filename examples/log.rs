@@ -81,6 +81,8 @@ enum Round {
 }
 
 fn log2_point(x: f64, rnd: Round) -> Interval {
+    assert!(x > 0.0 && x < f64::INFINITY);
+
     let (mut b, a) = libm::frexp(x);
     let mut a = a as f64;
 
@@ -136,10 +138,16 @@ fn log10(x: Interval) -> Interval {
 
 fn main() {
     let x = interval!("[1.234567]").unwrap();
+
     println!("log2(x) ⊆ {:.15}", log2(x));
     println!("log2(x) ⊆ {:.15} (MPFR)", x.log2());
+    assert!(x.log2().subset(log2(x)));
+
     println!("ln(x) ⊆ {:.15}", ln(x));
     println!("ln(x) ⊆ {:.15} (MPFR)", x.ln());
+    assert!(x.ln().subset(ln(x)));
+
     println!("log10(x) ⊆ {:.15}", log10(x));
     println!("log10(x) ⊆ {:.15} (MPFR)", x.log10());
+    assert!(x.log10().subset(log10(x)));
 }

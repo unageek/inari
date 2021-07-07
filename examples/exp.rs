@@ -118,10 +118,16 @@ fn exp10(x: Interval) -> Interval {
 
 fn main() {
     let x = interval!("[1.234567]").unwrap();
+
     println!("2^x ⊆ {:.15}", exp2(x));
     println!("2^x ⊆ {:.15} (MPFR)", x.exp2());
+    assert!(x.exp2().subset(exp2(x)));
+
     println!("e^x ⊆ {:.15}", exp(x));
     println!("e^x ⊆ {:.15} (MPFR)", x.exp());
+    assert!(x.exp().subset(exp(x)));
+
     println!("10^x ⊆ {:.15}", x.exp10());
     println!("10^x ⊆ {:.15} (MPFR)", exp10(x));
+    assert!(x.exp10().subset(exp10(x)));
 }
