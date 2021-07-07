@@ -13,8 +13,8 @@ use inari::*;
 //
 //   x = a + b,
 //
-// where a ∈ ℤ, b ∈ D. Therefore, 2^x = 2^a 2^b. The f64-interval extension of 2^a is trivial.
-// From the Taylor series about b = 0, 2^b is enclosed by:
+// where a ∈ ℤ, b ∈ D. Therefore, 2^x = 2^a 2^b.
+// From the Taylor polynomial of 2^b at b = 0 and its Lagrange remainder, we have:
 //
 //           N-1 ln(2)^n       ln(2)^N
 //   2^b ∈ {  ∑  ------- b^n + ------- b^N 2^β | β ∈ D}, ∀b ∈ D.
@@ -80,7 +80,7 @@ fn exp2_point(x: f64) -> Interval {
     } else if a > 1023.0 {
         const_interval!(f64::MAX, f64::INFINITY)
     } else {
-        let exp2_a = a.exp2();
+        let exp2_a = libm::ldexp(1.0, a as i32);
         interval!(exp2_a, exp2_a).unwrap()
     };
 

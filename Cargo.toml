@@ -69,7 +69,7 @@ required-features = ["gmp"]
 
 [[example]]
 name = "exp"
-required-features = ["gmp"]
+required-features = ["gmp", "libm"]
 
 [[example]]
 name = "log"

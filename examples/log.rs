@@ -8,16 +8,16 @@ use inari::*;
 //
 //   ln(x) = ln(2) lg(x).
 //
-// Let D = [bl, bu] be such that:
+// Now consider computing lg(x). Let D = [bl, bu] be such that:
 //
 //   bu / bl = √2,  1 - bl = bu - 1.
 //
-// Thus, D = [2 √2 - 2, 4 - 2 √2]. Now consider computing lg(x). Decompose x as follows:
+// Thus, D = [2 √2 - 2, 4 - 2 √2]. Decompose x as follows:
 //
 //   x = 2^a b,
 //
 // where 2a ∈ Z, b ∈ D. Therefore, lg(x) = a + lg(b).
-// From the Taylor series about b = 1, lg(b) is enclosed by:
+// From the Taylor polynomial of lg(b) at b = 1 and its Lagrange remainder, we have:
 //
 //             N-1 (-1)^(n + 1)             (-1)^(N + 1)
 //   lg(b) ∈ {  ∑  ------------ (b - 1)^n + ------------ (b - 1)^N β^-N | β ∈ D}, ∀b ∈ D.
