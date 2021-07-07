@@ -1,23 +1,9 @@
 #!/usr/bin/env wolframscript
 
-(* Format the source code in Wolfram Workbench before committing. *)
-
-toInterval[x_] :=
-    Module[ {ulp, inf, sup},
-        ulp = 2^(Floor[Log2[x]] - 52);
-        inf = Floor[x, ulp];
-        sup = Ceiling[x, ulp];
-        {inf, sup}
-    ];
-
-toLiteral[x_] :=
-    ExportString[x, "JSON"];
+Import[FileNameJoin @ {DirectoryName[$InputFileName], "interval.wl"}];
 
 def[name_, value_] :=
-    Module[ {inf, sup},
-        {inf, sup} = toLiteral /@ toInterval[value];
-        Print["pub const " <> name <> ": Self = const_interval!(" <> inf <> "," <> sup <> ");"];
-    ];
+    Print["pub const " <> name <> ": Self = " <> intervalExpression[value] <> ";"];
 
 def["E", E];
 def["FRAC_1_PI", 1/Pi];
