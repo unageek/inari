@@ -1,81 +1,110 @@
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<style type="text/css">
+  .docblock table {
+    border: unset;
+    border-bottom: 2px solid;
+    border-top: 2px solid;
+    margin: 1em auto;
+    width: unset;
+  }
+
+  .docblock table th {
+    border: unset;
+    border-bottom: 1px solid;
+  }
+
+  .docblock table th[align="center"] {
+    text-align: center;
+  }
+
+  .docblock table td {
+    border: unset;
+    border-bottom: 1px dotted;
+    /* !important to cancel `.content td:first-child { margin-right: 20px; }` set in rustdoc.css. */
+    padding: 0.5em !important;
+  }
+
+  .katex {
+    font-size: 1.09em !important;
+  }
+</style>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css"
+  integrity="sha384-Um5gpz1odJg5Z4HAmzPtgZKdTBHZdw8S29IecapCSB31ligYPhHQZMIlWLYQGVoc"
+  crossorigin="anonymous"
+/>
 <script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"
+  integrity="sha384-YNHdsYkH6gMx9y3mRkmcJ2mFUjTd0qNQQvY9VYZgQd7DcN7env35GzlmFaZ23JGp"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"
+  integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl"
+  crossorigin="anonymous"
 ></script>
 <script>
   (function () {
     "use strict";
 
-    // TODO: Bring \DeclarePairedDelimiter?
-    //   https://github.com/mathjax/MathJax/issues/2313
-    window.MathJax = {
-      tex: {
-        inlineMath: [["$", "$"]],
-        displayMath: [["$$", "$$"]],
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false },
+        ],
         macros: {
-          addend: "\\mathtt{addend}",
-          bin: "\\vphantom{0}_2",
-          e: "\\mathrm{e}",
-          if: "\\text{if }",
-          nextDown: "\\operatorname{\\mathtt{nextDown}}",
-          nextOut: "\\operatorname{\\mathtt{nextOut}}",
-          nextUp: "\\operatorname{\\mathtt{nextUp}}",
-          otherwise: "\\text{otherwise}",
-          rhs: "\\mathtt{rhs}",
-          self: "\\mathtt{self}",
-          sgn: "\\operatorname{sgn}",
-          RD: "\\operatorname{\\raise{.4ex}{▽}_\\F}",
-          RDU: "\\operatorname{◊_\\IF}",
-          RU: "\\operatorname{△_\\F}",
+          "\\addend": "\\mathtt{addend}",
+          "\\bin": "\\vphantom{0}_2",
+          "\\e": "\\mathrm{e}",
+          "\\if": "\\text{if }",
+          "\\nextDown": "\\operatorname{\\mathtt{nextDown}}",
+          "\\nextOut": "\\operatorname{\\mathtt{nextOut}}",
+          "\\nextUp": "\\operatorname{\\mathtt{nextUp}}",
+          "\\otherwise": "\\text{otherwise}",
+          "\\rhs": "\\mathtt{rhs}",
+          "\\self": "\\mathtt{self}",
+          "\\sgn": "\\operatorname{sgn}",
+          "\\RD": "\\operatorname{\\raisebox{.4ex}{$\\bigtriangledown$}_\\F}",
+          "\\RDU": "\\operatorname{\\lozenge_\\IF}",
+          "\\RU": "\\operatorname{\\bigtriangleup_\\F}",
           // Sets
-          D: "𝔻",
-          DIF: "{𝔻𝕀𝔽}",
-          DIR: "{𝔻𝕀\\overline{ℝ}}\\vphantom{𝕏}",
-          F: "𝔽",
-          IF: "{𝕀𝔽}\\vphantom{𝕏}",
-          IR: "{𝕀\\overline{ℝ}}\\vphantom{𝕏}",
-          N: "ℕ",
-          R: "ℝ",
-          XR: "{\\overline{ℝ}}\\vphantom{𝕏}",
+          "\\D": "𝔻",
+          "\\DIF": "{𝔻𝕀𝔽}",
+          "\\DIR": "{𝔻𝕀\\overline{ℝ}}\\vphantom{𝕏}",
+          "\\F": "𝔽",
+          "\\IF": "{𝕀𝔽}\\vphantom{𝕏}",
+          "\\IR": "{𝕀\\overline{ℝ}}\\vphantom{𝕏}",
+          "\\N": "ℕ",
+          "\\R": "ℝ",
+          "\\XR": "{\\overline{ℝ}}\\vphantom{𝕏}",
           // Decorations
-          com: "\\mathtt{com}",
-          dac: "\\mathtt{dac}",
-          def: "\\mathtt{def}",
-          trv: "\\mathtt{trv}",
-          ill: "\\mathtt{ill}",
+          "\\com": "\\mathtt{com}",
+          "\\dac": "\\mathtt{dac}",
+          "\\def": "\\mathtt{def}",
+          "\\trv": "\\mathtt{trv}",
+          "\\ill": "\\mathtt{ill}",
         },
-      },
-      options: {
-        renderActions: {
-          preprocess: [
-            10, // MathJax._.core.MathItem.STATE.FINDMATH
-            (doc) => {
-              for (const math of doc.math) {
-                preprocess(math);
-              }
-            },
-            (math, doc) => {
-              preprocess(math);
-            },
-          ],
+        preProcess: function (math) {
+          return math.replace(/./gu, (ch) => {
+            return charSubstitutions[ch] || ch;
+          });
         },
-      },
-    };
+        strict: true,
+      });
+    });
 
-    // NOTE: This does not work for surrogate pairs nor combining character sequences.
     const charSubstitutions = {
-      π: "𝜋",
+      "𝒇": "{\\boldsymbol{f}}",
+      "𝒙": "{\\boldsymbol{x}}",
+      "𝒚": "{\\boldsymbol{y}}",
+      "𝛑": "{\\boldsymbol{\\pi}}",
+      "∅": "\\emptyset",
       "∧": "\\mathrel{∧}", // logical AND
       "∨": "\\mathrel{∨}", // logical OR
-      "×": "\\times",
+      "∖": "\\setminus",
     };
-
-    function preprocess(math) {
-      math.math = math.math.replace(/./g, (ch) => {
-        return charSubstitutions[ch] || ch;
-      });
-    }
   })();
 </script>

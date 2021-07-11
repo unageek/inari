@@ -53,13 +53,13 @@ where $f\[𝒙\] = \\{f(x) ∣ x ∈ 𝒙 ∩ X\\}$ is the [image][image] of $�
 The _natural interval extension_ of $f$ is the interval extension that maps an interval $𝒙$ to the tightest interval that encloses $f\[𝒙\]$:
 
 $$
-\begin{align}
+\begin{align*}
  𝒇(𝒙) &= \operatorname{min}_⊆\\{𝒚 ∈ \IR ∣ 𝒚 ⊇ f\[𝒙\]\\} \\\\
   &= \begin{cases}
     ∅ & \if f\[𝒙\] = ∅, \\\\
     [\inf f\[𝒙\], \sup f\[𝒙\]] & \otherwise.
    \end{cases}
-\end{align}
+\end{align*}
 $$
 
 Let $n > 0$. Let $𝒇$ be the natural interval extension of $f$. The following holds:
@@ -87,10 +87,10 @@ Here are some examples of the natural interval extension. The cases where any of
 2. Addition and subtraction ($+, - : ℝ × ℝ → ℝ$) are extended as
 
    $$
-   \begin{align}
+   \begin{align*}
     [a, b] + [c, d] &= [a + c, b + d], \\\\
     [a, b] - [c, d] &= [a - d, b - c],
-   \end{align}
+   \end{align*}
    $$
 
    where
@@ -158,28 +158,28 @@ We denote by $\F ⊆ \XR$ the set of all normal and subnormal `f64` numbers, zer
 Let $\RD$ and $\RU : \XR → \F$ be the functions that maps an extended real number $x$ to the greatest $\F$ number $≤ x$ and the least $\F$ number $≥ x$ respectively:
 
 $$
-\begin{align}
+\begin{align*}
  \RD x &= \max\\{y ∈ \F ∣ y ≤ x\\}, \\\\
  \RU x &= \min\\{y ∈ \F ∣ x ≤ y\\},
-\end{align}
+\end{align*}
 $$
 
 and $\RDU : \IR → \IF$ be the function that maps an interval $𝒙$ to the tightest $\IF$ interval that encloses $𝒙$:
 
 $$
-\begin{align}
+\begin{align*}
  \RDU 𝒙 &= \operatorname{min}_⊆\\{𝒚 ∈ \IF ∣ 𝒚 ⊇ 𝒙\\} \\\\
   &= \begin{cases}
     ∅ & \if 𝒙 = ∅, \\\\
     [\RD a, \RU b] & \otherwise, 𝒙 = [a, b].
    \end{cases}
-\end{align}
+\end{align*}
 $$
 
 Let $\nextDown$ and $\nextUp : \F → \F$ be the functions defined as follows:
 
 $$
-\begin{align}
+\begin{align*}
  \nextDown(x) &= \begin{cases}
    -∞ & \if x = -∞, \\\\
    \max\\{y ∈ \F ∣ y < x\\} & \otherwise,
@@ -188,7 +188,7 @@ $$
    +∞ & \if x = +∞, \\\\
    \min\\{y ∈ \F ∣ x < y\\} & \otherwise,
   \end{cases}
-\end{align}
+\end{align*}
 $$
 
 and $\nextOut : \IF → \IF$ be the function defined as follows:
@@ -259,22 +259,22 @@ $$
 Let $n ∈ \N$ and $X ⊆ \R^n$. Let $f : X → \R$ be a real-valued function. Let $𝒙 ∈ \XR^n, 𝒚 ∈ \XR$. We define the following [predicates](https://proofwiki.org/wiki/Definition:Propositional_Function):
 
 $$
-\begin{align}
+\begin{align*}
 p\_\com(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f \text{ is continuous on } 𝒙) ∧ (\text{$𝒙$ and $𝒚$ are bounded}), \\\\
 p\_\dac(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f{↾\_𝒙} \text{ is continuous}), \\\\
 p\_\def(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X, \\\\
 p\_\trv(f, 𝒙, 𝒚) &:⟺ (\text{always true}), \\\\
 p\_\ill(f, 𝒙, 𝒚) &:⟺ X = ∅,
-\end{align}
+\end{align*}
 $$
 
 where $f{↾\_𝒙}$ is the [restriction] of $f$ to $𝒙$. The following implications hold:
 
 $$
-\begin{align}
+\begin{align*}
 p\_\com(f, 𝒙, 𝒚) ⟹ p\_\dac(f, 𝒙, 𝒚) &⟹ p\_\def(f, 𝒙, 𝒚) ⟹ p\_\trv(f, 𝒙, 𝒚), \\\\
 p\_\ill(f, 𝒙, 𝒚) &⟹ p\_\trv(f, 𝒙, 𝒚).
-\end{align}
+\end{align*}
 $$
 
 Let $𝒙 ∈ \IR, d ∈ \D$. A _decorated interval_ is a pair $(𝒙, d)$ of the following combinations:

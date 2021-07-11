@@ -5,10 +5,10 @@
 Consider the following sequence:
 
 $$
-\begin{align}
+\begin{align*}
  x_0 &= 0.1, \\\\
  x_k &= 16 ⋅ x_{k-1} - 1.5,\quad \text{for } k = 1, 2, …
-\end{align}
+\end{align*}
 $$
 
 It is obvious that $x_0 = x_1 = x_2 = … = 0.1$, but let's pretend not to know that and compute it numerically:
@@ -44,11 +44,11 @@ Apparently, something went wrong. Let’s see what happened.
 `x` is a [`f64`] number, which can represent a binary number with up to 53 binary digits (= 53 bits). On the other hand, the binary representation of $x_0$ is $0.1 = 0.00011001100… \bin$ (1100 repeats forever). Therefore, it cannot be represented exactly as a [`f64`] number. In fact, $\tilde x_0$, the initial value of `x`, is not 0.1 but the closest [`f64`] number to 0.1:
 
 $$
-\begin{align}
+\begin{align*}
  \tilde x_0 &= 0.000\overbrace{11001100…110011010}^\text{53 bits} \bin \\\\
   &= 1 × 2^{-4} + 1 × 2^{-5} + 0 × 2^{-6} + \cdots + 0 × 2^{-56} \\\\
   &= 0.1000000000000000055511151231257827021181583404541015625.
-\end{align}
+\end{align*}
 $$
 
 Note that in the first line, the leading zeros are not counted in the 53 bits. The inexactness of $\tilde x_0$, which is attributed to the finite nature of the number system, is called a [_round-off error_](https://en.wikipedia.org/wiki/Round-off_error) or _rounding error_.
@@ -67,10 +67,10 @@ $$
 Therefore,
 
 $$
-\begin{align}
+\begin{align*}
  \tilde x_1 &= 0.000\overbrace{11001100…110100000}^\text{53 bits} \bin \\\\
   &= 0.100000000000000088817841970012523233890533447265625.
-\end{align}
+\end{align*}
 $$
 
 $\tilde x_1$ is also an approximation of 0.1, but is less precise than $\tilde x_0$ by 4 bits. The loss of precision is caused by subtracting two numbers that are close to each other. This is called [_catastrophic cancellation_](https://en.wikipedia.org/wiki/Catastrophic_cancellation).

@@ -24,14 +24,7 @@ include = [
 
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = [
-  "--cfg",
-  "docsrs",
-  "--extend-css",
-  "src/_docs/extra.css",
-  "--html-in-header",
-  "src/_docs/header.html",
-]
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "src/_docs/header.html"]
 
 [features]
 default = ["gmp"]
