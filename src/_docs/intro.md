@@ -11,7 +11,7 @@ $$
 \end{align*}
 $$
 
-It is obvious that $x_0 = x_1 = x_2 = … = 0.1$, but let's pretend not to know that and compute it numerically:
+It is obvious that $x_0 = x_1 = x_2 = … = 0.1$, but let's pretend as if we are ignorant of that and compute them numerically:
 
 ```
 fn main() {
