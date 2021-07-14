@@ -56,30 +56,31 @@
           { left: "$", right: "$", display: false },
         ],
         macros: {
-          "\\addend": "\\mathtt{addend}",
-          "\\bin": "\\vphantom{0}_2",
+          "\\bin": "{}_2",
           "\\e": "\\mathrm{e}",
+          "\\hull": "\\operatorname{hull}",
           "\\if": "\\text{if }",
-          "\\nextDown": "\\operatorname{\\mathtt{nextDown}}",
-          "\\nextOut": "\\operatorname{\\mathtt{nextOut}}",
-          "\\nextUp": "\\operatorname{\\mathtt{nextUp}}",
           "\\otherwise": "\\text{otherwise}",
-          "\\rhs": "\\mathtt{rhs}",
-          "\\self": "\\mathtt{self}",
           "\\sgn": "\\operatorname{sgn}",
-          "\\RD": "\\operatorname{\\raisebox{.4ex}{$\\bigtriangledown$}_\\F}",
-          "\\RDU": "\\operatorname{\\lozenge_\\IF}",
-          "\\RU": "\\operatorname{\\bigtriangleup_\\F}",
+          "\\Rge": "\\operatorname{Rge}",
           // Sets
           "\\D": "𝔻",
-          "\\DIF": "{𝔻𝕀𝔽}",
-          "\\DIR": "{𝔻𝕀\\overline{ℝ}}\\vphantom{𝕏}",
+          "\\DIF": "{𝔻𝕀𝔽}{}", // {} is for aligning superscripts
+          "\\DIR": "{𝔻𝕀\\overline{ℝ}}{}",
           "\\F": "𝔽",
-          "\\IF": "{𝕀𝔽}\\vphantom{𝕏}",
-          "\\IR": "{𝕀\\overline{ℝ}}\\vphantom{𝕏}",
-          "\\N": "ℕ",
+          "\\IF": "{𝕀𝔽}{}",
+          "\\IR": "{𝕀\\overline{ℝ}}{}",
           "\\R": "ℝ",
-          "\\XR": "{\\overline{ℝ}}\\vphantom{𝕏}",
+          "\\XR": "\\overline{ℝ}{}",
+          // Machine-valued
+          "\\addend": "\\mathtt{addend}",
+          "\\fldown": "\\operatorname{\\mathtt{fl}_\\bigtriangledown}",
+          "\\flup": "\\operatorname{\\mathtt{fl}_\\bigtriangleup}",
+          "\\rhs": "\\mathtt{rhs}",
+          "\\self": "\\mathtt{self}",
+          "\\tfloor": "\\operatorname{\\mathtt{floor}}",
+          "\\thull": "\\operatorname{\\mathtt{hull}}",
+          "\\tsqrt": "\\operatorname{\\mathtt{sqrt}}",
           // Decorations
           "\\com": "\\mathtt{com}",
           "\\dac": "\\mathtt{dac}",
@@ -100,11 +101,11 @@
       "𝒇": "{\\boldsymbol{f}}",
       "𝒙": "{\\boldsymbol{x}}",
       "𝒚": "{\\boldsymbol{y}}",
-      "𝛑": "{\\boldsymbol{\\pi}}",
+      "∘": "\\circ",
       "∅": "\\emptyset",
       "∧": "\\mathrel{∧}", // logical AND
       "∨": "\\mathrel{∨}", // logical OR
-      "∖": "\\setminus",
+      "∖": "{\\setminus}", // enclosed in braces to remove margins
     };
   })();
 </script>
