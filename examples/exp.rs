@@ -39,7 +39,7 @@ fn exp2_point_reduced(x: f64) -> Interval {
     assert!(x.subset(const_interval!(-0.5, 0.5)));
 
     const N: usize = 14;
-    /// C[n] = ln(2)^n / n! for n = 0, …, N - 1.
+    // C[n] = ln(2)^n / n! for n = 0, …, N - 1.
     const C: [Interval; N] = [
         const_interval!(1.0, 1.0),
         const_interval!(0.6931471805599453, 0.6931471805599454),

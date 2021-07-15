@@ -7,7 +7,7 @@ impl Interval {
     /// $∅$, the empty set.
     pub const EMPTY: Self = unsafe { transmute([f64::NAN, f64::NAN]) };
 
-    /// $\[-∞, +∞\]$, the whole real line.
+    /// $\[-∞, +∞\]$.
     pub const ENTIRE: Self = const_interval!(f64::NEG_INFINITY, f64::INFINITY);
 
     /// The tightest interval enclosing $\e$, the base of natural logarithms.
@@ -70,13 +70,19 @@ impl Interval {
 
 macro_rules! def_com {
     ($c:ident) => {
+        #[doc = concat!("See [`Interval::", stringify!($c), "`].")]
         pub const $c: Self = Self::new_unchecked(Interval::$c, Decoration::Com);
     };
 }
 
 impl DecInterval {
+    /// $∅$, the empty set, decorated with [`Decoration::Trv`].
     pub const EMPTY: Self = Self::new_unchecked(Interval::EMPTY, Decoration::Trv);
+
+    /// $\[-∞, +∞\]$, decorated with [`Decoration::Dac`].
     pub const ENTIRE: Self = Self::new_unchecked(Interval::ENTIRE, Decoration::Dac);
+
+    /// A NaI (Not an Interval).
     pub const NAI: Self = Self::new_unchecked(Interval::EMPTY, Decoration::Ill);
 
     def_com!(E);

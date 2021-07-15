@@ -188,7 +188,7 @@ pub enum Overlap {
 
 impl Interval {
     /// Returns the overlapping state of `self` and `rhs`.
-    /// See [`Overlap`] for the possible values returned.
+    /// See [`Overlap`] for the possible states to be returned.
     pub fn overlap(self, rhs: Self) -> Overlap {
         use Overlap::*;
 
@@ -271,6 +271,9 @@ impl Interval {
 }
 
 impl DecInterval {
+    /// See [`Interval::overlap`].
+    ///
+    /// [`None`] is returned if `self` or `rhs` is NaI.
     pub fn overlap(self, rhs: Self) -> Option<Overlap> {
         if self.is_nai() || rhs.is_nai() {
             return None;

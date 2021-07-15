@@ -43,14 +43,15 @@ impl Mul for Interval {
     /// Tightness: tightest
     #[allow(clippy::many_single_char_names)]
     fn mul(self, rhs: Self) -> Self {
-        // [a, b] * [c, d]
-        //    |      M     |      N     |      P     |   Z
-        // ---+------------+------------+------------+------
-        //  M |     *1     | [b*c, a*c] | [a*d, b*d] | zero
-        //  N | [a*d, a*c] | [b*d, a*c] | [a*d, b*c] | zero
-        //  P | [b*c, b*d] | [b*c, a*d] | [a*c, b*d] | zero
-        //  Z |       zero |       zero |       zero | zero
-        // *1 [min(a*d, b*c), max(a*c, b*d)]
+        // [a, b] * [c, d] =
+        //
+        //    |      M     |      N     |      P     |  Z
+        // ---+------------+------------+------------+-----
+        //  M |     *1     | [b*c, a*c] | [a*d, b*d] | {0}
+        //  N | [a*d, a*c] | [b*d, a*c] | [a*d, b*c] | {0}
+        //  P | [b*c, b*d] | [b*c, a*d] | [a*c, b*d] | {0}
+        //  Z |     {0}    |     {0}    |     {0}    | {0}
+        // *1 [min{a*d, b*c}, max{a*c, b*d}]
 
         use IntervalClass2::*;
         match self.classify2(rhs) {
@@ -134,13 +135,14 @@ impl Div for Interval {
 
     /// Tightness: tightest
     fn div(self, rhs: Self) -> Self {
-        // [a, b] / [c, d]
-        //    |    M   |     N0    |     N1     |     P0    |     P1     |   Z
-        // ---+--------+-----------+------------+-----------+------------+-------
-        //  M | entire |    entire | [b/d, a/d] |    entire | [a/c, b/c] | empty
-        //  N | entire | [b/c, +∞] | [b/c, a/d] | [-∞, b/d] | [a/c, b/d] | empty
-        //  P | entire | [-∞, a/c] | [b/d, a/c] | [a/d, +∞] | [a/d, b/c] | empty
-        //  Z |   zero |      zero |       zero |      zero |       zero | empty
+        // [a, b] / [c, d] =
+        //
+        //    |  M  |     N0    |     N1     |     P0    |     P1     | Z
+        // ---+-----+-----------+------------+-----------+------------+---
+        //  M |  ℝ  |     ℝ     | [b/d, a/d] |     ℝ     | [a/c, b/c] | ∅
+        //  N |  ℝ  | [b/c, +∞] | [b/c, a/d] | [-∞, b/d] | [a/c, b/d] | ∅
+        //  P |  ℝ  | [-∞, a/c] | [b/d, a/c] | [a/d, +∞] | [a/d, b/c] | ∅
+        //  Z | {0} |    {0}    |     {0}    |    {0}    |     {0}    | ∅
 
         use IntervalClass2::*;
         match self.classify2(rhs) {
@@ -242,7 +244,6 @@ impl Add for DecInterval {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        #[allow(clippy::suspicious_arithmetic_impl)]
         if self.is_nai() || rhs.is_nai() {
             return Self::NAI;
         }
@@ -255,7 +256,6 @@ impl Sub for DecInterval {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
-        #[allow(clippy::suspicious_arithmetic_impl)]
         if self.is_nai() || rhs.is_nai() {
             return Self::NAI;
         }
@@ -268,7 +268,6 @@ impl Mul for DecInterval {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        #[allow(clippy::suspicious_arithmetic_impl)]
         if self.is_nai() || rhs.is_nai() {
             return Self::NAI;
         }
@@ -281,7 +280,6 @@ impl Div for DecInterval {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self {
-        #[allow(clippy::suspicious_arithmetic_impl)]
         if self.is_nai() || rhs.is_nai() {
             return Self::NAI;
         }

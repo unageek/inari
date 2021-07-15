@@ -184,6 +184,7 @@ impl Interval {
 }
 
 impl DecInterval {
+    /// See [`Interval::mul_add`].
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
         if self.is_nai() || rhs.is_nai() || addend.is_nai() {
             return Self::NAI;
@@ -195,6 +196,7 @@ impl DecInterval {
         )
     }
 
+    /// See [`Interval::recip`].
     pub fn recip(self) -> Self {
         if self.is_nai() {
             return self;
@@ -208,6 +210,7 @@ impl DecInterval {
         Self::set_dec(self.x.recip(), d)
     }
 
+    /// See [`Interval::sqr`].
     pub fn sqr(self) -> Self {
         if self.is_nai() {
             return self;
@@ -216,6 +219,7 @@ impl DecInterval {
         Self::set_dec(self.x.sqr(), self.d)
     }
 
+    /// See [`Interval::sqrt`].
     pub fn sqrt(self) -> Self {
         if self.is_nai() {
             return self;

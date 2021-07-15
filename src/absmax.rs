@@ -25,8 +25,7 @@ impl Interval {
         }
     }
 
-    /// Returns $\[\max(a, c), \max(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
-    /// are nonempty; otherwise, $∅$.
+    /// Returns the maximum of `self` and `rhs`.
     ///
     /// Tightness: tightest
     pub fn max(self, rhs: Self) -> Self {
@@ -50,8 +49,7 @@ impl Interval {
         }
     }
 
-    /// Returns $\[\min(a, c), \min(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
-    /// are nonempty; otherwise $∅$.
+    /// Returns the minimum of `self` and `rhs`.
     ///
     /// Tightness: tightest
     pub fn min(self, rhs: Self) -> Self {
@@ -77,6 +75,7 @@ impl Interval {
 }
 
 impl DecInterval {
+    /// See [`Interval::abs`].
     pub fn abs(self) -> Self {
         if self.is_nai() {
             return self;
@@ -85,6 +84,7 @@ impl DecInterval {
         Self::set_dec(self.x.abs(), self.d)
     }
 
+    /// See [`Interval::max`].
     pub fn max(self, rhs: Self) -> Self {
         if self.is_nai() {
             return self;
@@ -93,6 +93,7 @@ impl DecInterval {
         Self::set_dec(self.x.max(rhs.x), self.d.min(rhs.d))
     }
 
+    /// See [`Interval::min`].
     pub fn min(self, rhs: Self) -> Self {
         if self.is_nai() {
             return self;

@@ -57,10 +57,6 @@ features = ["float", "integer", "rational"]
 optional = true
 
 [[example]]
-name = "exact"
-required-features = ["gmp"]
-
-[[example]]
 name = "exp"
 required-features = ["gmp", "libm"]
 

@@ -1,7 +1,7 @@
 use crate::{interval::*, simd::*};
 
 impl Interval {
-    /// Rounds the bounds of `self` to integers using directed rounding toward $+∞$.
+    /// Rounds `self` to the closest integer toward $+∞$.
     ///
     /// Tightness: tightest
     ///
@@ -26,7 +26,7 @@ impl Interval {
         Self { rep: neg0(r) }
     }
 
-    /// Rounds the bounds of `self` to integers using directed rounding toward $-∞$.
+    /// Rounds `self` to the closest integer toward $-∞$.
     ///
     /// Tightness: tightest
     ///
@@ -50,8 +50,7 @@ impl Interval {
         Self { rep: neg0(r) }
     }
 
-    /// Rounds the bounds of `self` to the nearest integers,
-    /// with halfway cases rounded away from zero.
+    /// Rounds `self` to the closest integer, away from zero in case of ties.
     ///
     /// Tightness: tightest
     ///
@@ -76,8 +75,7 @@ impl Interval {
         }
     }
 
-    /// Rounds the bounds of `self` to the nearest integers,
-    /// with halfway cases rounded to even numbers.
+    /// Rounds `self` to the closest integer, the even number in case of ties.
     ///
     /// Tightness: tightest
     ///
@@ -104,8 +102,9 @@ impl Interval {
 
     /// Returns the sign of `self`.
     ///
-    /// Note the difference between the sign function and `f64::signum`; $\sgn(0)$ is always zero,
-    /// while the values of `+0.0_f64.signum()` and `-0.0_f64.signum()` are `+1.0` and `-1.0`, respectively.
+    /// Note the difference in definition between [`f64::signum`] and this function;
+    /// `+0.0_f64.signum()` and `-0.0_f64.signum()` return `+1.0` and `-1.0`, respectively,
+    /// while the sign of zero is just zero,
     ///
     /// Tightness: tightest
     ///
@@ -136,7 +135,7 @@ impl Interval {
         Self { rep: r }
     }
 
-    /// Rounds the bounds of `self` to integers using directed rounding toward zero.
+    /// Rounds `self` to the closest integer toward zero.
     ///
     /// Tightness: tightest
     ///
@@ -168,6 +167,7 @@ macro_rules! impl_dec {
     // In rounding functions, you can effectively check if an endpoint of x
     // is an integer by x.inf == y.inf or x.sup == y.sup.
     ($f:ident, $x:ident, $y:ident, $is_not_com:expr) => {
+        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
         pub fn $f(self) -> Self {
             if self.is_nai() {
                 return self;

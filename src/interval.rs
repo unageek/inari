@@ -121,10 +121,15 @@ impl TryFrom<(f64, f64)> for Interval {
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 #[repr(u8)]
 pub enum Decoration {
+    /// The “ill-formed” decoration.
     Ill = 0,
+    /// The “trivial” decoration.
     Trv = 4,
+    /// The “defined” decoration.
     Def = 8,
+    /// The “defined and continuous” decoration.
     Dac = 12,
+    /// The “common” decoration.
     Com = 16,
 }
 
@@ -158,6 +163,13 @@ pub struct DecInterval {
 }
 
 impl DecInterval {
+    /// Creates a [`DecInterval`] from the given interval and the decoration below:
+    ///
+    /// | Interval             | Decoration          |
+    /// | -------------------- | ------------------- |
+    /// | Nonempty and bounded | [`Decoration::Com`] |
+    /// | Unbounded            | [`Decoration::Dac`] |
+    /// | Empty                | [`Decoration::Trv`] |
     pub fn new(x: Interval) -> Self {
         use Decoration::*;
 
@@ -176,10 +188,12 @@ impl DecInterval {
         Self { x, d }
     }
 
+    /// Returns the decoration part `self`.
     pub fn decoration(self) -> Decoration {
         self.d
     }
 
+    /// Returns the interval part of `self` if it is not NaI; otherwise, [`None`].
     pub fn interval(self) -> Option<Interval> {
         if self.is_nai() {
             return None;
@@ -188,6 +202,14 @@ impl DecInterval {
         Some(self.x)
     }
 
+    /// Creates a [`DecInterval`] from the given interval and decoration.
+    /// If the decoration is invalid for the interval, the first one in the list is used:
+    ///
+    /// | Interval             | Valid decorations                                                                                       |
+    /// | -------------------- | ------------------------------------------------------------------------------------------------------- |
+    /// | Nonempty and bounded | [`Decoration::Com`], [`Decoration::Dac`], [`Decoration::Def`], [`Decoration::Trv`], [`Decoration::Ill`] |
+    /// | Unbounded            | [`Decoration::Dac`], [`Decoration::Def`], [`Decoration::Trv`], [`Decoration::Ill`]                      |
+    /// | Empty                | [`Decoration::Trv`], [`Decoration::Ill`]                                                                |
     pub fn set_dec(x: Interval, d: Decoration) -> Self {
         use Decoration::*;
 
