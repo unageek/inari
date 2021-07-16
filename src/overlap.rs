@@ -57,10 +57,10 @@ pub enum Overlap {
     Overlaps,
 
     /// ```text
-    ///        a    b                a,b
-    /// self:  •————•          self:  • (point)
-    ///  rhs:  •————————•       rhs:  •——————•
-    ///        c        d             c      d
+    ///        a    b        :          a=b
+    /// self:  •————•        :    self:  •
+    ///  rhs:  •————————•    :     rhs:  •——————•
+    ///        c        d    :           c      d
     /// ```
     ///
     /// Both `self` and `rhs` are nonempty and $a = c ∧ b < d$.
@@ -83,10 +83,10 @@ pub enum Overlap {
     ContainedBy,
 
     /// ```text
-    ///            a    b                   a,b
-    /// self:      •————•      self:         • (point)
-    ///  rhs:  •————————•       rhs:  •——————•
-    ///        c        d             c      d
+    ///            a    b    :                 a=b
+    /// self:      •————•    :    self:         •
+    ///  rhs:  •————————•    :     rhs:  •——————•
+    ///        c        d    :           c      d
     /// ```
     ///
     /// Both `self` and `rhs` are nonempty and $c < a ∧ b = d$.
@@ -96,10 +96,10 @@ pub enum Overlap {
     Finishes,
 
     /// ```text
-    ///        a      b            a,b
-    /// self:  •——————•      self:  • (point)
-    ///  rhs:  •——————•       rhs:  • (point)
-    ///        c      d            c,d
+    ///        a      b    :          a=b
+    /// self:  •——————•    :    self:  •
+    ///  rhs:  •——————•    :     rhs:  •
+    ///        c      d    :          c=d
     /// ```
     ///
     /// Both `self` and `rhs` are nonempty and $a = c ∧ b = d$.
@@ -109,10 +109,10 @@ pub enum Overlap {
     Equals,
 
     /// ```text
-    ///        a        b             a      b
-    /// self:  •————————•      self:  •——————•
-    ///  rhs:      •————•       rhs:         • (point)
-    ///            c    d                   c,d
+    ///        a        b    :           a      b
+    /// self:  •————————•    :    self:  •——————•
+    ///  rhs:      •————•    :     rhs:         •
+    ///            c    d    :                 c=d
     /// ```
     ///
     /// Both `self` and `rhs` are nonempty and $a < c ∧ b = d$.
@@ -135,10 +135,10 @@ pub enum Overlap {
     Contains,
 
     /// ```text
-    ///        a        b             a      b
-    /// self:  •————————•      self:  •——————•
-    ///  rhs:  •————•           rhs:  • (point)
-    ///        c    d                c,d
+    ///        a        b    :           a      b
+    /// self:  •————————•    :    self:  •——————•
+    ///  rhs:  •————•        :     rhs:  •
+    ///        c    d        :          c=d
     /// ```
     ///
     /// Both `self` and `rhs` are nonempty and $a = c ∧ d < b$.
