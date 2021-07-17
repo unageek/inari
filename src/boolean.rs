@@ -42,8 +42,10 @@ impl Interval {
     /// or equivalently,
     ///
     /// $$
-    /// ∀x ∈ \self, ∀y ∈ \rhs : x ≠ y.
+    /// ∀x ∈ \self, ∀y ∈ \rhs : x ≠ y,
     /// $$
+    ///
+    /// or equivalently,
     ///
     /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
     /// | :----------------: | :--------: | :---------------: |
@@ -74,15 +76,17 @@ impl Interval {
     /// Returns `true` if `self` is interior to `rhs`:
     ///
     /// $$
-    /// (∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀x ∈ \self, ∃y ∈ \rhs : y < x).
+    /// (∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀x ∈ \self, ∃y ∈ \rhs : y < x),
     /// $$
+    ///
+    /// or equivalently,
     ///
     /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
     /// | :----------------: | :--------: | :---------------: |
     /// | $\self = ∅$        | `true`     | `true`            |
     /// | $\self = \[a, b\]$ | `false`    | $c <′ a ∧ b <′ d$ |
     ///
-    /// where $x <′ y$ is defined as:
+    /// where $<′$ is defined as:
     ///
     /// $$
     /// x <′ y :⟺ x < y ∨ x = y = -∞ ∨ x = y = +∞.
@@ -189,8 +193,10 @@ impl Interval {
     /// Returns `true` if `self` is weakly less than `rhs`:
     ///
     /// $$
-    /// (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y).
+    /// (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y),
     /// $$
+    ///
+    /// or equivalently,
     ///
     /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
     /// | :----------------: | :--------: | :---------------: |
@@ -220,8 +226,10 @@ impl Interval {
     /// Returns `true` if `self` is to the left of `rhs` but may touch it:
     ///
     /// $$
-    /// ∀x ∈ \self, ∀y ∈ \rhs : x ≤ y.
+    /// ∀x ∈ \self, ∀y ∈ \rhs : x ≤ y,
     /// $$
+    ///
+    /// or equivalently,
     ///
     /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
     /// | :----------------: | :--------: | :---------------: |
@@ -248,15 +256,17 @@ impl Interval {
     /// Returns `true` if `self` is strictly less than `rhs`:
     ///
     /// $$
-    /// (∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀y ∈ \self, ∃x ∈ \rhs : x < y).
+    /// (∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀y ∈ \self, ∃x ∈ \rhs : x < y),
     /// $$
+    ///
+    /// or equivalently,
     ///
     /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
     /// | :----------------: | :--------: | :---------------: |
     /// | $\self = ∅$        | `true`     | `false`           |
     /// | $\self = \[a, b\]$ | `false`    | $a <′ c ∧ b <′ d$ |
     ///
-    /// where $x <′ y$ is defined as:
+    /// where $<′y$ is defined as:
     ///
     /// $$
     /// x <′ y :⟺ x < y ∨ x = y = -∞ ∨ x = y = +∞.
@@ -290,8 +300,10 @@ impl Interval {
     /// Returns `true` if `self` is strictly to the left of `rhs`:
     ///
     /// $$
-    /// ∀x ∈ \self, ∀y ∈ \rhs : x < y.
+    /// ∀x ∈ \self, ∀y ∈ \rhs : x < y,
     /// $$
+    ///
+    /// or equivalently,
     ///
     /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
     /// | :----------------: | :--------: | :---------------: |
@@ -311,8 +323,10 @@ impl Interval {
     /// or equivalently,
     ///
     /// $$
-    /// ∀x ∈ \self, ∃y ∈ \rhs : x = y.
+    /// ∀x ∈ \self, ∃y ∈ \rhs : x = y,
     /// $$
+    ///
+    /// or equivalently,
     ///
     /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
     /// | :----------------: | :--------: | :---------------: |

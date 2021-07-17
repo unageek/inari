@@ -1,7 +1,7 @@
 use crate::{interval::*, simd::*};
 
 impl Interval {
-    /// Returns the tightest interval that contains both `self` and `rhs` as its subsets.
+    /// Returns $\hull(\self ∪ \rhs)$, the tightest interval that contains both `self` and `rhs` as its subsets.
     ///
     /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$                    |
     /// | :----------------: | :--------: | :----------------------------------: |
