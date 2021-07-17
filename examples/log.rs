@@ -43,8 +43,8 @@ fn log2_point_reduced(x: f64) -> Interval {
 
     const N: usize = 22;
 
-    /// C[0] = 0,
-    /// C[n] = (-1)^(n + 1) / (n ln(2)) for n = 1, …, N - 1.
+    // C[0] = 0,
+    // C[n] = (-1)^(n + 1) / (n ln(2)) for n = 1, …, N - 1.
     const C: [Interval; N] = [
         const_interval!(0.0, 0.0),
         const_interval!(1.4426950408889634, 1.4426950408889636),

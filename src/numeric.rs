@@ -1,9 +1,18 @@
 use crate::{interval::*, simd::*};
 
 impl Interval {
-    /// Returns the (greatest) lower bound of `self`.
+    /// Returns the lower bound of `self`.
     ///
-    /// Equivalently, it returns $a$ if $\self = \[a, b\]$ is nonempty; otherwise, $+∞$.
+    /// The lower bound of an interval $𝒙$ is:
+    ///
+    /// $$
+    /// \inf(𝒙) = \begin{cases}
+    ///   +∞ & \if 𝒙 = ∅, \\\\
+    ///   a  & \if 𝒙 = \[a, b\].
+    ///  \end{cases}
+    /// $$
+    ///
+    /// The exact value is returned.
     ///
     /// # Examples
     ///
@@ -27,13 +36,18 @@ impl Interval {
         }
     }
 
-    /// Returns the magnitude of `self` if `self` is nonempty; otherwise, NaN.
+    /// Returns the magnitude of `self` if it is nonempty; otherwise, a NaN.
     ///
-    /// The magnitude of a nonempty interval $𝒙 = \[a, b\]$ is defined as follows:
+    /// The magnitude of a nonempty interval $𝒙 = \[a, b\]$ is:
     ///
     /// $$
-    /// \operatorname{mag}(𝒙) = \sup\\{|x| ∣ x ∈ 𝒙\\} = \max(|a|, |b|).
+    /// \begin{align*}
+    ///  \mag(𝒙) &= \sup\\{|x| ∣ x ∈ 𝒙\\} \\\\
+    ///   &= \max\\{|a|, |b|\\}.
+    /// \end{align*}
     /// $$
+    ///
+    /// The exact value is returned.
     ///
     /// # Examples
     ///
@@ -50,19 +64,20 @@ impl Interval {
         extract0(max(abs, swap(abs)))
     }
 
-    /// Returns the midpoint of `self` if `self` is nonempty; otherwise, NaN.
-    /// For nonempty cases, the following values are returned.
+    /// Returns the midpoint of `self` if it is nonempty; otherwise, a NaN.
     ///
-    /// - If $\self = \[-∞, +∞\]$, zero is returned.
-    /// - If $\self = \[-∞, b\]$ where $b < +∞$, `f64::MIN` is returned.
-    /// - If $\self = \[a, +∞\]$ where $a > -∞$, `f64::MAX` is returned.
-    /// - If `self` is bounded, $\operatorname{mid}(\self)$ rounded to the nearest `f64` value is returned.
-    ///
-    /// The midpoint of a nonempty interval $𝒙 = \[a, b\]$ is defined as follows:
+    /// The midpoint of a nonempty interval $𝒙 = \[a, b\]$ is:
     ///
     /// $$
-    /// \operatorname{mid}(𝒙) = \frac{1}{2}(a + b).
+    /// \mid(𝒙) = \frac{a + b}{2}.
     /// $$
+    ///
+    /// As an approximation in [`f64`], it returns:
+    ///
+    /// - `0.0`, if $\self = \[-∞, +∞\]$;
+    /// - [`f64::MIN`], if $\self = \[-∞, b\]$, where $b ∈ \R$;
+    /// - [`f64::MAX`], if $\self = \[a, +∞\]$, where $a ∈ \R$;
+    /// - otherwise, the closest [`f64`] number to $\mid(\self)$, away from zero in case of ties.
     ///
     /// # Examples
     ///
@@ -98,16 +113,21 @@ impl Interval {
         }
     }
 
-    /// Returns the mignitude of `self` if `self` is nonempty; otherwise, NaN.
+    /// Returns the mignitude of `self` if it is nonempty; otherwise, a NaN.
     ///
-    /// The mignitude of a nonempty interval $𝒙 = \[a, b\]$ is defined as follows:
+    /// The mignitude of a nonempty interval $𝒙 = \[a, b\]$ is:
     ///
     /// $$
-    /// \operatorname{mig}(𝒙) = \inf\\{|x| ∣ x ∈ 𝒙\\} = \begin{cases}
-    ///   \min(|a|, |b|) & \text{if } \sgn(a) = \sgn(b), \\\\
-    ///   0              & \text{otherwise}.
-    ///  \end{cases}
+    /// \begin{align*}
+    ///  \mig(𝒙) &= \inf\\{|x| ∣ x ∈ 𝒙\\} \\\\
+    ///   &= \begin{cases}
+    ///     \min\\{|a|, |b|\\} & \if \sgn(a) = \sgn(b), \\\\
+    ///     0                  & \otherwise.
+    ///    \end{cases}
+    /// \end{align*}
     /// $$
+    ///
+    /// The exact value is returned.
     ///
     /// # Examples
     ///
@@ -131,15 +151,16 @@ impl Interval {
         extract0(min(abs, swap(abs)))
     }
 
-    /// Returns the radius of `self` if `self` is nonempty; otherwise, NaN.
-    /// The result $r$ is the smallest `f64` number that satisfies
-    /// $\self ⊆ \[m - r, m + r\]$ where $m$ is the `f64` value returned by `self.mid()`.
+    /// Returns the radius of `self` if it is nonempty; otherwise, a NaN.
     ///
-    /// The radius of a nonempty interval $𝒙 = \[a, b\]$ is defined as follows:
+    /// The radius of a nonempty interval $𝒙 = \[a, b\]$ is:
     ///
     /// $$
-    /// \operatorname{rad}(𝒙) = \frac{1}{2}(b - a).
+    /// \rad(𝒙) = \frac{b - a}{2}.
     /// $$
+    ///
+    /// As an approximation in [`f64`], it returns the least [`f64`] number `r` that satisfies
+    /// $\self ⊆ \[𝚖 - 𝚛, 𝚖 + 𝚛\]$, where `m` is the midpoint returned by [`Self::mid`].
     ///
     /// # Examples
     ///
@@ -156,9 +177,18 @@ impl Interval {
         f64::max(sub1_ru(m, self.inf_raw()), sub1_ru(self.sup_raw(), m))
     }
 
-    /// Returns the (least) upper bound of `self`.
+    /// Returns the upper bound of `self`.
     ///
-    /// Equivalently, it returns $b$ if $\self = \[a, b\]$ is nonempty; otherwise, $-∞$.
+    /// The upper bound of an interval $𝒙$ is:
+    ///
+    /// $$
+    /// \sup(𝒙) = \begin{cases}
+    ///   -∞ & \if 𝒙 = ∅, \\\\
+    ///   b  & \if 𝒙 = \[a, b\].
+    ///  \end{cases}
+    /// $$
+    ///
+    /// The exact value is returned.
     ///
     /// # Examples
     ///
@@ -182,14 +212,15 @@ impl Interval {
         }
     }
 
-    /// Returns the width of `self` if `self` is nonempty; otherwise, NaN.
-    /// The result is rounded toward $+∞$.
+    /// Returns the width of `self` if it is nonempty; otherwise, a NaN.
     ///
-    /// The width of a nonempty interval $𝒙 = \[a, b\]$ is defined as follows:
+    /// The width of a nonempty interval $𝒙 = \[a, b\]$ is:
     ///
     /// $$
-    /// \operatorname{wid}(𝒙) = b - a.
+    /// \wid(𝒙) = b - a.
     /// $$
+    ///
+    /// As an approximation in [`f64`], it returns the closest [`f64`] number toward $+∞$.
     ///
     /// # Examples
     ///
@@ -211,7 +242,8 @@ impl Interval {
 }
 
 macro_rules! impl_dec {
-    ($f:ident) => {
+    ($(#[$meta:meta])* $f:ident) => {
+        $(#[$meta])*
         pub fn $f(self) -> f64 {
             if self.is_nai() {
                 return f64::NAN;
@@ -223,13 +255,48 @@ macro_rules! impl_dec {
 }
 
 impl DecInterval {
-    impl_dec!(inf);
-    impl_dec!(mag);
-    impl_dec!(mid);
-    impl_dec!(mig);
-    impl_dec!(rad);
-    impl_dec!(sup);
-    impl_dec!(wid);
+    impl_dec!(
+        /// See [`Interval::inf`].
+        ///
+        /// A NaN is returned if `self` is NaI.
+        inf
+    );
+    impl_dec!(
+        /// See [`Interval::mag`].
+        ///
+        /// A NaN is returned if `self` is NaI.
+        mag
+    );
+    impl_dec!(
+        /// See [`Interval::mid`].
+        ///
+        /// A NaN is returned if `self` is NaI.
+        mid
+    );
+    impl_dec!(
+        /// See [`Interval::mig`].
+        ///
+        /// A NaN is returned if `self` is NaI.
+        mig
+    );
+    impl_dec!(
+        /// See [`Interval::rad`].
+        ///
+        /// A NaN is returned if `self` is NaI.
+        rad
+    );
+    impl_dec!(
+        /// See [`Interval::sup`].
+        ///
+        /// A NaN is returned if `self` is NaI.
+        sup
+    );
+    impl_dec!(
+        /// See [`Interval::wid`].
+        ///
+        /// A NaN is returned if `self` is NaI.
+        wid
+    );
 }
 
 #[cfg(test)]

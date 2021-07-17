@@ -249,7 +249,7 @@ c. Implementation-defined behavior
 
 10. What methods are used to read or write strings from or to character streams? Does the implementation employ variations in locales (such as specific character case matching)? This includes the syntax used in the strings for reading and writing.
 
-    Rust's UTF-8–encoded string types are used. Only the syntax specified in the standard are supported as an input/output. For output, there are a few options for controlling the format.
+    Rust's UTF-8-encoded string types are used. Only the syntax specified in the standard are supported as an input/output. For output, there are a few options for controlling the format.
 
 11. What is the tightness of the string to interval conversion for non IEEE 754 conforming interval types and the tightness for the interval to string conversion for all interval types?
 
@@ -265,7 +265,7 @@ c. Implementation-defined behavior
 
 14. What decorations does the implementation provide and what is their mathematical definition? How are these decorations mapped when converting an interval to the interchange format?
 
-    The decorations `com`, `dac`, `def`, `trv` and `ill` are provided. See [intro] for their definitions. Each decoration is mapped to `16`, `12`, `8`, `4` and `0` respectively in the interchange representations.
+    The decorations `com`, `dac`, `def`, `trv` and `ill` are provided. See [intro] for their definitions. Each decoration is mapped to `16`, `12`, `8`, `4` and `0`, respectively, in the interchange representations.
 
 15. What interchange formats if any are provided for non IEEE 754 interval formats and on non IEEE 754 systems? How are these provided to the user?
 

@@ -46,7 +46,7 @@ impl Interval {
         to_le_bytes
     );
     impl_to_bytes!(
-        /// Returns the interchange representation of the interval in the target platform's native byte order.
+        /// Returns the interchange representation of the interval in the native byte order of the target platform.
         to_ne_bytes
     );
 
@@ -61,7 +61,7 @@ impl Interval {
         from_le_bytes
     );
     impl_try_from_bytes!(
-        /// Creates an interval from its interchange representation in the target platform's native byte order.
+        /// Creates an interval from its interchange representation in the native byte order of the target platform.
         try_from_ne_bytes,
         from_ne_bytes
     );
@@ -69,6 +69,7 @@ impl Interval {
 
 macro_rules! impl_to_bytes {
     ($to_bytes:ident) => {
+        #[doc = concat!("See [`Interval::", stringify!($to_bytes), "`].")]
         pub fn $to_bytes(self) -> [u8; 17] {
             let mut bytes = [0u8; 17];
             bytes[..8].copy_from_slice(&f64::$to_bytes(self.inf()));
@@ -81,6 +82,7 @@ macro_rules! impl_to_bytes {
 
 macro_rules! impl_try_from_bytes {
     ($try_from_bytes:ident, $from_bytes:ident) => {
+        #[doc = concat!("See [`Interval::", stringify!($try_from_bytes), "`].")]
         pub fn $try_from_bytes(bytes: [u8; 17]) -> Option<Self> {
             use Decoration::*;
             let a = f64::$from_bytes(<[u8; 8]>::try_from(&bytes[..8]).unwrap());

@@ -3,9 +3,9 @@ use crate::{interval::*, simd::*};
 // NOTE: `eq` is implemented in interval.rs
 
 impl Interval {
-    /// Returns `true` if `rhs` is a member of `self` ($\rhs ∈ \self$).
+    /// Returns `true` if `rhs` is a member of `self`: $\rhs ∈ \self$.
     ///
-    /// If `rhs` is not a real number, `false` is returned.
+    /// The result is `false` whenever `rhs` is infinite or NaN.
     ///
     /// # Examples
     ///
@@ -33,13 +33,24 @@ impl Interval {
         }
     }
 
-    /// Returns `true` if `self` and `rhs` are disjoint ($\self ∩ \rhs = ∅$).
-    ///
-    /// The formal definition is:
+    /// Returns `true` if `self` and `rhs` are disjoint:
     ///
     /// $$
-    /// ∀x ∈ \self, ∀y ∈ \rhs : x ≠ y.
+    /// \self ∩ \rhs = ∅,
     /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// $$
+    /// ∀x ∈ \self, ∀y ∈ \rhs : x ≠ y,
+    /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
+    /// | :----------------: | :--------: | :---------------: |
+    /// | $\self = ∅$        | `true`     | `true`            |
+    /// | $\self = \[a, b\]$ | `true`     | $b < c ∨ d < a$   |
     ///
     /// # Examples
     ///
@@ -62,12 +73,23 @@ impl Interval {
         }
     }
 
-    /// Returns `true` if `self` is interior to `rhs`.
-    ///
-    /// The formal definition is:
+    /// Returns `true` if `self` is interior to `rhs`:
     ///
     /// $$
-    /// (∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀x ∈ \self, ∃y ∈ \rhs : y < x).
+    /// (∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀x ∈ \self, ∃y ∈ \rhs : y < x),
+    /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
+    /// | :----------------: | :--------: | :---------------: |
+    /// | $\self = ∅$        | `true`     | `true`            |
+    /// | $\self = \[a, b\]$ | `false`    | $c <′ a ∧ b <′ d$ |
+    ///
+    /// where $<′$ is defined as:
+    ///
+    /// $$
+    /// x <′ y :⟺ x < y ∨ x = y = -∞ ∨ x = y = +∞.
     /// $$
     ///
     /// # Examples
@@ -107,7 +129,7 @@ impl Interval {
         all(lt(self.rep, splat(f64::INFINITY)))
     }
 
-    /// Returns `true` if `self` is empty ($\self = ∅$).
+    /// Returns `true` if `self` is empty: $\self = ∅$.
     ///
     /// # Examples
     ///
@@ -135,7 +157,13 @@ impl Interval {
         all(eq(self.rep, splat(f64::INFINITY)))
     }
 
-    /// Returns `true` if `self` consists of a single real number.
+    /// Returns `true` if `self` consists of a single real number:
+    ///
+    /// $$
+    /// ∃x ∈ ℝ : \self = \\{x\\}.
+    /// $$
+    ///
+    /// The result is `false` whenever `self` is empty or unbounded.
     ///
     /// # Examples
     ///
@@ -147,11 +175,11 @@ impl Interval {
     /// assert!(!Interval::ENTIRE.is_singleton());
     /// ```
     ///
-    /// 0.1 is not a member of `f64`:
+    /// 0.1 is not representable as a [`f64`] number:
     ///
     /// ```
     /// use inari::*;
-    /// // The singleton set that consists of the nearest `f64` number to 0.1.
+    /// // The singleton interval that consists of the closest [`f64`] number to 0.1.
     /// assert!(const_interval!(0.1, 0.1).is_singleton());
     /// // The tightest interval that encloses 0.1.
     /// #[cfg(feature = "gmp")]
@@ -162,13 +190,18 @@ impl Interval {
         self.inf_raw() == self.sup_raw()
     }
 
-    /// Returns `true` if `self` is weakly less than `rhs`.
-    ///
-    /// The formal definition is:
+    /// Returns `true` if `self` is weakly less than `rhs`:
     ///
     /// $$
-    /// (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y).
+    /// (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y),
     /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
+    /// | :----------------: | :--------: | :---------------: |
+    /// | $\self = ∅$        | `true`     | `false`           |
+    /// | $\self = \[a, b\]$ | `false`    | $a ≤ c ∧ b ≤ d$   |
     ///
     /// # Examples
     ///
@@ -190,13 +223,18 @@ impl Interval {
         l && r
     }
 
-    /// Returns `true` if `self` is to the left of but may touch `rhs`.
-    ///
-    /// The formal definition is:
+    /// Returns `true` if `self` is to the left of `rhs` but may touch it:
     ///
     /// $$
-    /// ∀x ∈ \self, ∀y ∈ \rhs : x ≤ y.
+    /// ∀x ∈ \self, ∀y ∈ \rhs : x ≤ y,
     /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
+    /// | :----------------: | :--------: | :---------------: |
+    /// | $\self = ∅$        | `true`     | `true`            |
+    /// | $\self = \[a, b\]$ | `true`     | $b ≤ c$           |
     ///
     /// # Examples
     ///
@@ -215,12 +253,23 @@ impl Interval {
         self.either_empty(rhs) | (self.sup_raw() <= rhs.inf_raw())
     }
 
-    /// Returns `true` if `self` is strictly less than `rhs`.
-    ///
-    /// The formal definition is:
+    /// Returns `true` if `self` is strictly less than `rhs`:
     ///
     /// $$
-    /// (∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀y ∈ \self, ∃x ∈ \rhs : x < y).
+    /// (∀x ∈ \self, ∃y ∈ \rhs : x < y) ∧ (∀y ∈ \self, ∃x ∈ \rhs : x < y),
+    /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
+    /// | :----------------: | :--------: | :---------------: |
+    /// | $\self = ∅$        | `true`     | `false`           |
+    /// | $\self = \[a, b\]$ | `false`    | $a <′ c ∧ b <′ d$ |
+    ///
+    /// where $<′y$ is defined as:
+    ///
+    /// $$
+    /// x <′ y :⟺ x < y ∨ x = y = -∞ ∨ x = y = +∞.
     /// $$
     ///
     /// # Examples
@@ -248,25 +297,41 @@ impl Interval {
         l && r
     }
 
-    /// Returns `true` if `self` is strictly to the left of `rhs`.
-    ///
-    /// The formal definition is:
+    /// Returns `true` if `self` is strictly to the left of `rhs`:
     ///
     /// $$
-    /// ∀x ∈ \self, ∀y ∈ \rhs : x < y.
+    /// ∀x ∈ \self, ∀y ∈ \rhs : x < y,
     /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
+    /// | :----------------: | :--------: | :---------------: |
+    /// | $\self = ∅$        | `true`     | `true`            |
+    /// | $\self = \[a, b\]$ | `true`     | $b < c$           |
     pub fn strict_precedes(self, rhs: Self) -> bool {
         // self = ∅  ∨  rhs = ∅  ∨  b < c
         self.either_empty(rhs) | (self.sup_raw() < rhs.inf_raw())
     }
 
-    /// Returns `true` if `self` is a subset of `rhs` ($\self ⊆ \rhs$).
-    ///
-    /// The formal definition is:
+    /// Returns `true` if `self` is a subset of `rhs`:
     ///
     /// $$
-    /// ∀x ∈ \self, ∃y ∈ \rhs : x = y.
+    /// \self ⊆ \rhs,
     /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// $$
+    /// ∀x ∈ \self, ∃y ∈ \rhs : x = y,
+    /// $$
+    ///
+    /// or equivalently,
+    ///
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$ |
+    /// | :----------------: | :--------: | :---------------: |
+    /// | $\self = ∅$        | `true`     | `true`            |
+    /// | $\self = \[a, b\]$ | `false`    | $c ≤ a ∧ b ≤ d$   |
     ///
     /// # Examples
     ///
@@ -297,6 +362,9 @@ impl Interval {
 
 macro_rules! impl_dec {
     ($f:ident, 1) => {
+        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
+        ///
+        /// `false` is returned if `self` is NaI.
         pub fn $f(self) -> bool {
             if self.is_nai() {
                 return false;
@@ -307,6 +375,9 @@ macro_rules! impl_dec {
     };
 
     ($f:ident, 2) => {
+        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
+        ///
+        /// `false` is returned if `self` or `rhs` is NaI.
         pub fn $f(self, rhs: Self) -> bool {
             if self.is_nai() || rhs.is_nai() {
                 return false;
@@ -318,6 +389,9 @@ macro_rules! impl_dec {
 }
 
 impl DecInterval {
+    /// See [`Interval::contains`].
+    ///
+    /// `false` is returned if `self` is NaI.
     pub fn contains(self, rhs: f64) -> bool {
         if self.is_nai() {
             return false;
@@ -332,6 +406,7 @@ impl DecInterval {
     impl_dec!(is_empty, 1);
     impl_dec!(is_entire, 1);
 
+    /// Returns `true` if `self` is NaI.
     pub fn is_nai(self) -> bool {
         self.d == Decoration::Ill
     }

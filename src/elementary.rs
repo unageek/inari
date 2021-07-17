@@ -230,7 +230,7 @@ impl Interval {
     );
 
     /// Returns the angle of the point $(\rhs, \self)$ measured counterclockwise from the positive
-    /// $x$-axis in the Euclidean $xy$-plane.
+    /// $x$-axis in the Euclidean plane.
     ///
     /// Tightness: tightest
     pub fn atan2(self, rhs: Self) -> Self {
@@ -442,7 +442,7 @@ impl Interval {
     }
 
     impl_mono_inc!(
-        /// Returns the exponential of `self`.
+        /// Returns `self` raised to the power of $\e$.
         ///
         /// Tightness: tightest
         exp,
@@ -566,7 +566,7 @@ impl Interval {
         }
     }
 
-    /// Returns `self` raised to the power of `rhs`, where `rhs` is an integer.
+    /// Returns `self` raised to the power of `rhs`.
     ///
     /// Tightness: tightest
     pub fn pown(self, rhs: i32) -> Self {
@@ -712,12 +712,14 @@ impl Interval {
 
 macro_rules! impl_dec {
     ($f:ident) => {
+        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
         pub fn $f(self) -> Self {
             Self::set_dec(self.x.$f(), self.d)
         }
     };
 
     ($f:ident, $f_impl:ident) => {
+        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
         pub fn $f(self) -> Self {
             let (y, d) = self.x.$f_impl();
             Self::set_dec(y, self.d.min(d))
@@ -727,6 +729,7 @@ macro_rules! impl_dec {
 
 macro_rules! impl_dec2 {
     ($f:ident, $f_impl:ident) => {
+        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
         pub fn $f(self, rhs: Self) -> Self {
             let (z, d) = self.x.$f_impl(rhs.x);
             Self::set_dec(z, self.d.min(rhs.d.min(d)))
@@ -752,6 +755,7 @@ impl DecInterval {
     impl_dec!(log2, log2_impl);
     impl_dec2!(pow, pow_impl);
 
+    /// See [`Interval::pown`].
     pub fn pown(self, rhs: i32) -> Self {
         let (y, d) = self.x.pown_impl(rhs);
         Self::set_dec(y, self.d.min(d))

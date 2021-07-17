@@ -1,11 +1,12 @@
 use crate::{interval::*, simd::*};
 
 impl Interval {
-    /// Returns $\[\min(a, c), \max(b, d)\]$ if both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
-    /// are nonempty. If either interval is empty, the other is returned.
-    /// If both are empty, $∅$ is returned.
+    /// Returns $\hull(\self ∪ \rhs)$, the tightest interval that contains both `self` and `rhs` as its subsets.
     ///
-    /// This is equivalent to $\self ∪ \rhs$ if the intervals are not disjoint,
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$                    |
+    /// | :----------------: | :--------: | :----------------------------------: |
+    /// | $\self = ∅$        | $∅$        | $\[c, d\]$                           |
+    /// | $\self = \[a, b\]$ | $\[a, b\]$ | $\[\min\\{a, c\\}, \max\\{b, d\\}\]$ |
     ///
     /// Tightness: tightest
     pub fn convex_hull(self, rhs: Self) -> Self {
@@ -23,9 +24,12 @@ impl Interval {
         }
     }
 
-    /// Returns $\self ∩ \rhs$. If the result is nonempty, it is equivalent to
-    /// $\[\max(a, c), \min(b, d)\]$, where both $\self = \[a, b\]$ and $\rhs = \[c, d\]$
-    /// are nonempty.
+    /// Returns $\self ∩ \rhs$, the intersection of `self` and `rhs`.
+    ///
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$                    |
+    /// | :----------------: | :--------: | :----------------------------------: |
+    /// | $\self = ∅$        | $∅$        | $∅$                                  |
+    /// | $\self = \[a, b\]$ | $∅$        | $\[\max\\{a, c\\}, \min\\{b, d\\}\]$ |
     ///
     /// Tightness: tightest
     pub fn intersection(self, rhs: Self) -> Self {
@@ -48,7 +52,8 @@ impl Interval {
 }
 
 macro_rules! impl_dec {
-    ($f:ident) => {
+    ($(#[$meta:meta])* $f:ident) => {
+        $(#[$meta])*
         pub fn $f(self, rhs: Self) -> Self {
             if self.is_nai() || rhs.is_nai() {
                 return Self::NAI;
@@ -60,8 +65,20 @@ macro_rules! impl_dec {
 }
 
 impl DecInterval {
-    impl_dec!(convex_hull);
-    impl_dec!(intersection);
+    impl_dec!(
+        /// See [`Interval::convex_hull`].
+        ///
+        /// A NaI is returned if `self` or `rhs` is NaI.
+        /// Otherwise, the result is decorated with [`Decoration::Trv`] regardless of the inputs.
+        convex_hull
+    );
+    impl_dec!(
+        /// See [`Interval::intersection`].
+        ///
+        /// A NaI is returned if `self` or `rhs` is NaI.
+        /// Otherwise, the result is decorated with [`Decoration::Trv`] regardless of the inputs.
+        intersection
+    );
 }
 
 #[cfg(test)]

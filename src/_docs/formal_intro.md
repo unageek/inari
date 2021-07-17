@@ -29,7 +29,7 @@ $$
 
 Every subset of $\XR$ has both an [infimum][inf] and a [supremum][sup] in $\XR$.
 
-Now we can write $\IR$, the set of all intervals as:
+Now we can write $\IR ⊆ \powerset(\R)$, the set of all intervals as:
 
 $$
 \IR = \\{∅\\} ∪ \\{[a, b] ∣ a ∈ \XR∖\\{+∞\\} ∧ b ∈ \XR∖\\{-∞\\} ∧ a ≤ b\\},
@@ -70,7 +70,7 @@ $$
 \Rge(f, 𝒙) = \\{f(x_1, …, x_n) ∣ \textstyle{⋀_{i=1}^n} x_i ∈ 𝒙_i ∧ (x_1, …, x_n) ∈ X\\}.
 $$
 
-Let $\hull : 𝒫(\R) → \IR$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IR$:
+Let $\hull : \powerset(\R) → \IR$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IR$:
 
 $$
 \begin{align*}
@@ -202,7 +202,7 @@ $$
 \end{align*}
 $$
 
-Let $\thull : 𝒫(\R) → \IF$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IF$:
+Let $\thull : \powerset(\R) → \IF$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IF$:
 
 $$
 \begin{align*}
