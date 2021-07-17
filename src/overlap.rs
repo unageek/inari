@@ -18,6 +18,14 @@ pub enum Overlap {
     /// Equivalently, $\self ≠ ∅ ∧ \rhs = ∅$.
     SecondEmpty,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $b < c$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \self ≠ ∅ ∧ \rhs ≠ ∅ ∧ ∀x ∈ \self, ∀y ∈ \rhs : x < y.
+    /// $$
+    ///
     /// ```text
     ///        a      b
     /// self:  •——————•
@@ -25,11 +33,23 @@ pub enum Overlap {
     ///                   c      d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $b < c$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ ∀x ∈ \self, ∀y ∈ \rhs : x < y$.
+    /// Inverse: [`Overlap::After`].
     Before,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $a < b ∧ b = c ∧ c < d$.
+    ///
+    /// Equivalently,
+    ///
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∀x ∈ \self, ∀y ∈ \rhs : x ≤ y \\\\
+    ///   &∧ ∃x ∈ \self, ∀y ∈ \rhs : x < y \\\\
+    ///   &∧ ∃x ∈ \self, ∃y ∈ \rhs : x = y.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///        a      b
     /// self:  •——————•
@@ -37,12 +57,22 @@ pub enum Overlap {
     ///               c      d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $a < b ∧ b = c ∧ c < d$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀x ∈ \self, ∀y ∈ \rhs : x ≤ y)
-    /// ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y) ∧ (∃x ∈ \self, ∃y ∈ \rhs : x = y)$.
+    /// Inverse: [`Overlap::MetBy`].
     Meets,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $a < c ∧ c < b ∧ b < d$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∃x ∈ \self, ∀y ∈ \rhs : x < y \\\\
+    ///   &∧ ∃y ∈ \rhs, ∀x ∈ \self : x < y \\\\
+    ///   &∧ ∃x ∈ \self, ∃y ∈ \rhs : y < x.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///        a      b
     /// self:  •——————•
@@ -50,12 +80,22 @@ pub enum Overlap {
     ///            c      d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $a < c ∧ c < b ∧ b < d$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y)
-    /// ∧ (∃y ∈ \rhs, ∀x ∈ \self : x < y) ∧ (∃x ∈ \self, ∃y ∈ \rhs : y < x)$.
+    /// Inverse: [`Overlap::OverlappedBy`].
     Overlaps,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $a = c ∧ b < d$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∀y ∈ \rhs, ∃x ∈ \self : x ≤ y \\\\
+    ///   &∧ ∀x ∈ \self, ∃y ∈ \rhs : y ≤ x \\\\
+    ///   &∧ ∃y ∈ \rhs, ∀x ∈ \self : x < y.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///        a    b        :          a=b
     /// self:  •————•        :    self:  •
@@ -63,12 +103,21 @@ pub enum Overlap {
     ///        c        d    :           c      d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $a = c ∧ b < d$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y)
-    /// ∧ (∀x ∈ \self, ∃y ∈ \rhs : y ≤ x) ∧ (∃y ∈ \rhs, ∀x ∈ \self : x < y)$.
+    /// Inverse: [`Overlap::StartedBy`].
     Starts,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $c < a ∧ b < d$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∃y ∈ \rhs, ∀x ∈ \self : y < x \\\\
+    ///   &∧ ∃y ∈ \rhs, ∀x ∈ \self : x < y.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///          a    b
     /// self:    •————•
@@ -76,12 +125,22 @@ pub enum Overlap {
     ///        c        d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $c < a ∧ b < d$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃y ∈ \rhs, ∀x ∈ \self : y < x)
-    /// ∧ (∃y ∈ \rhs, ∀x ∈ \self : x < y)$.
+    /// Inverse: [`Overlap::Contains`].
     ContainedBy,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $c < a ∧ b = d$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∃y ∈ \rhs, ∀x ∈ \self : y < x \\\\
+    ///   &∧ ∀y ∈ \rhs, ∃x ∈ \self : y ≤ x \\\\
+    ///   &∧ ∀x ∈ \self, ∃y ∈ \rhs : x ≤ y.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///            a    b    :                 a=b
     /// self:      •————•    :    self:         •
@@ -89,25 +148,42 @@ pub enum Overlap {
     ///        c        d    :           c      d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $c < a ∧ b = d$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃y ∈ \rhs, ∀x ∈ \self : y < x)
-    /// ∧ (∀y ∈ \rhs, ∃x ∈ \self : y ≤ x) ∧ (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y)$.
+    /// Inverse: [`Overlap::FinishedBy`].
     Finishes,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $a = c ∧ b = d$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∀x ∈ \self, ∃y ∈ \rhs : x = y \\\\
+    ///   &∧ ∀y ∈ \rhs, ∃x ∈ \self : y = x.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///        a      b    :          a=b
     /// self:  •——————•    :    self:  •
     ///  rhs:  •——————•    :     rhs:  •
     ///        c      d    :          c=d
     /// ```
-    ///
-    /// Both `self` and `rhs` are nonempty and $a = c ∧ b = d$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀x ∈ \self, ∃y ∈ \rhs : x = y)
-    /// ∧ (∀y ∈ \rhs, ∃x ∈ \self : y = x)$.
     Equals,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $a < c ∧ b = d$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∃x ∈ \self, ∀y ∈ \rhs : x < y \\\\
+    ///   &∧ ∀x ∈ \self, ∃y ∈ \rhs : x ≤ y \\\\
+    ///   &∧ ∀y ∈ \rhs, ∃x ∈ \self : y ≤ x.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///        a        b    :           a      b
     /// self:  •————————•    :    self:  •——————•
@@ -115,12 +191,21 @@ pub enum Overlap {
     ///            c    d    :                 c=d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $a < c ∧ b = d$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y)
-    /// ∧ (∀x ∈ \self, ∃y ∈ \rhs : x ≤ y) ∧ (∀y ∈ \rhs, ∃x ∈ \self : y ≤ x)$.
+    /// Inverse: [`Overlap::Finishes`].
     FinishedBy,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $a < c ∧ d < b$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∃x ∈ \self, ∀y ∈ \rhs : x < y \\\\
+    ///   &∧ ∃x ∈ \self, ∀y ∈ \rhs : y < x.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///        a        b
     /// self:  •————————•
@@ -128,12 +213,22 @@ pub enum Overlap {
     ///          c    d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $a < c ∧ d < b$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃x ∈ \self, ∀y ∈ \rhs : x < y)
-    /// ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x)$.
+    /// Inverse: [`Overlap::ContainedBy`].
     Contains,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $a = c ∧ d < b$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∀x ∈ \self, ∃y ∈ \rhs : y ≤ x \\\\
+    ///   &∧ ∀y ∈ \rhs, ∃x ∈ \self : x ≤ y \\\\
+    ///   &∧ ∃x ∈ \self, ∀y ∈ \rhs : y < x.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///        a        b    :           a      b
     /// self:  •————————•    :    self:  •——————•
@@ -141,12 +236,22 @@ pub enum Overlap {
     ///        c    d        :          c=d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $a = c ∧ d < b$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀x ∈ \self, ∃y ∈ \rhs : y ≤ x)
-    /// ∧ (∀y ∈ \rhs, ∃x ∈ \self : x ≤ y) ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x)$.
+    /// Inverse: [`Overlap::Starts`].
     StartedBy,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $c < a ∧ a < d ∧ d < b$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∃y ∈ \rhs, ∀x ∈ \self : y < x \\\\
+    ///   &∧ ∃x ∈ \self, ∀y ∈ \rhs : y < x \\\\
+    ///   &∧ ∃y ∈ \rhs, ∃x ∈ \self : x < y.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///            a      b
     /// self:      •——————•
@@ -154,12 +259,22 @@ pub enum Overlap {
     ///        c      d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $c < a ∧ a < d ∧ d < b$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∃y ∈ \rhs, ∀x ∈ \self : y < x)
-    /// ∧ (∃x ∈ \self, ∀y ∈ \rhs : y < x) ∧ (∃y ∈ \rhs, ∃x ∈ \self : x < y)$.
+    /// Inverse: [`Overlap::Overlaps`].
     OverlappedBy,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $c < d ∧ a = d ∧ a < b$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \begin{align*}
+    ///  \self ≠ ∅ ∧ \rhs ≠ ∅
+    ///   &∧ ∀y ∈ \rhs, ∀x ∈ \self : y ≤ x \\\\
+    ///   &∧ ∃y ∈ \rhs, ∃x ∈ \self : y = x \\\\
+    ///   &∧ ∃y ∈ \rhs, ∀x ∈ \self : y < x.
+    /// \end{align*}
+    /// $$
+    ///
     /// ```text
     ///               a      b
     /// self:         •——————•
@@ -167,12 +282,17 @@ pub enum Overlap {
     ///        c      d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $c < d ∧ a = d ∧ a < b$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ (∀y ∈ \rhs, ∀x ∈ \self : y ≤ x)
-    /// ∧ (∃y ∈ \rhs, ∃x ∈ \self : y = x) ∧ (∃y ∈ \rhs, ∀x ∈ \self : y < x)$.
+    /// Inverse: [`Overlap::Meets`].
     MetBy,
 
+    /// Both $\self = \[a, b\]$ and $rhs = \[c, d\]$ are nonempty and $d < a$.
+    ///
+    /// Equivalently,
+    ///
+    /// $$
+    /// \self ≠ ∅ ∧ \rhs ≠ ∅ ∧ ∀y ∈ \rhs, ∀x ∈ \self : y < x.
+    /// $$
+    ///
     /// ```text
     ///                   a      b
     /// self:             •——————•
@@ -180,9 +300,7 @@ pub enum Overlap {
     ///        c      d
     /// ```
     ///
-    /// Both `self` and `rhs` are nonempty and $d < a$.
-    ///
-    /// Equivalently, $\self ≠ ∅ ∧ \rhs ≠ ∅ ∧ ∀y ∈ \rhs, ∀x ∈ \self : y < x$.
+    /// Inverse: [`Overlap::Before`].
     After,
 }
 
