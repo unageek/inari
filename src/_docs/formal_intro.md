@@ -6,14 +6,14 @@ This article describes interval arithmetic (IA) implemented in the crate. The va
 
 An interval is a [closed][closed], [convex][convex] [subset][subset] of $\R$, the set of all real numbers. By definition, $∅$, the [empty set][emptyset] as well as $\R$ are also intervals. The notations of intervals are summarized below:
 
-| Interval notation     | Definition                                            | [Bounded][bounded] in $\R$ |
-| --------------------- | ----------------------------------------------------- | :------------------------: |
-| $∅$                   | $∅$, the empty set                                    |            Yes             |
-| $\set{a}$ or $[a, a]$ | $\set{a}$, where $a ∈ \R$                             |            Yes             |
-| $[a, b]$              | $\set{x ∈ \R ∣ a ≤ x ≤ b}$, where $a, b ∈ \R ∧ a ≤ b$ |            Yes             |
-| $[a, +∞]$             | $\set{x ∈ \R ∣ a ≤ x}$, where $a ∈ \R$                |             No             |
-| $[-∞, b]$             | $\set{x ∈ \R ∣ x ≤ b}$, where $b ∈ \R$                |             No             |
-| $\R$ or $[-∞, +∞]$    | $\R$, the set of all real numbers                     |             No             |
+| Interval notation    | Definition                                            | [Bounded][bounded] in $\R$ |
+| -------------------- | ----------------------------------------------------- | :------------------------: |
+| $∅$                  | $∅$, the empty set                                    |            Yes             |
+| $\set a$ or $[a, a]$ | $\set a$, where $a ∈ \R$                              |            Yes             |
+| $[a, b]$             | $\set{x ∈ \R ∣ a ≤ x ≤ b}$, where $a, b ∈ \R ∧ a ≤ b$ |            Yes             |
+| $[a, +∞]$            | $\set{x ∈ \R ∣ a ≤ x}$, where $a ∈ \R$                |             No             |
+| $[-∞, b]$            | $\set{x ∈ \R ∣ x ≤ b}$, where $b ∈ \R$                |             No             |
+| $\R$ or $[-∞, +∞]$   | $\R$, the set of all real numbers                     |             No             |
 
 The notation above can be rationalized by introducing the [extended real numbers][xreals] $\XR$, which is a superset of $\R$ with two extra elements, $+∞$ and $-∞$:
 
@@ -32,7 +32,7 @@ Every subset of $\XR$ has both an [infimum][inf] and a [supremum][sup] in $\XR$.
 Now we can write $\IR ⊆ \powerset(\R)$, the set of all intervals as:
 
 $$
-\IR = \set{∅} ∪ \set{[a, b] ∣ a ∈ \XR ∖ \set{+∞} ∧ b ∈ \XR ∖ \set{-∞} ∧ a ≤ b},
+\IR = \set ∅ ∪ \set{[a, b] ∣ a ∈ \XR ∖ \set{+∞} ∧ b ∈ \XR ∖ \set{-∞} ∧ a ≤ b},
 $$
 
 where $[a, b] = \set{x ∈ \R ∣ a ≤ x ≤ b}$.
@@ -142,13 +142,13 @@ Here are some examples of the natural interval extensions of functions. The triv
    where
 
    $$
-   ∀x ∈ \XR ∖ \set{0} : x × (±∞) = ±∞ × x = \begin{cases}
+   ∀x ∈ \XR ∖ \set 0 : x × (±∞) = ±∞ × x = \begin{cases}
      ±∞ & \if x > 0, \\\\
      ∓∞ & \if x < 0.
     \end{cases}
    $$
 
-1. Division $/ : \R × \R ∖ \set{0} → \R$:
+1. Division $/ : \R × \R ∖ \set 0 → \R$:
 
    $[a, b]/[c, d] =$
 
@@ -164,14 +164,14 @@ Here are some examples of the natural interval extensions of functions. The triv
    $$
    \begin{gather*}
     ∀x ∈ \R : \frac{x}{±∞} = 0, \\\\
-    ∀x ∈ \R ∖ \set{0} : \frac{±∞}{x} = \begin{cases}
+    ∀x ∈ \R ∖ \set 0 : \frac{±∞}{x} = \begin{cases}
       ±∞ & \if x > 0, \\\\
       ∓∞ & \if x < 0.
      \end{cases}
    \end{gather*}
    $$
 
-1. Let $c ∈ \R$ and $f : \R^0 → \R$ be the function that maps $∅$ to $c$ (note that $S^0 = \set{∅}$ for any set $S$). The natural interval extension of $f$ is the function $𝒇 : \IR^0 → \IR$ that maps $∅$ to $[c, c]$.
+1. Let $c ∈ \R$ and $f : \R^0 → \R$ be the function that maps $∅$ to $c$ (note that $S^0 = \set ∅$ for any set $S$). The natural interval extension of $f$ is the function $𝒇 : \IR^0 → \IR$ that maps $∅$ to $[c, c]$.
 
    For this reason, we define the natural interval extension of a real constant $c$ to be $[c, c]$.
 
@@ -184,7 +184,7 @@ We denote by $\F ⊆ \XR$ the set of all finite (both normal and subnormal) `f64
 We denote by $\IF ⊆ \IR$ the set of intervals whose bounds are $\F$-numbers:
 
 $$
-\IF = \set{∅} ∪ \set{[a, b] ∣ a ∈ \F ∖ \set{+∞} ∧ b ∈ \F ∖ \set{-∞} ∧ a ≤ b}.
+\IF = \set ∅ ∪ \set{[a, b] ∣ a ∈ \F ∖ \set{+∞} ∧ b ∈ \F ∖ \set{-∞} ∧ a ≤ b}.
 $$
 
 Let $n ≥ 0$, $X ⊆ \R^n$ and $f : X → \R$. A function $𝚏 : \IF^n → \IF$ is said to be an _$\IF$-interval extension_ of $f$ if and only if:

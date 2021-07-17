@@ -160,7 +160,7 @@ impl Interval {
     /// Returns `true` if `self` consists of a single real number:
     ///
     /// $$
-    /// ∃x ∈ ℝ : \self = \set{x}.
+    /// ∃x ∈ ℝ : \self = \set x.
     /// $$
     ///
     /// The result is `false` whenever `self` is empty or unbounded.
