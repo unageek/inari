@@ -160,7 +160,7 @@ impl Interval {
     /// Returns `true` if `self` consists of a single real number:
     ///
     /// $$
-    /// ∃x ∈ ℝ : \self = \\{x\\}.
+    /// ∃x ∈ ℝ : \self = \set{x}.
     /// $$
     ///
     /// The result is `false` whenever `self` is empty or unbounded.
@@ -266,7 +266,7 @@ impl Interval {
     /// | $\self = ∅$        | `true`     | `false`           |
     /// | $\self = \[a, b\]$ | `false`    | $a <′ c ∧ b <′ d$ |
     ///
-    /// where $<′y$ is defined as:
+    /// where $<′$ is defined as:
     ///
     /// $$
     /// x <′ y :⟺ x < y ∨ x = y = -∞ ∨ x = y = +∞.

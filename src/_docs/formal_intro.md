@@ -9,16 +9,16 @@ An interval is a [closed][closed], [convex][convex] [subset][subset] of $\R$, th
 | Interval notation     | Definition                                            | [Bounded][bounded] in $\R$ |
 | --------------------- | ----------------------------------------------------- | :------------------------: |
 | $∅$                   | $∅$, the empty set                                    |            Yes             |
-| $\\{a\\}$ or $[a, a]$ | $\\{a\\}$, where $a ∈ \R$                             |            Yes             |
-| $[a, b]$              | $\\{x ∈ \R ∣ a ≤ x ≤ b\\}$, where $a, b ∈ \R ∧ a ≤ b$ |            Yes             |
-| $[a, +∞]$             | $\\{x ∈ \R ∣ a ≤ x\\}$, where $a ∈ \R$                |             No             |
-| $[-∞, b]$             | $\\{x ∈ \R ∣ x ≤ b\\}$, where $b ∈ \R$                |             No             |
+| $\set{a}$ or $[a, a]$ | $\set{a}$, where $a ∈ \R$                             |            Yes             |
+| $[a, b]$              | $\set{x ∈ \R ∣ a ≤ x ≤ b}$, where $a, b ∈ \R ∧ a ≤ b$ |            Yes             |
+| $[a, +∞]$             | $\set{x ∈ \R ∣ a ≤ x}$, where $a ∈ \R$                |             No             |
+| $[-∞, b]$             | $\set{x ∈ \R ∣ x ≤ b}$, where $b ∈ \R$                |             No             |
 | $\R$ or $[-∞, +∞]$    | $\R$, the set of all real numbers                     |             No             |
 
 The notation above can be rationalized by introducing the [extended real numbers][xreals] $\XR$, which is a superset of $\R$ with two extra elements, $+∞$ and $-∞$:
 
 $$
-\XR = \R ∪ \\{+∞, -∞\\}.
+\XR = \R ∪ \set{+∞, -∞}.
 $$
 
 $\XR$ is a [totally ordered set][toset] extending the standard ordering of $\R$ with the following rule:
@@ -32,10 +32,10 @@ Every subset of $\XR$ has both an [infimum][inf] and a [supremum][sup] in $\XR$.
 Now we can write $\IR ⊆ \powerset(\R)$, the set of all intervals as:
 
 $$
-\IR = \\{∅\\} ∪ \\{[a, b] ∣ a ∈ \XR∖\\{+∞\\} ∧ b ∈ \XR∖\\{-∞\\} ∧ a ≤ b\\},
+\IR = \set{∅} ∪ \set{[a, b] ∣ a ∈ \XR ∖ \set{+∞} ∧ b ∈ \XR ∖ \set{-∞} ∧ a ≤ b},
 $$
 
-where $[a, b] = \\{x ∈ \R ∣ a ≤ x ≤ b\\}$.
+where $[a, b] = \set{x ∈ \R ∣ a ≤ x ≤ b}$.
 
 An interval is denoted by a bold letter such as $𝒙$ or $𝒚$. An $n$-tuple of intervals $(𝒙\_1, …, 𝒙\_n) ∈ \IR^n$ is also denoted by $𝒙$.
 
@@ -67,14 +67,14 @@ $$
 where
 
 $$
-\Rge(f, 𝒙) = \\{f(x_1, …, x_n) ∣ \textstyle{⋀_{i=1}^n} x_i ∈ 𝒙_i ∧ (x_1, …, x_n) ∈ X\\}.
+\Rge(f, 𝒙) = \set{f(x_1, …, x_n) ∣ \textstyle{⋀_{i=1}^n} x_i ∈ 𝒙_i ∧ (x_1, …, x_n) ∈ X}.
 $$
 
 Let $\hull : \powerset(\R) → \IR$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IR$:
 
 $$
 \begin{align*}
- \hull(X) &= \operatorname{min}_⊆\\{𝒙 ∈ \IR^n ∣ 𝒙 ⊇ X\\} \\\\
+ \hull(X) &= \operatorname{min_⊆} \set{𝒙 ∈ \IR^n ∣ 𝒙 ⊇ X} \\\\
   &= \begin{cases}
     ∅                & \if X = ∅, \\\\
     [\inf X, \sup X] & \otherwise.
@@ -91,7 +91,7 @@ $$
 Let $𝒇$ be the natural interval extension of $f$. The following holds:
 
 $$
-∀𝒙 ∈ \IR^n : [(∃i ∈ \\{1, …, n\\} : 𝒙\_i = ∅) ⟹ 𝒇(𝒙) = ∅].
+∀𝒙 ∈ \IR^n : [(∃i ∈ \set{1, …, n} : 𝒙\_i = ∅) ⟹ 𝒇(𝒙) = ∅].
 $$
 
 ### Examples
@@ -123,8 +123,8 @@ Here are some examples of the natural interval extensions of functions. The triv
 
    $$
    \begin{gather*}
-    ∀x ∈ \R ∪ \\{+∞\\} : x + (+∞) = +∞ + x = +∞, \\\\
-    ∀x ∈ \R ∪ \\{-∞\\} : x + (-∞) = -∞ + x = -∞, \\\\
+    ∀x ∈ \R ∪ \set{+∞} : x + (+∞) = +∞ + x = +∞, \\\\
+    ∀x ∈ \R ∪ \set{-∞} : x + (-∞) = -∞ + x = -∞, \\\\
     -(±∞) = ∓∞.
    \end{gather*}
    $$
@@ -133,22 +133,22 @@ Here are some examples of the natural interval extensions of functions. The triv
 
    $[a, b] × [c, d] =$
 
-   |             |  $d ≤ 0$   |              $c < 0 < d$               |  $0 ≤ c$   |
-   | :---------: | :--------: | :------------------------------------: | :--------: |
-   |   $b ≤ 0$   | $[bd, ac]$ |               $[ad, ac]$               | $[ad, bc]$ |
-   | $a < 0 < b$ | $[bc, ac]$ | $[\min\\{ad, bc\\}, \max\\{ac, bd\\}]$ | $[ad, bd]$ |
-   |   $0 ≤ a$   | $[bc, ad]$ |               $[bc, bd]$               | $[ac, bd]$ |
+   |             |  $d ≤ 0$   |               $c < 0 < d$                |  $0 ≤ c$   |
+   | :---------: | :--------: | :--------------------------------------: | :--------: |
+   |   $b ≤ 0$   | $[bd, ac]$ |                $[ad, ac]$                | $[ad, bc]$ |
+   | $a < 0 < b$ | $[bc, ac]$ | $[\min \set{ad, bc}, \max \set{ac, bd}]$ | $[ad, bd]$ |
+   |   $0 ≤ a$   | $[bc, ad]$ |                $[bc, bd]$                | $[ac, bd]$ |
 
    where
 
    $$
-   ∀x ∈ \XR{∖}\\{0\\} : x × (±∞) = ±∞ × x = \begin{cases}
+   ∀x ∈ \XR ∖ \set{0} : x × (±∞) = ±∞ × x = \begin{cases}
      ±∞ & \if x > 0, \\\\
      ∓∞ & \if x < 0.
     \end{cases}
    $$
 
-1. Division $/ : \R × \R∖\\{0\\} → \R$:
+1. Division $/ : \R × \R ∖ \set{0} → \R$:
 
    $[a, b]/[c, d] =$
 
@@ -164,14 +164,14 @@ Here are some examples of the natural interval extensions of functions. The triv
    $$
    \begin{gather*}
     ∀x ∈ \R : \frac{x}{±∞} = 0, \\\\
-    ∀x ∈ \R{∖}\\{0\\} : \frac{±∞}{x} = \begin{cases}
+    ∀x ∈ \R ∖ \set{0} : \frac{±∞}{x} = \begin{cases}
       ±∞ & \if x > 0, \\\\
       ∓∞ & \if x < 0.
      \end{cases}
    \end{gather*}
    $$
 
-1. Let $c ∈ \R$ and $f : \R^0 → \R$ be the function that maps $∅$ to $c$ (note that $S^0 = \\{∅\\}$ for any set $S$). The natural interval extension of $f$ is the function $𝒇 : \IR^0 → \IR$ that maps $∅$ to $[c, c]$.
+1. Let $c ∈ \R$ and $f : \R^0 → \R$ be the function that maps $∅$ to $c$ (note that $S^0 = \set{∅}$ for any set $S$). The natural interval extension of $f$ is the function $𝒇 : \IR^0 → \IR$ that maps $∅$ to $[c, c]$.
 
    For this reason, we define the natural interval extension of a real constant $c$ to be $[c, c]$.
 
@@ -184,7 +184,7 @@ We denote by $\F ⊆ \XR$ the set of all finite (both normal and subnormal) `f64
 We denote by $\IF ⊆ \IR$ the set of intervals whose bounds are $\F$-numbers:
 
 $$
-\IF = \\{∅\\} ∪ \\{[a, b] ∣ a ∈ \F∖\\{+∞\\} ∧ b ∈ \F∖\\{-∞\\} ∧ a ≤ b\\}.
+\IF = \set{∅} ∪ \set{[a, b] ∣ a ∈ \F ∖ \set{+∞} ∧ b ∈ \F ∖ \set{-∞} ∧ a ≤ b}.
 $$
 
 Let $n ≥ 0$, $X ⊆ \R^n$ and $f : X → \R$. A function $𝚏 : \IF^n → \IF$ is said to be an _$\IF$-interval extension_ of $f$ if and only if:
@@ -197,8 +197,8 @@ Let $\fldown$ and $\flup : \XR → \F$ be the functions that maps every $x ∈ \
 
 $$
 \begin{align*}
- \fldown(x) &= \max\\{y ∈ \F ∣ y ≤ x\\}, \\\\
- \flup(x) &= \min\\{y ∈ \F ∣ x ≤ y\\}.
+ \fldown(x) &= \max \set{y ∈ \F ∣ y ≤ x}, \\\\
+ \flup(x) &= \min \set{y ∈ \F ∣ x ≤ y}.
 \end{align*}
 $$
 
@@ -206,7 +206,7 @@ Let $\thull : \powerset(\R) → \IF$ be the function that maps every subset of $
 
 $$
 \begin{align*}
- \thull(X) &= \operatorname{min}_⊆\\{𝚡 ∈ \IF ∣ 𝚡 ⊇ X\\} \\\\
+ \thull(X) &= \operatorname{min_⊆} \set{𝚡 ∈ \IF ∣ 𝚡 ⊇ X} \\\\
   &= \begin{cases}
     ∅                                & \if X = ∅, \\\\
     [\fldown(\inf X), \flup(\sup X)] & \otherwise.
@@ -243,7 +243,7 @@ The decoration system gives us some additional information on the underlying fun
 We denote by $\D$ the set of decorations:
 
 $$
-\D = \\{\com, \dac, \def, \trv, \ill\\}.
+\D = \set{\com, \dac, \def, \trv, \ill}.
 $$
 
 Their names are abbreviations of **com**mon, **d**efined **a**nd **c**ontinuous, **def**ined, **tr**i**v**ial and **ill**-formed, respectively. $\D$ is a totally ordered set with the following ordering rules:
@@ -310,7 +310,7 @@ Let $π_I^{(n)} : \DIR^n ∋ 𝒙\_d ↦ 𝒙 ∈ \IR^n$ and $π_D^{(n)} : \DIR^
 Let $n ≥ 0$, $X ⊆ \R^n$ and $f : X → \R$. A function $𝒇 : \DIR^n → \DIR$ is said to be a _decorated interval extension_ of $f$ if and only if there exists $𝒇_I : \IR^n → \IR$ such that $𝒇_I$ is an interval extension of $f$ and $𝒇_I ∘ π_I^{(n)} = π_I ∘ 𝒇$ holds, and the following also holds:
 
 $$
-∀𝒙_{dx} ∈ \DIR^n, ∃d ∈ \D : [p_d(f, 𝒙, 𝒚) ∧ dy = \min\\{d, dx_1, …, dx_n\\}],
+∀𝒙_{dx} ∈ \DIR^n, ∃d ∈ \D : [p_d(f, 𝒙, 𝒚) ∧ dy = \min \set{d, dx_1, …, dx_n}],
 $$
 
 where $𝒚$ and $dy$ represents $π_I(𝒇(𝒙_{dx}))$ and $π_D(𝒇(𝒙_{dx}))$, respectively.
@@ -318,7 +318,7 @@ where $𝒚$ and $dy$ represents $π_I(𝒇(𝒙_{dx}))$ and $π_D(𝒇(𝒙_{dx
 Let $𝒇$ be a decorated interval extension of $f$. The following holds:
 
 $$
-∀𝒙_d ∈ \DIR^n : [(∃i ∈ \\{1, …, n\\} : d_i = \ill) ⟹ π_D(𝒇(𝒙_d)) = \ill].
+∀𝒙_d ∈ \DIR^n : [(∃i ∈ \set{1, …, n} : d_i = \ill) ⟹ π_D(𝒇(𝒙_d)) = \ill].
 $$
 
 Any interval decorated with $\ill$ is said to be _NaI_ (_Not an Interval_). A NaI is produced by an invalid construction of a (decorated) interval, and it is propagated through evaluation.

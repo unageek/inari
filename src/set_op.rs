@@ -3,10 +3,10 @@ use crate::{interval::*, simd::*};
 impl Interval {
     /// Returns $\hull(\self ∪ \rhs)$, the tightest interval that contains both `self` and `rhs` as its subsets.
     ///
-    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$                    |
-    /// | :----------------: | :--------: | :----------------------------------: |
-    /// | $\self = ∅$        | $∅$        | $\[c, d\]$                           |
-    /// | $\self = \[a, b\]$ | $\[a, b\]$ | $\[\min\\{a, c\\}, \max\\{b, d\\}\]$ |
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$                      |
+    /// | :----------------: | :--------: | :------------------------------------: |
+    /// | $\self = ∅$        | $∅$        | $\[c, d\]$                             |
+    /// | $\self = \[a, b\]$ | $\[a, b\]$ | $\[\min \set{a, c}, \max \set{b, d}\]$ |
     ///
     /// Tightness: tightest
     pub fn convex_hull(self, rhs: Self) -> Self {
@@ -26,10 +26,10 @@ impl Interval {
 
     /// Returns $\self ∩ \rhs$, the intersection of `self` and `rhs`.
     ///
-    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$                    |
-    /// | :----------------: | :--------: | :----------------------------------: |
-    /// | $\self = ∅$        | $∅$        | $∅$                                  |
-    /// | $\self = \[a, b\]$ | $∅$        | $\[\max\\{a, c\\}, \min\\{b, d\\}\]$ |
+    /// |                    | $\rhs = ∅$ | $\rhs = \[c, d\]$                      |
+    /// | :----------------: | :--------: | :------------------------------------: |
+    /// | $\self = ∅$        | $∅$        | $∅$                                    |
+    /// | $\self = \[a, b\]$ | $∅$        | $\[\max \set{a, c}, \min \set{b, d}\]$ |
     ///
     /// Tightness: tightest
     pub fn intersection(self, rhs: Self) -> Self {

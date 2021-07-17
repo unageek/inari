@@ -42,8 +42,8 @@ impl Interval {
     ///
     /// $$
     /// \begin{align*}
-    ///  \mag(𝒙) &= \sup\\{|x| ∣ x ∈ 𝒙\\} \\\\
-    ///   &= \max\\{|a|, |b|\\}.
+    ///  \mag(𝒙) &= \sup \set{|x| ∣ x ∈ 𝒙} \\\\
+    ///   &= \max \set{|a|, |b|}.
     /// \end{align*}
     /// $$
     ///
@@ -119,10 +119,10 @@ impl Interval {
     ///
     /// $$
     /// \begin{align*}
-    ///  \mig(𝒙) &= \inf\\{|x| ∣ x ∈ 𝒙\\} \\\\
+    ///  \mig(𝒙) &= \inf \set{|x| ∣ x ∈ 𝒙} \\\\
     ///   &= \begin{cases}
-    ///     \min\\{|a|, |b|\\} & \if \sgn(a) = \sgn(b), \\\\
-    ///     0                  & \otherwise.
+    ///     \min \set{|a|, |b|} & \if \sgn(a) = \sgn(b), \\\\
+    ///     0                   & \otherwise.
     ///    \end{cases}
     /// \end{align*}
     /// $$
