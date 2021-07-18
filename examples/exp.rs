@@ -17,7 +17,7 @@ use inari::*;
 // From the Taylor polynomial of 2^b at b = 0 and its Lagrange remainder, we have:
 //
 //           N-1 ln(2)^n       ln(2)^N
-//   2^b ∈ {  ∑  ------- b^n + ------- b^N 2^β | β ∈ D}, ∀b ∈ D.
+//   2^b ∈ {  ∑  ------- b^n + ------- b^N 2^β ∣ β ∈ D}, ∀b ∈ D.
 //           n=0   n!            N!
 //
 // From the following relations, N = 14 would be sufficient:

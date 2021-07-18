@@ -195,7 +195,7 @@ impl DecInterval {
     impl_dec!(ceil, x, y, x.sup_raw() == y.sup_raw()); // No need to check inf.
     impl_dec!(floor, x, y, x.inf_raw() == y.inf_raw()); // No need to check sup.
 
-    // Discontinuities: {x + 0.5 | x ∈ ℤ}.
+    // Discontinuities: {x + 0.5 ∣ x ∈ ℤ}.
     impl_dec!(round, x, y, {
         let abs_a = x.inf_raw().abs();
         let abs_b = x.sup_raw().abs();

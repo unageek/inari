@@ -6,14 +6,14 @@ This article describes interval arithmetic (IA) implemented in the crate. The va
 
 An interval is a [closed][closed], [convex][convex] [subset][subset] of $\R$, the set of all real numbers. By definition, $∅$, the [empty set][emptyset] as well as $\R$ are also intervals. The notations of intervals are summarized below:
 
-| Interval notation    | Definition                                            | [Bounded][bounded] in $\R$ |
-| -------------------- | ----------------------------------------------------- | :------------------------: |
-| $∅$                  | $∅$, the empty set                                    |            Yes             |
-| $\set a$ or $[a, a]$ | $\set a$, where $a ∈ \R$                              |            Yes             |
-| $[a, b]$             | $\set{x ∈ \R ∣ a ≤ x ≤ b}$, where $a, b ∈ \R ∧ a ≤ b$ |            Yes             |
-| $[a, +∞]$            | $\set{x ∈ \R ∣ a ≤ x}$, where $a ∈ \R$                |             No             |
-| $[-∞, b]$            | $\set{x ∈ \R ∣ x ≤ b}$, where $b ∈ \R$                |             No             |
-| $\R$ or $[-∞, +∞]$   | $\R$, the set of all real numbers                     |             No             |
+| Interval notation  | Definition                                            | [Bounded][bounded] in $\R$ |
+| ------------------ | ----------------------------------------------------- | :------------------------: |
+| $∅$                | $∅$, the empty set                                    |            Yes             |
+| $[a, a]$           | $\set a$, where $a ∈ \R$                              |            Yes             |
+| $[a, b]$           | $\set{x ∈ \R ∣ a ≤ x ≤ b}$, where $a, b ∈ \R ∧ a ≤ b$ |            Yes             |
+| $[a, +∞]$          | $\set{x ∈ \R ∣ a ≤ x}$, where $a ∈ \R$                |             No             |
+| $[-∞, b]$          | $\set{x ∈ \R ∣ x ≤ b}$, where $b ∈ \R$                |             No             |
+| $\R$ or $[-∞, +∞]$ | $\R$, the set of all real numbers                     |             No             |
 
 The notation above can be rationalized by introducing the [extended real numbers][xreals] $\XR$, which is a superset of $\R$ with two extra elements, $+∞$ and $-∞$:
 
@@ -35,7 +35,11 @@ $$
 \IR = \set ∅ ∪ \set{[a, b] ∣ a ∈ \XR ∖ \set{+∞} ∧ b ∈ \XR ∖ \set{-∞} ∧ a ≤ b},
 $$
 
-where $[a, b] = \set{x ∈ \R ∣ a ≤ x ≤ b}$.
+where
+
+$$
+[a, b] = \set{x ∈ \R ∣ a ≤ x ≤ b}.
+$$
 
 An interval is denoted by a bold letter such as $𝒙$ or $𝒚$. An $n$-tuple of intervals $(𝒙\_1, …, 𝒙\_n) ∈ \IR^n$ is also denoted by $𝒙$.
 
@@ -202,11 +206,11 @@ $$
 \end{align*}
 $$
 
-Let $\thull : \powerset(\R) → \IF$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IF$:
+Let $\fhull : \powerset(\R) → \IF$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IF$:
 
 $$
 \begin{align*}
- \thull(X) &= \operatorname{min_⊆} \set{𝚡 ∈ \IF ∣ 𝚡 ⊇ X} \\\\
+ \fhull(X) &= \operatorname{min_⊆} \set{𝚡 ∈ \IF ∣ 𝚡 ⊇ X} \\\\
   &= \begin{cases}
     ∅                                & \if X = ∅, \\\\
     [\fldown(\inf X), \flup(\sup X)] & \otherwise.
@@ -217,7 +221,7 @@ $$
 The _tightest_ $\IF$-interval extension of $f$ is the $\IF$-interval extension of $f$ that maps every $𝚡 ∈ \IF^n$ to the tightest enclosure of $\Rge(f, 𝚡)$ in $\IF$:
 
 $$
-𝚏(𝚡) = \thull(\Rge(f, 𝚡)).
+𝚏(𝚡) = \fhull(\Rge(f, 𝚡)).
 $$
 
 ### Examples
@@ -256,7 +260,7 @@ Let $n ≥ 0$, $X ⊆ \R^n$, $f : X → \R$, $𝒙 ∈ \IR^n$ and $𝒚 ∈ \IR$
 
 $$
 \begin{align*}
-p\_\com(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f \text{ is continuous on } 𝒙) ∧ (\text{$𝒙$ and $𝒚$ are bounded}), \\\\
+p\_\com(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f \text{ is continuous on } 𝒙) ∧ (\text{both $𝒙$ and $𝒚$ are bounded}), \\\\
 p\_\dac(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f{↾\_𝒙} \text{ is continuous}), \\\\
 p\_\def(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X, \\\\
 p\_\trv(f, 𝒙, 𝒚) &:⟺ (\text{always true}), \\\\
@@ -295,7 +299,7 @@ Let $𝒙 ∈ \IR, d ∈ \D$. A _decorated interval_ is a pair $(𝒙, d)$ of th
 
 We denote by $\DIR$ the set of all decorated intervals.
 
-- (Advanced) Fundamentally, $\DIR$ is defined as the set of pairs $(𝒚, dy)$ that satisfies:
+- \[Advanced\] Fundamentally, $\DIR$ is defined as the set of pairs $(𝒚, dy)$ that satisfies:
 
   $$
   ∃n ≥ 0, X ⊆ \R^n, f ∈ \R^X, 𝒙 ∈ \IR^n : [𝒚 ⊇ \Rge(f, 𝒙) ∧ p_{dy}(f, 𝒙, 𝒚)].
@@ -327,36 +331,36 @@ $\DIF$, the decorated version of $\IF$ and relevant properties are derived in th
 
 ### Examples
 
-1. Let $\tfloor : \DIF → \DIF$ be the tightest, strongest-decorated interval extension of the [floor function][floor] $⌊{⋅}⌋ : \R → \R$. Then,
+1. Let $\ffloor : \DIF → \DIF$ be the tightest, strongest-decorated interval extension of the [floor function][floor] $⌊{⋅}⌋ : \R → \R$. Then,
 
    $$
-   \tag{a} \tfloor([\mathtt{1.25}, \mathtt{1.75}]\_\com) = [\mathtt{1}, \mathtt{1}]\_\com.
-   $$
-
-   $$
-   \tag{b} \tfloor([\mathtt{0.5}, \mathtt{1.5}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\def.
+   \tag{a} \ffloor([\mathtt{1.25}, \mathtt{1.75}]\_\com) = [\mathtt{1}, \mathtt{1}]\_\com.
    $$
 
    $$
-   \tag{c} \tfloor([\mathtt{1}, \mathtt{1.5}]\_\com) = [\mathtt{1}, \mathtt{1}]\_\dac.
+   \tag{b} \ffloor([\mathtt{0.5}, \mathtt{1.5}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\def.
+   $$
+
+   $$
+   \tag{c} \ffloor([\mathtt{1}, \mathtt{1.5}]\_\com) = [\mathtt{1}, \mathtt{1}]\_\dac.
    $$
 
    In (b), the result is decorated with $\def$ because $⌊{⋅}⌋$ is discontinuous at $0$.
 
    In (c), the result is decorated with $\dac$ bacause the restriction of $⌊{⋅}⌋$ to $[1, 1.5]$ is continuous, by the definition of the [subspace topology][subspace].
 
-1. Let $\tsqrt : \DIF → \DIF$ be the tightest, strongest-decorated interval extension of $\sqrt{⋅} : [0, +∞] → \R$. Then,
+1. Let $\fsqrt : \DIF → \DIF$ be the tightest, strongest-decorated interval extension of $\sqrt{⋅} : [0, +∞] → \R$. Then,
 
    $$
-   \tag{a} \tsqrt([\mathtt{0}, \mathtt{1}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\com.
-   $$
-
-   $$
-   \tag{b} \tsqrt([\mathtt{-1}, \mathtt{1}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\trv.
+   \tag{a} \fsqrt([\mathtt{0}, \mathtt{1}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\com.
    $$
 
    $$
-   \tag{c} \tsqrt([\mathtt{-2}, \mathtt{-1}]\_\com) = ∅\_\trv.
+   \tag{b} \fsqrt([\mathtt{-1}, \mathtt{1}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\trv.
+   $$
+
+   $$
+   \tag{c} \fsqrt([\mathtt{-2}, \mathtt{-1}]\_\com) = ∅\_\trv.
    $$
 
 ## Notation

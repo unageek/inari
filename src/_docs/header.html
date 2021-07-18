@@ -28,9 +28,19 @@
   }
 
   .katex {
-    /* Using a simple binary fraction seems to prevent vertical misalignment of characters
-     * on Safari 14.1.1. */
+    /*
+     * Using a simple binary fraction seems to mitigate vertical misalignment of characters
+     * on Safari 14.1.1.
+     */
     font-size: 1.0625em;
+  }
+
+  /*
+   * Make display maths horizontally scrollable.
+   * https://katex.org/docs/issues.html#css-customization
+   */
+  .katex-display {
+    overflow: auto hidden;
   }
 </style>
 <script
@@ -72,48 +82,41 @@
           "\\Rge": "\\operatorname{Rge}",
           // Sets
           "\\D": "𝔻",
-          "\\DIF": "{𝔻𝕀𝔽}{}", // {} is for aligning superscripts
-          "\\DIR": "{𝔻𝕀\\overline{ℝ}}{}",
+          "\\DIF": "{𝔻𝕀𝔽}",
+          "\\DIR": "{𝔻𝕀\\overline ℝ}{}", // {} is for aligning superscripts
           "\\F": "𝔽",
-          "\\IF": "{𝕀𝔽}{}",
-          "\\IR": "{𝕀\\overline{ℝ}}{}",
+          "\\IF": "{𝕀𝔽}",
+          "\\IR": "{𝕀\\overline ℝ}{}",
           "\\R": "ℝ",
-          "\\XR": "\\overline{ℝ}{}",
-          // Machine-valued
-          "\\addend": "\\mathtt{addend}",
-          "\\fldown": "\\operatorname{\\mathtt{fl}_\\bigtriangledown}",
-          "\\flup": "\\operatorname{\\mathtt{fl}_\\bigtriangleup}",
-          "\\rhs": "\\mathtt{rhs}",
-          "\\self": "\\mathtt{self}",
-          "\\tfloor": "\\operatorname{\\mathtt{floor}}",
-          "\\thull": "\\operatorname{\\mathtt{hull}}",
-          "\\tsqrt": "\\operatorname{\\mathtt{sqrt}}",
+          "\\XR": "{\\overline ℝ}{}",
+          // Finite-precision
+          "\\addend": "{𝚊𝚍𝚍𝚎𝚗𝚍}",
+          "\\ffloor": "\\operatorname{𝚏𝚕𝚘𝚘𝚛}",
+          "\\fhull": "\\operatorname{𝚑𝚞𝚕𝚕}",
+          "\\fldown": "\\operatorname{{𝚏𝚕}_\\bigtriangledown}",
+          "\\flup": "\\operatorname{{𝚏𝚕}_\\bigtriangleup}",
+          "\\fsqrt": "\\operatorname{𝚜𝚚𝚛𝚝}",
+          "\\rhs": "{𝚛𝚑𝚜}",
+          "\\self": "{𝚜𝚎𝚕𝚏}",
           // Decorations
-          "\\com": "\\mathtt{com}",
-          "\\dac": "\\mathtt{dac}",
-          "\\def": "\\mathtt{def}",
-          "\\trv": "\\mathtt{trv}",
-          "\\ill": "\\mathtt{ill}",
-        },
-        preProcess: function (math) {
-          return math.replace(/./gu, (ch) => {
-            return charSubstitutions[ch] || ch;
-          });
+          "\\com": "{𝚌𝚘𝚖}",
+          "\\dac": "{𝚍𝚊𝚌}",
+          "\\def": "{𝚍𝚎𝚏}",
+          "\\trv": "{𝚝𝚛𝚟}",
+          "\\ill": "{𝚒𝚕𝚕}",
+          // Character substitutions
+          "𝒇": "{\\boldsymbol{f}}",
+          "𝒙": "{\\boldsymbol{x}}",
+          "𝒚": "{\\boldsymbol{y}}",
+          "∘": "\\circ ",
+          "∅": "\\emptyset ",
+          "∧": "\\mathrel{\\land}", // logical AND
+          "∨": "\\mathrel{\\lor}", // logical OR
+          "′": "^\\prime ",
+          "∖": "\\mathop{\\setminus}",
         },
         strict: true,
       });
     });
-
-    const charSubstitutions = {
-      "𝒇": "{\\boldsymbol{f}}",
-      "𝒙": "{\\boldsymbol{x}}",
-      "𝒚": "{\\boldsymbol{y}}",
-      "∘": "\\circ",
-      "∅": "\\emptyset",
-      "∧": "\\mathrel{∧}", // logical AND
-      "∨": "\\mathrel{∨}", // logical OR
-      "′": "^{\\prime}",
-      "∖": "\\mathop{\\setminus}",
-    };
   })();
 </script>

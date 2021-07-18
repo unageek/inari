@@ -20,7 +20,7 @@ use inari::*;
 // From the Taylor polynomial of lg(b) at b = 1 and its Lagrange remainder, we have:
 //
 //             N-1 (-1)^(n + 1)             (-1)^(N + 1)
-//   lg(b) ∈ {  ∑  ------------ (b - 1)^n + ------------ (b - 1)^N β^-N | β ∈ D}, ∀b ∈ D.
+//   lg(b) ∈ {  ∑  ------------ (b - 1)^n + ------------ (b - 1)^N β^-N ∣ β ∈ D}, ∀b ∈ D.
 //             n=0   n ln(2)                  N ln(2)
 //
 // From the following relations, N = 22 would be sufficient.
