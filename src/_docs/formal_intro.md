@@ -9,7 +9,6 @@ An interval is a [closed][closed], [convex][convex] [subset][subset] of $\R$, th
 | Interval notation  | Definition                                            | [Bounded][bounded] in $\R$ |
 | ------------------ | ----------------------------------------------------- | :------------------------: |
 | $∅$                | $∅$, the empty set                                    |            Yes             |
-| $[a, a]$           | $\set a$, where $a ∈ \R$                              |            Yes             |
 | $[a, b]$           | $\set{x ∈ \R ∣ a ≤ x ≤ b}$, where $a, b ∈ \R ∧ a ≤ b$ |            Yes             |
 | $[a, +∞]$          | $\set{x ∈ \R ∣ a ≤ x}$, where $a ∈ \R$                |             No             |
 | $[-∞, b]$          | $\set{x ∈ \R ∣ x ≤ b}$, where $b ∈ \R$                |             No             |
