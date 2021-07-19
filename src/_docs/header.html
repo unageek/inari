@@ -76,7 +76,7 @@
           "\\otherwise": "\\text{otherwise}",
           "\\powerset": "\\operatorname{\\mathcal{P}}",
           "\\rad": "\\operatorname{rad}",
-          "\\set": "{\\left\\{#1\\right\\}}",
+          "\\set": "{\\left\\{#1\\right\\}}", // enclose in {} to make it mathord
           "\\sgn": "\\operatorname{sgn}",
           "\\wid": "\\operatorname{wid}",
           "\\Rge": "\\operatorname{Rge}",
@@ -113,7 +113,7 @@
           "∧": "\\mathrel{\\land}", // logical AND
           "∨": "\\mathrel{\\lor}", // logical OR
           "′": "^\\prime ",
-          "∖": "\\mathop{\\setminus}",
+          "∖": "{\\setminus}",
         },
         strict: true,
       });

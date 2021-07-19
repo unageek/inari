@@ -70,7 +70,7 @@ $$
 where
 
 $$
-\Rge(f, 𝒙) = \set{f(x_1, …, x_n) ∣ \textstyle{⋀_{i=1}^n} x_i ∈ 𝒙_i ∧ (x_1, …, x_n) ∈ X}.
+\Rge(f, 𝒙) = \set{f(x_1, …, x_n) ∣ (∀i ∈ \set{1, …, n} : x_i ∈ 𝒙_i) ∧ (x_1, …, x_n) ∈ X}.
 $$
 
 Let $\hull : \powerset(\R) → \IR$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IR$:
@@ -259,9 +259,9 @@ Let $n ≥ 0$, $X ⊆ \R^n$, $f : X → \R$, $𝒙 ∈ \IR^n$ and $𝒚 ∈ \IR$
 
 $$
 \begin{align*}
-p\_\com(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f \text{ is continuous on } 𝒙) ∧ (\text{both $𝒙$ and $𝒚$ are bounded}), \\\\
-p\_\dac(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X ∧ (f{↾\_𝒙} \text{ is continuous}), \\\\
-p\_\def(f, 𝒙, 𝒚) &:⟺ ∅ ≠ 𝒙 ⊆ X, \\\\
+p\_\com(f, 𝒙, 𝒚) &:⟺ p\_\def(f, 𝒙, 𝒚) ∧ [∀i ∈ \set{1, …, n} : (𝒙_i \text{ is bounded})] ∧ (f \text{ is continuous on } 𝒙) ∧ (𝒚 \text{ is bounded}), \\\\
+p\_\dac(f, 𝒙, 𝒚) &:⟺ p\_\def(f, 𝒙, 𝒚) ∧ (f{↾\_𝒙} \text{ is continuous}), \\\\
+p\_\def(f, 𝒙, 𝒚) &:⟺ X ≠ ∅ ∧ 𝒙 ⊆ X ∧ ∀i ∈ \set{1, …, n} : 𝒙_i ≠ ∅, \\\\
 p\_\trv(f, 𝒙, 𝒚) &:⟺ (\text{always true}), \\\\
 p\_\ill(f, 𝒙, 𝒚) &:⟺ X = ∅,
 \end{align*}
@@ -368,6 +368,7 @@ Some of the symbols used in this article is different from the IEEE 1788 standar
 
 | This article                             | The IEEE 1788 standards                     |
 | ---------------------------------------- | ------------------------------------------- |
+| $𝒙 = [a, b]$                             | $𝒙 = [\underline x, \overline x]$           |
 | $\IR$                                    | $\overline{𝕀ℝ}$                             |
 | $\DIR$                                   | $\overline{𝔻𝕀ℝ}$                            |
 | ---                                      | $𝔽$ (as a generic number format)            |
