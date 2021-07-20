@@ -64,20 +64,20 @@ Note that while the bounds of an interval are members of $\XR$, the interval its
 Let $n ≥ 0$, $X ⊆ \R^n$ and $f : X → \R$. A function $𝒇 : \IR^n → \IR$ is said to be an _interval extension_ of $f$ if and only if:
 
 $$
-∀𝒙 ∈ \IR^n : 𝒇(𝒙) ⊇ \Rge(f, 𝒙),
+∀𝒙 ∈ \IR^n : 𝒇(𝒙) ⊇ \Range(f, 𝒙),
 $$
 
 where
 
 $$
-\Rge(f, 𝒙) = \set{f(x_1, …, x_n) ∣ (∀i ∈ \set{1, …, n} : x_i ∈ 𝒙_i) ∧ (x_1, …, x_n) ∈ X}.
+\Range(f, 𝒙) = \set{f(x_1, …, x_n) ∣ (∀i ∈ \set{1, …, n} : x_i ∈ 𝒙_i) ∧ (x_1, …, x_n) ∈ X}.
 $$
 
 Let $\hull : \powerset(\R) → \IR$ be the function that maps every subset of $\R$ to its tightest enclosure in $\IR$:
 
 $$
 \begin{align*}
- \hull(X) &= \operatorname{min_⊆} \set{𝒙 ∈ \IR^n ∣ 𝒙 ⊇ X} \\\\
+ \hull(X) &= \operatorname{min_⊆} \set{𝒙 ∈ \IR ∣ 𝒙 ⊇ X} \\\\
   &= \begin{cases}
     ∅                & \if X = ∅, \\\\
     [\inf X, \sup X] & \otherwise.
@@ -85,10 +85,10 @@ $$
 \end{align*}
 $$
 
-The _natural_ interval extension of $f$ is the interval extension of $f$ that maps every $𝒙 ∈ \IR^n$ to the tightest enclosure of $\Rge(f, 𝒙)$ in $\IR$:
+The _natural_ interval extension of $f$ is the interval extension of $f$ that maps every $𝒙 ∈ \IR^n$ to the tightest enclosure of $\Range(f, 𝒙)$ in $\IR$:
 
 $$
-𝒇(𝒙) = \hull(\Rge(f, 𝒙)).
+𝒇(𝒙) = \hull(\Range(f, 𝒙)).
 $$
 
 Let $𝒇$ be the natural interval extension of $f$. The following holds:
@@ -101,7 +101,7 @@ $$
 
 Here are some examples of the natural interval extensions of functions. The trivial cases where any of the arguments is $∅$ are omitted.
 
-1. Square root $\sqrt{⋅} : [0, ∞] → \R$:
+1. Square root $\sqrt{⋅} : [0, ∞) → \R$:
 
    $$
    \sqrt{[a, b]} = \begin{cases}
@@ -174,15 +174,21 @@ Here are some examples of the natural interval extensions of functions. The triv
    \end{gather*}
    $$
 
-1. Let $c ∈ \R$ and $f : \R^0 → \R$ be the function that maps $∅$ to $c$ (note that $S^0 = \set ∅$ for any set $S$). The natural interval extension of $f$ is the function $𝒇 : \IR^0 → \IR$ that maps $∅$ to $[c, c]$.
+### Constants
 
-   For this reason, we define the natural interval extension of a real constant $c$ to be $[c, c]$.
+Let's consider the case of $n = 0$. A real-valued function whose domain is a subset of $\R^0$ is called a _real constant_. Note that $S^0 = \set ∅$ for any set $S$, thus $\R^0 = \set ∅$. Therefore, the domain of a real constant is either $\set ∅$ or $∅$. In both cases, an interval extension of $f$ is of the form $𝒇 : \IR^0 → \IR$.
+
+1. Let $c ∈ \R$, $X = \set ∅ ⊆ \R^0$ and $f : X → \R$ be the function that maps $∅$ to $c$. The natural interval extension of $f$ is the function that maps $∅$ to $[c, c]$.
+
+   In the standard, $f$ is identified with the real number $c$. Following this convention, we may just say “$𝒄 ∈ \IR$ is an interval extension of $c ∈ \R$” when we mean that the function that maps $∅$ to $𝒄$ is an interval extension of the function that maps $∅$ to $c$.
+
+1. Let $X = ∅ ⊆ \R^0$ and $f : X → \R$ be the [empty function][emptymap]. The natural interval extension of $f$ is the function that maps $∅$ to $∅$.
 
 ## $\IF$-interval extensions of functions
 
 Floating-point arithmetic (FA) is an approximation of the extended real number arithmetic with a nice trade-off between magnitude and accuracy of numbers. The crate provides an efficient implementation of IA by using the binary64 floating-point numbers (the [`f64`] type) for representing and computing with intervals. Consult the IEEE 754 standards for the details of FA.
 
-We denote by $\F ⊆ \XR$ the set of all finite (both normal and subnormal) `f64` numbers, zero, $+∞$ and $-∞$. We refer to a member of $\F$ as a _$\F$-number_.
+We denote by $\F ⊆ \XR$ the set of all finite `f64` numbers, $+∞$ and $-∞$. We refer to a member of $\F$ as a _$\F$-number_.
 
 We denote by $\IF ⊆ \IR$ the set of intervals whose bounds are $\F$-numbers:
 
@@ -193,10 +199,10 @@ $$
 Let $n ≥ 0$, $X ⊆ \R^n$ and $f : X → \R$. A function $𝚏 : \IF^n → \IF$ is said to be an _$\IF$-interval extension_ of $f$ if and only if:
 
 $$
-∀𝚡 ∈ \IF^n : 𝚏(𝚡) ⊇ \Rge(f, 𝚡).
+∀𝚡 ∈ \IF^n : 𝚏(𝚡) ⊇ \Range(f, 𝚡).
 $$
 
-Let $\fldown$ and $\flup : \XR → \F$ be the functions that maps every $x ∈ \XR$ to the closest $\F$ number toward $-∞$ and $+∞$ respectively:
+Let $\fldown$ and $\flup : \XR → \F$ be the functions that maps every $x ∈ \XR$ to the closest $\F$-number toward $-∞$ and $+∞$ respectively:
 
 $$
 \begin{align*}
@@ -217,26 +223,26 @@ $$
 \end{align*}
 $$
 
-The _tightest_ $\IF$-interval extension of $f$ is the $\IF$-interval extension of $f$ that maps every $𝚡 ∈ \IF^n$ to the tightest enclosure of $\Rge(f, 𝚡)$ in $\IF$:
+The _tightest_ $\IF$-interval extension of $f$ is the $\IF$-interval extension of $f$ that maps every $𝚡 ∈ \IF^n$ to the tightest enclosure of $\Range(f, 𝚡)$ in $\IF$:
 
 $$
-𝚏(𝚡) = \fhull(\Rge(f, 𝚡)).
+𝚏(𝚡) = \fhull(\Range(f, 𝚡)).
 $$
 
 ### Examples
 
-Here are some examples of the _tightest_ $\IF$-interval extensions of functions.
+Here are some examples of the tightest $\IF$-interval extensions of functions.
 
 1. Addition $+ : \R × \R → \R$:
 
    $$
-   \operatorname{\mathtt{add}}([𝚊, 𝚋], [𝚌, 𝚍]) = [\fldown(𝚊 + 𝚌), \flup(𝚋 + 𝚍)].
+   \operatorname{𝚊𝚍𝚍}([𝚊, 𝚋], [𝚌, 𝚍]) = [\fldown(𝚊 + 𝚌), \flup(𝚋 + 𝚍)].
    $$
 
 1. $π = 3.14159265358979323…$:
 
    $$
-   \mathtt{pi} = [\mathtt{3.14159265358979311…}, \mathtt{3.14159265358979356…}].
+   {𝚙𝚒} = [\mathtt{3.14159265358979311…}, \mathtt{3.14159265358979356…}].
    $$
 
 ## The decoration system
@@ -260,7 +266,7 @@ Let $n ≥ 0$, $X ⊆ \R^n$, $f : X → \R$, $𝒙 ∈ \IR^n$ and $𝒚 ∈ \IR$
 $$
 \begin{align*}
 p\_\com(f, 𝒙, 𝒚) &:⟺ p\_\def(f, 𝒙, 𝒚) ∧ [∀i ∈ \set{1, …, n} : (𝒙_i \text{ is bounded})] ∧ (f \text{ is continuous on } 𝒙) ∧ (𝒚 \text{ is bounded}), \\\\
-p\_\dac(f, 𝒙, 𝒚) &:⟺ p\_\def(f, 𝒙, 𝒚) ∧ (f{↾\_𝒙} \text{ is continuous}), \\\\
+p\_\dac(f, 𝒙, 𝒚) &:⟺ p\_\def(f, 𝒙, 𝒚) ∧ (f{↾\_𝒙} \text{ is continuous on } 𝒙), \\\\
 p\_\def(f, 𝒙, 𝒚) &:⟺ X ≠ ∅ ∧ 𝒙 ⊆ X ∧ ∀i ∈ \set{1, …, n} : 𝒙_i ≠ ∅, \\\\
 p\_\trv(f, 𝒙, 𝒚) &:⟺ (\text{always true}), \\\\
 p\_\ill(f, 𝒙, 𝒚) &:⟺ X = ∅,
@@ -301,7 +307,7 @@ We denote by $\DIR$ the set of all decorated intervals.
 - \[Advanced\] Fundamentally, $\DIR$ is defined as the set of pairs $(𝒚, dy)$ that satisfies:
 
   $$
-  ∃n ≥ 0, X ⊆ \R^n, f ∈ \R^X, 𝒙 ∈ \IR^n : [𝒚 ⊇ \Rge(f, 𝒙) ∧ p_{dy}(f, 𝒙, 𝒚)].
+  ∃n ≥ 0, X ⊆ \R^n, f ∈ \R^X, 𝒙 ∈ \IR^n : [𝒚 ⊇ \Range(f, 𝒙) ∧ p_{dy}(f, 𝒙, 𝒚)].
   $$
 
   By substituting $n = 0$, $X = ∅$, $f : ∅ → \R$ (the [empty function][emptymap]) and $𝒙 = ∅$ into the above statement, we see that for any $𝒚 ∈ \IR$, $(𝒚, \ill)$ is a decorated interval.
@@ -333,38 +339,40 @@ $\DIF$, the decorated version of $\IF$ and relevant properties are derived in th
 1. Let $\ffloor : \DIF → \DIF$ be the tightest, strongest-decorated interval extension of the [floor function][floor] $⌊{⋅}⌋ : \R → \R$. Then,
 
    $$
-   \tag{a} \ffloor([\mathtt{1.25}, \mathtt{1.75}]\_\com) = [\mathtt{1}, \mathtt{1}]\_\com.
+   \tag{a} \ffloor([\mathtt{1.25}, \mathtt{1.5}]\_\com) = [\mathtt{1}, \mathtt{1}]\_\com,
    $$
 
    $$
-   \tag{b} \ffloor([\mathtt{0.5}, \mathtt{1.5}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\def.
+   \tag{b} \ffloor([\mathtt{0.5}, \mathtt{1.5}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\def,
    $$
 
    $$
    \tag{c} \ffloor([\mathtt{1}, \mathtt{1.5}]\_\com) = [\mathtt{1}, \mathtt{1}]\_\dac.
    $$
 
-   In (b), the result is decorated with $\def$ because $⌊{⋅}⌋$ is discontinuous at $0$.
+   In (a), the result is decorated with $\com$ because $⌊{⋅}⌋$ is continuous on $[1.25, 1.75]$.
 
-   In (c), the result is decorated with $\dac$ bacause the restriction of $⌊{⋅}⌋$ to $[1, 1.5]$ is continuous, by the definition of the [subspace topology][subspace].
+   In (b), the result is decorated with $\def$ because $⌊{⋅}⌋$ is discontinuous at 1.
 
-1. Let $\fsqrt : \DIF → \DIF$ be the tightest, strongest-decorated interval extension of $\sqrt{⋅} : [0, +∞] → \R$. Then,
+   In (c), the result is decorated with $\dac$ because while $⌊{⋅}⌋$ is discontinuous at 1, the restriction of the function to $𝒙 = [1, 1.5]$ is continuous on $𝒙$.
 
-   $$
-   \tag{a} \fsqrt([\mathtt{0}, \mathtt{1}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\com.
-   $$
+1. Let $\fsqrt : \DIF → \DIF$ be the tightest, strongest-decorated interval extension of $\sqrt{⋅} : [0, ∞) → \R$. Then,
 
    $$
-   \tag{b} \fsqrt([\mathtt{-1}, \mathtt{1}]\_\com) = [\mathtt{0}, \mathtt{1}]\_\trv.
+   \begin{align*}
+   \fsqrt([\mathtt{0}, \mathtt{1}]\_\com) &= [\mathtt{0}, \mathtt{1}]\_\com, \\\\
+   \fsqrt([\mathtt{-1}, \mathtt{1}]\_\com) &= [\mathtt{0}, \mathtt{1}]\_\trv, \\\\
+   \fsqrt([\mathtt{-2}, \mathtt{-1}]\_\com) &= ∅\_\trv.
+   \end{align*}
    $$
 
-   $$
-   \tag{c} \fsqrt([\mathtt{-2}, \mathtt{-1}]\_\com) = ∅\_\trv.
-   $$
+1. Let $X = \set ∅ ⊆ \R^0$ and $f : X → \R$ be the function that maps $∅$ to $π$. The tightest, strongest-decorated interval extension of $f$ is the function $\ff : \DIF^0 → \DIF$ that maps $∅$ to $[\mathtt{3.14159265358979311…}, \mathtt{3.14159265358979356…}]\_\com$.
+
+1. Let $X = ∅ ⊆ \R^0$ and $f : X → \R$ be the [empty function][emptymap]. The tightest, strongest-decorated interval extension of $f$ is the function $\ff : \DIF^0 → \DIF$ that maps $∅$ to $∅\_\ill$.
 
 ## Notation
 
-Some of the symbols used in this article is different from the IEEE 1788 standards. Here are the differences between them:
+Some of the symbols used in this article is different from the IEEE 1788 standards. The differences are summarized below:
 
 | This article                             | The IEEE 1788 standards                     |
 | ---------------------------------------- | ------------------------------------------- |
@@ -375,7 +383,7 @@ Some of the symbols used in this article is different from the IEEE 1788 standar
 | $\F$                                     | $\operatorname{Val}(𝔽)$                     |
 | $\IF$                                    | $𝕋$ (as a generic interval type)            |
 | $\DIF$                                   | $𝔻𝕋$ (as a generic decorated interval type) |
-| $\Rge(f, 𝒙)$                             | $\Rge(f ∣ 𝒙)$                               |
+| $\Range(f, 𝒙)$                           | $\operatorname{Rge}(f ∣ 𝒙)$                 |
 | $p_d(f,𝒙,𝒚)$                             | $p_d(f ∣ 𝒙)$                                |
 | The strongest decoration for $(f, 𝒙, 𝒚)$ | $\operatorname{Dec}(f ∣ 𝒙)$                 |
 
@@ -390,7 +398,6 @@ Some of the symbols used in this article is different from the IEEE 1788 standar
 [restriction]: https://proofwiki.org/wiki/Definition:Restriction/Mapping
 [reals]: https://proofwiki.org/wiki/Definition:Real_Number/Real_Number_Line
 [subset]: https://proofwiki.org/wiki/Definition:Subset
-[subspace]: https://proofwiki.org/wiki/Definition:Topological_Subspace
 [sup]: https://proofwiki.org/wiki/Definition:Supremum_of_Set
 [toset]: https://proofwiki.org/wiki/Definition:Totally_Ordered_Set
 [xreals]: https://proofwiki.org/wiki/Definition:Extended_Real_Number_Line
