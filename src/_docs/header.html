@@ -5,14 +5,21 @@
   crossorigin="anonymous"
 />
 <style type="text/css">
+  /*
+   * Original: https://github.com/rust-lang/rust/blob/f913a4fe901d6aeb84941fa06c17916d4e6d1dd7/src/librustdoc/html/static/css/rustdoc.css#L560
+   */
   .docblock table {
     border: unset;
     border-bottom: 2px solid;
     border-top: 2px solid;
+    display: table;
     margin: 1em auto;
     width: unset;
   }
 
+  /*
+   * Original: https://github.com/rust-lang/rust/blob/f913a4fe901d6aeb84941fa06c17916d4e6d1dd7/src/librustdoc/html/static/css/rustdoc.css#L572
+   */
   .docblock table th {
     border: unset;
     border-bottom: 1px solid;
@@ -22,9 +29,19 @@
     text-align: center;
   }
 
+  /*
+   * Original: https://github.com/rust-lang/rust/blob/f913a4fe901d6aeb84941fa06c17916d4e6d1dd7/src/librustdoc/html/static/css/rustdoc.css#L567
+   */
   .docblock table td {
     border: unset;
     border-bottom: 1px dotted;
+  }
+
+  /*
+   * Original: https://github.com/rust-lang/rust/blob/f913a4fe901d6aeb84941fa06c17916d4e6d1dd7/src/librustdoc/html/static/css/rustdoc.css#L555
+   */
+  .docblock table td:first-child {
+    padding: 0.5em;
   }
 
   .katex {
@@ -89,6 +106,7 @@
           "\\IR": "{𝕀\\overline ℝ}{}",
           "\\R": "ℝ",
           "\\XR": "{\\overline ℝ}{}",
+          "\\Z": "ℤ",
           // Finite-precision
           "\\addend": "{𝚊𝚍𝚍𝚎𝚗𝚍}",
           "\\ff": "\\operatorname{𝚏}",

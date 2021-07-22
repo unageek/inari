@@ -5,6 +5,10 @@ use crate::{classify::*, interval::*, simd::*};
 impl Interval {
     /// Returns $(\self × \rhs) + \addend$.
     ///
+    /// | Domain | Range |
+    /// | ------ | ----- |
+    /// | $\R^3$ | $\R$  |
+    ///
     /// Tightness: tightest
     // Almost a copy-paste of mul. Additions/modifications are indicated with "// *".
     #[allow(clippy::many_single_char_names)]
@@ -93,6 +97,10 @@ impl Interval {
 
     /// Returns the multiplicative inverse of `self`.
     ///
+    /// | Domain        | Range         |
+    /// | ------------- | ------------- |
+    /// | $\R ∖ \set 0$ | $\R ∖ \set 0$ |
+    ///
     /// Tightness: tightest
     pub fn recip(self) -> Self {
         use IntervalClass::*;
@@ -132,6 +140,10 @@ impl Interval {
 
     /// Returns the square of `self`.
     ///
+    /// | Domain | Range     |
+    /// | ------ | --------- |
+    /// | $\R$   | $\[0, ∞)$ |
+    ///
     /// Tightness: tightest
     pub fn sqr(self) -> Self {
         use IntervalClass::*;
@@ -163,6 +175,10 @@ impl Interval {
     }
 
     /// Returns the principal square root of `self`.
+    ///
+    /// | Domain    | Range     |
+    /// | --------- | --------- |
+    /// | $\[0, ∞)$ | $\[0, ∞)$ |
     ///
     /// Tightness: tightest
     pub fn sqrt(self) -> Self {

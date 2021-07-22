@@ -142,6 +142,10 @@ macro_rules! impl_mono_inc {
 impl Interval {
     /// Returns the inverse cosine of `self`.
     ///
+    /// | Domain      | Range      |
+    /// | ----------- | ---------- |
+    /// | $\[-1, 1\]$ | $\[0, π\]$ |
+    ///
     /// Tightness: tightest
     pub fn acos(self) -> Self {
         self.acos_impl().0
@@ -166,6 +170,10 @@ impl Interval {
 
     /// Returns the inverse hyperbolic cosine of `self`.
     ///
+    /// | Domain    | Range     |
+    /// | --------- | --------- |
+    /// | $\[1, ∞)$ | $\[0, ∞)$ |
+    ///
     /// Tightness: tightest
     pub fn acosh(self) -> Self {
         self.acosh_impl().0
@@ -189,6 +197,10 @@ impl Interval {
     }
 
     /// Returns the inverse sine of `self`.
+    ///
+    /// | Domain      | Range           |
+    /// | ----------- | --------------- |
+    /// | $\[-1, 1\]$ | $\[-π/2, π/2\]$ |
     ///
     /// Tightness: tightest
     pub fn asin(self) -> Self {
@@ -215,6 +227,10 @@ impl Interval {
     impl_mono_inc!(
         /// Returns the inverse hyperbolic sine of `self`.
         ///
+        /// | Domain | Range |
+        /// | ------ | ----- |
+        /// | $\R$   | $\R$  |
+        ///
         /// Tightness: tightest
         asinh,
         asinh_rd,
@@ -222,6 +238,10 @@ impl Interval {
     );
     impl_mono_inc!(
         /// Returns the inverse tangent of `self`.
+        ///
+        /// | Domain | Range         |
+        /// | ------ | ------------- |
+        /// | $\R$   | $(-π/2, π/2)$ |
         ///
         /// Tightness: tightest
         atan,
@@ -231,6 +251,10 @@ impl Interval {
 
     /// Returns the angle of the point $(\rhs, \self)$ measured counterclockwise from the positive
     /// $x$-axis in the Euclidean plane.
+    ///
+    /// | Domain                | Range      |
+    /// | --------------------- | ---------- |
+    /// | $\R^2 ∖ \set{(0, 0)}$ | $(-π, π\]$ |
     ///
     /// Tightness: tightest
     pub fn atan2(self, rhs: Self) -> Self {
@@ -350,6 +374,10 @@ impl Interval {
 
     /// Returns the inverse hyperbolic tangent of `self`.
     ///
+    /// | Domain    | Range |
+    /// | --------- | ----- |
+    /// | $(-1, 1)$ | $\R$  |
+    ///
     /// Tightness: tightest
     pub fn atanh(self) -> Self {
         self.atanh_impl().0
@@ -379,6 +407,10 @@ impl Interval {
     }
 
     /// Returns the cosine of `self`.
+    ///
+    /// | Domain | Range       |
+    /// | ------ | ----------- |
+    /// | $\R$   | $\[-1, 1\]$ |
     ///
     /// Tightness: tightest
     pub fn cos(self) -> Self {
@@ -424,6 +456,10 @@ impl Interval {
 
     /// Returns the hyperbolic cosine of `self`.
     ///
+    /// | Domain | Range     |
+    /// | ------ | --------- |
+    /// | $\R$   | $\[1, ∞)$ |
+    ///
     /// Tightness: tightest
     pub fn cosh(self) -> Self {
         if self.is_empty() {
@@ -444,6 +480,10 @@ impl Interval {
     impl_mono_inc!(
         /// Returns `self` raised to the power of $\e$.
         ///
+        /// | Domain | Range    |
+        /// | ------ | -------- |
+        /// | $\R$   | $(0, ∞)$ |
+        ///
         /// Tightness: tightest
         exp,
         exp_rd,
@@ -452,6 +492,10 @@ impl Interval {
     impl_mono_inc!(
         /// Returns `self` raised to the power of 10.
         ///
+        /// | Domain | Range    |
+        /// | ------ | -------- |
+        /// | $\R$   | $(0, ∞)$ |
+        ///
         /// Tightness: tightest
         exp10,
         exp10_rd,
@@ -459,6 +503,10 @@ impl Interval {
     );
     impl_mono_inc!(
         /// Returns `self` raised to the power of 2.
+        ///
+        /// | Domain | Range    |
+        /// | ------ | -------- |
+        /// | $\R$   | $(0, ∞)$ |
         ///
         /// Tightness: tightest
         exp2,
@@ -469,6 +517,10 @@ impl Interval {
     impl_log!(
         /// Returns the natural logarithm of `self`.
         ///
+        /// | Domain   | Range |
+        /// | -------- | ----- |
+        /// | $(0, ∞)$ | $\R$  |
+        ///
         /// Tightness: tightest
         ln,
         ln_impl,
@@ -477,6 +529,10 @@ impl Interval {
     );
     impl_log!(
         /// Returns the base-10 logarithm of `self`.
+        ///
+        /// | Domain   | Range |
+        /// | -------- | ----- |
+        /// | $(0, ∞)$ | $\R$  |
         ///
         /// Tightness: tightest
         log10,
@@ -487,6 +543,10 @@ impl Interval {
     impl_log!(
         /// Returns the base-2 logarithm of `self`.
         ///
+        /// | Domain   | Range |
+        /// | -------- | ----- |
+        /// | $(0, ∞)$ | $\R$  |
+        ///
         /// Tightness: tightest
         log2,
         log2_impl,
@@ -495,6 +555,10 @@ impl Interval {
     );
 
     /// Returns `self` raised to the power of `rhs`.
+    ///
+    /// | Domain                              | Range     |
+    /// | ----------------------------------- | --------- |
+    /// | $((0, ∞) × \R) ∪ (\set 0 × (0, ∞))$ | $\[0, ∞)$ |
     ///
     /// Tightness: tightest
     pub fn pow(self, rhs: Self) -> Self {
@@ -568,6 +632,16 @@ impl Interval {
 
     /// Returns `self` raised to the power of `rhs`.
     ///
+    /// For a fixed $n ∈ \Z$, the domain and the range of $\operatorname{pown}(x, n)$ are:
+    ///
+    /// |                | Domain        | Range         |
+    /// | -------------- | ------------- | ------------- |
+    /// | $n > 0$, odd   | $\R$          | $\R$          |
+    /// | $n > 0$, even  | $\R$          | $\[0, ∞)$     |
+    /// | $n = 0$        | $\R$          | $\set 1$      |
+    /// | $n < 0$, odd   | $\R ∖ \set 0$ | $\R ∖ \set 0$ |
+    /// | $n < 0$, even  | $\R ∖ \set 0$ | $(0, ∞)$      |
+    ///
     /// Tightness: tightest
     pub fn pown(self, rhs: i32) -> Self {
         self.pown_impl(rhs).0
@@ -630,6 +704,10 @@ impl Interval {
 
     /// Returns the sine of `self`.
     ///
+    /// | Domain | Range       |
+    /// | ------ | ----------- |
+    /// | $\R$   | $\[-1, 1\]$ |
+    ///
     /// Tightness: tightest
     pub fn sin(self) -> Self {
         if self.is_empty() {
@@ -664,6 +742,10 @@ impl Interval {
     impl_mono_inc!(
         /// Returns the hyperbolic sine of `self`.
         ///
+        /// | Domain | Range |
+        /// | ------ | ----- |
+        /// | $\R$   | $\R$  |
+        ///
         /// Tightness: tightest
         sinh,
         sinh_rd,
@@ -671,6 +753,10 @@ impl Interval {
     );
 
     /// Returns the tangent of `self`.
+    ///
+    /// | Domain                            | Range |
+    /// | --------------------------------- | ----- |
+    /// | $\R ∖ \set{(n + 1/2) π ∣ n ∈ \Z}$ | $\R$  |
     ///
     /// Tightness: tightest
     pub fn tan(self) -> Self {
@@ -702,6 +788,10 @@ impl Interval {
 
     impl_mono_inc!(
         /// Returns the hyperbolic tangent of `self`.
+        ///
+        /// | Domain | Range     |
+        /// | ------ | --------- |
+        /// | $\R$   | $(-1, 1)$ |
         ///
         /// Tightness: tightest
         tanh,

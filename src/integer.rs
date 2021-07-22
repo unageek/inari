@@ -3,6 +3,10 @@ use crate::{interval::*, simd::*};
 impl Interval {
     /// Rounds `self` to the closest integer toward $+∞$.
     ///
+    /// | Domain | Range |
+    /// | ------ | ----- |
+    /// | $\R$   | $\Z$  |
+    ///
     /// Tightness: tightest
     ///
     /// # Examples
@@ -28,6 +32,10 @@ impl Interval {
 
     /// Rounds `self` to the closest integer toward $-∞$.
     ///
+    /// | Domain | Range |
+    /// | ------ | ----- |
+    /// | $\R$   | $\Z$  |
+    ///
     /// Tightness: tightest
     ///
     /// # Examples
@@ -51,6 +59,10 @@ impl Interval {
     }
 
     /// Rounds `self` to the closest integer, away from zero in case of ties.
+    ///
+    /// | Domain | Range |
+    /// | ------ | ----- |
+    /// | $\R$   | $\Z$  |
     ///
     /// Tightness: tightest
     ///
@@ -76,6 +88,10 @@ impl Interval {
     }
 
     /// Rounds `self` to the closest integer, the even number in case of ties.
+    ///
+    /// | Domain | Range |
+    /// | ------ | ----- |
+    /// | $\R$   | $\Z$  |
     ///
     /// Tightness: tightest
     ///
@@ -105,6 +121,10 @@ impl Interval {
     /// Note the difference in definition between [`f64::signum`] and this function;
     /// `+0.0_f64.signum()` and `-0.0_f64.signum()` return `+1.0` and `-1.0`, respectively,
     /// while the sign of zero is just zero,
+    ///
+    /// | Domain | Range            |
+    /// | ------ | ---------------- |
+    /// | $\R$   | $\set{-1, 0, 1}$ |
     ///
     /// Tightness: tightest
     ///
@@ -136,6 +156,10 @@ impl Interval {
     }
 
     /// Rounds `self` to the closest integer toward zero.
+    ///
+    /// | Domain | Range |
+    /// | ------ | ----- |
+    /// | $\R$   | $\Z$  |
     ///
     /// Tightness: tightest
     ///
