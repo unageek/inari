@@ -1,3 +1,12 @@
+// A SIMD vector [x0; x1] stored in a register is usually depicted as:
+//
+//   +----------------+----------------+
+//   |       x1       |       x0       |
+//   +----------------+----------------+
+//   |127           64|63             0|
+//
+//   r[63:0] = x0, r[127:64] = x1.
+
 cfg_if::cfg_if! {
     if #[cfg(docsrs)] {
         mod unimplemented;
