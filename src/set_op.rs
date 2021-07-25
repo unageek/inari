@@ -7,8 +7,6 @@ impl Interval {
     /// | :----------------: | :--------: | :------------------------------------: |
     /// | $\self = ∅$        | $∅$        | $\[c, d\]$                             |
     /// | $\self = \[a, b\]$ | $\[a, b\]$ | $\[\min \set{a, c}, \max \set{b, d}\]$ |
-    ///
-    /// Tightness: tightest
     pub fn convex_hull(self, rhs: Self) -> Self {
         if self.is_empty() {
             return rhs;
@@ -30,8 +28,6 @@ impl Interval {
     /// | :----------------: | :--------: | :------------------------------------: |
     /// | $\self = ∅$        | $∅$        | $∅$                                    |
     /// | $\self = \[a, b\]$ | $∅$        | $\[\max \set{a, c}, \min \set{b, d}\]$ |
-    ///
-    /// Tightness: tightest
     pub fn intersection(self, rhs: Self) -> Self {
         if self.either_empty(rhs) {
             return Self::EMPTY;

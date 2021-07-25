@@ -7,8 +7,6 @@ impl Interval {
     /// | ------ | ----- |
     /// | $\R$   | $\Z$  |
     ///
-    /// Tightness: tightest
-    ///
     /// # Examples
     ///
     /// ```
@@ -36,8 +34,6 @@ impl Interval {
     /// | ------ | ----- |
     /// | $\R$   | $\Z$  |
     ///
-    /// Tightness: tightest
-    ///
     /// # Examples
     ///
     /// ```
@@ -63,8 +59,6 @@ impl Interval {
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R$   | $\Z$  |
-    ///
-    /// Tightness: tightest
     ///
     /// # Examples
     ///
@@ -93,8 +87,6 @@ impl Interval {
     /// | ------ | ----- |
     /// | $\R$   | $\Z$  |
     ///
-    /// Tightness: tightest
-    ///
     /// # Examples
     ///
     /// ```
@@ -118,15 +110,13 @@ impl Interval {
 
     /// Returns the sign of `self`.
     ///
-    /// Note the difference in definition between [`f64::signum`] and this function;
-    /// `+0.0_f64.signum()` and `-0.0_f64.signum()` return `+1.0` and `-1.0`, respectively,
-    /// while the sign of zero is just zero,
-    ///
     /// | Domain | Range            |
     /// | ------ | ---------------- |
     /// | $\R$   | $\set{-1, 0, 1}$ |
     ///
-    /// Tightness: tightest
+    /// Note the difference in definition between [`f64::signum`] and this function;
+    /// `+0.0_f64.signum()` and `-0.0_f64.signum()` return `+1.0` and `-1.0`, respectively,
+    /// while the sign of zero is just zero.
     ///
     /// # Examples
     ///
@@ -160,8 +150,6 @@ impl Interval {
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R$   | $\Z$  |
-    ///
-    /// Tightness: tightest
     ///
     /// # Examples
     ///

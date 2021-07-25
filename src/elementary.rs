@@ -145,8 +145,6 @@ impl Interval {
     /// | Domain      | Range      |
     /// | ----------- | ---------- |
     /// | $\[-1, 1\]$ | $\[0, π\]$ |
-    ///
-    /// Tightness: tightest
     pub fn acos(self) -> Self {
         self.acos_impl().0
     }
@@ -173,8 +171,6 @@ impl Interval {
     /// | Domain    | Range     |
     /// | --------- | --------- |
     /// | $\[1, ∞)$ | $\[0, ∞)$ |
-    ///
-    /// Tightness: tightest
     pub fn acosh(self) -> Self {
         self.acosh_impl().0
     }
@@ -201,8 +197,6 @@ impl Interval {
     /// | Domain      | Range           |
     /// | ----------- | --------------- |
     /// | $\[-1, 1\]$ | $\[-π/2, π/2\]$ |
-    ///
-    /// Tightness: tightest
     pub fn asin(self) -> Self {
         self.asin_impl().0
     }
@@ -230,8 +224,6 @@ impl Interval {
         /// | Domain | Range |
         /// | ------ | ----- |
         /// | $\R$   | $\R$  |
-        ///
-        /// Tightness: tightest
         asinh,
         asinh_rd,
         asinh_ru
@@ -242,8 +234,6 @@ impl Interval {
         /// | Domain | Range         |
         /// | ------ | ------------- |
         /// | $\R$   | $(-π/2, π/2)$ |
-        ///
-        /// Tightness: tightest
         atan,
         atan_rd,
         atan_ru
@@ -255,8 +245,6 @@ impl Interval {
     /// | Domain                | Range      |
     /// | --------------------- | ---------- |
     /// | $\R^2 ∖ \set{(0, 0)}$ | $(-π, π\]$ |
-    ///
-    /// Tightness: tightest
     pub fn atan2(self, rhs: Self) -> Self {
         self.atan2_impl(rhs).0
     }
@@ -377,8 +365,6 @@ impl Interval {
     /// | Domain    | Range |
     /// | --------- | ----- |
     /// | $(-1, 1)$ | $\R$  |
-    ///
-    /// Tightness: tightest
     pub fn atanh(self) -> Self {
         self.atanh_impl().0
     }
@@ -411,8 +397,6 @@ impl Interval {
     /// | Domain | Range       |
     /// | ------ | ----------- |
     /// | $\R$   | $\[-1, 1\]$ |
-    ///
-    /// Tightness: tightest
     pub fn cos(self) -> Self {
         if self.is_empty() {
             return self;
@@ -459,8 +443,6 @@ impl Interval {
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[1, ∞)$ |
-    ///
-    /// Tightness: tightest
     pub fn cosh(self) -> Self {
         if self.is_empty() {
             return self;
@@ -483,8 +465,6 @@ impl Interval {
         /// | Domain | Range    |
         /// | ------ | -------- |
         /// | $\R$   | $(0, ∞)$ |
-        ///
-        /// Tightness: tightest
         exp,
         exp_rd,
         exp_ru
@@ -495,8 +475,6 @@ impl Interval {
         /// | Domain | Range    |
         /// | ------ | -------- |
         /// | $\R$   | $(0, ∞)$ |
-        ///
-        /// Tightness: tightest
         exp10,
         exp10_rd,
         exp10_ru
@@ -507,8 +485,6 @@ impl Interval {
         /// | Domain | Range    |
         /// | ------ | -------- |
         /// | $\R$   | $(0, ∞)$ |
-        ///
-        /// Tightness: tightest
         exp2,
         exp2_rd,
         exp2_ru
@@ -520,8 +496,6 @@ impl Interval {
         /// | Domain   | Range |
         /// | -------- | ----- |
         /// | $(0, ∞)$ | $\R$  |
-        ///
-        /// Tightness: tightest
         ln,
         ln_impl,
         ln_rd,
@@ -533,8 +507,6 @@ impl Interval {
         /// | Domain   | Range |
         /// | -------- | ----- |
         /// | $(0, ∞)$ | $\R$  |
-        ///
-        /// Tightness: tightest
         log10,
         log10_impl,
         log10_rd,
@@ -546,8 +518,6 @@ impl Interval {
         /// | Domain   | Range |
         /// | -------- | ----- |
         /// | $(0, ∞)$ | $\R$  |
-        ///
-        /// Tightness: tightest
         log2,
         log2_impl,
         log2_rd,
@@ -559,8 +529,6 @@ impl Interval {
     /// | Domain                              | Range     |
     /// | ----------------------------------- | --------- |
     /// | $((0, ∞) × \R) ∪ (\set 0 × (0, ∞))$ | $\[0, ∞)$ |
-    ///
-    /// Tightness: tightest
     pub fn pow(self, rhs: Self) -> Self {
         self.pow_impl(rhs).0
     }
@@ -632,7 +600,7 @@ impl Interval {
 
     /// Returns `self` raised to the power of `rhs`.
     ///
-    /// For a fixed $n ∈ \Z$, the domain and the range of $\operatorname{pown}(x, n)$ are:
+    /// For a fixed $n ∈ \Z$, the domain and the range of the point function $\operatorname{pown}(x, n)$ are:
     ///
     /// |                | Domain        | Range         |
     /// | -------------- | ------------- | ------------- |
@@ -641,8 +609,6 @@ impl Interval {
     /// | $n = 0$        | $\R$          | $\set 1$      |
     /// | $n < 0$, odd   | $\R ∖ \set 0$ | $\R ∖ \set 0$ |
     /// | $n < 0$, even  | $\R ∖ \set 0$ | $(0, ∞)$      |
-    ///
-    /// Tightness: tightest
     pub fn pown(self, rhs: i32) -> Self {
         self.pown_impl(rhs).0
     }
@@ -707,8 +673,6 @@ impl Interval {
     /// | Domain | Range       |
     /// | ------ | ----------- |
     /// | $\R$   | $\[-1, 1\]$ |
-    ///
-    /// Tightness: tightest
     pub fn sin(self) -> Self {
         if self.is_empty() {
             return self;
@@ -745,8 +709,6 @@ impl Interval {
         /// | Domain | Range |
         /// | ------ | ----- |
         /// | $\R$   | $\R$  |
-        ///
-        /// Tightness: tightest
         sinh,
         sinh_rd,
         sinh_ru
@@ -757,8 +719,6 @@ impl Interval {
     /// | Domain                            | Range |
     /// | --------------------------------- | ----- |
     /// | $\R ∖ \set{(n + 1/2) π ∣ n ∈ \Z}$ | $\R$  |
-    ///
-    /// Tightness: tightest
     pub fn tan(self) -> Self {
         self.tan_impl().0
     }
@@ -792,8 +752,6 @@ impl Interval {
         /// | Domain | Range     |
         /// | ------ | --------- |
         /// | $\R$   | $(-1, 1)$ |
-        ///
-        /// Tightness: tightest
         tanh,
         tanh_rd,
         tanh_ru

@@ -6,8 +6,6 @@ impl Interval {
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[0, ∞)$ |
-    ///
-    /// Tightness: tightest
     pub fn abs(self) -> Self {
         use IntervalClass::*;
         match self.classify() {
@@ -34,8 +32,6 @@ impl Interval {
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R^2$ | $\R$  |
-    ///
-    /// Tightness: tightest
     pub fn max(self, rhs: Self) -> Self {
         if HAS_MAXIMUM {
             // [max(a, c), max(b, d)] = [-max(a, c); max(b, d)] = [min(-a, -c); max(b, d)]
@@ -62,8 +58,6 @@ impl Interval {
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R^2$ | $\R$  |
-    ///
-    /// Tightness: tightest
     pub fn min(self, rhs: Self) -> Self {
         if HAS_MAXIMUM {
             // [min(a, c), min(b, d)] = [-min(a, c); min(b, d)] = [max(-a, -c); min(b, d)]

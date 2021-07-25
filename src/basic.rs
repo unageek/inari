@@ -8,8 +8,6 @@ impl Interval {
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R^3$ | $\R$  |
-    ///
-    /// Tightness: tightest
     // Almost a copy-paste of mul. Additions/modifications are indicated with "// *".
     #[allow(clippy::many_single_char_names)]
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
@@ -100,8 +98,6 @@ impl Interval {
     /// | Domain        | Range         |
     /// | ------------- | ------------- |
     /// | $\R ∖ \set 0$ | $\R ∖ \set 0$ |
-    ///
-    /// Tightness: tightest
     pub fn recip(self) -> Self {
         use IntervalClass::*;
         match self.classify() {
@@ -143,8 +139,6 @@ impl Interval {
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[0, ∞)$ |
-    ///
-    /// Tightness: tightest
     pub fn sqr(self) -> Self {
         use IntervalClass::*;
         match self.classify() {
@@ -179,8 +173,6 @@ impl Interval {
     /// | Domain    | Range     |
     /// | --------- | --------- |
     /// | $\[0, ∞)$ | $\[0, ∞)$ |
-    ///
-    /// Tightness: tightest
     pub fn sqrt(self) -> Self {
         if self.is_empty() {
             return Self::EMPTY;

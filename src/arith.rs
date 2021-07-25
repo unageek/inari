@@ -4,7 +4,6 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 impl Neg for Interval {
     type Output = Self;
 
-    /// Tightness: tightest
     fn neg(self) -> Self {
         // [-b, -a] = [b; -a]
         Self {
@@ -16,7 +15,6 @@ impl Neg for Interval {
 impl Add for Interval {
     type Output = Self;
 
-    /// Tightness: tightest
     fn add(self, rhs: Self) -> Self {
         // [a + c, b + d] = [-a - c; b + d] = [-a; b] .+ [-c; d]
         let x = self.rep; // [-a; b]
@@ -28,7 +26,6 @@ impl Add for Interval {
 impl Sub for Interval {
     type Output = Self;
 
-    /// Tightness: tightest
     fn sub(self, rhs: Self) -> Self {
         // [a - d, b - c] = [-a + d; b - c] = [-a; b] .+ [d; -c]
         let x = self.rep; // [-a; b]
@@ -40,7 +37,6 @@ impl Sub for Interval {
 impl Mul for Interval {
     type Output = Self;
 
-    /// Tightness: tightest
     #[allow(clippy::many_single_char_names)]
     fn mul(self, rhs: Self) -> Self {
         // [a, b] * [c, d] =
@@ -133,7 +129,6 @@ impl Mul for Interval {
 impl Div for Interval {
     type Output = Self;
 
-    /// Tightness: tightest
     fn div(self, rhs: Self) -> Self {
         // [a, b] / [c, d] =
         //
