@@ -70,7 +70,7 @@ impl Interval {
 
 macro_rules! def_com {
     ($c:ident) => {
-        #[doc = concat!("See [`Interval::", stringify!($c), "`].")]
+        #[doc = concat!("[`Interval::", stringify!($c), "`] decorated with [`Decoration::Com`].")]
         pub const $c: Self = Self::new_unchecked(Interval::$c, Decoration::Com);
     };
 }
@@ -79,7 +79,7 @@ impl DecInterval {
     /// $∅$, the empty set, decorated with [`Decoration::Trv`].
     pub const EMPTY: Self = Self::new_unchecked(Interval::EMPTY, Decoration::Trv);
 
-    /// $\[-∞, +∞\]$, decorated with [`Decoration::Dac`].
+    /// $\[-∞, +∞\]$ decorated with [`Decoration::Dac`].
     pub const ENTIRE: Self = Self::new_unchecked(Interval::ENTIRE, Decoration::Dac);
 
     /// A NaI (Not an Interval).

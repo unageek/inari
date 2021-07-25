@@ -802,14 +802,18 @@ impl Interval {
 
 macro_rules! impl_dec {
     ($f:ident) => {
-        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
+        #[doc = concat!("The decorated version of [`Interval::", stringify!($f), "`].")]
+        ///
+        /// A NaI is returned if `self` is NaI.
         pub fn $f(self) -> Self {
             Self::set_dec(self.x.$f(), self.d)
         }
     };
 
     ($f:ident, $f_impl:ident) => {
-        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
+        #[doc = concat!("The decorated version of [`Interval::", stringify!($f), "`].")]
+        ///
+        /// A NaI is returned if `self` is NaI.
         pub fn $f(self) -> Self {
             let (y, d) = self.x.$f_impl();
             Self::set_dec(y, self.d.min(d))
@@ -819,7 +823,9 @@ macro_rules! impl_dec {
 
 macro_rules! impl_dec2 {
     ($f:ident, $f_impl:ident) => {
-        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
+        #[doc = concat!("The decorated version of [`Interval::", stringify!($f), "`].")]
+        ///
+        /// A NaI is returned if `self` or `rhs` is NaI.
         pub fn $f(self, rhs: Self) -> Self {
             let (z, d) = self.x.$f_impl(rhs.x);
             Self::set_dec(z, self.d.min(rhs.d.min(d)))
@@ -845,7 +851,9 @@ impl DecInterval {
     impl_dec!(log2, log2_impl);
     impl_dec2!(pow, pow_impl);
 
-    /// See [`Interval::pown`].
+    /// The decorated version of [`Interval::pown`].
+    ///
+    /// A NaI is returned if `self` is NaI.
     pub fn pown(self, rhs: i32) -> Self {
         let (y, d) = self.x.pown_impl(rhs);
         Self::set_dec(y, self.d.min(d))

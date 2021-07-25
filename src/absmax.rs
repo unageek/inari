@@ -87,7 +87,9 @@ impl Interval {
 }
 
 impl DecInterval {
-    /// See [`Interval::abs`].
+    /// The decorated version of [`Interval::abs`].
+    ///
+    /// A NaI is returned if `self` is NaI.
     pub fn abs(self) -> Self {
         if self.is_nai() {
             return self;
@@ -96,7 +98,9 @@ impl DecInterval {
         Self::set_dec(self.x.abs(), self.d)
     }
 
-    /// See [`Interval::max`].
+    /// The decorated version of [`Interval::max`].
+    ///
+    /// A NaI is returned if `self` or `rhs` is NaI.
     pub fn max(self, rhs: Self) -> Self {
         if self.is_nai() {
             return self;
@@ -105,7 +109,9 @@ impl DecInterval {
         Self::set_dec(self.x.max(rhs.x), self.d.min(rhs.d))
     }
 
-    /// See [`Interval::min`].
+    /// The decorated version of [`Interval::min`].
+    ///
+    /// A NaI is returned if `self` or `rhs` is NaI.
     pub fn min(self, rhs: Self) -> Self {
         if self.is_nai() {
             return self;

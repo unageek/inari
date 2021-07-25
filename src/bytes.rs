@@ -38,38 +38,38 @@ macro_rules! impl_try_from_bytes {
 
 impl Interval {
     impl_to_bytes!(
-        /// Returns the interchange representation of the interval in the big-endian byte order.
+        /// Returns the interchange representation of `self` in the big-endian byte order.
         to_be_bytes
     );
     impl_to_bytes!(
-        /// Returns the interchange representation of the interval in the little-endian byte order.
+        /// Returns the interchange representation of `self` in the little-endian byte order.
         to_le_bytes
     );
     impl_to_bytes!(
-        /// Returns the interchange representation of the interval in the native byte order of the target platform.
+        /// Returns the interchange representation of `self` in the native byte order of the target platform.
         to_ne_bytes
     );
 
     impl_try_from_bytes!(
-        /// Creates an interval from its interchange representation in the big-endian byte order.
+        /// Creates an [`Interval`] from its interchange representation in the big-endian byte order.
         try_from_be_bytes,
         from_be_bytes
     );
     impl_try_from_bytes!(
-        /// Creates an interval from its interchange representation in the little-endian byte order.
+        /// Creates an [`Interval`] from its interchange representation in the little-endian byte order.
         try_from_le_bytes,
         from_le_bytes
     );
     impl_try_from_bytes!(
-        /// Creates an interval from its interchange representation in the native byte order of the target platform.
+        /// Creates an [`Interval`] from its interchange representation in the native byte order of the target platform.
         try_from_ne_bytes,
         from_ne_bytes
     );
 }
 
 macro_rules! impl_to_bytes {
-    ($to_bytes:ident) => {
-        #[doc = concat!("See [`Interval::", stringify!($to_bytes), "`].")]
+    ($(#[$meta:meta])* $to_bytes:ident) => {
+        $(#[$meta])*
         pub fn $to_bytes(self) -> [u8; 17] {
             let mut bytes = [0u8; 17];
             bytes[..8].copy_from_slice(&f64::$to_bytes(self.inf()));
@@ -81,8 +81,8 @@ macro_rules! impl_to_bytes {
 }
 
 macro_rules! impl_try_from_bytes {
-    ($try_from_bytes:ident, $from_bytes:ident) => {
-        #[doc = concat!("See [`Interval::", stringify!($try_from_bytes), "`].")]
+    ($(#[$meta:meta])* $try_from_bytes:ident, $from_bytes:ident) => {
+        $(#[$meta])*
         pub fn $try_from_bytes(bytes: [u8; 17]) -> Option<Self> {
             use Decoration::*;
             let a = f64::$from_bytes(<[u8; 8]>::try_from(&bytes[..8]).unwrap());
@@ -116,13 +116,34 @@ macro_rules! impl_try_from_bytes {
 }
 
 impl DecInterval {
-    impl_to_bytes!(to_be_bytes);
-    impl_to_bytes!(to_le_bytes);
-    impl_to_bytes!(to_ne_bytes);
+    impl_to_bytes!(
+        /// Returns the interchange representation of `self` in the big-endian byte order.
+        to_be_bytes
+    );
+    impl_to_bytes!(
+        /// Returns the interchange representation of `self` in the little-endian byte order.
+        to_le_bytes
+    );
+    impl_to_bytes!(
+        /// Returns the interchange representation of `self` in the native byte order of the target platform.
+        to_ne_bytes
+    );
 
-    impl_try_from_bytes!(try_from_be_bytes, from_be_bytes);
-    impl_try_from_bytes!(try_from_le_bytes, from_le_bytes);
-    impl_try_from_bytes!(try_from_ne_bytes, from_ne_bytes);
+    impl_try_from_bytes!(
+        /// Creates a [`DecInterval`] from its interchange representation in the big-endian byte order.
+        try_from_be_bytes,
+        from_be_bytes
+    );
+    impl_try_from_bytes!(
+        /// Creates a [`DecInterval`] from its interchange representation in the little-endian byte order.
+        try_from_le_bytes,
+        from_le_bytes
+    );
+    impl_try_from_bytes!(
+        /// Creates a [`DecInterval`] from its interchange representation in the native byte order of the target platform.
+        try_from_ne_bytes,
+        from_ne_bytes
+    );
 }
 
 #[cfg(test)]

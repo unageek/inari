@@ -362,7 +362,8 @@ impl Interval {
 
 macro_rules! impl_dec {
     ($f:ident, 1) => {
-        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
+        #[doc = concat!("Applies [`Interval::", stringify!($f), "`] to the interval part of `self`")]
+        /// and returns the result.
         ///
         /// `false` is returned if `self` is NaI.
         pub fn $f(self) -> bool {
@@ -375,7 +376,8 @@ macro_rules! impl_dec {
     };
 
     ($f:ident, 2) => {
-        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
+        #[doc = concat!("Applies [`Interval::", stringify!($f), "`] to the interval parts of `self` and `rhs`")]
+        /// and returns the result.
         ///
         /// `false` is returned if `self` or `rhs` is NaI.
         pub fn $f(self, rhs: Self) -> bool {
@@ -389,7 +391,7 @@ macro_rules! impl_dec {
 }
 
 impl DecInterval {
-    /// See [`Interval::contains`].
+    /// Applies [`Interval::contains`] to the interval part of `self` and `rhs` and returns the result.
     ///
     /// `false` is returned if `self` is NaI.
     pub fn contains(self, rhs: f64) -> bool {

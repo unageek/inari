@@ -140,9 +140,11 @@ impl PartialOrd for Decoration {
     }
 }
 
-/// A decorated interval with [`f64`] bounds.
+/// The decorated version of [`Interval`].
 ///
-/// Note that by definition, a NaI is not equal to itself:
+/// ## Notes on equality comparison
+///
+/// By definition, a NaI is *not* equal to itself:
 ///
 /// ```
 /// use inari::*;
@@ -179,24 +181,6 @@ impl DecInterval {
         Self::new_unchecked(x, d)
     }
 
-    pub(crate) const fn new_unchecked(x: Interval, d: Decoration) -> Self {
-        Self { x, d }
-    }
-
-    /// Returns the decoration part `self`.
-    pub fn decoration(self) -> Decoration {
-        self.d
-    }
-
-    /// Returns the interval part of `self` if it is not NaI; otherwise, [`None`].
-    pub fn interval(self) -> Option<Interval> {
-        if self.is_nai() {
-            return None;
-        }
-
-        Some(self.x)
-    }
-
     /// Creates a [`DecInterval`] from the given interval and decoration.
     /// If the decoration is invalid for the interval, the first one in the list is used:
     ///
@@ -217,6 +201,24 @@ impl DecInterval {
         } else {
             Self::new_unchecked(x, d)
         }
+    }
+
+    /// Returns the interval part of `self` if it is not NaI; otherwise, [`None`].
+    pub fn interval(self) -> Option<Interval> {
+        if self.is_nai() {
+            return None;
+        }
+
+        Some(self.x)
+    }
+
+    /// Returns the decoration part `self`.
+    pub fn decoration(self) -> Decoration {
+        self.d
+    }
+
+    pub(crate) const fn new_unchecked(x: Interval, d: Decoration) -> Self {
+        Self { x, d }
     }
 }
 
@@ -369,10 +371,10 @@ macro_rules! dec_interval {
 
 /// Creates an [`Interval`] from [`f64`] bounds.
 ///
-/// It can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
+/// The macro can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
 ///
-/// The usage is almost the same as the macro [`interval!(a, b)`](`interval!`),
-/// except that `const_interval!(a, b)` returns an [`Interval`]
+/// The usage is almost the same as the macro [`interval!(a, b)`](`interval!`)
+/// except that this macro returns an [`Interval`] directly,
 /// or results in a compilation error if the construction is invalid.
 #[macro_export]
 macro_rules! const_interval {
@@ -393,10 +395,10 @@ macro_rules! const_interval {
 
 /// Creates a [`DecInterval`] from [`f64`] bounds.
 ///
-/// It can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
+/// The macro can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
 ///
-/// The usage is almost the same as the macro [`dec_interval!(a, b)`](`dec_interval!`),
-/// except that `const_dec_interval!(a, b)` returns a [`DecInterval`]
+/// The usage is almost the same as the macro [`dec_interval!(a, b)`](`dec_interval!`)
+/// except that this macro returns a [`DecInterval`] directly,
 /// or results in a compilation error if the construction is invalid.
 #[macro_export]
 macro_rules! const_dec_interval {

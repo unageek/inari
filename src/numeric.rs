@@ -242,8 +242,11 @@ impl Interval {
 }
 
 macro_rules! impl_dec {
-    ($(#[$meta:meta])* $f:ident) => {
-        $(#[$meta])*
+    ($f:ident) => {
+        #[doc = concat!("Applies [`Interval::", stringify!($f), "`] to the interval part of `self`")]
+        /// and returns the result.
+        ///
+        /// A NaN is returned if `self` is NaI.
         pub fn $f(self) -> f64 {
             if self.is_nai() {
                 return f64::NAN;
@@ -255,48 +258,13 @@ macro_rules! impl_dec {
 }
 
 impl DecInterval {
-    impl_dec!(
-        /// See [`Interval::inf`].
-        ///
-        /// A NaN is returned if `self` is NaI.
-        inf
-    );
-    impl_dec!(
-        /// See [`Interval::mag`].
-        ///
-        /// A NaN is returned if `self` is NaI.
-        mag
-    );
-    impl_dec!(
-        /// See [`Interval::mid`].
-        ///
-        /// A NaN is returned if `self` is NaI.
-        mid
-    );
-    impl_dec!(
-        /// See [`Interval::mig`].
-        ///
-        /// A NaN is returned if `self` is NaI.
-        mig
-    );
-    impl_dec!(
-        /// See [`Interval::rad`].
-        ///
-        /// A NaN is returned if `self` is NaI.
-        rad
-    );
-    impl_dec!(
-        /// See [`Interval::sup`].
-        ///
-        /// A NaN is returned if `self` is NaI.
-        sup
-    );
-    impl_dec!(
-        /// See [`Interval::wid`].
-        ///
-        /// A NaN is returned if `self` is NaI.
-        wid
-    );
+    impl_dec!(inf);
+    impl_dec!(mag);
+    impl_dec!(mid);
+    impl_dec!(mig);
+    impl_dec!(rad);
+    impl_dec!(sup);
+    impl_dec!(wid);
 }
 
 #[cfg(test)]

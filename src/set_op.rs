@@ -52,8 +52,11 @@ impl Interval {
 }
 
 macro_rules! impl_dec {
-    ($(#[$meta:meta])* $f:ident) => {
-        $(#[$meta])*
+    ($f:ident) => {
+        #[doc = concat!("Applies [`Interval::", stringify!($f), "`] to the interval parts of `self` and `rhs`")]
+        /// and returns the result decorated with [`Decoration::Trv`].
+        ///
+        /// A NaI is returned if `self` or `rhs` is NaI.
         pub fn $f(self, rhs: Self) -> Self {
             if self.is_nai() || rhs.is_nai() {
                 return Self::NAI;
@@ -65,20 +68,8 @@ macro_rules! impl_dec {
 }
 
 impl DecInterval {
-    impl_dec!(
-        /// See [`Interval::convex_hull`].
-        ///
-        /// A NaI is returned if `self` or `rhs` is NaI.
-        /// Otherwise, the result is decorated with [`Decoration::Trv`] regardless of the inputs.
-        convex_hull
-    );
-    impl_dec!(
-        /// See [`Interval::intersection`].
-        ///
-        /// A NaI is returned if `self` or `rhs` is NaI.
-        /// Otherwise, the result is decorated with [`Decoration::Trv`] regardless of the inputs.
-        intersection
-    );
+    impl_dec!(convex_hull);
+    impl_dec!(intersection);
 }
 
 #[cfg(test)]

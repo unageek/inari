@@ -191,7 +191,9 @@ macro_rules! impl_dec {
     // In rounding functions, you can effectively check if an endpoint of x
     // is an integer by x.inf == y.inf or x.sup == y.sup.
     ($f:ident, $x:ident, $y:ident, $is_not_com:expr) => {
-        #[doc = concat!("See [`Interval::", stringify!($f), "`].")]
+        #[doc = concat!("The decorated version of [`Interval::", stringify!($f), "`].")]
+        ///
+        /// A NaI is returned if `self` is NaI.
         pub fn $f(self) -> Self {
             if self.is_nai() {
                 return self;

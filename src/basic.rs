@@ -200,7 +200,9 @@ impl Interval {
 }
 
 impl DecInterval {
-    /// See [`Interval::mul_add`].
+    /// The decorated version of [`Interval::mul_add`].
+    ///
+    /// A NaI is returned if `self`, `rhs` or `addend` is NaI.
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
         if self.is_nai() || rhs.is_nai() || addend.is_nai() {
             return Self::NAI;
@@ -212,7 +214,9 @@ impl DecInterval {
         )
     }
 
-    /// See [`Interval::recip`].
+    /// The decorated version of [`Interval::recip`].
+    ///
+    /// A NaI is returned if `self` is NaI.
     pub fn recip(self) -> Self {
         if self.is_nai() {
             return self;
@@ -226,7 +230,9 @@ impl DecInterval {
         Self::set_dec(self.x.recip(), d)
     }
 
-    /// See [`Interval::sqr`].
+    /// The decorated version of [`Interval::sqr`].
+    ///
+    /// A NaI is returned if `self` is NaI.
     pub fn sqr(self) -> Self {
         if self.is_nai() {
             return self;
@@ -235,7 +241,9 @@ impl DecInterval {
         Self::set_dec(self.x.sqr(), self.d)
     }
 
-    /// See [`Interval::sqrt`].
+    /// The decorated version of [`Interval::sqrt`].
+    ///
+    /// A NaI is returned if `self` is NaI.
     pub fn sqrt(self) -> Self {
         if self.is_nai() {
             return self;

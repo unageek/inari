@@ -22,6 +22,9 @@ pub use self::{
 
 pub mod _docs;
 
+// List the constructors first in the documentation.
+mod interval;
+
 mod absmax;
 mod arith;
 mod basic;
@@ -34,7 +37,6 @@ mod elementary;
 #[cfg(feature = "gmp")]
 mod format;
 mod integer;
-mod interval;
 mod numeric;
 mod overlap;
 #[cfg(feature = "gmp")]

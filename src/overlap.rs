@@ -1,6 +1,6 @@
 use crate::interval::*;
 
-/// An overlapping state between intervals, returned by [`Interval::overlap`].
+/// The overlapping state between intervals, returned by [`Interval::overlap`].
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Overlap {
     /// Both `self` and `rhs` are empty.
@@ -389,7 +389,7 @@ impl Interval {
 }
 
 impl DecInterval {
-    /// See [`Interval::overlap`].
+    /// Applies [`Interval::overlap`] to the interval parts of `self` and `rhs` and returns the result.
     ///
     /// [`None`] is returned if `self` or `rhs` is NaI.
     pub fn overlap(self, rhs: Self) -> Option<Overlap> {
