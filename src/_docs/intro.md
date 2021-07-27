@@ -56,12 +56,12 @@ Note that in the first line, the leading zeros are not counted in the 53 bits. T
 In the first iteration of the `for` loop, $\tilde x_1$ is computed as:
 
 $$
-\begin{array}{rrcl}
-    & 16 ⋅ \tilde x_0 & = & \overbrace{1.1001100…110011010}^\text{53 bits} \bin \\\\
- \- &            1.5 & = & 1.1000000…000000000 \bin \\\\
+\begin{align*}
+    && 16 ⋅ \tilde x_0 &= \overbrace{1.1001100…110011010}^\text{53 bits} \bin \\\\
+ \- &&             1.5 &= 1.1000000…000000000 \bin \\\\
  \hline
-    &     \tilde x_1 & = & 0.000\underbrace{1100…1100110100000}_\text{53 bits} \bin.
-\end{array}
+    &&      \tilde x_1 &= 0.000\underbrace{1100…1100110100000}_\text{53 bits} \bin.
+\end{align*}
 $$
 
 Therefore,
