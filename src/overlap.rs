@@ -1,6 +1,62 @@
 use crate::interval::*;
 
 /// The overlapping state between intervals, returned by [`Interval::overlap`].
+///
+/// # Quick Reference
+///
+/// `self` relative to `rhs`:
+///
+/// ```text
+///                      rhs
+///                   c       d
+///                   •———————•
+///      ┌─    a   b  :       :
+///      │   B •———•  :       :
+///      │      M •———•       :                              rhs
+///      │        O •———•     :                              c=d
+///      │          S •———•   :                               •
+///      │          S •       :                  ┌─    a   b  :
+///      │         Cb : •———• :                  │   B •———•  :
+///      │            :   •———• F                │            • E
+/// self │            :       • F           self │        •———• Fb
+///      │            •———————• E                │          •———• C
+///      │          •—————————• Fb               │            •———• Sb
+///      │          •———————————• C              │            :  •———• A
+///      │            •—————————• Sb             └─           :  a   b
+///      │            :     •———• Ob                          •
+///      │            :       •———• Mb                       c=d
+///      │            :       :  •———• A
+///      └─           :       :  a   b
+///                   •———————•
+///                   c       d
+/// ```
+///
+/// `rhs` relative to `self`:
+///
+/// ```text
+///                     self
+///                   a       b
+///                   •———————•
+///      ┌─           :       :  c   d
+///      │            :       :  •———• B
+///      │            :       •———• M                       self
+///      │            :     •———• O                          a=b
+///      │            •—————————• S                           •
+///      │          •———————————• Cb             ┌─           :  c   d
+///      │          •—————————• F                │            :  •———• B
+///      │            •———————• E                │            •———• S
+///  rhs │            :   •———• Fb           rhs │          •———• Cb
+///      │            :       • Fb               │        •———• F
+///      │          C : •———• :                  │            • E
+///      │         Sb •———•   :                  │   A •———•  :
+///      │         Sb •       :                  └─    c   d  :
+///      │       Ob •———•     :                               •
+///      │     Mb •———•       :                              a=b
+///      │   A •———•  :       :
+///      └─    c   d  :       :
+///                   •———————•
+///                   a       b
+/// ```
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Overlap {
     /// Both `self` and `rhs` are empty.
