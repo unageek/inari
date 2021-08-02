@@ -132,6 +132,8 @@ Here are some examples of the natural interval extensions of functions. The triv
    \end{gather*}
    $$
 
+   Note that addition of extended real numbers is not defined for every pair. Specifically, $+∞ + (-∞)$ and $-∞ + (+∞)$ are left undefined.
+
 1. Multiplication $× : \R × \R → \R$:
 
    $[a, b] × [c, d] =$
