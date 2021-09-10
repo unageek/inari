@@ -7,13 +7,15 @@ on:
     branches: [master]
   workflow_dispatch:
 
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+  RUSTDOCFLAGS: -Ctarget-cpu=haswell -Dwarnings
+  RUSTFLAGS: -Ctarget-cpu=haswell -Dwarnings
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      CARGO_TERM_COLOR: always
-      RUSTDOCFLAGS: -Ctarget-cpu=haswell -Dwarnings
-      RUSTFLAGS: -Ctarget-cpu=haswell -Dwarnings
 
     steps:
       - uses: actions/checkout@v2
@@ -31,6 +33,7 @@ jobs:
         with:
           toolchain: nightly
           components: clippy, rustfmt
+          override: true
           profile: minimal
 
       - uses: Swatinem/rust-cache@v1
@@ -69,9 +72,31 @@ jobs:
       - name: Check docs
         run: cargo rustdoc
 
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/gmp-mpfr-sys
+          key: ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('Cargo.toml') }}
+          restore-keys: |
+            ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: minimal
+
+      - uses: Swatinem/rust-cache@v1
+
       - name: Coverage
         env:
-          CARGO_INCREMENTAL: 0
           RUSTFLAGS: ${{ env.RUSTFLAGS }} -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
           RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
         run: |
@@ -82,7 +107,7 @@ jobs:
         id: coverage
         uses: actions-rs/grcov@v0.1
 
-      - name: Upload coverage to Coveralls
+      - name: Upload to Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
