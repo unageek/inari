@@ -24,9 +24,9 @@ jobs:
         with:
           path: |
             ~/.cache/gmp-mpfr-sys
-          key: ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('Cargo.toml') }}
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('Cargo.toml') }}
           restore-keys: |
-            ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-
 
       - uses: actions-rs/toolchain@v1
         with:

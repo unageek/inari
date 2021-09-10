@@ -7,33 +7,37 @@
 
 **inari** is a Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 
-## Requirements
+## Supported Rust Versions
 
-### Rust version
+A **nightly** toolchain >= `nightly-2021-05-20` is required.
 
-A recent version of the nightly toolchain is required since some unstable features ([asm](https://github.com/rust-lang/rust/issues/72016), [stdsimd](https://github.com/rust-lang/rust/issues/48556)) are used in the crate. You need to specify the toolchain by, for example, the [toolchain file](https://rust-lang.github.io/rustup/overrides.html#the-toolchain-file) in your crate (see [example](https://github.com/unageek/graphest/blob/master/rust/rust-toolchain).
+This is because there are a few unstable features that the crate depends on: [`asm`](https://github.com/rust-lang/rust/issues/72016), [`stdsimd`](https://github.com/rust-lang/rust/issues/48556), etc. To use the crate as a dependency, you need to [override the toolchain](https://rust-lang.github.io/rustup/overrides.html) in your project. Here is an [example](https://github.com/unageek/graphest/blob/master/rust-toolchain) that does this with the `rust-toolchain` file.
 
-### Target CPU
+## Supported Platforms
+
+The following CPUs are supported:
 
 - x86-64
 
   Haswell-based and newer processors are supported.
 
-  You need to specify the target CPU when building a crate that depends on inari. One way to do that is to add a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) to the consuming crate (see [example](https://github.com/unageek/graphest/blob/master/rust/.cargo/config.toml); you may want to change `native` to `haswell` for maximum compatibility if you are going to distribute your binary).
+  You need to specify the target CPU when building a crate that depends on inari. One way to do that is using a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your project (see [example](https://github.com/unageek/graphest/blob/master/.cargo/config.toml); you may want to change `native` to `haswell` to achieve maximum compatibility if you are going to distribute executables).
 
-- AArch64 (a.k.a. ARM64)
+- AArch64 (ARM64)
 
   Experimental, it is not tested continuously.
 
-## Conditional features
+When using the Cargo feature `gmp` (see below), the target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate.
 
-- `gmp` (enabled by default) - Enables operations that depend on GMP and MPFR, namely, transcendental functions and conversion between texts and intervals. You can opt-out the feature to reduce dependencies. Even in that case, you still have access to all arithmetic operations that are required for writing filters for robust geometric predicates.
+## Cargo Features
 
-## Related projects
-
-- [Graphest](https://github.com/unageek/graphest) - a faithful graphing calculator
+- `gmp` (enabled by default) - Enables operations that depend on GMP and MPFR, namely, the transcendental functions and conversion between texts and intervals. You can opt-out the feature to reduce dependencies. Even in that case, you still have access to all arithmetic operations that are required for making robust geometric predicates, for example.
 
 ## [Changelog](CHANGELOG.md)
+
+## Related Projects
+
+- [Graphest](https://github.com/unageek/graphest) - a faithful graphing calculator
 
 ## TODO
 
