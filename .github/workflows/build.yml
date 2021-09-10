@@ -28,8 +28,7 @@ jobs:
           restore-keys: |
             ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           components: clippy, rustfmt
@@ -86,8 +85,7 @@ jobs:
           restore-keys: |
             ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           override: true
