@@ -5,7 +5,7 @@ pub(crate) const HAS_MAXIMUM: bool = true;
 pub(crate) type F64X2 = float64x2_t;
 
 pub(crate) fn abs(x: F64X2) -> F64X2 {
-    vabsq_f64(x)
+    unsafe { vabsq_f64(x) }
 }
 
 pub(crate) fn all(x: F64X2) -> bool {
@@ -26,7 +26,7 @@ pub(crate) fn bitmask(x: F64X2) -> u32 {
 }
 
 pub(crate) fn ceil(x: F64X2) -> F64X2 {
-    vrndpq_f64(x)
+    unsafe { vrndpq_f64(x) }
 }
 
 pub(crate) fn constant(x: f64, y: f64) -> F64X2 {
@@ -46,7 +46,7 @@ pub(crate) fn extract1(x: F64X2) -> f64 {
 }
 
 pub(crate) fn floor(x: F64X2) -> F64X2 {
-    vrndmq_f64(x)
+    unsafe { vrndmq_f64(x) }
 }
 
 pub(crate) fn ge(x: F64X2, y: F64X2) -> F64X2 {
@@ -66,7 +66,7 @@ pub(crate) fn lt(x: F64X2, y: F64X2) -> F64X2 {
 }
 
 pub(crate) fn max(x: F64X2, y: F64X2) -> F64X2 {
-    vmaxnmq_f64(x, y)
+    unsafe { vmaxnmq_f64(x, y) }
 }
 
 pub(crate) fn maximum(x: F64X2, y: F64X2) -> F64X2 {
@@ -74,7 +74,7 @@ pub(crate) fn maximum(x: F64X2, y: F64X2) -> F64X2 {
 }
 
 pub(crate) fn min(x: F64X2, y: F64X2) -> F64X2 {
-    vminnmq_f64(x, y)
+    unsafe { vminnmq_f64(x, y) }
 }
 
 pub(crate) fn minimum(x: F64X2, y: F64X2) -> F64X2 {
@@ -82,7 +82,7 @@ pub(crate) fn minimum(x: F64X2, y: F64X2) -> F64X2 {
 }
 
 pub(crate) fn neg(x: F64X2) -> F64X2 {
-    vnegq_f64(x)
+    unsafe { vnegq_f64(x) }
 }
 
 pub(crate) fn neg0(x: F64X2) -> F64X2 {
@@ -94,11 +94,11 @@ pub(crate) fn or(x: F64X2, y: F64X2) -> F64X2 {
 }
 
 pub(crate) fn round(x: F64X2) -> F64X2 {
-    vrndaq_f64(x)
+    unsafe { vrndaq_f64(x) }
 }
 
 pub(crate) fn round_ties_to_even(x: F64X2) -> F64X2 {
-    vrndnq_f64(x)
+    unsafe { vrndnq_f64(x) }
 }
 
 pub(crate) fn shuffle02(x: F64X2, y: F64X2) -> F64X2 {
@@ -122,38 +122,12 @@ pub(crate) fn swap(x: F64X2) -> F64X2 {
 }
 
 pub(crate) fn trunc(x: F64X2) -> F64X2 {
-    vrndq_f64(x)
+    unsafe { vrndq_f64(x) }
 }
 
 fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
     constant(extract1(x), extract0(y))
 }
-
-macro_rules! impl_op {
-    ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal) => {
-        pub(crate) fn $f(mut $x: $t, $($y: $t,)*) -> $t {
-            unsafe {
-                asm!(
-                    $inst,
-                    $x = inout(vreg) $x,
-                    $($y = in(vreg) $y,)*
-                    options(pure, nomem, nostack, preserves_flags)
-                );
-            }
-            $x
-        }
-    };
-}
-
-impl_op!(F64X2, vabsq_f64(x), "fabs.2d {x:v}, {x:v}");
-impl_op!(F64X2, vmaxnmq_f64(x, y), "fmaxnm.2d {x:v}, {x:v}, {y:v}");
-impl_op!(F64X2, vminnmq_f64(x, y), "fminnm.2d {x:v}, {x:v}, {y:v}");
-impl_op!(F64X2, vnegq_f64(x), "fneg.2d {x:v}, {x:v}");
-impl_op!(F64X2, vrndaq_f64(x), "frinta.2d {x:v}, {x:v}");
-impl_op!(F64X2, vrndmq_f64(x), "frintm.2d {x:v}, {x:v}");
-impl_op!(F64X2, vrndnq_f64(x), "frintn.2d {x:v}, {x:v}");
-impl_op!(F64X2, vrndpq_f64(x), "frintp.2d {x:v}, {x:v}");
-impl_op!(F64X2, vrndq_f64(x), "frintz.2d {x:v}, {x:v}");
 
 macro_rules! impl_op_round {
     ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
