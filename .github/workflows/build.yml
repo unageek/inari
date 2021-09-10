@@ -8,7 +8,10 @@ on:
   workflow_dispatch:
 
 env:
+  CARGO_INCREMENTAL: 0
   CARGO_TERM_COLOR: always
+  RUSTDOCFLAGS: -Ctarget-cpu=haswell -Dwarnings
+  RUSTFLAGS: -Ctarget-cpu=haswell -Dwarnings
 
 jobs:
   build:
@@ -17,69 +20,92 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions/cache@v2
         with:
+          path: |
+            ~/.cache/gmp-mpfr-sys
+          key: ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('Cargo.toml') }}
+          restore-keys: |
+            ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
           components: clippy, rustfmt
+          override: true
           profile: minimal
+
+      - uses: Swatinem/rust-cache@v1
 
       - name: Is AVX-512F available?
         id: avx512f
         run: lscpu | grep --quiet avx512f
         continue-on-error: true
 
-      - name: Run tests
-        run: cargo test --release --all-features
-        env:
-          RUSTFLAGS: -Ctarget-cpu=haswell
-          RUSTDOCFLAGS: -Ctarget-cpu=haswell
+      - name: Test
+        run: cargo test --release
 
-      - name: Run tests w/ AVX-512F enabled
-        run: cargo test --release --all-features
+      - name: Test (target AVX-512F)
+        run: cargo test --release
         if: ${{ steps.avx512f.outcome == 'success' }}
         env:
-          RUSTFLAGS: -Ctarget-cpu=haswell -Ctarget-feature=+avx512f
-          RUSTDOCFLAGS: -Ctarget-cpu=haswell -Ctarget-feature=+avx512f
+          RUSTFLAGS: ${{ env.RUSTFLAGS }} -Ctarget-feature=+avx512f
+          RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Ctarget-feature=+avx512f
 
-      - name: Run tests (--no-default-features)
+      - name: Test (--no-default-features)
         run: cargo test --release --no-default-features
-        env:
-          RUSTFLAGS: -Ctarget-cpu=haswell
-          RUSTDOCFLAGS: -Ctarget-cpu=haswell
 
       - name: Clippy
-        run: cargo clippy --all-targets --all-features -- -Dwarnings
-        env:
-          RUSTFLAGS: -Ctarget-cpu=haswell
-          RUSTDOCFLAGS: -Ctarget-cpu=haswell
+        run: cargo clippy --all-targets
 
-      - name: Clippy w/ AVX-512F enabled
-        run: cargo clippy --all-targets --all-features -- -Dwarnings
+      - name: Clippy (target AVX-512F)
+        run: cargo clippy --all-targets
         if: ${{ steps.avx512f.outcome == 'success' }}
         env:
-          RUSTFLAGS: -Ctarget-cpu=haswell -Ctarget-feature=+avx512f
-          RUSTDOCFLAGS: -Ctarget-cpu=haswell -Ctarget-feature=+avx512f
+          RUSTFLAGS: ${{ env.RUSTFLAGS }} -Ctarget-feature=+avx512f
+          RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Ctarget-feature=+avx512f
 
       - name: Check format
         run: cargo fmt -- --check
 
       - name: Check docs
-        run: cargo rustdoc --all-features -- -Dwarnings
+        run: cargo rustdoc
+
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/gmp-mpfr-sys
+          key: ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('Cargo.toml') }}
+          restore-keys: |
+            ${{ env.GITHUB_JOB }}-${{ secrets.CACHE_VERSION }}-
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: minimal
+
+      - uses: Swatinem/rust-cache@v1
 
       - name: Coverage
         env:
-          CARGO_INCREMENTAL: 0
-          RUSTFLAGS: -Ctarget-cpu=haswell -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
-          RUSTDOCFLAGS: -Ctarget-cpu=haswell -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
+          RUSTFLAGS: ${{ env.RUSTFLAGS }} -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
+          RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
         run: |
           cargo clean
-          cargo test --all-features
+          cargo test
 
       - name: Gather coverage data
         id: coverage
         uses: actions-rs/grcov@v0.1
 
-      - name: Upload coverage to Coveralls
+      - name: Upload to Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
