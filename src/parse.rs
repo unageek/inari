@@ -544,8 +544,8 @@ fn rational_to_f64(r: &Rational, infsup: InfSup) -> F64 {
     unsafe {
         let orig_emin = mpfr::get_emin();
         let orig_emax = mpfr::get_emax();
-        mpfr::set_emin((f64::MIN_EXP - (f64::MANTISSA_DIGITS as i32) + 1) as i64);
-        mpfr::set_emax(f64::MAX_EXP as i64);
+        mpfr::set_emin((f64::MIN_EXP - (f64::MANTISSA_DIGITS as i32) + 1).into());
+        mpfr::set_emax(f64::MAX_EXP.into());
         let t = mpfr::set_q(f.as_raw_mut(), r.as_raw(), rnd);
         let t = mpfr::subnormalize(f.as_raw_mut(), t, rnd);
         let f = mpfr::get_d(f.as_raw(), rnd);
