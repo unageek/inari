@@ -2,6 +2,10 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.10.9 - 2021-10-10
+
+- Now inari supports `x86_64-pc-windows-gnu` as a target.
+
 ## v0.10.0 - 2021-06-30
 
 ### Added
