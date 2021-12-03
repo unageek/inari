@@ -9,7 +9,7 @@
 
 ## Supported Rust Versions
 
-A **nightly** toolchain >= `nightly-2021-05-20` is required.
+A **nightly** toolchain >= `nightly-2021-10-05` is required.
 
 This is because there are a few unstable features that the crate depends on: [`asm`](https://github.com/rust-lang/rust/issues/72016), [`stdsimd`](https://github.com/rust-lang/rust/issues/48556), etc. To use the crate as a dependency, you need to [override the toolchain](https://rust-lang.github.io/rustup/overrides.html) in your project. Here is an [example](https://github.com/unageek/graphest/blob/master/rust-toolchain) that does this with the `rust-toolchain` file.
 
