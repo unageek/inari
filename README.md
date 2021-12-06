@@ -11,7 +11,7 @@
 
 A **nightly** toolchain >= `nightly-2021-10-05` is required.
 
-This is because there are a few unstable features that the crate depends on: [`asm`](https://github.com/rust-lang/rust/issues/72016), [`stdsimd`](https://github.com/rust-lang/rust/issues/48556), etc. To use the crate as a dependency, you need to [override the toolchain](https://rust-lang.github.io/rustup/overrides.html) in your project. Here is an [example](https://github.com/unageek/graphest/blob/master/rust-toolchain) that does this with the `rust-toolchain` file.
+The requirement of a nightly toolchain is due to a few [unstable features](https://doc.rust-lang.org/stable/unstable-book/) used in the crate: [`asm`](https://doc.rust-lang.org/stable/unstable-book/library-features/asm.html), [`stdsimd`](https://doc.rust-lang.org/stable/unstable-book/library-features/stdsimd.html), etc. To use the crate as a dependency, you need to [override the toolchain](https://rust-lang.github.io/rustup/overrides.html) in your project. Here is an [example](https://github.com/unageek/graphest/blob/master/rust-toolchain) that does this with the `rust-toolchain` file.
 
 ## Supported Platforms
 
@@ -27,24 +27,17 @@ The following CPUs are supported:
 
   Experimental, it is not tested continuously.
 
-When using the Cargo feature `gmp` (see below), the target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate.
+When using the Cargo feature `gmp` (see below), target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate.
 
 ## Cargo Features
 
-- `gmp` (enabled by default) - Enables operations that depend on GMP and MPFR, namely, the transcendental functions and conversion between texts and intervals. You can opt-out the feature to reduce dependencies. Even in that case, you still have access to all arithmetic operations that are required for making robust geometric predicates, for example.
+- `gmp` (enabled by default) - Enables [operations](https://docs.rs/inari/latest/inari/_docs/conformance/) that depend on GMP and MPFR. You can opt out the feature to reduce dependencies. Even in that case, you still have access to all operations required by certain kind of tasks, such as making fast robust predicates for computational geometry.
 
 ## [Changelog](CHANGELOG.md)
 
 ## Related Projects
 
 - [Graphest](https://github.com/unageek/graphest) - a faithful graphing calculator
-
-## TODO
-
-- Improve conformance to the standard
-- More formatting options
-  - https://octave.sourceforge.io/interval/function/intervaltotext.html
-  - https://docs.python.org/3/library/string.html#formatspec
 
 ## References
 
