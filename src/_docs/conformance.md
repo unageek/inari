@@ -14,22 +14,22 @@ Some operations are only available when the crate is built with the conditional 
 
 | Operation | Implementation       | Requires `gmp` |
 | --------- | -------------------- | -------------- |
-| empty()   | [`Interval::EMPTY`]  | No             |
-| entire()  | [`Interval::ENTIRE`] | No             |
+| empty()   | [`Interval::EMPTY`]  | -              |
+| entire()  | [`Interval::ENTIRE`] | -              |
 
 #### Forward-mode elementary functions
 
 | Operation            | Implementation                                             | Requires `gmp` |
 | -------------------- | ---------------------------------------------------------- | -------------- |
-| neg(_x_)             | `-x`                                                       | No             |
-| add(_x_, _y_)        | `x + y`                                                    | No             |
-| sub(_x_, _y_)        | `x - y`                                                    | No             |
-| mul(_x_, _y_)        | `x * y`                                                    | No             |
-| div(_x_, _y_)        | `x / y`                                                    | No             |
-| recip(_x_)           | [`x.recip()`](`Interval::recip`)                           | No             |
-| sqr(_x_)             | [`x.sqr()`](`Interval::sqr`)                               | No             |
-| sqrt(_x_)            | [`x.sqrt()`](`Interval::sqrt`)                             | No             |
-| fma(_x_, _y_, _z_)   | [`x.mul_add(y, z)`](`Interval::mul_add`)                   | No             |
+| neg(_x_)             | `-x`                                                       | -              |
+| add(_x_, _y_)        | `x + y`                                                    | -              |
+| sub(_x_, _y_)        | `x - y`                                                    | -              |
+| mul(_x_, _y_)        | `x * y`                                                    | -              |
+| div(_x_, _y_)        | `x / y`                                                    | -              |
+| recip(_x_)           | [`x.recip()`](`Interval::recip`)                           | -              |
+| sqr(_x_)             | [`x.sqr()`](`Interval::sqr`)                               | -              |
+| sqrt(_x_)            | [`x.sqrt()`](`Interval::sqrt`)                             | -              |
+| fma(_x_, _y_, _z_)   | [`x.mul_add(y, z)`](`Interval::mul_add`)                   | -              |
 | pown(_x_, _n_)       | [`x.pown(n)`](`Interval::pown`)                            | Yes            |
 | pow(_x_, _y_)        | [`x.pow(y)`](`Interval::pow`)                              | Yes            |
 | exp(_x_)             | [`x.exp()`](`Interval::exp`)                               | Yes            |
@@ -51,15 +51,15 @@ Some operations are only available when the crate is built with the conditional 
 | asinh(_x_)           | [`x.asinh()`](`Interval::asinh`)                           | Yes            |
 | acosh(_x_)           | [`x.acosh()`](`Interval::acosh`)                           | Yes            |
 | atanh(_x_)           | [`x.atanh()`](`Interval::atanh`)                           | Yes            |
-| sign(_x_)            | [`x.sign()`](`Interval::sign`)                             | No             |
-| ceil(_x_)            | [`x.ceil()`](`Interval::ceil`)                             | No             |
-| floor(_x_)           | [`x.floor()`](`Interval::floor`)                           | No             |
-| trunc(_x_)           | [`x.trunc()`](`Interval::trunc`)                           | No             |
-| roundTiesToEven(_x_) | [`x.round_ties_to_even()`](`Interval::round_ties_to_even`) | No             |
-| roundTiesToAway(_x_) | [`x.round()`](`Interval::round`)                           | No             |
-| abs(_x_)             | [`x.abs()`](`Interval::abs`)                               | No             |
-| min(_x_, _y_)        | [`x.min(y)`](`Interval::min`)                              | No             |
-| max(_x_, _y_)        | [`x.max(y)`](`Interval::max`)                              | No             |
+| sign(_x_)            | [`x.sign()`](`Interval::sign`)                             | -              |
+| ceil(_x_)            | [`x.ceil()`](`Interval::ceil`)                             | -              |
+| floor(_x_)           | [`x.floor()`](`Interval::floor`)                           | -              |
+| trunc(_x_)           | [`x.trunc()`](`Interval::trunc`)                           | -              |
+| roundTiesToEven(_x_) | [`x.round_ties_to_even()`](`Interval::round_ties_to_even`) | -              |
+| roundTiesToAway(_x_) | [`x.round()`](`Interval::round`)                           | -              |
+| abs(_x_)             | [`x.abs()`](`Interval::abs`)                               | -              |
+| min(_x_, _y_)        | [`x.min(y)`](`Interval::min`)                              | -              |
+| max(_x_, _y_)        | [`x.max(y)`](`Interval::max`)                              | -              |
 
 #### Reverse-mode elementary functions
 
@@ -77,43 +77,43 @@ Not implemented.
 
 | Operation                | Implementation                                                                                                                                                                       | Requires `gmp` |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
-| numsToInterval(_a_, _b_) | [`interval!(a, b)`](`interval!`)<br>[`const_interval!(a, b)`](`const_interval!`)<br>[`dec_interval!(a, b)`](`dec_interval!`)<br>[`const_dec_interval!(a, b)`](`const_dec_interval!`) | No             |
+| numsToInterval(_a_, _b_) | [`interval!(a, b)`](`interval!`)<br>[`const_interval!(a, b)`](`const_interval!`)<br>[`dec_interval!(a, b)`](`dec_interval!`)<br>[`const_dec_interval!(a, b)`](`const_dec_interval!`) | -              |
 | textToInterval(_s_)      | [`interval!(s)`](`interval!`)<br>[`dec_interval!(s)`](`dec_interval!`)                                                                                                               | Yes            |
 
 #### Set operations
 
 | Operation              | Implementation                                  | Requires `gmp` |
 | ---------------------- | ----------------------------------------------- | -------------- |
-| intersection(_x_, _y_) | [`x.intersection(y)`](`Interval::intersection`) | No             |
-| convexHull(_x_, _y_)   | [`x.convex_hull(y)`](`Interval::convex_hull`)   | No             |
+| intersection(_x_, _y_) | [`x.intersection(y)`](`Interval::intersection`) | -              |
+| convexHull(_x_, _y_)   | [`x.convex_hull(y)`](`Interval::convex_hull`)   | -              |
 
 #### Numeric functions of intervals
 
 | Operation | Implementation               | Requires `gmp` |
 | --------- | ---------------------------- | -------------- |
-| inf(_x_)  | [`x.inf()`](`Interval::inf`) | No             |
-| sup(_x_)  | [`x.sup()`](`Interval::sup`) | No             |
-| mid(_x_)  | [`x.mid()`](`Interval::mid`) | No             |
-| wid(_x_)  | [`x.wid()`](`Interval::wid`) | No             |
-| rad(_x_)  | [`x.rad()`](`Interval::rad`) | No             |
-| mag(_x_)  | [`x.mag()`](`Interval::mag`) | No             |
-| mig(_x_)  | [`x.mig()`](`Interval::mig`) | No             |
+| inf(_x_)  | [`x.inf()`](`Interval::inf`) | -              |
+| sup(_x_)  | [`x.sup()`](`Interval::sup`) | -              |
+| mid(_x_)  | [`x.mid()`](`Interval::mid`) | -              |
+| wid(_x_)  | [`x.wid()`](`Interval::wid`) | -              |
+| rad(_x_)  | [`x.rad()`](`Interval::rad`) | -              |
+| mag(_x_)  | [`x.mag()`](`Interval::mag`) | -              |
+| mig(_x_)  | [`x.mig()`](`Interval::mig`) | -              |
 
 #### Boolean functions of intervals
 
 | Operation                | Implementation                                            | Requires `gmp` |
 | ------------------------ | --------------------------------------------------------- | -------------- |
-| isEmpty(_x_)             | [`x.is_empty()`](`Interval::is_empty`)                    | No             |
-| isEntire(_x_)            | [`x.is_entire()`](`Interval::is_entire`)                  | No             |
-| isNaI(_x_)               | [`x.is_nai()`](`DecInterval::is_nai`) for [`DecInterval`] | No             |
-| equal(_x_, _y_)          | `x == y`                                                  | No             |
-| subset(_x_, _y_)         | [`x.subset(y)`](`Interval::subset`)                       | No             |
-| less(_x_, _y_)           | [`x.less(y)`](`Interval::less`)                           | No             |
-| precedes(_x_, _y_)       | [`x.precedes(y)`](`Interval::precedes`)                   | No             |
-| interior(_x_, _y_)       | [`x.interior(y)`](`Interval::interior`)                   | No             |
-| strictLess(_x_, _y_)     | [`x.strict_less(y)`](`Interval::strict_less`)             | No             |
-| strictPrecedes(_x_, _y_) | [`x.strict_precedes(y)`](`Interval::strict_precedes`)     | No             |
-| disjoint(_x_, _y_)       | [`x.disjoint(y)`](`Interval::disjoint`)                   | No             |
+| isEmpty(_x_)             | [`x.is_empty()`](`Interval::is_empty`)                    | -              |
+| isEntire(_x_)            | [`x.is_entire()`](`Interval::is_entire`)                  | -              |
+| isNaI(_x_)               | [`x.is_nai()`](`DecInterval::is_nai`) for [`DecInterval`] | -              |
+| equal(_x_, _y_)          | `x == y`                                                  | -              |
+| subset(_x_, _y_)         | [`x.subset(y)`](`Interval::subset`)                       | -              |
+| less(_x_, _y_)           | [`x.less(y)`](`Interval::less`)                           | -              |
+| precedes(_x_, _y_)       | [`x.precedes(y)`](`Interval::precedes`)                   | -              |
+| interior(_x_, _y_)       | [`x.interior(y)`](`Interval::interior`)                   | -              |
+| strictLess(_x_, _y_)     | [`x.strict_less(y)`](`Interval::strict_less`)             | -              |
+| strictPrecedes(_x_, _y_) | [`x.strict_precedes(y)`](`Interval::strict_precedes`)     | -              |
+| disjoint(_x_, _y_)       | [`x.disjoint(y)`](`Interval::disjoint`)                   | -              |
 
 ### Recommended operations
 
@@ -129,15 +129,15 @@ Not implemented.
 
 | Operation             | Implementation                                             | Requires `gmp` |
 | --------------------- | ---------------------------------------------------------- | -------------- |
-| isCommonInterval(_x_) | [`x.is_common_interval()`](`Interval::is_common_interval`) | No             |
-| isSingleton(_x_)      | [`x.is_singleton()`](`Interval::is_singleton`)             | No             |
-| isMember(_x_, _y_)    | [`y.contains(x)`](`Interval::contains`)                    | No             |
+| isCommonInterval(_x_) | [`x.is_common_interval()`](`Interval::is_common_interval`) | -              |
+| isSingleton(_x_)      | [`x.is_singleton()`](`Interval::is_singleton`)             | -              |
+| isMember(_x_, _y_)    | [`y.contains(x)`](`Interval::contains`)                    | -              |
 
 #### Extended interval comparison
 
 | Operation         | Implementation                                                                                        | Requires `gmp` |
 | ----------------- | ----------------------------------------------------------------------------------------------------- | -------------- |
-| overlap(_x_, _y_) | [`x.overlap(y)`](`Interval::overlap`)<br>[`x.overlap(y)`](`DecInterval::overlap`) for [`DecInterval`] | No             |
+| overlap(_x_, _y_) | [`x.overlap(y)`](`Interval::overlap`)<br>[`x.overlap(y)`](`DecInterval::overlap`) for [`DecInterval`] | -              |
 
 #### Exact reduction operations
 
@@ -147,10 +147,10 @@ Not implemented.
 
 | Operation           | Implementation                                          | Requires `gmp` |
 | ------------------- | ------------------------------------------------------- | -------------- |
-| newDec(_x_)         | [`DecInterval::new(x)`](`DecInterval::new`)             | No             |
-| intervalPart(_x_)   | [`x.interval()`](`DecInterval::interval`)               | No             |
-| decorationPart(_x_) | [`x.decoration()`](`DecInterval::decoration`)           | No             |
-| setDec(_x_, _dx_)   | [`DecInterval::set_dec(x, dx)`](`DecInterval::set_dec`) | No             |
+| newDec(_x_)         | [`DecInterval::new(x)`](`DecInterval::new`)             | -              |
+| intervalPart(_x_)   | [`x.interval()`](`DecInterval::interval`)               | -              |
+| decorationPart(_x_) | [`x.decoration()`](`DecInterval::decoration`)           | -              |
+| setDec(_x_, _dx_)   | [`DecInterval::set_dec(x, dx)`](`DecInterval::set_dec`) | -              |
 
 Comparison of decorations is implemented as defined in the standard.
 
