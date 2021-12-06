@@ -6,7 +6,16 @@
 />
 <style type="text/css">
   /*
-   * Original: https://github.com/rust-lang/rust/blob/f913a4fe901d6aeb84941fa06c17916d4e6d1dd7/src/librustdoc/html/static/css/rustdoc.css#L560
+   * Overrides
+   *  https://github.com/rust-lang/rust/blob/0fb1c371d4a14f9ce7a721d8aea683a6e6774f6c/src/librustdoc/html/static/css/rustdoc.css#L601
+   */
+  .docblock > :not(.information) {
+    overflow-x: unset;
+  }
+
+  /*
+   * Overrides
+   *   https://github.com/rust-lang/rust/blob/0fb1c371d4a14f9ce7a721d8aea683a6e6774f6c/src/librustdoc/html/static/css/rustdoc.css#L653
    */
   .docblock table {
     border: unset;
@@ -18,7 +27,8 @@
   }
 
   /*
-   * Original: https://github.com/rust-lang/rust/blob/f913a4fe901d6aeb84941fa06c17916d4e6d1dd7/src/librustdoc/html/static/css/rustdoc.css#L572
+   * Overrides
+   *   https://github.com/rust-lang/rust/blob/0fb1c371d4a14f9ce7a721d8aea683a6e6774f6c/src/librustdoc/html/static/css/rustdoc.css#L665
    */
   .docblock table th {
     border: unset;
@@ -30,7 +40,8 @@
   }
 
   /*
-   * Original: https://github.com/rust-lang/rust/blob/f913a4fe901d6aeb84941fa06c17916d4e6d1dd7/src/librustdoc/html/static/css/rustdoc.css#L567
+   * Overrides
+   *   https://github.com/rust-lang/rust/blob/0fb1c371d4a14f9ce7a721d8aea683a6e6774f6c/src/librustdoc/html/static/css/rustdoc.css#L660
    */
   .docblock table td {
     border: unset;
@@ -38,7 +49,8 @@
   }
 
   /*
-   * Original: https://github.com/rust-lang/rust/blob/f913a4fe901d6aeb84941fa06c17916d4e6d1dd7/src/librustdoc/html/static/css/rustdoc.css#L555
+   * Overrides
+   *   https://github.com/rust-lang/rust/blob/0fb1c371d4a14f9ce7a721d8aea683a6e6774f6c/src/librustdoc/html/static/css/rustdoc.css#L648
    */
   .docblock table td:first-child {
     padding: 0.5em;
