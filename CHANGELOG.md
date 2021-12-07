@@ -2,6 +2,12 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.11.0 - 2021-12-07
+
+### Fixed
+
+- Downstream crates are no longer required to specify the `static_assertions` crate as their dependency.
+
 ## v0.10.9 - 2021-10-10
 
 - Now inari supports `x86_64-pc-windows-gnu` as a target.
