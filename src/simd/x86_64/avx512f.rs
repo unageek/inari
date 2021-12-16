@@ -1,3 +1,5 @@
+use std::arch::asm;
+
 macro_rules! impl_op_round {
     ($t:ty, $reg:ident, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
         impl_op_round!($t, $reg, $f ($x $(,$y)*), $inst, "{{rd-sae}}");

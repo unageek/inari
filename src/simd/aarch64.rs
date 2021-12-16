@@ -1,4 +1,7 @@
-use std::{arch::aarch64::*, mem::transmute};
+use std::{
+    arch::{aarch64::*, asm},
+    mem::transmute,
+};
 
 pub(crate) const HAS_MAXIMUM: bool = true;
 

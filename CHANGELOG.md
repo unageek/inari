@@ -2,7 +2,17 @@
 
 The ❗ icon indicates a breaking change.
 
+## v0.12.0 - 2021-12-16
+
+The crate requires a nightly toolchain >= `nightly-2021-12-16`.
+
+### Fixed
+
+- Fixed build failure on the latest nightly toolchain.
+
 ## v0.11.0 - 2021-12-07
+
+The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Fixed
 
