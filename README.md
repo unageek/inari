@@ -1,7 +1,7 @@
 # 🦊 inari
 
 [![crates.io](https://img.shields.io/crates/v/inari.svg)](https://crates.io/crates/inari)
-[![docs](https://docs.rs/inari/badge.svg)](https://docs.rs/inari)
+[![docs](https://img.shields.io/docsrs/inari)](https://docs.rs/inari)
 [![build](https://img.shields.io/github/workflow/status/unageek/inari/build/master)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
 [![coverage](https://img.shields.io/coveralls/github/unageek/inari/master)](https://coveralls.io/github/unageek/inari?branch=master)
 
