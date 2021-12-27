@@ -58,7 +58,7 @@ fn fmt_impl(x: Interval, d: Option<Decoration>, f: &mut fmt::Formatter, conv: ch
         let fb = Float::with_val(f64::MANTISSA_DIGITS, x.sup());
         let sa = mpfr_printf(&format!("%{}RD{}", prec, conv), &fa);
         let sb = mpfr_printf(&format!("%{}RU{}", prec, conv), &fb);
-        write!(f, "[{:>w$},{:>w$}]{}", sa, sb, sd, w = width)
+        write!(f, "[{:>w$}, {:>w$}]{}", sa, sb, sd, w = width)
     }
 }
 
@@ -109,61 +109,61 @@ mod tests {
     fn format() {
         assert_eq!(
             format!("{}", const_interval!(f64::NEG_INFINITY, 0.0)),
-            "[-inf,0.000000]"
+            "[-inf, 0.000000]"
         );
         assert_eq!(
             format!("{:e}", const_interval!(f64::NEG_INFINITY, 0.0)),
-            "[-inf,0.0000000000000000e+00]"
+            "[-inf, 0.0000000000000000e+00]"
         );
         assert_eq!(
             format!("{:x}", const_interval!(f64::NEG_INFINITY, 0.0)),
-            "[-inf,0x0p+0]"
+            "[-inf, 0x0p+0]"
         );
 
         assert_eq!(
             format!("{}", const_interval!(0.0, f64::INFINITY)),
-            "[-0.000000,inf]"
+            "[-0.000000, inf]"
         );
         assert_eq!(
             format!("{:e}", const_interval!(0.0, f64::INFINITY)),
-            "[-0.0000000000000000e+00,inf]"
+            "[-0.0000000000000000e+00, inf]"
         );
         assert_eq!(
             format!("{:x}", const_interval!(0.0, f64::INFINITY)),
-            "[-0x0p+0,inf]"
+            "[-0x0p+0, inf]"
         );
 
-        assert_eq!(format!("{:.6}", I::PI), "[3.141592,3.141593]");
-        assert_eq!(format!("{:.6e}", I::PI), "[3.141592e+00,3.141593e+00]");
-        assert_eq!(format!("{:.6x}", I::PI), "[0x3.243f6ap+0,0x3.243f6bp+0]");
+        assert_eq!(format!("{:.6}", I::PI), "[3.141592, 3.141593]");
+        assert_eq!(format!("{:.6e}", I::PI), "[3.141592e+00, 3.141593e+00]");
+        assert_eq!(format!("{:.6x}", I::PI), "[0x3.243f6ap+0, 0x3.243f6bp+0]");
         assert_eq!(
             format!("{:.6}", DI::set_dec(I::PI, D::Com)),
-            "[3.141592,3.141593]_com"
+            "[3.141592, 3.141593]_com"
         );
         assert_eq!(
             format!("{:.6}", DI::set_dec(I::PI, D::Dac)),
-            "[3.141592,3.141593]_dac"
+            "[3.141592, 3.141593]_dac"
         );
         assert_eq!(
             format!("{:.6}", DI::set_dec(I::PI, D::Def)),
-            "[3.141592,3.141593]_def"
+            "[3.141592, 3.141593]_def"
         );
         assert_eq!(
             format!("{:.6}", DI::set_dec(I::PI, D::Trv)),
-            "[3.141592,3.141593]_trv"
+            "[3.141592, 3.141593]_trv"
         );
 
         assert_eq!(
             format!("{:15.6}", I::PI),
-            "[       3.141592,       3.141593]"
+            "[       3.141592,        3.141593]"
         );
         assert_eq!(
             format!("{:15.6e}", I::PI),
-            "[   3.141592e+00,   3.141593e+00]"
+            "[   3.141592e+00,    3.141593e+00]"
         );
         assert_eq!(
             format!("{:15.6x}", I::PI),
-            "[  0x3.243f6ap+0,  0x3.243f6bp+0]"
+            "[  0x3.243f6ap+0,   0x3.243f6bp+0]"
         );
 
         macro_rules! check {
