@@ -32,6 +32,7 @@ gmp = ["gmp-mpfr-sys", "nom", "rug"]
 
 [dependencies]
 cfg-if = "1.0"
+forward_ref = "1.0.0"
 
 [dependencies.gmp-mpfr-sys]
 version = "1.4"
