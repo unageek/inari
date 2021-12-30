@@ -55,6 +55,11 @@ default-features = false
 features = ["float", "integer", "rational"]
 optional = true
 
+[dependencies.crlibm]
+version = "*"
+optional = true
+git = "https://github.com/Chris00/rust-crlibm"
+
 [[example]]
 name = "exp"
 required-features = ["gmp", "libm"]

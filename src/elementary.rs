@@ -1,92 +1,22 @@
 use crate::{classify::*, const_interval, interval::*};
-use gmp_mpfr_sys::mpfr;
-use rug::Float;
 
-macro_rules! mpfr_fn {
-    ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
-        fn $f_rd(x: f64) -> f64 {
-            mpfr_fn!($mpfr_f(x, RNDD))
-        }
+#[cfg_attr(feature = "crlibm", allow(dead_code))]
+mod mpfr;
+#[cfg(not(feature = "crlibm"))]
+use self::mpfr::*;
 
-        fn $f_ru(x: f64) -> f64 {
-            mpfr_fn!($mpfr_f(x, RNDU))
-        }
-    };
+#[cfg(feature = "crlibm")]
+pub use crlibm::*;
 
-    ($mpfr_f:ident($x:ident, $rnd:ident)) => {{
-        let mut x = Float::with_val(f64::MANTISSA_DIGITS, $x);
-        let rnd = mpfr::rnd_t::$rnd;
-        unsafe {
-            mpfr::$mpfr_f(x.as_raw_mut(), x.as_raw(), rnd);
-            mpfr::get_d(x.as_raw(), rnd)
-        }
-    }};
-}
+// Functions not provided by crlibm.
+#[cfg(feature = "crlibm")]
+pub use self::mpfr::{
+    acosh_rd, acosh_ru, asinh_rd, asinh_ru, atan2_rd, atan2_ru,
+    atanh_rd, atanh_ru, exp10_rd, exp10_ru, exp2_rd, exp2_ru,
+    pow_rd, pow_ru, pown_rd, pown_ru, tanh_rd, tanh_ru};
+// Functions provided by crlibm which could be interesting here:
+// cospi, sinpi, tanpi, atanpi, asinpi, acospi, exp_m1, ln_1p
 
-macro_rules! mpfr_fn2 {
-    ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
-        fn $f_rd(x: f64, y: f64) -> f64 {
-            mpfr_fn2!($mpfr_f(x, y, RNDD))
-        }
-
-        fn $f_ru(x: f64, y: f64) -> f64 {
-            mpfr_fn2!($mpfr_f(x, y, RNDU))
-        }
-    };
-
-    ($mpfr_f:ident($x:ident, $y:ident, $rnd:ident)) => {{
-        let mut x = Float::with_val(f64::MANTISSA_DIGITS, $x);
-        let y = Float::with_val(f64::MANTISSA_DIGITS, $y);
-        let rnd = mpfr::rnd_t::$rnd;
-        unsafe {
-            mpfr::$mpfr_f(x.as_raw_mut(), x.as_raw(), y.as_raw(), rnd);
-            mpfr::get_d(x.as_raw(), rnd)
-        }
-    }};
-}
-
-macro_rules! mpfr_fn_si {
-    ($mpfr_f:ident, $f_rd:ident, $f_ru:ident) => {
-        fn $f_rd(x: f64, y: i32) -> f64 {
-            mpfr_fn_si!($mpfr_f(x, y, RNDD))
-        }
-
-        fn $f_ru(x: f64, y: i32) -> f64 {
-            mpfr_fn_si!($mpfr_f(x, y, RNDU))
-        }
-    };
-
-    ($mpfr_f:ident($x:ident, $y:ident, $rnd:ident)) => {{
-        let mut x = Float::with_val(f64::MANTISSA_DIGITS, $x);
-        let rnd = mpfr::rnd_t::$rnd;
-        unsafe {
-            mpfr::$mpfr_f(x.as_raw_mut(), x.as_raw(), $y.into(), rnd);
-            mpfr::get_d(x.as_raw(), rnd)
-        }
-    }};
-}
-
-mpfr_fn!(acos, acos_rd, acos_ru);
-mpfr_fn!(acosh, acosh_rd, acosh_ru);
-mpfr_fn!(asin, asin_rd, asin_ru);
-mpfr_fn!(asinh, asinh_rd, asinh_ru);
-mpfr_fn!(atan, atan_rd, atan_ru);
-mpfr_fn2!(atan2, atan2_rd, atan2_ru);
-mpfr_fn!(atanh, atanh_rd, atanh_ru);
-mpfr_fn!(cos, cos_rd, cos_ru);
-mpfr_fn!(cosh, cosh_rd, cosh_ru);
-mpfr_fn!(exp, exp_rd, exp_ru);
-mpfr_fn!(exp10, exp10_rd, exp10_ru);
-mpfr_fn!(exp2, exp2_rd, exp2_ru);
-mpfr_fn!(log, ln_rd, ln_ru);
-mpfr_fn!(log10, log10_rd, log10_ru);
-mpfr_fn!(log2, log2_rd, log2_ru);
-mpfr_fn2!(pow, pow_rd, pow_ru);
-mpfr_fn_si!(pow_si, pown_rd, pown_ru);
-mpfr_fn!(sin, sin_rd, sin_ru);
-mpfr_fn!(sinh, sinh_rd, sinh_ru);
-mpfr_fn!(tan, tan_rd, tan_ru);
-mpfr_fn!(tanh, tanh_rd, tanh_ru);
 
 fn rem_euclid_2(x: f64) -> f64 {
     if 2.0 * (x / 2.0).floor() == x {
