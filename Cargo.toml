@@ -32,6 +32,7 @@ gmp = ["gmp-mpfr-sys", "nom", "rug"]
 
 [dependencies]
 cfg-if = "1.0"
+serde = { version = "1.0.0", features = ["derive"], optional = true }
 
 [dependencies.gmp-mpfr-sys]
 version = "1.4"

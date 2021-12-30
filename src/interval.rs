@@ -8,13 +8,18 @@ use std::{
     result,
 };
 
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum IntervalErrorKind {
     PossiblyUndefinedOperation,
     UndefinedOperation,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IntervalError {
     pub(crate) kind: IntervalErrorKind,
 }
@@ -112,8 +117,33 @@ impl TryFrom<(f64, f64)> for Interval {
     }
 }
 
+#[cfg(feature = "serde")]
+mod serde_for_interval {
+    use serde::{Serialize, Serializer, Deserialize, Deserializer};
+
+    #[derive(Serialize, Deserialize)]
+    struct I { inf: f64, sup: f64 }
+
+    impl Serialize for super::Interval {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: Serializer {
+            I{inf: self.inf_raw(), sup: self.sup_raw()}
+            .serialize(serializer)
+        }
+    }
+
+    impl<'de> Deserialize<'de> for super::Interval {
+        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: Deserializer<'de> {
+            I::deserialize(deserializer)
+                .map(|x: I| super::Interval::with_infsup_raw(x.inf, x.sup))
+        }
+    }
+}
+
 /// The decoration of a [`DecInterval`].
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[repr(u8)]
 pub enum Decoration {
     /// The “ill-formed” decoration.
@@ -154,6 +184,7 @@ impl PartialOrd for Decoration {
 /// For this reason, the traits [`Eq`] and [`Hash`] are not implemented for the type.
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct DecInterval {
     pub(crate) x: Interval,
     pub(crate) d: Decoration,
