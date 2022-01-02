@@ -398,9 +398,15 @@ macro_rules! const_interval {
 /// The usage is almost the same as the macro [`dec_interval!(a, b)`](`dec_interval!`)
 /// except that this macro returns a [`DecInterval`] directly,
 /// or results in a compilation error if the construction is invalid.
+/// In addition, `const_dec_interval(a, b, d)` sets the decoration
+/// to be at most `d` (further restrictions apply when one of the bounds
+/// is infinite).
 #[macro_export]
 macro_rules! const_dec_interval {
-    ($a:expr, $b:expr) => {{
+    ($a:expr, $b:expr) => {
+        const_dec_interval!($a, $b, Decoration::Com)
+    };
+    ($a:expr, $b:expr, $dec: path) => {{
         use ::std::{mem::transmute, primitive::*};
 
         #[repr(C)]
@@ -414,9 +420,9 @@ macro_rules! const_dec_interval {
             transmute::<_, $crate::DecInterval>(_DecInterval {
                 x: $crate::const_interval!($a, $b),
                 d: if $a == f64::NEG_INFINITY || $b == f64::INFINITY {
-                    $crate::Decoration::Dac
+                    $crate::Decoration::Dac.min($dec)
                 } else {
-                    $crate::Decoration::Com
+                    $crate::Decoration::Com.min($dec)
                 },
             })
         }
