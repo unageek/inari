@@ -189,6 +189,25 @@ impl Interval {
             Self::with_infsup_raw(sqrt1_rd(a), sqrt1_ru(b))
         }
     }
+
+    /// Return an enclosure for the width of `self`.  If `self` is
+    /// empty, then the empty interval is also returned.
+    ///
+    /// | Domain | Range     |
+    /// | ------ | --------- |
+    /// | $\R$   | $\[0, ∞)$ |
+    pub fn width(self) -> Self {
+        if self.is_empty() {
+            return Self::EMPTY;
+        }
+        let a = self.inf_raw();
+        let b = self.sup_raw();
+        let w = Self::with_infsup_raw(b,b) - Self::with_infsup_raw(a,a);
+        if w.inf_raw() == f64::INFINITY {
+            return Self::INFINITY;
+        }
+        w
+    }
 }
 
 impl DecInterval {
@@ -248,6 +267,16 @@ impl DecInterval {
         };
         Self::set_dec(self.x.sqrt(), d)
     }
+
+    /// The decorated version of [`Interval::width`].
+    ///
+    /// A NaI is returned if `self` is NaI.
+    pub fn width(self) -> Self {
+        if self.is_nai() {
+            return self;
+        }
+        Self::set_dec(self.x.width(), self.d)
+    }
 }
 
 #[cfg(test)]
@@ -265,6 +294,7 @@ mod tests {
         assert!(I::EMPTY.recip().is_empty());
         assert!(I::EMPTY.sqrt().is_empty());
         assert!(I::EMPTY.sqr().is_empty());
+        assert!(I::EMPTY.width().is_empty());
 
         assert!((DI::EMPTY.mul_add(DI::PI, DI::PI)).is_empty());
         assert!((DI::PI.mul_add(DI::EMPTY, DI::PI)).is_empty());
@@ -273,6 +303,14 @@ mod tests {
         assert!(DI::EMPTY.recip().is_empty());
         assert!(DI::EMPTY.sqrt().is_empty());
         assert!(DI::EMPTY.sqr().is_empty());
+    }
+
+    #[test]
+    fn width() {
+        assert_eq!(const_interval!(1., 2.).width(),
+                   const_interval!(1., 1.));
+        assert!((const_interval!(1.,1.) / const_interval!(3.,3.)).width()
+                .is_singleton());
     }
 
     #[test]

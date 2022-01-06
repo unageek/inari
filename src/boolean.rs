@@ -190,6 +190,41 @@ impl Interval {
         self.inf_raw() == self.sup_raw()
     }
 
+    /// Returns `true` if `self` cannot be split i.e., it is empty
+    /// or its two bounds are equal or are consecutive `f64` numbers.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::*;
+    /// assert!(Interval::EMPTY.is_atomic());
+    /// assert!(const_interval!(1.0, 1.0).is_atomic());
+    /// assert!(!const_interval!(1.0, 2.0).is_atomic());
+    /// assert!(const_interval!(1.0, 1.0 + f64::EPSILON).is_atomic());
+    /// assert!(Interval::PI.is_atomic());
+    /// assert!(const_interval!(f64::MAX, f64::INFINITY).is_atomic());
+    /// assert!(const_interval!(f64::NEG_INFINITY, f64::MIN).is_atomic());
+    /// assert!(!Interval::ENTIRE.is_atomic());
+    /// ```
+    pub fn is_atomic(self) -> bool {
+        if self.is_empty() { return true };
+        // See https://github.com/rust-lang/rust/pull/88728
+        // self.inf_raw() < ∞
+        const TINY_BITS: u64 = 0x1; // Smallest positive f64.
+        const CLEAR_SIGN_MASK: u64 = 0x7fff_ffff_ffff_ffff;
+
+        let bits_inf = self.inf_raw().to_bits();
+        let abs_inf = bits_inf & CLEAR_SIGN_MASK;
+        let next_bits = if abs_inf == 0 {
+            TINY_BITS
+        } else if bits_inf == abs_inf {
+            bits_inf + 1
+        } else {
+            bits_inf - 1
+        };
+        f64::from_bits(next_bits) >= self.sup_raw()
+    }
+
     /// Returns `true` if `self` is weakly less than `rhs`:
     ///
     /// $$
