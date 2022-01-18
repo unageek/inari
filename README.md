@@ -2,8 +2,8 @@
 
 [![crates.io](https://img.shields.io/crates/v/inari.svg)](https://crates.io/crates/inari)
 [![docs](https://img.shields.io/docsrs/inari)](https://docs.rs/inari)
-[![build](https://img.shields.io/github/workflow/status/unageek/inari/build/master)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
-[![coverage](https://img.shields.io/coveralls/github/unageek/inari/master)](https://coveralls.io/github/unageek/inari?branch=master)
+[![build](https://img.shields.io/github/workflow/status/unageek/inari/build/main)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
+[![coverage](https://img.shields.io/coveralls/github/unageek/inari/main)](https://coveralls.io/github/unageek/inari?branch=main)
 
 **inari** is a Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 
@@ -11,7 +11,7 @@
 
 A **nightly** toolchain >= `nightly-2021-12-16` is required.
 
-The requirement of a nightly toolchain is due to a few [unstable features](https://doc.rust-lang.org/stable/unstable-book/) used in the crate: [`asm`](https://doc.rust-lang.org/stable/unstable-book/library-features/asm.html), [`stdsimd`](https://doc.rust-lang.org/stable/unstable-book/library-features/stdsimd.html), etc. To use the crate as a dependency, you need to [override the toolchain](https://rust-lang.github.io/rustup/overrides.html) in your project. Here is an [example](https://github.com/unageek/graphest/blob/master/rust-toolchain) that does this with the `rust-toolchain` file.
+The requirement of a nightly toolchain is due to a few [unstable features](https://doc.rust-lang.org/stable/unstable-book/) used in the crate: [`asm`](https://doc.rust-lang.org/stable/unstable-book/library-features/asm.html), [`stdsimd`](https://doc.rust-lang.org/stable/unstable-book/library-features/stdsimd.html), etc. To use the crate as a dependency, you need to [override the toolchain](https://rust-lang.github.io/rustup/overrides.html) in your project. Here is an [example](https://github.com/unageek/graphest/blob/main/rust-toolchain) that does this with the `rust-toolchain` file.
 
 ## Supported Platforms
 
@@ -21,7 +21,7 @@ The following CPUs are supported:
 
   Haswell-based and newer processors are supported.
 
-  You need to specify the target CPU when building a crate that depends on inari. One way to do that is using a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your project (see [example](https://github.com/unageek/graphest/blob/master/.cargo/config.toml); you may want to change `native` to `haswell` to achieve maximum compatibility if you are going to distribute executables).
+  You need to specify the target CPU when building a crate that depends on inari. One way to do that is using a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your project (see [example](https://github.com/unageek/graphest/blob/main/.cargo/config.toml); you may want to change `native` to `haswell` to achieve maximum compatibility if you are going to distribute executables).
 
 - AArch64 (ARM64)
 
