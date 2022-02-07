@@ -610,7 +610,7 @@ impl Interval {
 
     /// Returns `self` raised to the power of `rhs`.
     ///
-    /// For a fixed $n ∈ \Z$, the domain and the range of the point function $\operatorname{pown}(x, n)$ are:
+    /// For a fixed $n ∈ \Z$, the domain and the range of the point function $\operatorname{powi}(x, n)$ are:
     ///
     /// |                | Domain        | Range         |
     /// | -------------- | ------------- | ------------- |
@@ -620,11 +620,11 @@ impl Interval {
     /// | $n < 0$, odd   | $\R ∖ \set 0$ | $\R ∖ \set 0$ |
     /// | $n < 0$, even  | $\R ∖ \set 0$ | $(0, ∞)$      |
     #[must_use]
-    pub fn pown(self, rhs: i32) -> Self {
-        self.pown_impl(rhs).0
+    pub fn powi(self, rhs: i32) -> Self {
+        self.powi_impl(rhs).0
     }
 
-    fn pown_impl(self, rhs: i32) -> (Self, Decoration) {
+    fn powi_impl(self, rhs: i32) -> (Self, Decoration) {
         if self.is_empty() {
             return (self, Decoration::Trv);
         }
@@ -825,12 +825,12 @@ impl DecInterval {
     impl_dec!(log2, log2_impl);
     impl_dec2!(pow, pow_impl);
 
-    /// The decorated version of [`Interval::pown`].
+    /// The decorated version of [`Interval::powi`].
     ///
     /// A NaI is returned if `self` is NaI.
     #[must_use]
-    pub fn pown(self, rhs: i32) -> Self {
-        let (y, d) = self.x.pown_impl(rhs);
+    pub fn powi(self, rhs: i32) -> Self {
+        let (y, d) = self.x.powi_impl(rhs);
         Self::set_dec(y, self.d.min(d))
     }
 
@@ -866,7 +866,7 @@ mod tests {
         assert!(DI::NAI.log2().is_nai());
         assert!(DI::NAI.pow(DI::EMPTY).is_nai());
         assert!(DI::EMPTY.pow(DI::NAI).is_nai());
-        assert!(DI::NAI.pown(1).is_nai());
+        assert!(DI::NAI.powi(1).is_nai());
         assert!(DI::NAI.sin().is_nai());
         assert!(DI::NAI.sinh().is_nai());
         assert!(DI::NAI.tan().is_nai());
