@@ -20,6 +20,7 @@ impl Interval {
     /// ```
     ///
     /// See also: [`Interval::floor`], [`Interval::trunc`].
+    #[must_use]
     pub fn ceil(self) -> Self {
         // _mm_ceil_pd/_mm_floor_pd are slow, better to avoid shuffling them.
         // ceil([a, b]) = [-ceil(a); ceil(b)]
@@ -47,6 +48,7 @@ impl Interval {
     /// ```
     ///
     /// See also: [`Interval::ceil`], [`Interval::trunc`].
+    #[must_use]
     pub fn floor(self) -> Self {
         // floor([a, b]) = [-floor(a); floor(b)]
         let x = neg0(self.rep); // [a; b]
@@ -75,6 +77,7 @@ impl Interval {
     /// ```
     ///
     /// See also: [`Interval::round_ties_to_even`].
+    #[must_use]
     pub fn round(self) -> Self {
         Self {
             rep: round(self.rep),
@@ -102,6 +105,7 @@ impl Interval {
     /// ```
     ///
     /// See also: [`Interval::round`].
+    #[must_use]
     pub fn round_ties_to_even(self) -> Self {
         Self {
             rep: round_ties_to_even(self.rep),
@@ -128,6 +132,7 @@ impl Interval {
     /// assert_eq!(Interval::EMPTY.sign(), Interval::EMPTY);
     /// assert_eq!(Interval::ENTIRE.sign(), const_interval!(-1.0, 1.0));
     /// ```
+    #[must_use]
     pub fn sign(self) -> Self {
         if self.is_empty() {
             return Self::EMPTY;
@@ -164,6 +169,7 @@ impl Interval {
     /// ```
     ///
     /// See also: [`Interval::ceil`], [`Interval::floor`].
+    #[must_use]
     pub fn trunc(self) -> Self {
         Self {
             rep: trunc(self.rep),
@@ -182,6 +188,7 @@ macro_rules! impl_dec {
         #[doc = concat!("The decorated version of [`Interval::", stringify!($f), "`].")]
         ///
         /// A NaI is returned if `self` is NaI.
+        #[must_use]
         pub fn $f(self) -> Self {
             if self.is_nai() {
                 return self;
