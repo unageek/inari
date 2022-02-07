@@ -6,6 +6,7 @@ impl Interval {
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[0, ∞)$ |
+    #[must_use]
     pub fn abs(self) -> Self {
         use IntervalClass::*;
         match self.classify() {
@@ -32,6 +33,7 @@ impl Interval {
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R^2$ | $\R$  |
+    #[must_use]
     pub fn max(self, rhs: Self) -> Self {
         if HAS_MAXIMUM {
             // [max(a, c), max(b, d)] = [-max(a, c); max(b, d)] = [min(-a, -c); max(b, d)]
@@ -58,6 +60,7 @@ impl Interval {
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R^2$ | $\R$  |
+    #[must_use]
     pub fn min(self, rhs: Self) -> Self {
         if HAS_MAXIMUM {
             // [min(a, c), min(b, d)] = [-min(a, c); min(b, d)] = [max(-a, -c); min(b, d)]
@@ -84,6 +87,7 @@ impl DecInterval {
     /// The decorated version of [`Interval::abs`].
     ///
     /// A NaI is returned if `self` is NaI.
+    #[must_use]
     pub fn abs(self) -> Self {
         if self.is_nai() {
             return self;
@@ -95,6 +99,7 @@ impl DecInterval {
     /// The decorated version of [`Interval::max`].
     ///
     /// A NaI is returned if `self` or `rhs` is NaI.
+    #[must_use]
     pub fn max(self, rhs: Self) -> Self {
         if self.is_nai() {
             return self;
@@ -106,6 +111,7 @@ impl DecInterval {
     /// The decorated version of [`Interval::min`].
     ///
     /// A NaI is returned if `self` or `rhs` is NaI.
+    #[must_use]
     pub fn min(self, rhs: Self) -> Self {
         if self.is_nai() {
             return self;

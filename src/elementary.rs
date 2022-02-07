@@ -99,6 +99,7 @@ fn rem_euclid_2(x: f64) -> f64 {
 macro_rules! impl_log {
     ($(#[$meta:meta])* $f:ident, $f_impl:ident, $f_rd:ident, $f_ru:ident) => {
         $(#[$meta])*
+        #[must_use]
         pub fn $f(self) -> Self {
             self.$f_impl().0
         }
@@ -129,6 +130,7 @@ macro_rules! impl_log {
 macro_rules! impl_mono_inc {
     ($(#[$meta:meta])* $f:ident, $f_rd:ident, $f_ru:ident) => {
         $(#[$meta])*
+        #[must_use]
         pub fn $f(self) -> Self {
             if self.is_empty() {
                 return self;
@@ -145,6 +147,7 @@ impl Interval {
     /// | Domain      | Range      |
     /// | ----------- | ---------- |
     /// | $\[-1, 1\]$ | $\[0, π\]$ |
+    #[must_use]
     pub fn acos(self) -> Self {
         self.acos_impl().0
     }
@@ -171,6 +174,7 @@ impl Interval {
     /// | Domain    | Range     |
     /// | --------- | --------- |
     /// | $\[1, ∞)$ | $\[0, ∞)$ |
+    #[must_use]
     pub fn acosh(self) -> Self {
         self.acosh_impl().0
     }
@@ -197,6 +201,7 @@ impl Interval {
     /// | Domain      | Range           |
     /// | ----------- | --------------- |
     /// | $\[-1, 1\]$ | $\[-π/2, π/2\]$ |
+    #[must_use]
     pub fn asin(self) -> Self {
         self.asin_impl().0
     }
@@ -245,6 +250,7 @@ impl Interval {
     /// | Domain                | Range      |
     /// | --------------------- | ---------- |
     /// | $\R^2 ∖ \set{(0, 0)}$ | $(-π, π\]$ |
+    #[must_use]
     pub fn atan2(self, rhs: Self) -> Self {
         self.atan2_impl(rhs).0
     }
@@ -365,6 +371,7 @@ impl Interval {
     /// | Domain    | Range |
     /// | --------- | ----- |
     /// | $(-1, 1)$ | $\R$  |
+    #[must_use]
     pub fn atanh(self) -> Self {
         self.atanh_impl().0
     }
@@ -397,6 +404,7 @@ impl Interval {
     /// | Domain | Range       |
     /// | ------ | ----------- |
     /// | $\R$   | $\[-1, 1\]$ |
+    #[must_use]
     pub fn cos(self) -> Self {
         if self.is_empty() {
             return self;
@@ -443,6 +451,7 @@ impl Interval {
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[1, ∞)$ |
+    #[must_use]
     pub fn cosh(self) -> Self {
         if self.is_empty() {
             return self;
@@ -529,6 +538,7 @@ impl Interval {
     /// | Domain                              | Range     |
     /// | ----------------------------------- | --------- |
     /// | $((0, ∞) × \R) ∪ (\set 0 × (0, ∞))$ | $\[0, ∞)$ |
+    #[must_use]
     pub fn pow(self, rhs: Self) -> Self {
         self.pow_impl(rhs).0
     }
@@ -609,6 +619,7 @@ impl Interval {
     /// | $n = 0$        | $\R$          | $\set 1$      |
     /// | $n < 0$, odd   | $\R ∖ \set 0$ | $\R ∖ \set 0$ |
     /// | $n < 0$, even  | $\R ∖ \set 0$ | $(0, ∞)$      |
+    #[must_use]
     pub fn pown(self, rhs: i32) -> Self {
         self.pown_impl(rhs).0
     }
@@ -673,6 +684,7 @@ impl Interval {
     /// | Domain | Range       |
     /// | ------ | ----------- |
     /// | $\R$   | $\[-1, 1\]$ |
+    #[must_use]
     pub fn sin(self) -> Self {
         if self.is_empty() {
             return self;
@@ -719,6 +731,7 @@ impl Interval {
     /// | Domain                            | Range |
     /// | --------------------------------- | ----- |
     /// | $\R ∖ \set{(n + 1/2) π ∣ n ∈ \Z}$ | $\R$  |
+    #[must_use]
     pub fn tan(self) -> Self {
         self.tan_impl().0
     }
@@ -763,6 +776,7 @@ macro_rules! impl_dec {
         #[doc = concat!("The decorated version of [`Interval::", stringify!($f), "`].")]
         ///
         /// A NaI is returned if `self` is NaI.
+        #[must_use]
         pub fn $f(self) -> Self {
             Self::set_dec(self.x.$f(), self.d)
         }
@@ -772,6 +786,7 @@ macro_rules! impl_dec {
         #[doc = concat!("The decorated version of [`Interval::", stringify!($f), "`].")]
         ///
         /// A NaI is returned if `self` is NaI.
+        #[must_use]
         pub fn $f(self) -> Self {
             let (y, d) = self.x.$f_impl();
             Self::set_dec(y, self.d.min(d))
@@ -784,6 +799,7 @@ macro_rules! impl_dec2 {
         #[doc = concat!("The decorated version of [`Interval::", stringify!($f), "`].")]
         ///
         /// A NaI is returned if `self` or `rhs` is NaI.
+        #[must_use]
         pub fn $f(self, rhs: Self) -> Self {
             let (z, d) = self.x.$f_impl(rhs.x);
             Self::set_dec(z, self.d.min(rhs.d.min(d)))
@@ -812,6 +828,7 @@ impl DecInterval {
     /// The decorated version of [`Interval::pown`].
     ///
     /// A NaI is returned if `self` is NaI.
+    #[must_use]
     pub fn pown(self, rhs: i32) -> Self {
         let (y, d) = self.x.pown_impl(rhs);
         Self::set_dec(y, self.d.min(d))

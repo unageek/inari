@@ -10,6 +10,7 @@ impl Interval {
     /// | $\R^3$ | $\R$  |
     // Almost a copy-paste of mul. Additions/modifications are indicated with "// *".
     #[allow(clippy::many_single_char_names)]
+    #[must_use]
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
         if addend.is_empty() {
             return Self::EMPTY; // *
@@ -98,6 +99,7 @@ impl Interval {
     /// | Domain        | Range         |
     /// | ------------- | ------------- |
     /// | $\R ∖ \set 0$ | $\R ∖ \set 0$ |
+    #[must_use]
     pub fn recip(self) -> Self {
         use IntervalClass::*;
         match self.classify() {
@@ -139,6 +141,7 @@ impl Interval {
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[0, ∞)$ |
+    #[must_use]
     pub fn sqr(self) -> Self {
         use IntervalClass::*;
         match self.classify() {
@@ -173,6 +176,7 @@ impl Interval {
     /// | Domain    | Range     |
     /// | --------- | --------- |
     /// | $\[0, ∞)$ | $\[0, ∞)$ |
+    #[must_use]
     pub fn sqrt(self) -> Self {
         if self.is_empty() {
             return Self::EMPTY;
@@ -195,6 +199,7 @@ impl DecInterval {
     /// The decorated version of [`Interval::mul_add`].
     ///
     /// A NaI is returned if `self`, `rhs` or `addend` is NaI.
+    #[must_use]
     pub fn mul_add(self, rhs: Self, addend: Self) -> Self {
         if self.is_nai() || rhs.is_nai() || addend.is_nai() {
             return Self::NAI;
@@ -209,6 +214,7 @@ impl DecInterval {
     /// The decorated version of [`Interval::recip`].
     ///
     /// A NaI is returned if `self` is NaI.
+    #[must_use]
     pub fn recip(self) -> Self {
         if self.is_nai() {
             return self;
@@ -225,6 +231,7 @@ impl DecInterval {
     /// The decorated version of [`Interval::sqr`].
     ///
     /// A NaI is returned if `self` is NaI.
+    #[must_use]
     pub fn sqr(self) -> Self {
         if self.is_nai() {
             return self;
@@ -236,6 +243,7 @@ impl DecInterval {
     /// The decorated version of [`Interval::sqrt`].
     ///
     /// A NaI is returned if `self` is NaI.
+    #[must_use]
     pub fn sqrt(self) -> Self {
         if self.is_nai() {
             return self;

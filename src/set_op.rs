@@ -7,6 +7,7 @@ impl Interval {
     /// | :----------------: | :--------: | :------------------------------------: |
     /// | $\self = ∅$        | $∅$        | $\[c, d\]$                             |
     /// | $\self = \[a, b\]$ | $\[a, b\]$ | $\[\min \set{a, c}, \max \set{b, d}\]$ |
+    #[must_use]
     pub fn convex_hull(self, rhs: Self) -> Self {
         if self.is_empty() {
             return rhs;
@@ -28,6 +29,7 @@ impl Interval {
     /// | :----------------: | :--------: | :------------------------------------: |
     /// | $\self = ∅$        | $∅$        | $∅$                                    |
     /// | $\self = \[a, b\]$ | $∅$        | $\[\max \set{a, c}, \min \set{b, d}\]$ |
+    #[must_use]
     pub fn intersection(self, rhs: Self) -> Self {
         if self.either_empty(rhs) {
             return Self::EMPTY;
@@ -53,6 +55,7 @@ macro_rules! impl_dec {
         /// and returns the result decorated with [`Decoration::Trv`].
         ///
         /// A NaI is returned if `self` or `rhs` is NaI.
+        #[must_use]
         pub fn $f(self, rhs: Self) -> Self {
             if self.is_nai() || rhs.is_nai() {
                 return Self::NAI;

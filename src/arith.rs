@@ -1,5 +1,6 @@
 use crate::{classify::*, interval::*, simd::*};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use forward_ref::*;
 
 impl Neg for Interval {
     type Output = Self;
@@ -12,6 +13,8 @@ impl Neg for Interval {
     }
 }
 
+forward_ref_unop!(impl Neg, neg for Interval);
+
 impl Add for Interval {
     type Output = Self;
 
@@ -23,6 +26,8 @@ impl Add for Interval {
     }
 }
 
+forward_ref_binop!(impl Add, add for Interval, Interval);
+
 impl Sub for Interval {
     type Output = Self;
 
@@ -33,6 +38,8 @@ impl Sub for Interval {
         Self { rep: add_ru(x, y) }
     }
 }
+
+forward_ref_binop!(impl Sub, sub for Interval, Interval);
 
 impl Mul for Interval {
     type Output = Self;
@@ -125,6 +132,8 @@ impl Mul for Interval {
         }
     }
 }
+
+forward_ref_binop!(impl Mul, mul for Interval, Interval);
 
 impl Div for Interval {
     type Output = Self;
@@ -223,6 +232,8 @@ impl Div for Interval {
     }
 }
 
+forward_ref_binop!(impl Div, div for Interval, Interval);
+
 impl Neg for DecInterval {
     type Output = Self;
 
@@ -234,6 +245,8 @@ impl Neg for DecInterval {
         Self::set_dec(-self.x, self.d)
     }
 }
+
+forward_ref_unop!(impl Neg, neg for DecInterval);
 
 impl Add for DecInterval {
     type Output = Self;
@@ -247,6 +260,8 @@ impl Add for DecInterval {
     }
 }
 
+forward_ref_binop!(impl Add, add for DecInterval, DecInterval);
+
 impl Sub for DecInterval {
     type Output = Self;
 
@@ -259,6 +274,8 @@ impl Sub for DecInterval {
     }
 }
 
+forward_ref_binop!(impl Sub, sub for DecInterval, DecInterval);
+
 impl Mul for DecInterval {
     type Output = Self;
 
@@ -270,6 +287,8 @@ impl Mul for DecInterval {
         Self::set_dec(self.x * rhs.x, self.d.min(rhs.d))
     }
 }
+
+forward_ref_binop!(impl Mul, mul for DecInterval, DecInterval);
 
 impl Div for DecInterval {
     type Output = Self;
@@ -288,6 +307,8 @@ impl Div for DecInterval {
     }
 }
 
+forward_ref_binop!(impl Div, div for DecInterval, DecInterval);
+
 macro_rules! impl_op_assign {
     ($OpAssign:ident, $op_assign:ident, $op:ident) => {
         impl $OpAssign for Interval {
@@ -296,11 +317,17 @@ macro_rules! impl_op_assign {
             }
         }
 
+        forward_ref_op_assign!(impl $OpAssign, $op_assign for Interval,
+                               Interval);
+
         impl $OpAssign for DecInterval {
             fn $op_assign(&mut self, rhs: Self) {
                 *self = self.$op(rhs);
             }
         }
+
+        forward_ref_op_assign!(impl $OpAssign, $op_assign for DecInterval,
+                               DecInterval);
     };
 }
 
