@@ -42,34 +42,11 @@ impl InfSup {
 }
 
 /// An extended rational number.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 enum Number {
     NegInfinity,
     Rational(Rational),
     Infinity,
-}
-
-impl Ord for Number {
-    fn cmp(&self, other: &Self) -> Ordering {
-        use Number::*;
-
-        match (self, other) {
-            (NegInfinity, Rational(_)) | (NegInfinity, Infinity) | (Rational(_), Infinity) => {
-                Ordering::Less
-            }
-            (Rational(_), NegInfinity) | (Infinity, NegInfinity) | (Infinity, Rational(_)) => {
-                Ordering::Greater
-            }
-            (Rational(a), Rational(b)) => a.cmp(b),
-            _ => Ordering::Equal,
-        }
-    }
-}
-
-impl PartialOrd for Number {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl std::ops::Neg for Number {
