@@ -1,6 +1,5 @@
 use crate::simd::*;
 use std::{
-    cmp::Ordering,
     convert::TryFrom,
     error::Error,
     fmt,
@@ -113,7 +112,7 @@ impl TryFrom<(f64, f64)> for Interval {
 }
 
 /// The decoration of a [`DecInterval`].
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[repr(u8)]
 pub enum Decoration {
     /// The “ill-formed” decoration.
@@ -126,18 +125,6 @@ pub enum Decoration {
     Dac = 12,
     /// The “common” decoration.
     Com = 16,
-}
-
-impl Ord for Decoration {
-    fn cmp(&self, rhs: &Self) -> Ordering {
-        (*self as u8).cmp(&(*rhs as u8))
-    }
-}
-
-impl PartialOrd for Decoration {
-    fn partial_cmp(&self, rhs: &Self) -> Option<Ordering> {
-        Some(self.cmp(rhs))
-    }
 }
 
 /// The decorated version of [`Interval`].
