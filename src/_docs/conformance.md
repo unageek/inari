@@ -30,7 +30,7 @@ Some operations are only available when the crate is built with the conditional 
 | sqr(_x_)             | [`x.sqr()`](`Interval::sqr`)                               | -              |
 | sqrt(_x_)            | [`x.sqrt()`](`Interval::sqrt`)                             | -              |
 | fma(_x_, _y_, _z_)   | [`x.mul_add(y, z)`](`Interval::mul_add`)                   | -              |
-| pown(_x_, _n_)       | [`x.pown(n)`](`Interval::pown`)                            | Yes            |
+| pown(_x_, _n_)       | [`x.powi(n)`](`Interval::powi`)                            | Yes            |
 | pow(_x_, _y_)        | [`x.pow(y)`](`Interval::pow`)                              | Yes            |
 | exp(_x_)             | [`x.exp()`](`Interval::exp`)                               | Yes            |
 | exp2(_x_)            | [`x.exp2()`](`Interval::exp2`)                             | Yes            |

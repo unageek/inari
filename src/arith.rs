@@ -1,6 +1,6 @@
 use crate::{classify::*, interval::*, simd::*};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use forward_ref::*;
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 impl Neg for Interval {
     type Output = Self;
