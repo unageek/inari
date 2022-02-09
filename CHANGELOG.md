@@ -2,7 +2,7 @@
 
 The icon ⚠️ indicates a breaking change.
 
-## Unreleased
+## v0.13.0 - 2021-02-09
 
 ### Changed
 
