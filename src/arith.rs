@@ -433,4 +433,59 @@ mod tests {
         assert!((DI::NAI / DI::PI).is_nai());
         assert!((DI::PI / DI::NAI).is_nai());
     }
+
+    #[allow(clippy::op_ref)]
+    #[test]
+    fn ref_type_args() {
+        const E: I = I::EMPTY;
+        const DE: DI = DI::EMPTY;
+
+        let _ = -&E;
+
+        let _ = &E + E;
+        let _ = E + &E;
+        let _ = &E + &E;
+
+        let _ = &E - E;
+        let _ = E - &E;
+        let _ = &E - &E;
+
+        let _ = &E * E;
+        let _ = E * &E;
+        let _ = &E * &E;
+
+        let _ = &E / E;
+        let _ = E / &E;
+        let _ = &E / &E;
+
+        let _ = -&DE;
+
+        let _ = &DE + DE;
+        let _ = DE + &DE;
+        let _ = &DE + &DE;
+
+        let _ = &DE - DE;
+        let _ = DE - &DE;
+        let _ = &DE - &DE;
+
+        let _ = &DE * DE;
+        let _ = DE * &DE;
+        let _ = &DE * &DE;
+
+        let _ = &DE / DE;
+        let _ = DE / &DE;
+        let _ = &DE / &DE;
+
+        let mut e = I::EMPTY;
+        e += &E;
+        e -= &E;
+        e *= &E;
+        e /= &E;
+
+        let mut de = DI::EMPTY;
+        de += &DE;
+        de -= &DE;
+        de *= &DE;
+        de /= &DE;
+    }
 }
