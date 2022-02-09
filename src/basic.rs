@@ -5,6 +5,8 @@ use crate::{classify::*, interval::*, simd::*};
 impl Interval {
     /// Returns $(\self × \rhs) + \addend$.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R^3$ | $\R$  |
@@ -96,6 +98,8 @@ impl Interval {
 
     /// Returns the multiplicative inverse of `self`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain        | Range         |
     /// | ------------- | ------------- |
     /// | $\R ∖ \set 0$ | $\R ∖ \set 0$ |
@@ -138,6 +142,8 @@ impl Interval {
 
     /// Returns the square of `self`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[0, ∞)$ |
@@ -172,6 +178,8 @@ impl Interval {
     }
 
     /// Returns the principal square root of `self`.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain    | Range     |
     /// | --------- | --------- |

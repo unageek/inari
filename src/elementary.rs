@@ -144,6 +144,8 @@ macro_rules! impl_mono_inc {
 impl Interval {
     /// Returns the inverse cosine of `self`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain      | Range      |
     /// | ----------- | ---------- |
     /// | $\[-1, 1\]$ | $\[0, π\]$ |
@@ -171,6 +173,8 @@ impl Interval {
 
     /// Returns the inverse hyperbolic cosine of `self`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain    | Range     |
     /// | --------- | --------- |
     /// | $\[1, ∞)$ | $\[0, ∞)$ |
@@ -197,6 +201,8 @@ impl Interval {
     }
 
     /// Returns the inverse sine of `self`.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain      | Range           |
     /// | ----------- | --------------- |
@@ -226,6 +232,8 @@ impl Interval {
     impl_mono_inc!(
         /// Returns the inverse hyperbolic sine of `self`.
         ///
+        /// The domain and the range of the point function are:
+        ///
         /// | Domain | Range |
         /// | ------ | ----- |
         /// | $\R$   | $\R$  |
@@ -235,6 +243,8 @@ impl Interval {
     );
     impl_mono_inc!(
         /// Returns the inverse tangent of `self`.
+        ///
+        /// The domain and the range of the point function are:
         ///
         /// | Domain | Range         |
         /// | ------ | ------------- |
@@ -246,6 +256,8 @@ impl Interval {
 
     /// Returns the angle of the point $(\rhs, \self)$ measured counterclockwise from the positive
     /// $x$-axis in the Euclidean plane.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain                | Range      |
     /// | --------------------- | ---------- |
@@ -368,6 +380,8 @@ impl Interval {
 
     /// Returns the inverse hyperbolic tangent of `self`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain    | Range |
     /// | --------- | ----- |
     /// | $(-1, 1)$ | $\R$  |
@@ -400,6 +414,8 @@ impl Interval {
     }
 
     /// Returns the cosine of `self`.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain | Range       |
     /// | ------ | ----------- |
@@ -448,6 +464,8 @@ impl Interval {
 
     /// Returns the hyperbolic cosine of `self`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[1, ∞)$ |
@@ -471,6 +489,8 @@ impl Interval {
     impl_mono_inc!(
         /// Returns `self` raised to the power of $\e$.
         ///
+        /// The domain and the range of the point function are:
+        ///
         /// | Domain | Range    |
         /// | ------ | -------- |
         /// | $\R$   | $(0, ∞)$ |
@@ -481,6 +501,8 @@ impl Interval {
     impl_mono_inc!(
         /// Returns `self` raised to the power of 10.
         ///
+        /// The domain and the range of the point function are:
+        ///
         /// | Domain | Range    |
         /// | ------ | -------- |
         /// | $\R$   | $(0, ∞)$ |
@@ -490,6 +512,8 @@ impl Interval {
     );
     impl_mono_inc!(
         /// Returns `self` raised to the power of 2.
+        ///
+        /// The domain and the range of the point function are:
         ///
         /// | Domain | Range    |
         /// | ------ | -------- |
@@ -502,6 +526,8 @@ impl Interval {
     impl_log!(
         /// Returns the natural logarithm of `self`.
         ///
+        /// The domain and the range of the point function are:
+        ///
         /// | Domain   | Range |
         /// | -------- | ----- |
         /// | $(0, ∞)$ | $\R$  |
@@ -512,6 +538,8 @@ impl Interval {
     );
     impl_log!(
         /// Returns the base-10 logarithm of `self`.
+        ///
+        /// The domain and the range of the point function are:
         ///
         /// | Domain   | Range |
         /// | -------- | ----- |
@@ -524,6 +552,8 @@ impl Interval {
     impl_log!(
         /// Returns the base-2 logarithm of `self`.
         ///
+        /// The domain and the range of the point function are:
+        ///
         /// | Domain   | Range |
         /// | -------- | ----- |
         /// | $(0, ∞)$ | $\R$  |
@@ -534,6 +564,17 @@ impl Interval {
     );
 
     /// Returns `self` raised to the power of `rhs`.
+    ///
+    /// The point function is defined as follows:
+    ///
+    /// $$
+    /// x^y = \begin{cases}
+    ///   0           & \for x = 0 ∧ y > 0, \\\\
+    ///   e^{y \ln x} & \for x > 0.
+    ///  \end{cases}
+    /// $$
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain                              | Range     |
     /// | ----------------------------------- | --------- |
@@ -610,7 +651,17 @@ impl Interval {
 
     /// Returns `self` raised to the power of `rhs`.
     ///
-    /// For a fixed $n ∈ \Z$, the domain and the range of the point function $\operatorname{powi}(x, n)$ are:
+    /// The point functions are indexed by $n$, and are defined as follows:
+    ///
+    /// $$
+    /// x^n = \begin{cases}
+    ///   \overbrace{x × ⋯ × x}^{n \text{ copies}} & \for n > 0, \\\\
+    ///   1          & \for n = 0, \\\\
+    ///   1 / x^{-n} & \for n < 0.
+    ///  \end{cases}
+    /// $$
+    ///
+    /// The domains and the ranges of the point functions are:
     ///
     /// |                | Domain        | Range         |
     /// | -------------- | ------------- | ------------- |
@@ -681,6 +732,8 @@ impl Interval {
 
     /// Returns the sine of `self`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range       |
     /// | ------ | ----------- |
     /// | $\R$   | $\[-1, 1\]$ |
@@ -718,6 +771,8 @@ impl Interval {
     impl_mono_inc!(
         /// Returns the hyperbolic sine of `self`.
         ///
+        /// The domain and the range of the point function are:
+        ///
         /// | Domain | Range |
         /// | ------ | ----- |
         /// | $\R$   | $\R$  |
@@ -727,6 +782,8 @@ impl Interval {
     );
 
     /// Returns the tangent of `self`.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain                            | Range |
     /// | --------------------------------- | ----- |
@@ -761,6 +818,8 @@ impl Interval {
 
     impl_mono_inc!(
         /// Returns the hyperbolic tangent of `self`.
+        ///
+        /// The domain and the range of the point function are:
         ///
         /// | Domain | Range     |
         /// | ------ | --------- |

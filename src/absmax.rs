@@ -3,6 +3,8 @@ use crate::{classify::*, interval::*, simd::*};
 impl Interval {
     /// Returns the absolute value of `self`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range     |
     /// | ------ | --------- |
     /// | $\R$   | $\[0, ∞)$ |
@@ -30,6 +32,8 @@ impl Interval {
 
     /// Returns the maximum of `self` and `rhs`.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R^2$ | $\R$  |
@@ -56,6 +60,8 @@ impl Interval {
     }
 
     /// Returns the minimum of `self` and `rhs`.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain | Range |
     /// | ------ | ----- |

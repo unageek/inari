@@ -3,6 +3,8 @@ use crate::{interval::*, simd::*};
 impl Interval {
     /// Rounds `self` to the closest integer toward $+∞$.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R$   | $\Z$  |
@@ -31,6 +33,8 @@ impl Interval {
 
     /// Rounds `self` to the closest integer toward $-∞$.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R$   | $\Z$  |
@@ -57,6 +61,8 @@ impl Interval {
     }
 
     /// Rounds `self` to the closest integer, away from zero in case of ties.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain | Range |
     /// | ------ | ----- |
@@ -86,6 +92,8 @@ impl Interval {
 
     /// Rounds `self` to the closest integer, the even number in case of ties.
     ///
+    /// The domain and the range of the point function are:
+    ///
     /// | Domain | Range |
     /// | ------ | ----- |
     /// | $\R$   | $\Z$  |
@@ -113,6 +121,8 @@ impl Interval {
     }
 
     /// Returns the sign of `self`.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain | Range            |
     /// | ------ | ---------------- |
@@ -151,6 +161,8 @@ impl Interval {
     }
 
     /// Rounds `self` to the closest integer toward zero.
+    ///
+    /// The domain and the range of the point function are:
     ///
     /// | Domain | Range |
     /// | ------ | ----- |
