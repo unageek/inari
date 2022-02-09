@@ -1,6 +1,16 @@
 # Changelog
 
-The ❗ icon indicates a breaking change.
+The icon ⚠️ indicates a breaking change.
+
+## Unreleased
+
+### Changed
+
+- ⚠️ Renamed `(Dec)Interval::pown` to `(Dec)Interval::powi` so that it matches with the standard method `f64::powi`.
+
+### Added
+
+- Implemented the standard arithmetic operators `std::ops::{Neg, Add, Sub, Mul, Div}` and the corresponding assignment operators `std::ops::{AddAssign, SubAssign, MulAssign, DivAssign}` for `(Dec)Interval` for the cases when one or both of the arguments are given by reference.
 
 ## v0.12.0 - 2021-12-16
 
@@ -30,7 +40,7 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Removed
 
-- ❗ Removed the method `IntervalError::value`.
+- ⚠️ Removed the method `IntervalError::value`.
 
   Previously, the following values were returned by the method:
 
@@ -41,8 +51,8 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Changed
 
-- ❗ Changed the return type of the functions `(Dec)Interval::try_from_be_bytes`, `try_from_le_bytes` and `try_from_ne_bytes` to `Option<(Dec)Interval>`.
-- ❗ Changed the struct `IntervalError` to be non-generic due to the removal of the `value` method.
+- ⚠️ Changed the return type of the functions `(Dec)Interval::try_from_be_bytes`, `try_from_le_bytes` and `try_from_ne_bytes` to `Option<(Dec)Interval>`.
+- ⚠️ Changed the struct `IntervalError` to be non-generic due to the removal of the `value` method.
 
 ## v0.9.9 - 2021-06-18
 
@@ -72,7 +82,7 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Changed
 
-- ❗ Explicitly check the target CPU features during compilation. From this version, you need to specify `RUSTFLAGS='-Ctarget-cpu=<CPU>'`, where `<CPU>` must be `haswell` or a newer microarchitecture; otherwise, build fails.
+- ⚠️ Explicitly check the target CPU features during compilation. From this version, you need to specify `RUSTFLAGS='-Ctarget-cpu=<CPU>'`, where `<CPU>` must be `haswell` or a newer microarchitecture; otherwise, build fails.
 
 ## v0.8.0 - 2020-11-24
 
@@ -84,20 +94,20 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Removed
 
-- ❗ Removed the enum variant `IntervalErrorKind::IntvlPartOfNaI`.
+- ⚠️ Removed the enum variant `IntervalErrorKind::IntvlPartOfNaI`.
 
 ### Changed
 
-- ❗ Renamed the method `(Dec)Interval::round_ties_to_away` to `round`.
-- ❗ Renamed the methods `DecInterval::interval_part` and `decoration_part` to `interval` and `decoration`, respectively.
-- ❗ Changed the return type of the method `DecInterval::interval` (former `interval_part`) to `Option<Interval>` from `Result<Interval>`.
-- ❗ Renamed the enum `OverlappingState` to `Overlap`.
+- ⚠️ Renamed the method `(Dec)Interval::round_ties_to_away` to `round`.
+- ⚠️ Renamed the methods `DecInterval::interval_part` and `decoration_part` to `interval` and `decoration`, respectively.
+- ⚠️ Changed the return type of the method `DecInterval::interval` (former `interval_part`) to `Option<Interval>` from `Result<Interval>`.
+- ⚠️ Renamed the enum `OverlappingState` to `Overlap`.
 
 ## v0.7.0 - 2020-11-14
 
 ### Changed
 
-- ❗ Renamed `DecoratedInterval` to `DecInterval`. Now its name is consistent with the macro `(const_)dec_interval!`.
+- ⚠️ Renamed `DecoratedInterval` to `DecInterval`. Now its name is consistent with the macro `(const_)dec_interval!`.
 
 ## v0.6.1 - 2020-09-25
 
@@ -113,13 +123,13 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Removed
 
-- ❗ Removed the enum variant `OverlappingState::Undefined`.
+- ⚠️ Removed the enum variant `OverlappingState::Undefined`.
 
 ### Changed
 
-- ❗ Changed the return type of the method `DecoratedInterval::overlap` to `Option<OverlappingState>` from `OverlappingState`.
+- ⚠️ Changed the return type of the method `DecoratedInterval::overlap` to `Option<OverlappingState>` from `OverlappingState`.
   - Now it returns `None` if at least one of its arguments is NaI.
-- ❗ Renamed the enum variant `OverlappingState::Equal` to `Equals`.
+- ⚠️ Renamed the enum variant `OverlappingState::Equal` to `Equals`.
 
 ## v0.5.1 - 2020-08-31
 
@@ -131,7 +141,7 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Changed
 
-- ❗ Renamed the method `(Decorated)Interval::log` to `ln` to make them consistent with `f64::ln`.
+- ⚠️ Renamed the method `(Decorated)Interval::log` to `ln` to make them consistent with `f64::ln`.
 
 ## v0.4.0 - 2020-08-25
 
@@ -168,11 +178,11 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Removed
 
-- ❗ Removed the functions `(Decorated)Interval::empty`, `entire` and `DecoratedInterval::nai` in favor of the new constants.
+- ⚠️ Removed the functions `(Decorated)Interval::empty`, `entire` and `DecoratedInterval::nai` in favor of the new constants.
 
 ### Changed
 
-- ❗ Changeed the representation of the struct `DecoratedInterval` to `#[repr(C)]` from the default one, while users must not rely on it.
+- ⚠️ Changeed the representation of the struct `DecoratedInterval` to `#[repr(C)]` from the default one, while users must not rely on it.
 
 ## v0.2.1 - 2020-07-17
 
@@ -188,14 +198,14 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
   - Added the struct `DecoratedInterval`.
   - Added the macro `dec_interval!` that constructs a decorated interval.
   - Added the enum `Decoration`.
-  - ❗ Added the enum variant `IntervalErrorKind::IntvlPartOfNaI`.
-  - ❗ Added the enum variant `OverlappingState::Undefined`.
+  - ⚠️ Added the enum variant `IntervalErrorKind::IntvlPartOfNaI`.
+  - ⚠️ Added the enum variant `OverlappingState::Undefined`.
 - Added the macro rule `interval!("...", exact)` that constructs an interval from an exact interval literal (`exactToInterval` in the standard).
 
 ### Changed
 
-- ❗ Renamed the function `Interval::is_member` to `contains` and swapped the order of parameters to make it a method.
-- ❗ Changed the method `IntervalError<T>::value` to take `self` instead of `&self`.
+- ⚠️ Renamed the function `Interval::is_member` to `contains` and swapped the order of parameters to make it a method.
+- ⚠️ Changed the method `IntervalError<T>::value` to take `self` instead of `&self`.
 
 ## v0.1.0 - 2020-07-03
 
