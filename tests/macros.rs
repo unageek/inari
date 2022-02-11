@@ -41,7 +41,7 @@ fn macros_gmp() {
         inari::const_interval!(1.0, 2.0)
     );
     assert_eq!(
-        inari::interval!("[1.0, 2.0]", exact).unwrap(),
+        inari::interval_exact!("[1.0, 2.0]").unwrap(),
         inari::const_interval!(1.0, 2.0)
     );
     assert_eq!(
