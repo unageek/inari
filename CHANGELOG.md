@@ -2,6 +2,12 @@
 
 The icon ⚠️ indicates a breaking change.
 
+## v0.14.0 - 2021-02-11
+
+### Changed
+
+- ⚠️ Revised the syntax of the macro `interval!(s, exact)` to `interval_exact!(s)`.
+
 ## v0.13.0 - 2021-02-09
 
 ### Changed
