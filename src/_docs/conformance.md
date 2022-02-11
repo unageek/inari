@@ -168,10 +168,10 @@ See [Constructors](#constructors).
 
 #### Exact text representation
 
-| Operation            | Implementation                       | Requires `gmp` |
-| -------------------- | ------------------------------------ | -------------- |
-| intervalToExact(_x_) | `format!("{:x}", x)`                 | Yes            |
-| exactToInterval(_s_) | [`interval!(s, exact)`](`interval!`) | Yes            |
+| Operation            | Implementation                            | Requires `gmp` |
+| -------------------- | ----------------------------------------- | -------------- |
+| intervalToExact(_x_) | `format!("{:x}", x)`                      | Yes            |
+| exactToInterval(_s_) | [`interval_exact!(s)`](`interval_exact!`) | Yes            |
 
 ### Interchange representations and encodings
 

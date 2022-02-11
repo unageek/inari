@@ -254,27 +254,25 @@ macro_rules! interval {
 
 /// Creates an [`Interval`] from [`f64`] bounds or from a bare interval literal.
 ///
-/// In case of a failure, it returns a [`Result<Interval>`] instead of an [`Interval`].
-///
-/// If the construction is invalid,
-/// an [`Err`] with [`IntervalErrorKind::UndefinedOperation`] is returned.
-/// If it cannot determine whether the construction is valid or not,
-/// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
+/// There are two variants of the macro:
 ///
 /// - `interval!(a, b)`
 ///
-///   Creates an interval $\[a, b\]$, where `a` and `b` are [`f64`] values.
+///   Creates an interval $\[a, b\]$.
+///   The condition $a ≤ b ∧ a < +∞ ∧ b > -∞$ must be held.
 ///
-///   The conditions $a ≤ b$, $a < +∞$ and $b > -∞$ must be held.
+///   `a` and `b` must be [`f64`] values.
 ///
 /// - `interval!(s)`
 ///
 ///   Creates an interval from a bare interval literal. `s` must be a string slice ([`&str`]).
 ///
-/// - `interval!(s, exact)`
+/// The result is a [`Result<Interval>`].
 ///
-///   Creates an interval $𝒙$ from the bare interval literal obtained by `format!("{:x}", x)`.
-///   `s` must be a string slice ([`&str`]).
+/// If the construction is invalid,
+/// an [`Err`] value with [`IntervalErrorKind::UndefinedOperation`] is returned.
+/// If it fails to determine whether the construction is valid or not,
+/// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
 ///
 /// For creating a constant, the macro [`const_interval!`] should be preferred over this one.
 #[cfg(feature = "gmp")]
@@ -299,6 +297,52 @@ macro_rules! interval {
     };
 }
 
+/// Creates an [`Interval`] from a bare interval literal, only if the conversion is exact.
+///
+/// `s` must be a string slice ([`&str`]). THe result is a [`Result<Interval>`].
+///
+/// If the construction is invalid or inexact,
+/// an [`Err`] value with [`IntervalErrorKind::UndefinedOperation`] is returned.
+/// If it fails to determine whether the construction is valid or not,
+/// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
+///
+/// Bare interval literals obtained by `format!("{:x}", x)` should always be converted back.
+///
+/// ## Examples
+///
+/// ### Exact construction
+///
+/// ```
+/// use inari::*;
+/// assert_eq!(interval_exact!("[1.25]"), Ok(const_interval!(1.25, 1.25)));
+/// ```
+///
+/// ```
+/// use inari::*;
+/// let s = format!("{:x}", Interval::PI);
+/// assert_eq!(s, "[0x3.243f6a8885a3p+0,0x3.243f6a8885a32p+0]");
+/// assert_eq!(interval_exact!(&s), Ok(Interval::PI));
+/// ```
+///
+/// ### Inexact construction
+///
+/// ```
+/// use inari::*;
+/// let result = interval_exact!("[0.1]");
+/// assert!(result.is_err());
+/// assert_eq!(result.unwrap_err().kind(), IntervalErrorKind::UndefinedOperation);
+/// ```
+#[cfg(feature = "gmp")]
+#[macro_export]
+macro_rules! interval_exact {
+    ($s:expr) => {{
+        use ::std::primitive::*;
+        fn is_str(_: &str) {}
+        is_str($s);
+        $crate::Interval::_try_from_str_exact($s)
+    }};
+}
+
 #[doc(hidden)]
 #[macro_export]
 macro_rules! _dec_interval {
@@ -321,24 +365,26 @@ macro_rules! dec_interval {
 
 /// Creates a [`DecInterval`] from [`f64`] bounds or from a decorated interval literal.
 ///
-/// In case of a failure, it returns a [`Result<DecInterval>`] instead of a [`DecInterval`].
-///
-/// If the construction is invalid,
-/// an [`Err`] with [`IntervalErrorKind::UndefinedOperation`] is returned.
-/// If it cannot determine whether the construction is valid or not,
-/// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
+/// There are two variants of the macro:
 ///
 /// - `dec_interval!(a, b)`
 ///
-///   Creates a decorated interval $\[a, b\]$ with the strongest decoration,
-///   where `a` and `b` are [`f64`] values.
+///   Creates a decorated interval $\[a, b\]$ with the strongest decoration.
+///   The condition $a ≤ b ∧ a < +∞ ∧ b > -∞$ must be held.
 ///
-///   The conditions $a ≤ b$, $a < +∞$ and $b > -∞$ must be held.
+///   `a` and `b` must be [`f64`] values.
 ///
 /// - `dec_interval!(s)`
 ///
 ///   Creates a decorated interval from a decorated interval literal.
 ///   `s` must be a string slice ([`&str`]).
+///
+/// The result is a [`Result<DecInterval>`].
+///
+/// If the construction is invalid,
+/// an [`Err`] value with [`IntervalErrorKind::UndefinedOperation`] is returned.
+/// If it fails to determine whether the construction is valid or not,
+/// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
 ///
 /// For creating a constant, the macro [`const_dec_interval!`] should be preferred over this one.
 #[cfg(feature = "gmp")]
@@ -357,6 +403,8 @@ macro_rules! dec_interval {
 }
 
 /// Creates an [`Interval`] from [`f64`] bounds.
+///
+/// `a` and `b` must be constant `f64` values. The result is an [`Interval`].
 ///
 /// The macro can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
 ///
@@ -379,6 +427,8 @@ macro_rules! const_interval {
 }
 
 /// Creates a [`DecInterval`] from [`f64`] bounds.
+///
+/// `a` and `b` must be constant `f64` values. The result is a [`DecInterval`].
 ///
 /// The macro can be used in [constant expressions](https://doc.rust-lang.org/reference/const_eval.html#constant-expressions).
 ///

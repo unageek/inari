@@ -681,42 +681,42 @@ mod tests {
 
     #[test]
     fn try_from_str_exact() {
-        assert_eq!(interval!("[]", exact).unwrap(), I::EMPTY);
-        assert_eq!(interval!("[Empty]", exact).unwrap(), I::EMPTY);
-        assert_eq!(interval!("[Entire]", exact).unwrap(), I::ENTIRE);
+        assert_eq!(interval_exact!("[]").unwrap(), I::EMPTY);
+        assert_eq!(interval_exact!("[Empty]").unwrap(), I::EMPTY);
+        assert_eq!(interval_exact!("[Entire]").unwrap(), I::ENTIRE);
         assert_eq!(
-            interval!("[0.0, 1.0]", exact).unwrap(),
+            interval_exact!("[0.0, 1.0]").unwrap(),
             const_interval!(0.0, 1.0)
         );
         assert_eq!(
-            interval!("[0.0, 0.1]", exact).unwrap_err().kind(),
+            interval_exact!("[0.0, 0.1]").unwrap_err().kind(),
             UndefinedOperation
         );
         assert_eq!(
-            interval!("[0.1, 1.0]", exact).unwrap_err().kind(),
+            interval_exact!("[0.1, 1.0]").unwrap_err().kind(),
             UndefinedOperation
         );
 
         // The smallest positive subnormal number.
         let f = 5e-324;
         assert_eq!(
-            interval!("[0x0.0000000000001p-1022]", exact).unwrap(),
+            interval_exact!("[0x0.0000000000001p-1022]").unwrap(),
             interval!(f, f).unwrap()
         );
         assert_eq!(
-            interval!("[0x0.0000000000000ffp-1022]", exact)
+            interval_exact!("[0x0.0000000000000ffp-1022]")
                 .unwrap_err()
                 .kind(),
             UndefinedOperation
         );
         assert_eq!(
-            interval!("[0x0.000000000000101p-1022]", exact)
+            interval_exact!("[0x0.000000000000101p-1022]")
                 .unwrap_err()
                 .kind(),
             UndefinedOperation
         );
         assert_eq!(
-            interval!("[0x0.0000000000001p-1023]", exact)
+            interval_exact!("[0x0.0000000000001p-1023]")
                 .unwrap_err()
                 .kind(),
             UndefinedOperation
@@ -725,30 +725,30 @@ mod tests {
         // The largest normal number.
         let f = f64::MAX;
         assert_eq!(
-            interval!("[0x1.fffffffffffffp+1023]", exact).unwrap(),
+            interval_exact!("[0x1.fffffffffffffp+1023]").unwrap(),
             interval!(f, f).unwrap()
         );
         assert_eq!(
-            interval!("[0x1.ffffffffffffeffp+1023]", exact)
+            interval_exact!("[0x1.ffffffffffffeffp+1023]")
                 .unwrap_err()
                 .kind(),
             UndefinedOperation
         );
         assert_eq!(
-            interval!("[0x1.fffffffffffff01p+1023]", exact)
+            interval_exact!("[0x1.fffffffffffff01p+1023]")
                 .unwrap_err()
                 .kind(),
             UndefinedOperation
         );
         assert_eq!(
-            interval!("[0x1.fffffffffffffp+1024]", exact)
+            interval_exact!("[0x1.fffffffffffffp+1024]")
                 .unwrap_err()
                 .kind(),
             UndefinedOperation
         );
 
         assert_eq!(
-            interval!("[123e2147483648]", exact).unwrap_err().kind(),
+            interval_exact!("[123e2147483648]").unwrap_err().kind(),
             PossiblyUndefinedOperation
         );
     }
