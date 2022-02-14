@@ -12,7 +12,7 @@ impl Interval {
     ///  \end{cases}
     /// $$
     ///
-    /// The exact value is returned.
+    /// The exact value is returned.  When $a = 0$, `-0.0` is returned.
     ///
     /// # Examples
     ///
@@ -188,7 +188,8 @@ impl Interval {
     ///  \end{cases}
     /// $$
     ///
-    /// The exact value is returned.
+    /// The exact value is returned.  When $b = 0$, `0.0` (the
+    /// positive zero) is returned.
     ///
     /// # Examples
     ///
