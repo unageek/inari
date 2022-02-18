@@ -108,14 +108,17 @@ pub(crate) fn round_ties_to_even(x: F64X2) -> F64X2 {
     unsafe { _mm_round_pd(x, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC) }
 }
 
+/// `shuffle02([x0, x1], [x2, x3]) = [x0, x2]`
 pub(crate) fn shuffle02(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_shuffle_pd(x, y, 0) }
 }
 
+/// `shuffle03([x0, x1], [x2, x3]) = [x0, x3]`
 pub(crate) fn shuffle03(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_shuffle_pd(x, y, 2) }
 }
 
+/// `shuffle13([x0, x1], [x2, x3]) = [x1, x3]`
 pub(crate) fn shuffle13(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_shuffle_pd(x, y, 3) }
 }
@@ -132,6 +135,7 @@ pub(crate) fn trunc(x: F64X2) -> F64X2 {
     unsafe { _mm_round_pd(x, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC) }
 }
 
+/// `shuffle13([x0, x1], [x2, x3]) = [x1, x2]`
 fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_shuffle_pd(x, y, 1) }
 }
