@@ -16,7 +16,7 @@ mod itf1788_tests {
     mod ieee1788_constructors;
     mod ieee1788_exceptions;
     mod libieeep1788_bool;
-    //mod libieeep1788_cancel;
+    mod libieeep1788_cancel;
     mod libieeep1788_class;
     mod libieeep1788_elem;
     //mod libieeep1788_mul_rev;

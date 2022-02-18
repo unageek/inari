@@ -40,6 +40,10 @@ pub(crate) fn eq(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { transmute(vceqq_f64(x, y)) }
 }
 
+pub(crate) fn extract(x: F64X2) -> [f64; 2] {
+    unsafe { transmute::<_, [f64; 2]>(x) }
+}
+
 pub(crate) fn extract0(x: F64X2) -> f64 {
     unsafe { transmute::<_, [f64; 2]>(x)[0] }
 }
@@ -132,6 +136,18 @@ fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
     constant(extract1(x), extract0(y))
 }
 
+pub(crate) fn add_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { vaddq_f64(x, y) }
+}
+
+pub(crate) fn sub_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { vsubq_f64(x, y) }
+}
+
+pub(crate) fn hadd(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { constant(vaddvq_f64(x), vaddvq_f64(y)) }
+}
+
 macro_rules! impl_op_round {
     ($t:ty, $f:ident ($x:ident $(,$y:ident)*), $inst:literal, rd) => {
         impl_op_round!($t, $f ($x $(,$y)*), $inst, 0x800000);
@@ -165,6 +181,7 @@ impl_op_round!(f64, sqrt1_rd(x), "fsqrt {x:d}, {x:d}", rd);
 impl_op_round!(f64, sqrt1_ru(x), "fsqrt {x:d}, {x:d}", ru);
 impl_op_round!(f64, sub1_ru(x, y), "fsub {x:d}, {x:d}, {y:d}", ru);
 impl_op_round!(F64X2, add_ru(x, y), "fadd.2d {x:v}, {x:v}, {y:v}", ru);
+impl_op_round!(F64X2, sub_ru(x, y), "fsub.2d {x:v}, {x:v}, {y:v}", ru);
 impl_op_round!(F64X2, mul_ru(x, y), "fmul.2d {x:v}, {x:v}, {y:v}", ru);
 impl_op_round!(F64X2, div_ru(x, y), "fdiv.2d {x:v}, {x:v}, {y:v}", ru);
 

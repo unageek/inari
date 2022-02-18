@@ -37,6 +37,10 @@ pub(crate) fn eq(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_cmpeq_pd(x, y) }
 }
 
+pub(crate) fn extract(x: F64X2) -> [f64; 2] {
+    unsafe { transmute::<_, [f64; 2]>(x) }
+}
+
 pub(crate) fn extract0(x: F64X2) -> f64 {
     unsafe { transmute::<_, [f64; 2]>(x)[0] }
 }
@@ -142,6 +146,21 @@ fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
 
 fn xor(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_xor_pd(x, y) }
+}
+
+/// `add_rn([x0, x1], [y0, y1]) = [x0 + y0, x1 + y1]` rounded to nearest.
+pub(crate) fn add_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { _mm_add_pd(x, y) }
+}
+
+/// `sub_rn([x0, x1], [y0, y1]) = [x0 - y0, x1 - y1]` rounded to nearest.
+pub(crate) fn sub_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { _mm_sub_pd(x, y) }
+}
+
+/// `hadd_rn([x0, x1], [y0, y1]) = [x0 + x1, y0 + y1]` rounded to nearest.
+pub(crate) fn hadd_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { _mm_hadd_pd(x, y) }
 }
 
 cfg_if::cfg_if! {
