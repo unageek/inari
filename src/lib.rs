@@ -11,7 +11,6 @@
 //!
 //! See [Conformance to the standard][`_docs::conformance`] for details.
 
-#![cfg_attr(target_arch = "aarch64", feature(stdsimd))]
 #![allow(clippy::float_cmp)]
 
 pub use self::{

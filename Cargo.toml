@@ -3,6 +3,7 @@ name = "inari"
 version = "0.14.0"
 authors = ["Masashi Mizuno"]
 edition = "2021"
+rust-version = "1.59"
 description = "A Rust implementation of interval arithmetic"
 documentation = "https://docs.rs/inari"
 readme = "README.md"
