@@ -4,14 +4,9 @@
 [![docs](https://img.shields.io/docsrs/inari)](https://docs.rs/inari)
 [![build](https://img.shields.io/github/workflow/status/unageek/inari/build/main)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
 [![coverage](https://img.shields.io/coveralls/github/unageek/inari/main)](https://coveralls.io/github/unageek/inari?branch=main)
+[![rustc 1.59+](https://img.shields.io/badge/rustc-1.59%2B-lightgrey)](https://blog.rust-lang.org/2022/02/24/Rust-1.59.0.html)
 
 **inari** is a Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
-
-## Supported Rust Versions
-
-A **nightly** toolchain >= `nightly-2021-12-16` is required.
-
-The requirement of a nightly toolchain is due to a few [unstable features](https://doc.rust-lang.org/stable/unstable-book/) used in the crate: [`asm`](https://doc.rust-lang.org/stable/unstable-book/library-features/asm.html), [`stdsimd`](https://doc.rust-lang.org/stable/unstable-book/library-features/stdsimd.html), etc. To use the crate as a dependency, you need to [override the toolchain](https://rust-lang.github.io/rustup/overrides.html) in your project. Here is an [example](https://github.com/unageek/graphest/blob/main/rust-toolchain) that does this with the `rust-toolchain` file.
 
 ## Supported Platforms
 
@@ -27,7 +22,7 @@ The following CPUs are supported:
 
   Experimental, it is not tested continuously.
 
-When using the Cargo feature `gmp` (see below), target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate.
+When using the Cargo feature `gmp` (see below), target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate. For example, MSVC is not supported.
 
 ## Cargo Features
 
@@ -37,7 +32,7 @@ When using the Cargo feature `gmp` (see below), target platforms are limited to 
 
 ## Related Projects
 
-- [Graphest](https://github.com/unageek/graphest) - a faithful graphing calculator
+- [Graphest](https://github.com/unageek/graphest) - A faithful graphing calculator
 
 ## References
 
