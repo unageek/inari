@@ -11,7 +11,6 @@
  *
  */
 //Language imports
-#![rustfmt::skip]
 
 //Test library imports
 
