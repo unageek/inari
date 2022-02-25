@@ -21,7 +21,6 @@
  *
  */
 //Language imports
-#![rustfmt::skip]
 
 //Test library imports
 
@@ -53,7 +52,10 @@ fn minimal_is_empty_test() {
 fn minimal_is_empty_dec_test() {
     assert_eq2!(DI::NAI.is_empty(), false);
     assert!(DI::EMPTY.is_empty());
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).is_empty(), false);
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).is_empty(),
+        false
+    );
     assert_eq2!(nd2di(1.0, 2.0, D::Com).is_empty(), false);
     assert_eq2!(nd2di(-1.0, 2.0, D::Trv).is_empty(), false);
     assert_eq2!(nd2di(-3.0, -2.0, D::Dac).is_empty(), false);
@@ -110,9 +112,18 @@ fn minimal_is_entire_dec_test() {
 #[test]
 fn minimal_is_nai_dec_test() {
     assert!(DI::NAI.is_nai());
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).is_nai(), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).is_nai(), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).is_nai(), false);
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).is_nai(),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def).is_nai(),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac).is_nai(),
+        false
+    );
     assert_eq2!(nd2di(1.0, 2.0, D::Com).is_nai(), false);
     assert_eq2!(nd2di(-1.0, 2.0, D::Trv).is_nai(), false);
     assert_eq2!(nd2di(-3.0, -2.0, D::Dac).is_nai(), false);
@@ -134,11 +145,17 @@ fn minimal_equal_test() {
     assert!(I::EMPTY == I::EMPTY);
     assert_eq2!(I::EMPTY == n2i(1.0, 2.0), false);
     assert!(n2i(f64::NEG_INFINITY, f64::INFINITY) == n2i(f64::NEG_INFINITY, f64::INFINITY));
-    assert_eq2!(n2i(1.0, 2.4) == n2i(f64::NEG_INFINITY, f64::INFINITY), false);
+    assert_eq2!(
+        n2i(1.0, 2.4) == n2i(f64::NEG_INFINITY, f64::INFINITY),
+        false
+    );
     assert!(n2i(1.0, f64::INFINITY) == n2i(1.0, f64::INFINITY));
     assert_eq2!(n2i(1.0, 2.4) == n2i(1.0, f64::INFINITY), false);
     assert!(n2i(f64::NEG_INFINITY, 2.0) == n2i(f64::NEG_INFINITY, 2.0));
-    assert_eq2!(n2i(f64::NEG_INFINITY, 2.4) == n2i(f64::NEG_INFINITY, 2.0), false);
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, 2.4) == n2i(f64::NEG_INFINITY, 2.0),
+        false
+    );
     assert!(n2i(-2.0, 0.0) == n2i(-2.0, 0.0));
     assert!(n2i(-0.0, 2.0) == n2i(0.0, 2.0));
     assert!(n2i(-0.0, -0.0) == n2i(0.0, 0.0));
@@ -156,12 +173,24 @@ fn minimal_equal_dec_test() {
     assert_eq2!(DI::NAI == DI::NAI, false);
     assert_eq2!(DI::EMPTY == nd2di(1.0, 2.0, D::Trv), false);
     assert_eq2!(DI::NAI == nd2di(1.0, 2.0, D::Trv), false);
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def) == nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv));
-    assert_eq2!(nd2di(1.0, 2.4, D::Trv) == nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv), false);
+    assert!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Def)
+            == nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)
+    );
+    assert_eq2!(
+        nd2di(1.0, 2.4, D::Trv) == nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv),
+        false
+    );
     assert!(nd2di(1.0, f64::INFINITY, D::Trv) == nd2di(1.0, f64::INFINITY, D::Trv));
-    assert_eq2!(nd2di(1.0, 2.4, D::Def) == nd2di(1.0, f64::INFINITY, D::Trv), false);
+    assert_eq2!(
+        nd2di(1.0, 2.4, D::Def) == nd2di(1.0, f64::INFINITY, D::Trv),
+        false
+    );
     assert!(nd2di(f64::NEG_INFINITY, 2.0, D::Trv) == nd2di(f64::NEG_INFINITY, 2.0, D::Trv));
-    assert_eq2!(nd2di(f64::NEG_INFINITY, 2.4, D::Def) == nd2di(f64::NEG_INFINITY, 2.0, D::Trv), false);
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, 2.4, D::Def) == nd2di(f64::NEG_INFINITY, 2.0, D::Trv),
+        false
+    );
     assert!(nd2di(-2.0, 0.0, D::Trv) == nd2di(-2.0, 0.0, D::Trv));
     assert!(nd2di(-0.0, 2.0, D::Def) == nd2di(0.0, 2.0, D::Trv));
     assert!(nd2di(-0.0, -0.0, D::Trv) == nd2di(0.0, 0.0, D::Trv));
@@ -181,7 +210,10 @@ fn minimal_subset_test() {
     assert_eq2!(n2i(0.0, 4.0).subset(I::EMPTY), false);
     assert_eq2!(n2i(-0.0, 4.0).subset(I::EMPTY), false);
     assert_eq2!(n2i(-0.1, 1.0).subset(I::EMPTY), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).subset(I::EMPTY), false);
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).subset(I::EMPTY),
+        false
+    );
     assert!(n2i(0.0, 4.0).subset(n2i(f64::NEG_INFINITY, f64::INFINITY)));
     assert!(n2i(-0.0, 4.0).subset(n2i(f64::NEG_INFINITY, f64::INFINITY)));
     assert!(n2i(-0.1, 1.0).subset(n2i(f64::NEG_INFINITY, f64::INFINITY)));
@@ -214,11 +246,20 @@ fn minimal_subset_dec_test() {
     assert_eq2!(nd2di(0.0, 4.0, D::Trv).subset(DI::EMPTY), false);
     assert_eq2!(nd2di(-0.0, 4.0, D::Def).subset(DI::EMPTY), false);
     assert_eq2!(nd2di(-0.1, 1.0, D::Trv).subset(DI::EMPTY), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).subset(DI::EMPTY), false);
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).subset(DI::EMPTY),
+        false
+    );
     assert!(nd2di(0.0, 4.0, D::Trv).subset(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
     assert!(nd2di(-0.0, 4.0, D::Trv).subset(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
     assert!(nd2di(-0.1, 1.0, D::Trv).subset(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).subset(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
+    assert!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).subset(nd2di(
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+            D::Trv
+        ))
+    );
     assert!(nd2di(1.0, 2.0, D::Trv).subset(nd2di(1.0, 2.0, D::Trv)));
     assert!(nd2di(1.0, 2.0, D::Trv).subset(nd2di(0.0, 4.0, D::Trv)));
     assert!(nd2di(1.0, 2.0, D::Def).subset(nd2di(-0.0, 4.0, D::Def)));
@@ -239,12 +280,30 @@ fn minimal_less_test() {
     assert_eq2!(n2i(1.0, 2.0).less(I::EMPTY), false);
     assert_eq2!(I::EMPTY.less(n2i(1.0, 2.0)), false);
     assert!(n2i(f64::NEG_INFINITY, f64::INFINITY).less(n2i(f64::NEG_INFINITY, f64::INFINITY)));
-    assert_eq2!(n2i(1.0, 2.0).less(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(0.0, 2.0).less(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(-0.0, 2.0).less(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).less(n2i(1.0, 2.0)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).less(n2i(0.0, 2.0)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).less(n2i(-0.0, 2.0)), false);
+    assert_eq2!(
+        n2i(1.0, 2.0).less(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(0.0, 2.0).less(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(-0.0, 2.0).less(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).less(n2i(1.0, 2.0)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).less(n2i(0.0, 2.0)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).less(n2i(-0.0, 2.0)),
+        false
+    );
     assert!(n2i(0.0, 2.0).less(n2i(0.0, 2.0)));
     assert!(n2i(0.0, 2.0).less(n2i(-0.0, 2.0)));
     assert!(n2i(0.0, 2.0).less(n2i(1.0, 2.0)));
@@ -272,13 +331,35 @@ fn minimal_less_dec_test() {
     assert!(DI::EMPTY.less(DI::EMPTY));
     assert_eq2!(nd2di(1.0, 2.0, D::Trv).less(DI::EMPTY), false);
     assert_eq2!(DI::EMPTY.less(nd2di(1.0, 2.0, D::Trv)), false);
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
-    assert_eq2!(nd2di(1.0, 2.0, D::Def).less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(0.0, 2.0, D::Trv).less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(-0.0, 2.0, D::Trv).less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).less(nd2di(1.0, 2.0, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).less(nd2di(0.0, 2.0, D::Def)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).less(nd2di(-0.0, 2.0, D::Trv)), false);
+    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).less(nd2di(
+        f64::NEG_INFINITY,
+        f64::INFINITY,
+        D::Trv
+    )));
+    assert_eq2!(
+        nd2di(1.0, 2.0, D::Def).less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(0.0, 2.0, D::Trv).less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-0.0, 2.0, D::Trv).less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).less(nd2di(1.0, 2.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).less(nd2di(0.0, 2.0, D::Def)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).less(nd2di(-0.0, 2.0, D::Trv)),
+        false
+    );
     assert!(nd2di(0.0, 2.0, D::Trv).less(nd2di(0.0, 2.0, D::Trv)));
     assert!(nd2di(0.0, 2.0, D::Trv).less(nd2di(-0.0, 2.0, D::Trv)));
     assert!(nd2di(0.0, 2.0, D::Def).less(nd2di(1.0, 2.0, D::Def)));
@@ -302,11 +383,26 @@ fn minimal_precedes_test() {
     assert!(I::EMPTY.precedes(n2i(3.0, 4.0)));
     assert!(n2i(3.0, 4.0).precedes(I::EMPTY));
     assert!(I::EMPTY.precedes(I::EMPTY));
-    assert_eq2!(n2i(1.0, 2.0).precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(0.0, 2.0).precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(-0.0, 2.0).precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).precedes(n2i(1.0, 2.0)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
+    assert_eq2!(
+        n2i(1.0, 2.0).precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(0.0, 2.0).precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(-0.0, 2.0).precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).precedes(n2i(1.0, 2.0)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
     assert!(n2i(1.0, 2.0).precedes(n2i(3.0, 4.0)));
     assert!(n2i(1.0, 3.0).precedes(n2i(3.0, 4.0)));
     assert!(n2i(-3.0, -1.0).precedes(n2i(-1.0, 0.0)));
@@ -331,18 +427,46 @@ fn minimal_precedes_dec_test() {
     assert!(DI::EMPTY.precedes(nd2di(3.0, 4.0, D::Def)));
     assert!(nd2di(3.0, 4.0, D::Trv).precedes(DI::EMPTY));
     assert!(DI::EMPTY.precedes(DI::EMPTY));
-    assert_eq2!(nd2di(1.0, 2.0, D::Trv).precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(0.0, 2.0, D::Trv).precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(-0.0, 2.0, D::Trv).precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).precedes(nd2di(1.0, 2.0, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
+    assert_eq2!(
+        nd2di(1.0, 2.0, D::Trv).precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(0.0, 2.0, D::Trv).precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-0.0, 2.0, D::Trv).precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).precedes(nd2di(1.0, 2.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).precedes(nd2di(
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+            D::Trv
+        )),
+        false
+    );
     assert!(nd2di(1.0, 2.0, D::Trv).precedes(nd2di(3.0, 4.0, D::Trv)));
     assert!(nd2di(1.0, 3.0, D::Trv).precedes(nd2di(3.0, 4.0, D::Def)));
     assert!(nd2di(-3.0, -1.0, D::Def).precedes(nd2di(-1.0, 0.0, D::Trv)));
     assert!(nd2di(-3.0, -1.0, D::Trv).precedes(nd2di(-1.0, -0.0, D::Trv)));
-    assert_eq2!(nd2di(1.0, 3.5, D::Trv).precedes(nd2di(3.0, 4.0, D::Trv)), false);
-    assert_eq2!(nd2di(1.0, 4.0, D::Trv).precedes(nd2di(3.0, 4.0, D::Trv)), false);
-    assert_eq2!(nd2di(-3.0, -0.1, D::Trv).precedes(nd2di(-1.0, 0.0, D::Trv)), false);
+    assert_eq2!(
+        nd2di(1.0, 3.5, D::Trv).precedes(nd2di(3.0, 4.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(1.0, 4.0, D::Trv).precedes(nd2di(3.0, 4.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-3.0, -0.1, D::Trv).precedes(nd2di(-1.0, 0.0, D::Trv)),
+        false
+    );
     assert!(nd2di(0.0, 0.0, D::Trv).precedes(nd2di(-0.0, -0.0, D::Trv)));
     assert!(nd2di(-0.0, -0.0, D::Trv).precedes(nd2di(0.0, 0.0, D::Def)));
     assert!(nd2di(-0.0, 0.0, D::Trv).precedes(nd2di(0.0, 0.0, D::Trv)));
@@ -359,7 +483,10 @@ fn minimal_interior_test() {
     assert!(n2i(f64::NEG_INFINITY, f64::INFINITY).interior(n2i(f64::NEG_INFINITY, f64::INFINITY)));
     assert!(n2i(0.0, 4.0).interior(n2i(f64::NEG_INFINITY, f64::INFINITY)));
     assert!(I::EMPTY.interior(n2i(f64::NEG_INFINITY, f64::INFINITY)));
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).interior(n2i(0.0, 4.0)), false);
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).interior(n2i(0.0, 4.0)),
+        false
+    );
     assert_eq2!(n2i(0.0, 4.0).interior(n2i(0.0, 4.0)), false);
     assert!(n2i(1.0, 2.0).interior(n2i(0.0, 4.0)));
     assert_eq2!(n2i(-2.0, 2.0).interior(n2i(-2.0, 4.0)), false);
@@ -380,19 +507,46 @@ fn minimal_interior_dec_test() {
     assert!(DI::EMPTY.interior(DI::EMPTY));
     assert!(DI::EMPTY.interior(nd2di(0.0, 4.0, D::Trv)));
     assert_eq2!(nd2di(0.0, 4.0, D::Def).interior(DI::EMPTY), false);
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).interior(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
+    assert!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).interior(nd2di(
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+            D::Trv
+        ))
+    );
     assert!(nd2di(0.0, 4.0, D::Trv).interior(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
     assert!(DI::EMPTY.interior(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).interior(nd2di(0.0, 4.0, D::Trv)), false);
-    assert_eq2!(nd2di(0.0, 4.0, D::Trv).interior(nd2di(0.0, 4.0, D::Trv)), false);
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).interior(nd2di(0.0, 4.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(0.0, 4.0, D::Trv).interior(nd2di(0.0, 4.0, D::Trv)),
+        false
+    );
     assert!(nd2di(1.0, 2.0, D::Def).interior(nd2di(0.0, 4.0, D::Trv)));
-    assert_eq2!(nd2di(-2.0, 2.0, D::Trv).interior(nd2di(-2.0, 4.0, D::Def)), false);
+    assert_eq2!(
+        nd2di(-2.0, 2.0, D::Trv).interior(nd2di(-2.0, 4.0, D::Def)),
+        false
+    );
     assert!(nd2di(-0.0, -0.0, D::Trv).interior(nd2di(-2.0, 4.0, D::Trv)));
     assert!(nd2di(0.0, 0.0, D::Def).interior(nd2di(-2.0, 4.0, D::Trv)));
-    assert_eq2!(nd2di(0.0, 0.0, D::Trv).interior(nd2di(-0.0, -0.0, D::Trv)), false);
-    assert_eq2!(nd2di(0.0, 4.4, D::Trv).interior(nd2di(0.0, 4.0, D::Trv)), false);
-    assert_eq2!(nd2di(-1.0, -1.0, D::Trv).interior(nd2di(0.0, 4.0, D::Def)), false);
-    assert_eq2!(nd2di(2.0, 2.0, D::Def).interior(nd2di(-2.0, -1.0, D::Trv)), false);
+    assert_eq2!(
+        nd2di(0.0, 0.0, D::Trv).interior(nd2di(-0.0, -0.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(0.0, 4.4, D::Trv).interior(nd2di(0.0, 4.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-1.0, -1.0, D::Trv).interior(nd2di(0.0, 4.0, D::Def)),
+        false
+    );
+    assert_eq2!(
+        nd2di(2.0, 2.0, D::Def).interior(nd2di(-2.0, -1.0, D::Trv)),
+        false
+    );
 }
 
 #[test]
@@ -400,9 +554,17 @@ fn minimal_strictly_less_test() {
     assert!(I::EMPTY.strict_less(I::EMPTY));
     assert_eq2!(n2i(1.0, 2.0).strict_less(I::EMPTY), false);
     assert_eq2!(I::EMPTY.strict_less(n2i(1.0, 2.0)), false);
-    assert!(n2i(f64::NEG_INFINITY, f64::INFINITY).strict_less(n2i(f64::NEG_INFINITY, f64::INFINITY)));
-    assert_eq2!(n2i(1.0, 2.0).strict_less(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).strict_less(n2i(1.0, 2.0)), false);
+    assert!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).strict_less(n2i(f64::NEG_INFINITY, f64::INFINITY))
+    );
+    assert_eq2!(
+        n2i(1.0, 2.0).strict_less(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).strict_less(n2i(1.0, 2.0)),
+        false
+    );
     assert_eq2!(n2i(1.0, 2.0).strict_less(n2i(1.0, 2.0)), false);
     assert!(n2i(1.0, 2.0).strict_less(n2i(3.0, 4.0)));
     assert!(n2i(1.0, 3.5).strict_less(n2i(3.0, 4.0)));
@@ -422,16 +584,43 @@ fn minimal_strictly_less_dec_test() {
     assert!(DI::EMPTY.strict_less(DI::EMPTY));
     assert_eq2!(nd2di(1.0, 2.0, D::Trv).strict_less(DI::EMPTY), false);
     assert_eq2!(DI::EMPTY.strict_less(nd2di(1.0, 2.0, D::Def)), false);
-    assert!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).strict_less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)));
-    assert_eq2!(nd2di(1.0, 2.0, D::Trv).strict_less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).strict_less(nd2di(1.0, 2.0, D::Trv)), false);
-    assert_eq2!(nd2di(1.0, 2.0, D::Trv).strict_less(nd2di(1.0, 2.0, D::Trv)), false);
+    assert!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).strict_less(nd2di(
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+            D::Trv
+        ))
+    );
+    assert_eq2!(
+        nd2di(1.0, 2.0, D::Trv).strict_less(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).strict_less(nd2di(1.0, 2.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(1.0, 2.0, D::Trv).strict_less(nd2di(1.0, 2.0, D::Trv)),
+        false
+    );
     assert!(nd2di(1.0, 2.0, D::Trv).strict_less(nd2di(3.0, 4.0, D::Trv)));
     assert!(nd2di(1.0, 3.5, D::Def).strict_less(nd2di(3.0, 4.0, D::Trv)));
-    assert_eq2!(nd2di(1.0, 4.0, D::Trv).strict_less(nd2di(3.0, 4.0, D::Def)), false);
-    assert_eq2!(nd2di(0.0, 4.0, D::Trv).strict_less(nd2di(0.0, 4.0, D::Def)), false);
-    assert_eq2!(nd2di(-0.0, 4.0, D::Def).strict_less(nd2di(0.0, 4.0, D::Trv)), false);
-    assert_eq2!(nd2di(-2.0, -1.0, D::Def).strict_less(nd2di(-2.0, -1.0, D::Def)), false);
+    assert_eq2!(
+        nd2di(1.0, 4.0, D::Trv).strict_less(nd2di(3.0, 4.0, D::Def)),
+        false
+    );
+    assert_eq2!(
+        nd2di(0.0, 4.0, D::Trv).strict_less(nd2di(0.0, 4.0, D::Def)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-0.0, 4.0, D::Def).strict_less(nd2di(0.0, 4.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-2.0, -1.0, D::Def).strict_less(nd2di(-2.0, -1.0, D::Def)),
+        false
+    );
     assert!(nd2di(-3.0, -1.5, D::Trv).strict_less(nd2di(-2.0, -1.0, D::Trv)));
 }
 
@@ -440,9 +629,19 @@ fn minimal_strictly_precedes_test() {
     assert!(I::EMPTY.strict_precedes(n2i(3.0, 4.0)));
     assert!(n2i(3.0, 4.0).strict_precedes(I::EMPTY));
     assert!(I::EMPTY.strict_precedes(I::EMPTY));
-    assert_eq2!(n2i(1.0, 2.0).strict_precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).strict_precedes(n2i(1.0, 2.0)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).strict_precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
+    assert_eq2!(
+        n2i(1.0, 2.0).strict_precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).strict_precedes(n2i(1.0, 2.0)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY)
+            .strict_precedes(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
     assert!(n2i(1.0, 2.0).strict_precedes(n2i(3.0, 4.0)));
     assert_eq2!(n2i(1.0, 3.0).strict_precedes(n2i(3.0, 4.0)), false);
     assert_eq2!(n2i(-3.0, -1.0).strict_precedes(n2i(-1.0, 0.0)), false);
@@ -462,17 +661,51 @@ fn minimal_strictly_precedes_dec_test() {
     assert!(DI::EMPTY.strict_precedes(nd2di(3.0, 4.0, D::Trv)));
     assert!(nd2di(3.0, 4.0, D::Def).strict_precedes(DI::EMPTY));
     assert!(DI::EMPTY.strict_precedes(DI::EMPTY));
-    assert_eq2!(nd2di(1.0, 2.0, D::Trv).strict_precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).strict_precedes(nd2di(1.0, 2.0, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).strict_precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
+    assert_eq2!(
+        nd2di(1.0, 2.0, D::Trv).strict_precedes(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).strict_precedes(nd2di(1.0, 2.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).strict_precedes(nd2di(
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+            D::Trv
+        )),
+        false
+    );
     assert!(nd2di(1.0, 2.0, D::Trv).strict_precedes(nd2di(3.0, 4.0, D::Trv)));
-    assert_eq2!(nd2di(1.0, 3.0, D::Def).strict_precedes(nd2di(3.0, 4.0, D::Trv)), false);
-    assert_eq2!(nd2di(-3.0, -1.0, D::Trv).strict_precedes(nd2di(-1.0, 0.0, D::Def)), false);
-    assert_eq2!(nd2di(-3.0, -0.0, D::Def).strict_precedes(nd2di(0.0, 1.0, D::Trv)), false);
-    assert_eq2!(nd2di(-3.0, 0.0, D::Trv).strict_precedes(nd2di(-0.0, 1.0, D::Trv)), false);
-    assert_eq2!(nd2di(1.0, 3.5, D::Trv).strict_precedes(nd2di(3.0, 4.0, D::Trv)), false);
-    assert_eq2!(nd2di(1.0, 4.0, D::Trv).strict_precedes(nd2di(3.0, 4.0, D::Def)), false);
-    assert_eq2!(nd2di(-3.0, -0.1, D::Trv).strict_precedes(nd2di(-1.0, 0.0, D::Trv)), false);
+    assert_eq2!(
+        nd2di(1.0, 3.0, D::Def).strict_precedes(nd2di(3.0, 4.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-3.0, -1.0, D::Trv).strict_precedes(nd2di(-1.0, 0.0, D::Def)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-3.0, -0.0, D::Def).strict_precedes(nd2di(0.0, 1.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-3.0, 0.0, D::Trv).strict_precedes(nd2di(-0.0, 1.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(1.0, 3.5, D::Trv).strict_precedes(nd2di(3.0, 4.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(1.0, 4.0, D::Trv).strict_precedes(nd2di(3.0, 4.0, D::Def)),
+        false
+    );
+    assert_eq2!(
+        nd2di(-3.0, -0.1, D::Trv).strict_precedes(nd2di(-1.0, 0.0, D::Trv)),
+        false
+    );
 }
 
 #[test]
@@ -484,9 +717,18 @@ fn minimal_disjoint_test() {
     assert_eq2!(n2i(0.0, 0.0).disjoint(n2i(-0.0, -0.0)), false);
     assert_eq2!(n2i(0.0, -0.0).disjoint(n2i(-0.0, 0.0)), false);
     assert_eq2!(n2i(3.0, 4.0).disjoint(n2i(1.0, 7.0)), false);
-    assert_eq2!(n2i(3.0, 4.0).disjoint(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).disjoint(n2i(1.0, 7.0)), false);
-    assert_eq2!(n2i(f64::NEG_INFINITY, f64::INFINITY).disjoint(n2i(f64::NEG_INFINITY, f64::INFINITY)), false);
+    assert_eq2!(
+        n2i(3.0, 4.0).disjoint(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).disjoint(n2i(1.0, 7.0)),
+        false
+    );
+    assert_eq2!(
+        n2i(f64::NEG_INFINITY, f64::INFINITY).disjoint(n2i(f64::NEG_INFINITY, f64::INFINITY)),
+        false
+    );
 }
 
 #[test]
@@ -499,10 +741,32 @@ fn minimal_disjoint_dec_test() {
     assert!(nd2di(3.0, 4.0, D::Trv).disjoint(DI::EMPTY));
     assert!(DI::EMPTY.disjoint(DI::EMPTY));
     assert!(nd2di(3.0, 4.0, D::Trv).disjoint(nd2di(1.0, 2.0, D::Def)));
-    assert_eq2!(nd2di(0.0, 0.0, D::Trv).disjoint(nd2di(-0.0, -0.0, D::Trv)), false);
-    assert_eq2!(nd2di(0.0, -0.0, D::Trv).disjoint(nd2di(-0.0, 0.0, D::Trv)), false);
-    assert_eq2!(nd2di(3.0, 4.0, D::Def).disjoint(nd2di(1.0, 7.0, D::Def)), false);
-    assert_eq2!(nd2di(3.0, 4.0, D::Trv).disjoint(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).disjoint(nd2di(1.0, 7.0, D::Trv)), false);
-    assert_eq2!(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).disjoint(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)), false);
+    assert_eq2!(
+        nd2di(0.0, 0.0, D::Trv).disjoint(nd2di(-0.0, -0.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(0.0, -0.0, D::Trv).disjoint(nd2di(-0.0, 0.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(3.0, 4.0, D::Def).disjoint(nd2di(1.0, 7.0, D::Def)),
+        false
+    );
+    assert_eq2!(
+        nd2di(3.0, 4.0, D::Trv).disjoint(nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).disjoint(nd2di(1.0, 7.0, D::Trv)),
+        false
+    );
+    assert_eq2!(
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Trv).disjoint(nd2di(
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+            D::Trv
+        )),
+        false
+    );
 }

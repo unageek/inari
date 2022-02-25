@@ -11,7 +11,6 @@
  *
  */
 //Language imports
-#![rustfmt::skip]
 
 //Test library imports
 
@@ -74,21 +73,39 @@ fn ieee1788_e() {
 #[test]
 fn ieee1788_e2() {
     assert_eq2!(t2di("[ ]"), DI::EMPTY);
-    assert_eq2!(t2di("[entire]"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
-    assert_eq2!(t2di("[1.e-3, 1.1e-3]"), nd2di(0.0009999999999999998, 0.0011, D::Com));
-    assert_eq2!(t2di("[-Inf, 2/3]"), nd2di(f64::NEG_INFINITY, 0.6666666666666667, D::Dac));
+    assert_eq2!(
+        t2di("[entire]"),
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac)
+    );
+    assert_eq2!(
+        t2di("[1.e-3, 1.1e-3]"),
+        nd2di(0.0009999999999999998, 0.0011, D::Com)
+    );
+    assert_eq2!(
+        t2di("[-Inf, 2/3]"),
+        nd2di(f64::NEG_INFINITY, 0.6666666666666667, D::Dac)
+    );
     assert_eq2!(t2di("[0x1.3p-1,]"), nd2di(0.59375, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("[,]"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
     assert_eq2!(t2di("3.56?1"), nd2di(3.55, 3.5700000000000003, D::Com));
     assert_eq2!(t2di("3.56?1e2"), nd2di(355.0, 357.0, D::Com));
     assert_eq2!(t2di("3.560?2"), nd2di(3.558, 3.5620000000000003, D::Com));
-    assert_eq2!(t2di("3.56?"), nd2di(3.5549999999999997, 3.5650000000000004, D::Com));
-    assert_eq2!(t2di("3.560?2u"), nd2di(3.5599999999999996, 3.5620000000000003, D::Com));
+    assert_eq2!(
+        t2di("3.56?"),
+        nd2di(3.5549999999999997, 3.5650000000000004, D::Com)
+    );
+    assert_eq2!(
+        t2di("3.560?2u"),
+        nd2di(3.5599999999999996, 3.5620000000000003, D::Com)
+    );
     assert_eq2!(t2di("-10?"), nd2di(-10.5, -9.5, D::Com));
     assert_eq2!(t2di("-10?u"), nd2di(-10.0, -9.5, D::Com));
     assert_eq2!(t2di("-10?12"), nd2di(-22.0, 2.0, D::Com));
     assert_eq2!(t2di("-10??u"), nd2di(-10.0, f64::INFINITY, D::Dac));
-    assert_eq2!(t2di("-10??"), nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac));
+    assert_eq2!(
+        t2di("-10??"),
+        nd2di(f64::NEG_INFINITY, f64::INFINITY, D::Dac)
+    );
     assert_eq2!(t2di("[nai]"), DI::NAI);
     assert_eq2!(t2di("3.56?1_def"), nd2di(3.55, 3.5700000000000003, D::Def));
 }

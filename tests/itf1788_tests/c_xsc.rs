@@ -25,7 +25,6 @@
  *
  */
 //Language imports
-#![rustfmt::skip]
 
 //Test library imports
 
@@ -97,13 +96,19 @@ fn cxsc_intervalsetops() {
     assert_eq2!(n2i(1.0, 4.0).convex_hull(n2i(-2.0, 2.0)), n2i(-2.0, 4.0));
     assert_eq2!(n2i(3.0, 4.0).convex_hull(n2i(-2.0, 2.0)), n2i(-2.0, 4.0));
     assert_eq2!(n2i(-2.0, 2.0).intersection(n2i(-4.0, -3.0)), I::EMPTY);
-    assert_eq2!(n2i(-2.0, 2.0).intersection(n2i(-4.0, -1.0)), n2i(-2.0, -1.0));
+    assert_eq2!(
+        n2i(-2.0, 2.0).intersection(n2i(-4.0, -1.0)),
+        n2i(-2.0, -1.0)
+    );
     assert_eq2!(n2i(-2.0, 2.0).intersection(n2i(-4.0, 4.0)), n2i(-2.0, 2.0));
     assert_eq2!(n2i(-2.0, 2.0).intersection(n2i(-1.0, 1.0)), n2i(-1.0, 1.0));
     assert_eq2!(n2i(-2.0, 2.0).intersection(n2i(1.0, 4.0)), n2i(1.0, 2.0));
     assert_eq2!(n2i(-2.0, 2.0).intersection(n2i(3.0, 4.0)), I::EMPTY);
     assert_eq2!(n2i(-4.0, -3.0).intersection(n2i(-2.0, 2.0)), I::EMPTY);
-    assert_eq2!(n2i(-4.0, -1.0).intersection(n2i(-2.0, 2.0)), n2i(-2.0, -1.0));
+    assert_eq2!(
+        n2i(-4.0, -1.0).intersection(n2i(-2.0, 2.0)),
+        n2i(-2.0, -1.0)
+    );
     assert_eq2!(n2i(-4.0, 4.0).intersection(n2i(-2.0, 2.0)), n2i(-2.0, 2.0));
     assert_eq2!(n2i(-1.0, 1.0).intersection(n2i(-2.0, 2.0)), n2i(-1.0, 1.0));
     assert_eq2!(n2i(1.0, 4.0).intersection(n2i(-2.0, 2.0)), n2i(1.0, 2.0));
@@ -130,11 +135,23 @@ fn cxsc_intervalmixsetops() {
 // Tests A|B, B|A, A and B are scalar-type
 #[test]
 fn cxsc_scalarmixsetops() {
-    assert_eq2!(n2i(-2.0, -2.0).convex_hull(n2i(-4.0, -4.0)), n2i(-4.0, -2.0));
-    assert_eq2!(n2i(-2.0, -2.0).convex_hull(n2i(-2.0, -2.0)), n2i(-2.0, -2.0));
+    assert_eq2!(
+        n2i(-2.0, -2.0).convex_hull(n2i(-4.0, -4.0)),
+        n2i(-4.0, -2.0)
+    );
+    assert_eq2!(
+        n2i(-2.0, -2.0).convex_hull(n2i(-2.0, -2.0)),
+        n2i(-2.0, -2.0)
+    );
     assert_eq2!(n2i(-2.0, -2.0).convex_hull(n2i(2.0, 2.0)), n2i(-2.0, 2.0));
-    assert_eq2!(n2i(-4.0, -4.0).convex_hull(n2i(-2.0, -2.0)), n2i(-4.0, -2.0));
-    assert_eq2!(n2i(-2.0, -2.0).convex_hull(n2i(-2.0, -2.0)), n2i(-2.0, -2.0));
+    assert_eq2!(
+        n2i(-4.0, -4.0).convex_hull(n2i(-2.0, -2.0)),
+        n2i(-4.0, -2.0)
+    );
+    assert_eq2!(
+        n2i(-2.0, -2.0).convex_hull(n2i(-2.0, -2.0)),
+        n2i(-2.0, -2.0)
+    );
     assert_eq2!(n2i(2.0, 2.0).convex_hull(n2i(-2.0, -2.0)), n2i(-2.0, 2.0));
 }
 

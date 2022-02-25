@@ -11,7 +11,6 @@
  *
  */
 //Language imports
-#![rustfmt::skip]
 
 //Test library imports
 
@@ -27,5 +26,8 @@ fn exceptions() {
     assert_eq2!(t2i("[+infinity]"), I::EMPTY);
     assert_eq2!(n2i(f64::INFINITY, f64::NEG_INFINITY), I::EMPTY);
     assert_eq2!(DI::NAI.interval().unwrap_or(I::EMPTY), I::EMPTY);
-    assert_eq2!(t2i("[1.0000000000000001, 1.0000000000000002]"), n2i(1.0, 1.0000000000000002));
+    assert_eq2!(
+        t2i("[1.0000000000000001, 1.0000000000000002]"),
+        n2i(1.0, 1.0000000000000002)
+    );
 }
