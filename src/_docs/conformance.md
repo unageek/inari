@@ -76,19 +76,19 @@ Not implemented.
 | cancelMinus(_x_, _y_) | [`Interval::cancel_minus`] | -              |
 | cancelPlus(_x_, _y_)  | [`Interval::cancel_plus`]  | -              |
 
-#### Constructors
-
-| Operation                | Implementation                                                                                                                                                                       | Requires `gmp` |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
-| numsToInterval(_a_, _b_) | [`interval!(a, b)`](`interval!`)<br>[`const_interval!(a, b)`](`const_interval!`)<br>[`dec_interval!(a, b)`](`dec_interval!`)<br>[`const_dec_interval!(a, b)`](`const_dec_interval!`) | -              |
-| textToInterval(_s_)      | [`interval!(s)`](`interval!`)<br>[`dec_interval!(s)`](`dec_interval!`)                                                                                                               | Yes            |
-
 #### Set operations
 
 | Operation              | Implementation                                  | Requires `gmp` |
 | ---------------------- | ----------------------------------------------- | -------------- |
 | intersection(_x_, _y_) | [`x.intersection(y)`](`Interval::intersection`) | -              |
 | convexHull(_x_, _y_)   | [`x.convex_hull(y)`](`Interval::convex_hull`)   | -              |
+
+#### Constructors
+
+| Operation                | Implementation                                                                                                                                                                       | Requires `gmp` |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
+| numsToInterval(_a_, _b_) | [`interval!(a, b)`](`interval!`)<br>[`const_interval!(a, b)`](`const_interval!`)<br>[`dec_interval!(a, b)`](`dec_interval!`)<br>[`const_dec_interval!(a, b)`](`const_dec_interval!`) | -              |
+| textToInterval(_s_)      | [`interval!(s)`](`interval!`)<br>[`dec_interval!(s)`](`dec_interval!`)                                                                                                               | Yes            |
 
 #### Numeric functions of intervals
 
