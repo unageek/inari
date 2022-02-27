@@ -4,64 +4,92 @@ use std::{cmp::Ordering, unreachable};
 // NOTE: `neg`, `add`, `sub`, `mul` and `div` are implemented in arith.rs
 
 impl Interval {
-    /// When `self` and `rhs` are bounded, return the tightest
-    /// interval `z` such that `rhz + z` ⊇ `self` if such a `z` exists
-    /// (which is the case iff the width of `self` is greater or equal
-    /// to the width of `rhs`.  If `self` or `rhs` is unbounded or `z`
-    /// does not exists, return [`ENTIRE`][Self::ENTIRE].
+    /// When `self` and `rhs` are bounded, returns the tightest
+    /// interval `z` such that `rhs` + `z` ⊇ `self` if such `z`
+    /// exists, which is the case iff the width of `self` is greater
+    /// than or equal to the width of `rhs`.  If `self` or `rhs` is
+    /// unbounded, or such `z` does not exist, returns
+    /// [`ENTIRE`][Self::ENTIRE].
     ///
-    /// Mathematically, $\operatorname{cancel_minus}(y+z, y) = z$ but,
-    /// on a computer, this function may return a slight
-    /// overestimation of $z$.  Moreover, when `x.cancel_minus(y)` is
-    /// not `ENTIRE`, one has `x.cancel_minus(y)` ⊆ `x-y` but
-    /// generally not the equality.
+    /// Mathematically, $\operatorname{cancel_minus}(y+z, y) = z$
+    /// should hold.  However, with floating-point arithmetic, this
+    /// function may return a slight overestimation of $z$.  Moreover,
+    /// when `x.cancel_minus(y)` is not [`ENTIRE`][Self::ENTIRE], one has
+    /// `x.cancel_minus(y)` ⊆ `x` - `y` but generally not the equality.
     ///
     /// # Example
     ///
     /// ```
     /// use inari::*;
-    /// let y = const_interval!(0., 1.);
-    /// let z = const_interval!(3., 4.);
-    /// assert_eq!((y+z).cancel_minus(y), z);
+    /// let y = const_interval!(0.0, 1.0);
+    /// let z = const_interval!(3.0, 4.0);
+    /// assert_eq!((y + z).cancel_minus(y), z);
     /// ```
     #[must_use]
     pub fn cancel_minus(self, rhs: Self) -> Self {
+        use Ordering::*;
+        // cancel_minus([a, b], [c, d]) =
+        //
+        //            | Empty  | Common | Unbounded
+        // -----------+--------+--------+-----------
+        //  Empty     | Empty  | Empty  |  Entire
+        //  Common    | Entire |   *1   |  Entire
+        //  Unbounded | Entire | Entire |  Entire
+        //
+        // *1  | [a - c, b - d]  if width(x) ≥ width(y),
+        //     | Entire          otherwise.
         if self.is_empty() && (rhs.is_empty() || rhs.is_common_interval()) {
             return Self::EMPTY;
         }
         if !self.is_common_interval() || rhs.is_empty() || !rhs.is_common_interval() {
             return Self::ENTIRE;
         }
+
         let x = self.rep; // [-a; b]
         let y = rhs.rep; // [-c; d]
-        let z = sub_ru(x, y); // [▵(-a+c); ▵(b-d)] = [▿(a-c), ▵(b-d)]
-        let w = hadd_rn(x, y); // widths round to nearest, ≥ 0
-        let [wx, wy] = extract(w);
+        let z = sub_ru(x, y); // [a - c, b - d] = [c - a; b - d] = [-a; b] .- [-c; d]
+        let w_rn = hadd_rn(x, y); // [width(x); width(y)] = [b - a; d - c] = [-a; -c] .+ [b; d],
+                                  // rounded to nearest, ≥ 0.
+        let [wx, wy] = extract(w_rn);
         // `wx` and `wy` are not NaN as `x` and `y` are common intervals.
         match wx.partial_cmp(&wy) {
-            Some(Ordering::Greater) => {
-                // width(x) > width(y) without rounding. `z.inf()`
-                // cannot be +∞ due to rounding downward.
+            Some(Greater) => {
+                // width(x) > width(y) without rounding.
+                // `z.inf()` cannot be +∞ due to rounding downward.
                 Self { rep: z }
             }
-            Some(Ordering::Less) => Self::ENTIRE,
-            Some(Ordering::Equal) => {
+            Some(Less) => Self::ENTIRE,
+            Some(Equal) => {
                 if wx == f64::INFINITY {
-                    // widths too large to be compared through their roundings
+                    // wx = wy = +∞.
+                    // The widths are too large to be compared through
+                    // the rounded values.
                     let z_rn = sub_rn(x, y);
-                    let [z0, z1] = extract(z_rn);
-                    match (-z0).partial_cmp(&z1) {
-                        Some(Ordering::Less) => Self { rep: z },
-                        Some(Ordering::Greater) => Self::ENTIRE,
-                        Some(Ordering::Equal) => {
-                            // -z0 == z1.  Use the 2Sum algorithm to
-                            // get the remainders.
+                    let [mz0, z1] = extract(z_rn);
+                    match (-mz0).partial_cmp(&z1) {
+                        Some(Greater) => Self::ENTIRE,
+                        Some(Less) => Self { rep: z },
+                        Some(Equal) => {
+                            // z0 = z1.
+                            // Use the 2Sum algorithm to compute the
+                            // remainders dz0 and dz1, where
+                            //   c - a = z0 + dz0, b - d = z1 + dz1, or
+                            //   x .+ (-y) = z_rn .+ dz.
+                            //
+                            // (z_rn, dz) = elementwise_two_sum(x, -y)
+                            //   z_rn := x .+ (-y) = [-a; -c] .- [b; d]
+                            //   d1 := z_rn .- (-y) = z_rn .+ y
+                            //   d2 := z_rn .- d1
+                            //   d1 := x .- d1
+                            //   d2 := -y .- d2 ⟹ -d2 = y .+ d2
+                            //   dz := d1 .+ d2 = d1 .- (-d2)
                             let d1 = add_rn(z_rn, y);
                             let d2 = sub_rn(z_rn, d1);
                             let d1 = sub_rn(x, d1);
-                            let d2 = add_rn(y, d2);
-                            let [dz0, dz1] = extract(sub_rn(d1, d2));
-                            if -dz0 <= dz1 {
+                            let md2 = add_rn(y, d2);
+                            let dz = sub_rn(d1, md2);
+                            let [mdz0, dz1] = extract(dz);
+                            if -mdz0 <= dz1 {
                                 Self { rep: z }
                             } else {
                                 Self::ENTIRE
@@ -70,14 +98,26 @@ impl Interval {
                         None => unreachable!(),
                     }
                 } else {
-                    // wx == wy < +∞. Use 2Sum to compute the remainders.
-                    // width(x) = wx + dx, width(y) = wy + dy
-                    let d1 = sub_rn(w, shuffle13(x, y));
-                    let d2 = sub_rn(w, d1);
+                    // wx = wy < +∞.
+                    // Use the 2Sum algorithm to compute the remainders
+                    // dx and dy, where
+                    //   -a + b = wx + dx, -c + d = wy + dy, or
+                    //   [-a; -c] .+ [b; d] = w_rn .+ dw.
+                    //
+                    // (w_rn, dw) = elementwise_two_sum([-a; -c], [b; d])
+                    //   w_rn := [b - a; d - c] = [-a; -c] .+ [b; d]
+                    //   d1 := w_rn .- [b; d]
+                    //   d2 := w_rn .- d1
+                    //   d1 := [-a; -c] .- d1
+                    //   d2 := [b; d] .- d2
+                    //   dw := d1 .+ d2
+                    let d1 = sub_rn(w_rn, shuffle13(x, y));
+                    let d2 = sub_rn(w_rn, d1);
                     let d1 = sub_rn(shuffle02(x, y), d1);
                     let d2 = sub_rn(shuffle13(x, y), d2);
-                    let [dx, dy] = extract(add_rn(d1, d2));
-                    if dx >= dy {
+                    let dw = add_rn(d1, d2);
+                    let [dwx, dwy] = extract(dw);
+                    if dwx >= dwy {
                         Self { rep: z }
                     } else {
                         Self::ENTIRE
