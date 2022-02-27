@@ -11,6 +11,10 @@ pub(crate) fn abs(x: F64X2) -> F64X2 {
     unsafe { vabsq_f64(x) }
 }
 
+pub(crate) fn add_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { vaddq_f64(x, y) }
+}
+
 pub(crate) fn all(x: F64X2) -> bool {
     unsafe { transmute::<_, u64>(vmovn_u64(transmute(x))) == !0u64 }
 }
@@ -62,6 +66,10 @@ pub(crate) fn ge(x: F64X2, y: F64X2) -> F64X2 {
 
 pub(crate) fn gt(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { transmute(vcgtq_f64(x, y)) }
+}
+
+pub(crate) fn hadd_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { constant(vaddvq_f64(x), vaddvq_f64(y)) }
 }
 
 pub(crate) fn le(x: F64X2, y: F64X2) -> F64X2 {
@@ -124,6 +132,10 @@ pub(crate) fn splat(x: f64) -> F64X2 {
     unsafe { transmute([x, x]) }
 }
 
+pub(crate) fn sub_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { vsubq_f64(x, y) }
+}
+
 pub(crate) fn swap(x: F64X2) -> F64X2 {
     shuffle12(x, x)
 }
@@ -134,18 +146,6 @@ pub(crate) fn trunc(x: F64X2) -> F64X2 {
 
 fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
     constant(extract1(x), extract0(y))
-}
-
-pub(crate) fn add_rn(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { vaddq_f64(x, y) }
-}
-
-pub(crate) fn sub_rn(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { vsubq_f64(x, y) }
-}
-
-pub(crate) fn hadd(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { constant(vaddvq_f64(x), vaddvq_f64(y)) }
 }
 
 macro_rules! impl_op_round {

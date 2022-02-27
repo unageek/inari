@@ -6,6 +6,10 @@ pub(crate) fn abs(_: F64X2) -> F64X2 {
     unimplemented!()
 }
 
+pub(crate) fn add_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unimplemented!()
+}
+
 pub(crate) fn add_ru(_: F64X2, _: F64X2) -> F64X2 {
     unimplemented!()
 }
@@ -42,6 +46,10 @@ pub(crate) fn eq(_: F64X2, _: F64X2) -> F64X2 {
     unimplemented!()
 }
 
+pub(crate) fn extract(x: F64X2) -> [f64; 2] {
+    unimplemented!()
+}
+
 pub(crate) fn extract0(_: F64X2) -> f64 {
     unimplemented!()
 }
@@ -59,6 +67,10 @@ pub(crate) fn ge(_: F64X2, _: F64X2) -> F64X2 {
 }
 
 pub(crate) fn gt(_: F64X2, _: F64X2) -> F64X2 {
+    unimplemented!()
+}
+
+pub(crate) fn hadd_rn(x: F64X2, y: F64X2) -> F64X2 {
     unimplemented!()
 }
 
@@ -135,6 +147,10 @@ pub(crate) fn sqrt1_rd(_: f64) -> f64 {
 }
 
 pub(crate) fn sqrt1_ru(_: f64) -> f64 {
+    unimplemented!()
+}
+
+pub(crate) fn sub_rn(x: F64X2, y: F64X2) -> F64X2 {
     unimplemented!()
 }
 

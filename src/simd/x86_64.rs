@@ -9,6 +9,11 @@ pub(crate) fn abs(x: F64X2) -> F64X2 {
     unsafe { _mm_andnot_pd(splat(-0.0), x) }
 }
 
+/// `add_rn([x0, x1], [y0, y1]) = [x0 + y0, x1 + y1]` rounded to nearest.
+pub(crate) fn add_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { _mm_add_pd(x, y) }
+}
+
 pub(crate) fn all(x: F64X2) -> bool {
     bitmask(x) == 3
 }
@@ -60,6 +65,11 @@ pub(crate) fn ge(x: F64X2, y: F64X2) -> F64X2 {
 
 pub(crate) fn gt(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_cmpgt_pd(x, y) }
+}
+
+/// `hadd_rn([x0, x1], [y0, y1]) = [x0 + x1, y0 + y1]` rounded to nearest.
+pub(crate) fn hadd_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { _mm_hadd_pd(x, y) }
 }
 
 pub(crate) fn le(x: F64X2, y: F64X2) -> F64X2 {
@@ -131,6 +141,11 @@ pub(crate) fn splat(x: f64) -> F64X2 {
     unsafe { transmute([x, x]) }
 }
 
+/// `sub_rn([x0, x1], [y0, y1]) = [x0 - y0, x1 - y1]` rounded to nearest.
+pub(crate) fn sub_rn(x: F64X2, y: F64X2) -> F64X2 {
+    unsafe { _mm_sub_pd(x, y) }
+}
+
 pub(crate) fn swap(x: F64X2) -> F64X2 {
     shuffle12(x, x)
 }
@@ -146,21 +161,6 @@ fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
 
 fn xor(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_xor_pd(x, y) }
-}
-
-/// `add_rn([x0, x1], [y0, y1]) = [x0 + y0, x1 + y1]` rounded to nearest.
-pub(crate) fn add_rn(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { _mm_add_pd(x, y) }
-}
-
-/// `sub_rn([x0, x1], [y0, y1]) = [x0 - y0, x1 - y1]` rounded to nearest.
-pub(crate) fn sub_rn(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { _mm_sub_pd(x, y) }
-}
-
-/// `hadd_rn([x0, x1], [y0, y1]) = [x0 + x1, y0 + y1]` rounded to nearest.
-pub(crate) fn hadd_rn(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { _mm_hadd_pd(x, y) }
 }
 
 cfg_if::cfg_if! {
