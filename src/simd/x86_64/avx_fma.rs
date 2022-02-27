@@ -35,6 +35,7 @@ impl_op_round!(f64, sqrt1_rd(x), "vsqrtsd {x}, {x}, {x}", rd);
 impl_op_round!(f64, sqrt1_ru(x), "vsqrtsd {x}, {x}, {x}", ru);
 impl_op_round!(f64, sub1_ru(x, y), "vsubsd {x}, {x}, {y}", ru);
 impl_op_round!(super::F64X2, add_ru(x, y), "vaddpd {x}, {x}, {y}", ru);
+impl_op_round!(super::F64X2, sub_ru(x, y), "vsubpd {x}, {x}, {y}", ru);
 impl_op_round!(super::F64X2, mul_ru(x, y), "vmulpd {x}, {x}, {y}", ru);
 impl_op_round!(super::F64X2, div_ru(x, y), "vdivpd {x}, {x}, {y}", ru);
 impl_op_round!(

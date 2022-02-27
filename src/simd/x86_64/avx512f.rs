@@ -37,6 +37,13 @@ impl_op_round!(
 impl_op_round!(
     super::F64X2,
     zmm_reg,
+    sub_ru(x, y),
+    "vsubpd {x:z}, {x:z}, {y:z}",
+    ru
+);
+impl_op_round!(
+    super::F64X2,
+    zmm_reg,
     mul_ru(x, y),
     "vmulpd {x:z}, {x:z}, {y:z}",
     ru
