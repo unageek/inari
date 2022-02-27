@@ -69,9 +69,12 @@ Not implemented.
 
 Not implemented.
 
-#### Cancellative addition and multiplication
+#### Cancellative addition and subtraction
 
-Not implemented.
+| Operation             | Implementation             | Requires `gmp` |
+| --------------------- | -------------------------- | -------------- |
+| cancelMinus(_x_, _y_) | [`Interval::cancel_minus`] | -              |
+| cancelPlus(_x_, _y_)  | [`Interval::cancel_plus`]  | -              |
 
 #### Constructors
 
