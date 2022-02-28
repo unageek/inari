@@ -4,26 +4,46 @@ use std::{cmp::Ordering, unreachable};
 // NOTE: `neg`, `add`, `sub`, `mul` and `div` are implemented in arith.rs
 
 impl Interval {
-    /// When `self` and `rhs` are bounded, returns the tightest
-    /// interval `z` such that `rhs` + `z` ⊇ `self` if such `z`
-    /// exists, which is the case iff the width of `self` is greater
-    /// than or equal to the width of `rhs`.  If `self` or `rhs` is
-    /// unbounded, or such `z` does not exist, returns
-    /// [`ENTIRE`][Self::ENTIRE].
+    /// Returns the *unique* interval `z` such that `rhs + z` ⊇ `self`
+    /// if both `self` and `rhs` are bounded, and if the width of `self` is greater than or equal to
+    /// that of `rhs`. Otherwise, returns [`Interval::ENTIRE`].
     ///
-    /// Mathematically, $\operatorname{cancel_minus}(y+z, y) = z$
-    /// should hold.  However, with floating-point arithmetic, this
-    /// function may return a slight overestimation of $z$.  Moreover,
-    /// when `x.cancel_minus(y)` is not [`ENTIRE`][Self::ENTIRE], one has
-    /// `x.cancel_minus(y)` ⊆ `x` - `y` but generally not the equality.
+    /// Even when `x.cancel_minus(y)` is not [`Interval::ENTIRE`], its value is
+    /// different from `x - y`, as the latter gives the tightest enclosure of `x` − `y`,
+    /// while the former does not always enclose `x` − `y`.
+    /// In such case, `x.cancel_minus(y)` ⊆ `x - y` holds, but generally not the equality.
     ///
-    /// # Example
+    /// # Examples
+    ///
+    /// Getting a partial sum omitting a single term from their total:
     ///
     /// ```
     /// use inari::*;
-    /// let y = const_interval!(0.0, 1.0);
-    /// let z = const_interval!(3.0, 4.0);
-    /// assert_eq!((y + z).cancel_minus(y), z);
+    /// let x = const_interval!(1.0, 2.0);
+    /// let y = const_interval!(3.0, 4.0);
+    /// let z = const_interval!(5.0, 6.0);
+    /// assert_eq!((x + y + z).cancel_minus(x), y + z);
+    /// assert_eq!((x + y + z).cancel_minus(y), x + z);
+    /// assert_eq!((x + y + z).cancel_minus(z), x + y);
+    /// ```
+    ///
+    /// Returns [`Interval::ENTIRE`] when the partial sum cannot be known uniquely:
+    ///
+    /// ```
+    /// use inari::*;
+    /// let x = const_interval!(1.0, 2.0);
+    /// let y = const_interval!(3.0, f64::MAX);
+    /// assert_eq!((x + y).cancel_minus(x), Interval::ENTIRE);
+    /// assert_eq!((x + y).cancel_minus(y), Interval::ENTIRE);
+    /// ```
+    ///
+    /// Returns [`Interval::ENTIRE`] when the partial sum does not exist:
+    ///
+    /// ```
+    /// use inari::*;
+    /// let x = const_interval!(1.0, 2.0);
+    /// let x_plus_y = const_interval!(1.0, 1.5);
+    /// assert_eq!(x_plus_y.cancel_minus(x), Interval::ENTIRE);
     /// ```
     #[must_use]
     pub fn cancel_minus(self, rhs: Self) -> Self {
@@ -128,9 +148,9 @@ impl Interval {
         }
     }
 
-    /// `x.cancel_plus(y)` is `x.cancel_minus(-y)`.
+    /// `x.cancel_plus(y)` is equivalent to `x.cancel_minus(-y)`.
     ///
-    /// See [`cancel_minus`][Self::cancel_minus] for more information.
+    /// See [`Interval::cancel_minus`] for more information.
     #[inline]
     #[must_use]
     pub fn cancel_plus(self, rhs: Self) -> Self {
