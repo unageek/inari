@@ -7,6 +7,8 @@
 
 **inari** is a Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 
+It [covers](https://docs.rs/inari/latest/inari/_docs/conformance/index.html) all required operations of IEEE Std 1788.1-2017. It also implements some parts of IEEE Std 1788-2015.
+
 ## Supported Rust Versions
 
 A **nightly** toolchain >= `nightly-2021-12-16` is required.

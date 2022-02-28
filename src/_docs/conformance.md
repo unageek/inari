@@ -1,6 +1,6 @@
 # Conformance to the standard
 
-inari implements a subset of the IEEE 1788-2015 standard. This page describes the current status of conformance to the standard.
+inari implements a subset of IEEE Std 1788-2015. This page describes the current status of conformance to the standard.
 
 ## Implemented operations
 

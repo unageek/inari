@@ -4,6 +4,8 @@ The icon ⚠️ indicates a breaking change.
 
 ## Unreleased
 
+This is the first version of the crate that covers all required operations of IEEE Std 1788.1-2017.
+
 ### Added
 
 - Implemented `(Dec)Interval::cancel_minus` and `cancel_plus`.

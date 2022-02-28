@@ -6,8 +6,10 @@
 //!
 //! inari implements a subset of the following standards for interval arithmetic:
 //!
-//! - [IEEE 1788-2015](https://doi.org/10.1109/IEEESTD.2015.7140721)
-//! - [IEEE 1788.1-2017](https://doi.org/10.1109/IEEESTD.2018.8277144) - a simplified version of IEEE 1788-2015
+//! - [IEEE Std 1788-2015](https://doi.org/10.1109/IEEESTD.2015.7140721)
+//! - [IEEE Std 1788.1-2017](https://doi.org/10.1109/IEEESTD.2018.8277144) - A simplified version and a subset of IEEE Std 1788-2015
+//!
+//!   The crate covers all required operations of the standard.
 //!
 //! See [Conformance to the standard][`_docs::conformance`] for details.
 
