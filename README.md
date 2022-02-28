@@ -27,7 +27,7 @@ The following CPUs are supported:
 
   Experimental, it is not tested continuously.
 
-When using the Cargo feature `gmp` (see below), target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate.
+When using the Cargo feature `gmp` (see below), target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate. For example, MSVC is not supported.
 
 ## Cargo Features
 
@@ -37,7 +37,7 @@ When using the Cargo feature `gmp` (see below), target platforms are limited to 
 
 ## Related Projects
 
-- [Graphest](https://github.com/unageek/graphest) - a faithful graphing calculator
+- [Graphest](https://github.com/unageek/graphest) - A faithful graphing calculator
 
 ## References
 
