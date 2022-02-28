@@ -2,6 +2,12 @@
 
 The icon ⚠️ indicates a breaking change.
 
+## Unreleased
+
+### Added
+
+- Implemented `(Dec)Interval::cancel_minus` and `cancel_plus`.
+
 ## v0.14.0 - 2021-02-11
 
 ### Changed
