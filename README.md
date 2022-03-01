@@ -37,6 +37,14 @@ When using the Cargo feature `gmp` (see below), target platforms are limited to 
 
 ## [Changelog](CHANGELOG.md)
 
+## Building the Documentation Locally
+
+```bash
+RUSTDOCFLAGS="--cfg docsrs --html-in-header /path/to/src/_docs/header.html" cargo doc --open
+```
+
+The absolute path is required for `header.html`.
+
 ## Related Projects
 
 - [Graphest](https://github.com/unageek/graphest) - A faithful graphing calculator
