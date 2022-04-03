@@ -2,7 +2,7 @@
 
 The icon ⚠️ indicates a breaking change.
 
-## Unreleased
+## v0.15.0 - 2022-04-03
 
 This is the first version of the crate that covers all required operations of IEEE Std 1788.1-2017.
 
@@ -10,13 +10,13 @@ This is the first version of the crate that covers all required operations of IE
 
 - Implemented `(Dec)Interval::cancel_minus` and `cancel_plus`.
 
-## v0.14.0 - 2021-02-11
+## v0.14.0 - 2022-02-11
 
 ### Changed
 
 - ⚠️ Revised the syntax of the macro `interval!(s, exact)` to `interval_exact!(s)`.
 
-## v0.13.0 - 2021-02-09
+## v0.13.0 - 2022-02-09
 
 ### Changed
 
