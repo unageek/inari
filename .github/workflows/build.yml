@@ -53,7 +53,7 @@ jobs:
           RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Ctarget-feature=+avx512f
 
       - name: Test (--no-default-features)
-        run: cargo test --release --no-default-features
+        run: cargo test --release --no-default-features --lib --tests
 
       - name: Clippy
         run: cargo clippy --all-targets
