@@ -264,7 +264,7 @@ fn uncertain_direction(s: &str) -> IResult<&str, UncertainDirection> {
 }
 
 fn pow(base: u32, exp: i32) -> Rational {
-    let i = Integer::from(Integer::u_pow_u(base, exp.abs() as u32));
+    let i = Integer::from(Integer::u_pow_u(base, exp.unsigned_abs()));
     let mut r = Rational::from(i);
     if exp < 0 {
         r.recip_mut();
