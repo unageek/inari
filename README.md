@@ -4,6 +4,7 @@
 [![docs](https://img.shields.io/docsrs/inari)](https://docs.rs/inari)
 [![build](https://img.shields.io/github/workflow/status/unageek/inari/build/main)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
 [![coverage](https://img.shields.io/coveralls/github/unageek/inari/main)](https://coveralls.io/github/unageek/inari?branch=main)
+[![rustc 1.61+](https://img.shields.io/badge/rustc-1.61%2B-lightgrey)](https://blog.rust-lang.org/2022/05/19/Rust-1.61.0.html)
 
 **inari** is a Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 
@@ -11,9 +12,7 @@ It [covers](https://docs.rs/inari/latest/inari/_docs/conformance/index.html) all
 
 ## Supported Rust Versions
 
-A **nightly** toolchain >= `nightly-2021-12-16` is required.
-
-The requirement of a nightly toolchain is due to a few [unstable features](https://doc.rust-lang.org/stable/unstable-book/) used in the crate: [`asm`](https://doc.rust-lang.org/stable/unstable-book/library-features/asm.html), [`stdsimd`](https://doc.rust-lang.org/stable/unstable-book/library-features/stdsimd.html), etc. To use the crate as a dependency, you need to [override the toolchain](https://rust-lang.github.io/rustup/overrides.html) in your project. Here is an [example](https://github.com/unageek/graphest/blob/main/rust-toolchain) that does this with the `rust-toolchain` file.
+[Rust 1.61.0](https://blog.rust-lang.org/2022/05/19/Rust-1.61.0.html) or newer is required.
 
 ## Supported Platforms
 
