@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.61.0
+          toolchain: nightly
           override: true
           profile: minimal
           components: clippy, rustfmt
@@ -110,3 +110,43 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ${{ steps.coverage.outputs.report }}
+
+  msrv:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/gmp-mpfr-sys
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.61.0
+          override: true
+          profile: minimal
+
+      - uses: Swatinem/rust-cache@v1
+
+      - name: Is AVX-512F available?
+        id: avx512f
+        run: lscpu | grep --quiet avx512f
+        continue-on-error: true
+
+      - name: Check
+        run: cargo check --all-targets
+
+      - name: Check (target AVX-512F)
+        run: cargo check --all-targets
+        if: ${{ steps.avx512f.outcome == 'success' }}
+        env:
+          RUSTFLAGS: ${{ env.RUSTFLAGS }} -Ctarget-feature=+avx512f
+          RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Ctarget-feature=+avx512f
+
+      - name: Check (--no-default-features)
+        run: cargo check --no-default-features --all-targets
