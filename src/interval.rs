@@ -285,13 +285,6 @@ macro_rules! interval {
         $s.parse::<$crate::Interval>()
     }};
 
-    ($s:expr, exact) => {{
-        use ::std::primitive::*;
-        fn is_str(_: &str) {}
-        is_str($s);
-        $crate::Interval::_try_from_str_exact($s)
-    }};
-
     ($a:expr, $b:expr) => {
         $crate::_interval!($a, $b)
     };
