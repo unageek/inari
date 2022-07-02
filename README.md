@@ -8,11 +8,7 @@
 
 **inari** is a Rust implementation of [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic).
 
-It [covers](https://docs.rs/inari/latest/inari/_docs/conformance/index.html) all required operations of IEEE Std 1788.1-2017. It also implements some parts of IEEE Std 1788-2015.
-
-## Supported Rust Versions
-
-[Rust 1.61.0](https://blog.rust-lang.org/2022/05/19/Rust-1.61.0.html) or newer is required.
+It [conforms](https://docs.rs/inari/latest/inari/_docs/conformance/index.html) to [IEEE Std 1788.1-2017](https://doi.org/10.1109/IEEESTD.2018.8277144). It also implements a subset of [IEEE Std 1788-2015](https://doi.org/10.1109/IEEESTD.2015.7140721).
 
 ## Supported Platforms
 
@@ -39,12 +35,12 @@ When using the Cargo feature `gmp` (see below), target platforms are limited to 
 ## Building the Documentation Locally
 
 ```bash
-RUSTDOCFLAGS="--cfg docsrs --html-in-header /path/to/src/_docs/header.html" cargo doc --open
+RUSTDOCFLAGS="--cfg docsrs --html-in-header /path/to/inari/src/_docs/header.html" cargo doc --open
 ```
 
-The absolute path is required for `header.html`.
+The absolute path to [`header.html`](src/_docs/header.html) must be specified.
 
-## Related Projects
+## Related Project
 
 - [Graphest](https://github.com/unageek/graphest) - A faithful graphing calculator
 
