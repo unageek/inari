@@ -275,6 +275,8 @@ macro_rules! interval {
 /// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
 ///
 /// For creating a constant, the macro [`const_interval!`] should be preferred over this one.
+///
+/// [`const_interval!`]: crate::const_interval
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! interval {
@@ -380,6 +382,8 @@ macro_rules! dec_interval {
 /// [`IntervalErrorKind::PossiblyUndefinedOperation`] is returned.
 ///
 /// For creating a constant, the macro [`const_dec_interval!`] should be preferred over this one.
+///
+/// [`const_dec_interval!`]: crate::const_dec_interval
 #[cfg(feature = "gmp")]
 #[macro_export]
 macro_rules! dec_interval {
