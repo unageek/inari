@@ -2,6 +2,18 @@
 
 The icon ⚠️ indicates a breaking change.
 
+## Unreleased
+
+### Changed
+
+- ⚠️ Changed the minimum supported Rust version to v1.61.0.
+
+### Removed
+
+- ⚠️ Removed the macro `interval!(s, exact)`.
+
+  Use the macro `interval_exact!(s)` instead. The removal should have been done in [v0.14.0](#v0140---2022-02-11).
+
 ## v0.15.0 - 2022-04-03
 
 This is the first version of the crate that covers all required operations of IEEE Std 1788.1-2017.
