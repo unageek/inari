@@ -1,8 +1,8 @@
 # Changelog
 
-The icon ⚠️ indicates a breaking change.
+Items marked with ⚠️ are breaking changes.
 
-## Unreleased
+## v1.0.0 - 2022-07-09
 
 ### Changed
 
@@ -12,7 +12,7 @@ The icon ⚠️ indicates a breaking change.
 
 - ⚠️ Removed the macro `interval!(s, exact)`.
 
-  Use the macro `interval_exact!(s)` instead. The removal should have been done in [v0.14.0](#v0140---2022-02-11).
+  Use the macro `interval_exact!(s)` [introduced](#v0140---2022-02-11) in v0.14.0 instead. (The removal should have been made in that version.)
 
 ## v0.15.0 - 2022-04-03
 
