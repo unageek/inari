@@ -2,7 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/inari.svg)](https://crates.io/crates/inari)
 [![docs](https://img.shields.io/docsrs/inari)](https://docs.rs/inari)
-[![build](https://img.shields.io/github/workflow/status/unageek/inari/build/main)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
+[![build](https://img.shields.io/github/actions/workflow/status/unageek/inari/build.yml?branch=main)](https://github.com/unageek/inari/actions?query=branch%3Amaster+workflow%3Abuild)
 [![coverage](https://img.shields.io/coveralls/github/unageek/inari/main)](https://coveralls.io/github/unageek/inari?branch=main)
 [![rustc 1.61+](https://img.shields.io/badge/rustc-1.61%2B-lightgrey)](https://blog.rust-lang.org/2022/05/19/Rust-1.61.0.html)
 
