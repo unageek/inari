@@ -129,12 +129,10 @@ impl Interval {
     pub fn mul_rev_to_pair(self, numerator: Self) -> (Self, Self) {
         use IntervalClass2::*;
         match numerator.classify2(self) {
-            E_E | E_M | E_N0 | E_N1 | E_P0 | E_P1 | E_Z | M_E | N0_E |  N1_E
-                | N1_Z | P0_E | P1_E | P1_Z | Z_E =>
-                (Self::EMPTY, Self::EMPTY),
-            M_Z | N0_Z | P0_Z | Z_Z | M_M | M_N0 | M_P0 | N0_M | P0_M | Z_M
-                | Z_N0 | Z_P0 | N0_N0 | N0_P0 | P0_N0 | P0_P0  =>
-                (Self::ENTIRE, Self::EMPTY),
+            E_E | E_M | E_N0 | E_N1 | E_P0 | E_P1 | E_Z | M_E | N0_E | N1_E | N1_Z | P0_E
+            | P1_E | P1_Z | Z_E => (Self::EMPTY, Self::EMPTY),
+            M_Z | N0_Z | P0_Z | Z_Z | M_M | M_N0 | M_P0 | N0_M | P0_M | Z_M | Z_N0 | Z_P0
+            | N0_N0 | N0_P0 | P0_N0 | P0_P0 => (Self::ENTIRE, Self::EMPTY),
             Z_N1 | Z_P1 => (Self::zero(), Self::EMPTY),
             N1_M => {
                 // N1 / M => [-∞, b/d] ∪ [b/c, +∞] = [+∞; b/d] ∪ [-b/c; +∞]
@@ -142,8 +140,14 @@ impl Interval {
                 let x = numerator.rep; // [-a; b]
                 let x = shuffle13(x, x); // [b; b]
                 let q = div_ru(x, self.rep); // [b/(-c); b/d]
-                (Self { rep: shuffle13(splat(f64::INFINITY), q)},
-                 Self { rep: shuffle02(q, splat(f64::INFINITY)) })
+                (
+                    Self {
+                        rep: shuffle13(splat(f64::INFINITY), q),
+                    },
+                    Self {
+                        rep: shuffle02(q, splat(f64::INFINITY)),
+                    },
+                )
             }
             P1_M => {
                 // P1 / M => [-∞, a/c] ∪ [a/d, +∞] = [+∞; a/c] ∪ [-a/d; +∞]
@@ -151,8 +155,14 @@ impl Interval {
                 let x = numerator.rep; // [-a; b]
                 let x = shuffle02(x, x); // [-a; -a]
                 let q = div_ru(x, self.rep); // [a/c; -a/d]
-                (Self { rep: shuffle02(splat(f64::INFINITY), q) },
-                 Self { rep: shuffle13(q, splat(f64::INFINITY)) })
+                (
+                    Self {
+                        rep: shuffle02(splat(f64::INFINITY), q),
+                    },
+                    Self {
+                        rep: shuffle13(q, splat(f64::INFINITY)),
+                    },
+                )
             }
             M_N1 => (numerator.div_m_n1(self), Self::EMPTY),
             M_P1 => (numerator.div_m_p1(self), Self::EMPTY),
@@ -162,7 +172,7 @@ impl Interval {
             N0_P1 | N1_P1 => (numerator.div_n_p1(self), Self::EMPTY),
             P1_N0 => (numerator.div_p1_n0(self), Self::EMPTY),
             P0_N1 | P1_N1 => (numerator.div_p_n1(self), Self::EMPTY),
-            P1_P0 => (numerator.div_p1_p0(self),Self::EMPTY),
+            P1_P0 => (numerator.div_p1_p0(self), Self::EMPTY),
             P0_P1 | P1_P1 => (numerator.div_p_p1(self), Self::EMPTY),
         }
     }
@@ -669,12 +679,16 @@ mod tests {
     #[test]
     fn mul_rev_to_pair() {
         let zero = const_interval!(0., 0.);
-        assert_eq!(zero.mul_rev_to_pair(const_interval!(1., 2.)),
-                   (I::EMPTY, I::EMPTY));
+        assert_eq!(
+            zero.mul_rev_to_pair(const_interval!(1., 2.)),
+            (I::EMPTY, I::EMPTY)
+        );
         let pos = const_interval!(0., f64::INFINITY);
         let neg = const_interval!(f64::NEG_INFINITY, 0.);
-        assert_eq!(I::ENTIRE.mul_rev_to_pair(const_interval!(1., 1.)),
-                   (neg, pos));
+        assert_eq!(
+            I::ENTIRE.mul_rev_to_pair(const_interval!(1., 1.)),
+            (neg, pos)
+        );
         assert_eq!(pos.mul_rev_to_pair(pos), (I::ENTIRE, I::EMPTY));
         assert_eq!(neg.mul_rev_to_pair(pos), (I::ENTIRE, I::EMPTY));
     }
