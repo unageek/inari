@@ -4,6 +4,102 @@ use std::{cmp::Ordering, unreachable};
 // NOTE: `neg`, `add`, `sub`, `mul` and `div` are implemented in arith.rs
 
 impl Interval {
+    // Division functions [a, b] / [c, d] for various cases, shared
+    // between `mul_rev_to_pair` (below) and `Div` (in arith.rs).
+    #[inline]
+    pub(crate) fn div_m_n1(self, rhs: Self) -> Self {
+        // M / N1 => [b/d, a/d] = [-b/d; a/d] = [b/-d; -a/-d] = [b; -a] ./ [-d; -d]
+        let x = swap(self.rep); // [b; -a]
+        let y = swap(rhs.rep); // [d; -c]
+        let y = neg0(y); // [-d; -c]
+        let y = shuffle02(y, y); // [-d; -d]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_m_p1(self, rhs: Self) -> Self {
+        // M / P1 => [a/c, b/c] = [-a/c; b/c] = [-a; b] ./ [c; c]
+        let x = self.rep; // [-a; b]
+        let y = neg0(rhs.rep); // [c; d]
+        let y = shuffle02(y, y); // [c; c]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_n1_n0(self, rhs: Self) -> Self {
+        // N / N0 => [b/c, +∞] = [-b/c; +∞] = [b/-c; +∞]
+        let x = swap(self.rep); // [b; -a]
+        let y = rhs.rep; // [-c; d]
+        Self {
+            rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn div_n_n1(self, rhs: Self) -> Self {
+        // N / N1 => [b/c, a/d] = [-b/c; a/d] = [b/-c; a/d] = [b; a] ./ [-c; d]
+        let x = neg0(self.rep); // [a; b]
+        let x = swap(x); // [b; a]
+        let y = rhs.rep; // [-c; d]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_n1_p0(self, rhs: Self) -> Self {
+        // N / P0 => [-∞, b/d] = [+∞; b/d]
+        let x = self.rep; // [-a; b]
+        let y = rhs.rep; // [-c; d]
+        Self {
+            rep: shuffle03(splat(f64::INFINITY), div_ru(x, y)),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn div_n_p1(self, rhs: Self) -> Self {
+        // N / P1 => [a/c, b/d] = [-a/c; b/d] = [-a; b] ./ [c; d]
+        let x = self.rep; // [-a; b]
+        let y = neg0(rhs.rep); // [c; d]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_p1_n0(self, rhs: Self) -> Self {
+        // P / N0 => [-∞, a/c] = [+∞; a/c] = [+∞; -a/-c]
+        let x = self.rep; // [-a; b]
+        let y = rhs.rep; // [-c; d]
+        Self {
+            rep: shuffle02(splat(f64::INFINITY), div_ru(x, y)),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn div_p_n1(self, rhs: Self) -> Self {
+        // P / N1 => [b/d, a/c] = [-b/d; a/c] = [-b/d; -a/-c] = [-b; -a] ./ [d; -c]
+        let x = swap(self.rep); // [b; -a]
+        let x = neg0(x); // [-b; -a]
+        let y = swap(rhs.rep); // [d; -c]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_p1_p0(self, rhs: Self) -> Self {
+        // P / P0 => [a/d, +∞] = [-a/d; +∞]
+        let x = self.rep; // [-a; b]
+        let y = swap(rhs.rep); // [d; -c]
+        Self {
+            rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn div_p_p1(self, rhs: Self) -> Self {
+        // P / P1 => [a/d, b/c] = [-a/d; b/c] = [-a; b] ./ [d; c]
+        let x = self.rep; // [-a; b]
+        let y = neg0(rhs.rep); // [c; d]
+        let y = swap(y); // [d; c]
+        Self { rep: div_ru(x, y) }
+    }
+
     /// Return the two-output division of `numerator`/ₛₑₜ`self`.
     ///
     /// Recall that, according to the standard,
@@ -58,77 +154,16 @@ impl Interval {
                 (Self { rep: shuffle02(splat(f64::INFINITY), q) },
                  Self { rep: shuffle13(q, splat(f64::INFINITY)) })
             }
-            // Below are the common rules with `numerator`/`self`
-            M_N1 => {
-                // M / N1 => [b/d, a/d] = [-b/d; a/d] = [b/-d; -a/-d]  = [b; -a] ./ [-d; -d]
-                let x = swap(numerator.rep); // [b; -a]
-                let y = swap(self.rep); // [d; -c]
-                let y = neg0(y); // [-d; -c]
-                let y = shuffle02(y, y); // [-d; -d]
-                (Self { rep: div_ru(x, y) }, Self::EMPTY)
-            }
-            M_P1 => {
-                // M / P1 => [a/c, b/c] = [-a/c; b/c] = [-a; b] ./ [c; c]
-                let x = numerator.rep; // [-a; b]
-                let y = neg0(self.rep); // [c; d]
-                let y = shuffle02(y, y); // [c; c]
-                (Self { rep: div_ru(x, y) }, Self::EMPTY)
-            }
-            N1_N0 => {
-                // N / N0 => [b/c, +∞] = [-b/c; +∞] = [b/-c; +∞]
-                let x = swap(numerator.rep); // [b; -a]
-                let y = self.rep; // [-c; d]
-                (Self { rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)) },
-                 Self::EMPTY)
-            }
-            N0_N1 | N1_N1 => {
-                // N / N1 => [b/c, a/d] = [-b/c; a/d] = [b/-c; a/d] = [b; a] ./ [-c; d]
-                let x = neg0(numerator.rep); // [a; b]
-                let x = swap(x); // [b; a]
-                let y = self.rep; // [-c; d]
-                (Self { rep: div_ru(x, y) }, Self::EMPTY)
-            }
-            N1_P0 => {
-                // N / P0 => [-∞, b/d] = [+∞; b/d]
-                let x = numerator.rep; // [-a; b]
-                let y = self.rep; // [-c; d]
-                (Self { rep: shuffle03(splat(f64::INFINITY), div_ru(x, y)) },
-                 Self::EMPTY)
-            }
-            N0_P1 | N1_P1 => {
-                // N / P1 => [a/c, b/d] = [-a/c; b/d] = [-a; b] ./ [c; d]
-                let x = numerator.rep; // [-a; b]
-                let y = neg0(self.rep); // [c; d]
-                (Self { rep: div_ru(x, y) }, Self::EMPTY)
-            }
-            P1_N0 => {
-                // P / N0 => [-∞, a/c] = [+∞; a/c] = [+∞; -a/-c]
-                let x = numerator.rep; // [-a; b]
-                let y = self.rep; // [-c; d]
-                (Self { rep: shuffle02(splat(f64::INFINITY), div_ru(x, y)) },
-                 Self::EMPTY)
-            }
-            P0_N1 | P1_N1 => {
-                // P / N1 => [b/d, a/c] = [-b/d; a/c] = [-b/d; -a/-c] = [-b; -a] ./ [d; -c]
-                let x = swap(numerator.rep); // [b; -a]
-                let x = neg0(x); // [-b; -a]
-                let y = swap(self.rep); // [d; -c]
-                (Self { rep: div_ru(x, y) }, Self::EMPTY)
-            }
-            P1_P0 => {
-                // P / P0 => [a/d, +∞] = [-a/d; +∞]
-                let x = numerator.rep; // [-a; b]
-                let y = swap(self.rep); // [d; -c]
-                (Self { rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)) },
-                 Self::EMPTY)
-            }
-            P0_P1 | P1_P1 => {
-                // P / P1 => [a/d, b/c] = [-a/d; b/c] = [-a; b] ./ [d; c]
-                let x = numerator.rep; // [-a; b]
-                let y = neg0(self.rep); // [c; d]
-                let y = swap(y); // [d; c]
-                (Self { rep: div_ru(x, y) }, Self::EMPTY)
-            }
+            M_N1 => (numerator.div_m_n1(self), Self::EMPTY),
+            M_P1 => (numerator.div_m_p1(self), Self::EMPTY),
+            N1_N0 => (numerator.div_n1_n0(self), Self::EMPTY),
+            N0_N1 | N1_N1 => (numerator.div_n_n1(self), Self::EMPTY),
+            N1_P0 => (numerator.div_n1_p0(self), Self::EMPTY),
+            N0_P1 | N1_P1 => (numerator.div_n_p1(self), Self::EMPTY),
+            P1_N0 => (numerator.div_p1_n0(self), Self::EMPTY),
+            P0_N1 | P1_N1 => (numerator.div_p_n1(self), Self::EMPTY),
+            P1_P0 => (numerator.div_p1_p0(self),Self::EMPTY),
+            P0_P1 | P1_P1 => (numerator.div_p_p1(self), Self::EMPTY),
         }
     }
 
