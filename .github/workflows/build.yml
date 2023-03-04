@@ -35,7 +35,7 @@ jobs:
           profile: minimal
           components: clippy, rustfmt
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: Is AVX-512F available?
         id: avx512f
@@ -91,7 +91,7 @@ jobs:
           override: true
           profile: minimal
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: Coverage
         env:
@@ -131,7 +131,7 @@ jobs:
           override: true
           profile: minimal
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: Is AVX-512F available?
         id: avx512f
