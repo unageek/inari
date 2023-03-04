@@ -100,10 +100,11 @@ impl Interval {
         Self { rep: div_ru(x, y) }
     }
 
-    /// Return the two-output division of `numerator`/ₛₑₜ`self`.
+    /// Return the two-output division of
+    /// `numerator`$\setdiv \self$.
     ///
     /// Recall that, according to the standard,
-    /// c /ₛₑₜ b := {x ∈ ℝ | ∃β ∈ b, xβ ∈ c}.
+    /// $𝒚 \setdiv 𝒙 := \set{z ∈ \R ∣ ∃x ∈ 𝒙,\ zx ∈ 𝒚}$.
     ///
     /// # Examples
     ///
