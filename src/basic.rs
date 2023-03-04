@@ -556,6 +556,23 @@ impl Interval {
 }
 
 impl DecInterval {
+    /// The decorated version of [`Interval::mul_rev_to_pair`].
+    ///
+    /// A NaI is returned if `self` or `rhs` is NaI.
+    #[must_use]
+    pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
+        if self.is_nai() || numerator.is_nai() {
+            return [Self::NAI; 2]
+        }
+        let [u, v] = self.x.mul_rev_to_pair(numerator.x);
+        let d = if self.x.contains(0.0) {
+            Decoration::Trv
+        } else {
+            self.d.min(numerator.d)
+        };
+        [Self::set_dec(u, d), Self::set_dec(v, Decoration::Trv)]
+    }
+
     /// The decorated version of [`Interval::cancel_minus`].
     ///
     /// A NaI is returned if `self` or `rhs` is NaI.
