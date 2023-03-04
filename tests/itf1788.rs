@@ -19,7 +19,7 @@ mod itf1788_tests {
     mod libieeep1788_cancel;
     mod libieeep1788_class;
     mod libieeep1788_elem;
-    //mod libieeep1788_mul_rev;
+    mod libieeep1788_mul_rev;
     mod libieeep1788_num;
     mod libieeep1788_overlap;
     mod libieeep1788_rec_bool;
