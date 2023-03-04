@@ -562,7 +562,7 @@ impl DecInterval {
     #[must_use]
     pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
         if self.is_nai() || numerator.is_nai() {
-            return [Self::NAI; 2]
+            return [Self::NAI; 2];
         }
         let [u, v] = self.x.mul_rev_to_pair(numerator.x);
         let d = if self.x.contains(0.0) {
