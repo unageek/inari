@@ -26,7 +26,7 @@ impl Interval {
     }
 
     #[inline]
-    pub(crate) fn div_n1_n0(self, rhs: Self) -> Self {
+    pub(crate) fn div_n_n0(self, rhs: Self) -> Self {
         // N / N0 => [b/c, +∞] = [-b/c; +∞] = [b/-c; +∞]
         let x = swap(self.rep); // [b; -a]
         let y = rhs.rep; // [-c; d]
@@ -45,7 +45,7 @@ impl Interval {
     }
 
     #[inline]
-    pub(crate) fn div_n1_p0(self, rhs: Self) -> Self {
+    pub(crate) fn div_n_p0(self, rhs: Self) -> Self {
         // N / P0 => [-∞, b/d] = [+∞; b/d]
         let x = self.rep; // [-a; b]
         let y = rhs.rep; // [-c; d]
@@ -63,7 +63,7 @@ impl Interval {
     }
 
     #[inline]
-    pub(crate) fn div_p1_n0(self, rhs: Self) -> Self {
+    pub(crate) fn div_p_n0(self, rhs: Self) -> Self {
         // P / N0 => [-∞, a/c] = [+∞; a/c] = [+∞; -a/-c]
         let x = self.rep; // [-a; b]
         let y = rhs.rep; // [-c; d]
@@ -82,7 +82,7 @@ impl Interval {
     }
 
     #[inline]
-    pub(crate) fn div_p1_p0(self, rhs: Self) -> Self {
+    pub(crate) fn div_p_p0(self, rhs: Self) -> Self {
         // P / P0 => [a/d, +∞] = [-a/d; +∞]
         let x = self.rep; // [-a; b]
         let y = swap(rhs.rep); // [d; -c]
@@ -166,13 +166,13 @@ impl Interval {
             }
             M_N1 => [numerator.div_m_n1(self), Self::EMPTY],
             M_P1 => [numerator.div_m_p1(self), Self::EMPTY],
-            N1_N0 => [numerator.div_n1_n0(self), Self::EMPTY],
+            N1_N0 => [numerator.div_n_n0(self), Self::EMPTY],
             N0_N1 | N1_N1 => [numerator.div_n_n1(self), Self::EMPTY],
-            N1_P0 => [numerator.div_n1_p0(self), Self::EMPTY],
+            N1_P0 => [numerator.div_n_p0(self), Self::EMPTY],
             N0_P1 | N1_P1 => [numerator.div_n_p1(self), Self::EMPTY],
-            P1_N0 => [numerator.div_p1_n0(self), Self::EMPTY],
+            P1_N0 => [numerator.div_p_n0(self), Self::EMPTY],
             P0_N1 | P1_N1 => [numerator.div_p_n1(self), Self::EMPTY],
-            P1_P0 => [numerator.div_p1_p0(self), Self::EMPTY],
+            P1_P0 => [numerator.div_p_p0(self), Self::EMPTY],
             P0_P1 | P1_P1 => [numerator.div_p_p1(self), Self::EMPTY],
         }
     }

@@ -156,13 +156,13 @@ impl Div for Interval {
             Z_M | Z_N0 | Z_N1 | Z_P0 | Z_P1 => Self::zero(),
             M_N1 => self.div_m_n1(rhs),
             M_P1 => self.div_m_p1(rhs),
-            N0_N0 | N1_N0 => self.div_n1_n0(rhs),
+            N0_N0 | N1_N0 => self.div_n_n0(rhs),
             N0_N1 | N1_N1 => self.div_n_n1(rhs),
-            N0_P0 | N1_P0 => self.div_n1_p0(rhs),
+            N0_P0 | N1_P0 => self.div_n_p0(rhs),
             N0_P1 | N1_P1 => self.div_n_p1(rhs),
-            P0_N0 | P1_N0 => self.div_p1_n0(rhs),
+            P0_N0 | P1_N0 => self.div_p_n0(rhs),
             P0_N1 | P1_N1 => self.div_p_n1(rhs),
-            P0_P0 | P1_P0 => self.div_p1_p0(rhs),
+            P0_P0 | P1_P0 => self.div_p_p0(rhs),
             P0_P1 | P1_P1 => self.div_p_p1(rhs),
         }
     }
