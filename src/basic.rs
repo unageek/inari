@@ -100,31 +100,30 @@ impl Interval {
         Self { rep: div_ru(x, y) }
     }
 
-    /// Return the two-output division of
-    /// `numerator`$\setdiv \self$.
+    /// Return the two-output division of `numerator`$\setdiv \self$.
     ///
     /// Recall that, according to the standard,
     /// $𝒚 \setdiv 𝒙 := \set{z ∈ \R ∣ ∃x ∈ 𝒙,\ zx ∈ 𝒚}$.
+    /// Accordingly, this function returns $[∅, ∅]$ if `self` or
+    /// `numerator` is empty.  If `numerator`$\setdiv \self$ is a
+    /// single interval $𝒛$, $[𝒛, ∅]$ is returned.  Otherwise
+    /// $[𝒛₁, 𝒛₂]$ is returned, with $𝒛₁ < 𝒛₂$ being such that
+    /// $𝒛₁ ∪ 𝒛₂ =$`numerator`$\setdiv \self$.
     ///
     /// # Examples
     ///
     /// ```
-    /// use inari::*;
-    /// let zero = const_interval!(0., 0.);
-    /// let one = const_interval!(1., 1.);
-    /// let unit = const_interval!(0., 1.);
-    /// let x = const_interval!(1., 2.);
-    /// let y = const_interval!(0., 2.);
-    /// let z = const_interval!(1., f64::INFINITY);
-    /// let u = const_interval!(-1., 1.);
-    /// assert_eq!(zero.mul_rev_to_pair(x), [Interval::EMPTY, Interval::EMPTY]);
-    /// assert_eq!(zero.mul_rev_to_pair(y), [Interval::ENTIRE, Interval::EMPTY]);
-    /// assert_eq!(one.mul_rev_to_pair(x), [x, Interval::EMPTY]);
-    /// assert_eq!(z.mul_rev_to_pair(one), [unit, Interval::EMPTY]);
-    /// assert_eq!(u.mul_rev_to_pair(x),
-    ///            [const_interval!(f64::NEG_INFINITY, -1.),
-    ///             const_interval!(1., f64::INFINITY)]);
-    /// assert_eq!(u.mul_rev_to_pair(zero), [Interval::ENTIRE, Interval::EMPTY]);
+    /// use inari::{Interval as I, const_interval as c};
+    /// let zero = c!(0., 0.);
+    /// assert_eq!(zero.mul_rev_to_pair(c!(1., 2.)), [I::EMPTY; 2]);
+    /// assert_eq!(zero.mul_rev_to_pair(c!(0., 2.)), [I::ENTIRE, I::EMPTY]);
+    /// let x = c!(1., 2.);
+    /// assert_eq!(c!(1., 1.).mul_rev_to_pair(x), [x, I::EMPTY]);
+    /// assert_eq!(c!(1., f64::INFINITY).mul_rev_to_pair(c!(1., 1.)),
+    ///            [c!(0., 1.), I::EMPTY]);
+    /// assert_eq!(c!(-1., 1.).mul_rev_to_pair(c!(1., 2.)),
+    ///            [c!(f64::NEG_INFINITY, -1.), c!(1., f64::INFINITY)]);
+    /// assert_eq!(c!(-1., 1.).mul_rev_to_pair(zero), [I::ENTIRE, I::EMPTY]);
     /// ```
     #[must_use]
     pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
@@ -559,7 +558,7 @@ impl Interval {
 impl DecInterval {
     /// The decorated version of [`Interval::mul_rev_to_pair`].
     ///
-    /// A NaI is returned if `self` or `rhs` is NaI.
+    /// A NaI is returned if `self` or `numerator` is NaI.
     #[must_use]
     pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
         if self.is_nai() || numerator.is_nai() {
