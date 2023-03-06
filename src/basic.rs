@@ -570,12 +570,12 @@ impl Interval {
 impl DecInterval {
     /// The decorated version of [`Interval::mul_rev_to_pair`].
     ///
-    /// `[Self::NAI, Self::NAI]` is returned if `self` or `numerator`
-    /// is NaI.  If neither `self` nor `numerator` are empty and $0 ∉
-    /// \self$, `[z,`[`Self::EMPTY`]`]` is returned with `z` being the
-    /// same as `numerator / self` and is decorated the same way.  In
-    /// all other cases, both output are decorated with
-    /// [`Trv`](Decoration::Trv).
+    /// The array `[Self::NAI, Self::NAI]` is returned if `self` or
+    /// `numerator` is NaI.  When neither `self` nor `numerator` are
+    /// empty and $0 ∉ \self ,$ `[z,`[`Self::EMPTY`]`]` is returned
+    /// with `z` being the same as `numerator / self` and is decorated
+    /// the same way.  In all other cases, both output are decorated
+    /// with [`Trv`](Decoration::Trv).
     #[must_use]
     pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
         if self.is_nai() || numerator.is_nai() {
