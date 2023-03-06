@@ -100,8 +100,9 @@ impl Interval {
         Self { rep: div_ru(x, y) }
     }
 
-    /// Return the extended division of `numerator`$\setdiv \self$
-    /// (also called *two-output division* in the IEEE 1788 standard).
+    /// Return the two-output reverse multiplication:
+    /// `numerator`$\setdiv \self$ (also called *two-output division*
+    /// in the IEEE 1788 standard).
     ///
     /// The set-division of two intervals $𝒙$ and $𝒚$ is defined as
     /// $$𝒙 \setdiv 𝒚 := \set{z ∈ \R ∣ ∃y ∈ 𝒚,\ zy ∈ 𝒙}.$$
@@ -127,6 +128,7 @@ impl Interval {
     /// let zero = c!(0., 0.);
     /// assert_eq!(zero.mul_rev_to_pair(c!(1., 2.)), [I::EMPTY; 2]);
     /// assert_eq!(zero.mul_rev_to_pair(c!(0., 2.)), [I::ENTIRE, I::EMPTY]);
+    /// assert_eq!(zero.mul_rev_to_pair(zero), [I::ENTIRE, I::EMPTY]);
     /// let x = c!(1., 2.);
     /// assert_eq!(c!(1., 1.).mul_rev_to_pair(x), [x, I::EMPTY]);
     /// assert_eq!(c!(1., f64::INFINITY).mul_rev_to_pair(c!(1., 1.)),
@@ -568,11 +570,11 @@ impl Interval {
 impl DecInterval {
     /// The decorated version of [`Interval::mul_rev_to_pair`].
     ///
-    /// A NaI is returned if `self` or `numerator` is NaI.  If neither
-    /// `self` nor `numerator` are empty and $0 ∉ \self$,
-    /// `[z,`[`Self::EMPTY`]`]` is returned with `z` being the same as
-    /// `numerator / self` and is decorated the same way.  In all
-    /// other cases, both output are decorated with
+    /// `[Self::NAI, Self::NAI]` is returned if `self` or `numerator`
+    /// is NaI.  If neither `self` nor `numerator` are empty and $0 ∉
+    /// \self$, `[z,`[`Self::EMPTY`]`]` is returned with `z` being the
+    /// same as `numerator / self` and is decorated the same way.  In
+    /// all other cases, both output are decorated with
     /// [`Trv`](Decoration::Trv).
     #[must_use]
     pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
