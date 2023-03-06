@@ -100,15 +100,25 @@ impl Interval {
         Self { rep: div_ru(x, y) }
     }
 
-    /// Return the two-output division of `numerator`$\setdiv \self$.
+    /// Return the extended division of `numerator`$\setdiv \self$
+    /// (also called *two-output division* in the IEEE 1788 standard).
     ///
-    /// Recall that, according to the standard,
-    /// $𝒚 \setdiv 𝒙 := \set{z ∈ \R ∣ ∃x ∈ 𝒙,\ zx ∈ 𝒚}$.
-    /// Accordingly, this function returns $[∅, ∅]$ if `self` or
-    /// `numerator` is empty.  If `numerator`$\setdiv \self$ is a
-    /// single interval $𝒛$, $[𝒛, ∅]$ is returned.  Otherwise
-    /// $[𝒛₁, 𝒛₂]$ is returned, with $𝒛₁ < 𝒛₂$ being such that
-    /// $𝒛₁ ∪ 𝒛₂ =$`numerator`$\setdiv \self$.
+    /// The set-division of two intervals $𝒙$ and $𝒚$ is defined as
+    /// $$𝒙 \setdiv 𝒚 := \set{z ∈ \R ∣ ∃y ∈ 𝒚,\ zy ∈ 𝒙}.$$
+    /// Let us distinguish several cases.
+    /// - If $𝒙$ or $𝒚$ is empty, $𝒙 \setdiv 𝒚 = ∅$.  Thus if `self`
+    ///   or `numerator` is empty, this function returns `[EMPTY, EMPTY]`.
+    /// - If $0 ∉ 𝒚$, $𝒙 \setdiv 𝒚$ is a single interval $𝒛$ which
+    ///   coincides with the standard interval division $𝒙 / 𝒚$.  Then
+    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) returns `[z, EMPTY]` where `z` is
+    ///   an encosure of $𝒛$.
+    /// - If $0 ∈ 𝒚$ and $0 ∉ 𝒙$, $𝒙 \setdiv 𝒚$ is a made of two
+    ///   intervals $𝒛₁ ∪ 𝒛₂$.  The standard division $𝒙 / 𝒚$ returns
+    ///   the interval enclosure of the result, namely $ℝ$.  Here,
+    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) returns $[𝒛₁, 𝒛₂]$ ordered such
+    ///   that $𝒛₁ < 𝒛₂$.
+    /// - If $0 ∈ 𝒚$ and $0 ∈ 𝒙$, $𝒙 \setdiv 𝒚 = ℝ$.  Accordingly,
+    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) return `[ENTIRE, EMPTY]`.
     ///
     /// # Examples
     ///
@@ -558,7 +568,12 @@ impl Interval {
 impl DecInterval {
     /// The decorated version of [`Interval::mul_rev_to_pair`].
     ///
-    /// A NaI is returned if `self` or `numerator` is NaI.
+    /// A NaI is returned if `self` or `numerator` is NaI.  If neither
+    /// `self` nor `numerator` are empty and $0 ∉ \self$,
+    /// `[z,`[`Self::EMPTY`]`]` is returned with `z` being the same as
+    /// `numerator / self` and is decorated the same way.  In all
+    /// other cases, both output are decorated with
+    /// [`Trv`](Decoration::Trv).
     #[must_use]
     pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
         if self.is_nai() || numerator.is_nai() {
