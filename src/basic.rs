@@ -100,43 +100,54 @@ impl Interval {
         Self { rep: div_ru(x, y) }
     }
 
-    /// Return the two-output reverse multiplication:
-    /// `numerator`$\setdiv \self$ (also called *two-output division*
-    /// in the IEEE 1788 standard).
+    /// Returns the reverse multiplication $\numerator \setdiv′ \self$
+    /// (beware the order of the arguments) as an array of two intervals.
+    /// The operation is also called *two-output division* in IEEE Std 1788-2015.
     ///
-    /// The set-division of two intervals $𝒙$ and $𝒚$ is defined as
-    /// $$𝒙 \setdiv 𝒚 := \set{z ∈ \R ∣ ∃y ∈ 𝒚,\ zy ∈ 𝒙}.$$
-    /// Let us distinguish several cases.
-    /// - If $𝒙$ or $𝒚$ is empty, $𝒙 \setdiv 𝒚 = ∅$.  Thus if `self`
-    ///   or `numerator` is empty, this function returns `[EMPTY, EMPTY]`.
-    /// - If $0 ∉ 𝒚$, $𝒙 \setdiv 𝒚$ is a single interval $𝒛$ which
-    ///   coincides with the standard interval division $𝒙 / 𝒚$.  Then
-    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) returns `[z, EMPTY]` where `z` is
-    ///   an encosure of $𝒛$.
-    /// - If $0 ∈ 𝒚$ and $0 ∉ 𝒙$, $𝒙 \setdiv 𝒚$ is a made of two
-    ///   intervals $𝒛₁ ∪ 𝒛₂$.  The standard division $𝒙 / 𝒚$ returns
-    ///   the interval enclosure of the result, namely $ℝ$.  Here,
-    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) returns $[𝒛₁, 𝒛₂]$ ordered such
-    ///   that $𝒛₁ < 𝒛₂$.
-    /// - If $0 ∈ 𝒚$ and $0 ∈ 𝒙$, $𝒙 \setdiv 𝒚 = ℝ$.  Accordingly,
-    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) return `[ENTIRE, EMPTY]`.
+    /// For intervals $𝒙$ and $𝒚$, the reverse multiplication is defined as:
+    ///
+    /// $$
+    /// 𝒙 \setdiv′ 𝒚 := \set{z ∈ \R ∣ ∃y ∈ 𝒚 : zy ∈ 𝒙}.
+    /// $$
+    ///
+    /// For comparison, the standard division is defined as:
+    ///
+    /// $$
+    /// 𝒙 \setdiv 𝒚 := \set{x / y ∣ (x, y) ∈ 𝒙 × 𝒚 ∖ \set 0}.
+    /// $$
+    ///
+    /// The interval division $𝒙 / 𝒚$ is an enclosure of $𝒙 \setdiv 𝒚$.
+    /// As a significant difference between two definitions, when $𝒙 = 𝒚 = \set 0$,
+    /// $𝒙 \setdiv 𝒚 = ∅$, while $𝒙 \setdiv′ 𝒚 = \R$.
+    ///
+    /// Let $𝒙 = \numerator$ and $𝒚 = \self$. The function returns an array of two intervals as follows:
+    ///
+    /// - If $𝒙 = ∅ ∨ 𝒚 = ∅$, $𝒙 \setdiv′ 𝒚 = ∅$ and returned as `[`[`Interval::EMPTY`]`; 2]`.
+    ///   In the following cases, $𝒙 ≠ ∅ ∧ 𝒚 ≠ ∅$.
+    /// - If $0 ∉ 𝒚$, $𝒙 \setdiv′ 𝒚$ is a single interval $𝒛$ and returned as `[z, `[`Interval::EMPTY`]`]`,
+    ///   where `z` is the tightest enclosure of $𝒛$, and so on.
+    ///   In this case, $𝒙 \setdiv′ 𝒚 = 𝒙 \setdiv 𝒚 = 𝒙 / 𝒚$.
+    /// - If $0 ∈ 𝒚 ∧ 0 ∉ 𝒙$, $𝒙 \setdiv′ 𝒚$ is made of two intervals $𝒛₁ ∪ 𝒛₂$ ($𝒛₁ ≺ 𝒛₂$)
+    ///   and returned as `[z1, z2]`.
+    ///   In this case, $𝒙 \setdiv′ 𝒚 = 𝒙 \setdiv 𝒚$ too, but $𝒙 / 𝒚 = \R$.
+    /// - If $0 ∈ 𝒚 ∧ 0 ∈ 𝒙$, $𝒙 \setdiv′ 𝒚 = ℝ$ and returned as `[`[`Interval::ENTIRE`]`, `[`Interval::EMPTY`]`]`.
     ///
     /// # Examples
     ///
     /// ```
     /// use inari::{Interval as I, const_interval as c};
-    /// let zero = c!(0., 0.);
-    /// assert_eq!(zero.mul_rev_to_pair(c!(1., 2.)), [I::EMPTY; 2]);
-    /// assert_eq!(zero.mul_rev_to_pair(c!(0., 2.)), [I::ENTIRE, I::EMPTY]);
+    /// let zero = c!(0.0, 0.0);
+    /// assert_eq!(zero.mul_rev_to_pair(c!(1.0, 2.0)), [I::EMPTY; 2]);
+    /// assert_eq!(zero.mul_rev_to_pair(c!(0.0, 2.0)), [I::ENTIRE, I::EMPTY]);
     /// assert_eq!(zero.mul_rev_to_pair(zero), [I::ENTIRE, I::EMPTY]);
-    /// let x = c!(1., 2.);
+    /// let x = c!(1.0, 2.0);
     /// assert_eq!(I::ENTIRE.mul_rev_to_pair(x), [c!(f64::NEG_INFINITY, 0.0), c!(0.0, f64::INFINITY)]);
-    /// assert_eq!(c!(1., 1.).mul_rev_to_pair(x), [x, I::EMPTY]);
-    /// assert_eq!(c!(1., f64::INFINITY).mul_rev_to_pair(c!(1., 1.)),
-    ///            [c!(0., 1.), I::EMPTY]);
-    /// assert_eq!(c!(-1., 1.).mul_rev_to_pair(c!(1., 2.)),
-    ///            [c!(f64::NEG_INFINITY, -1.), c!(1., f64::INFINITY)]);
-    /// assert_eq!(c!(-1., 1.).mul_rev_to_pair(zero), [I::ENTIRE, I::EMPTY]);
+    /// assert_eq!(c!(1.0, 1.0).mul_rev_to_pair(x), [x, I::EMPTY]);
+    /// assert_eq!(c!(1.0, f64::INFINITY).mul_rev_to_pair(c!(1.0, 1.0)),
+    ///            [c!(0.0, 1.0), I::EMPTY]);
+    /// assert_eq!(c!(-1.0, 1.0).mul_rev_to_pair(c!(1.0, 2.0)),
+    ///            [c!(f64::NEG_INFINITY, -1.0), c!(1.0, f64::INFINITY)]);
+    /// assert_eq!(c!(-1.0, 1.0).mul_rev_to_pair(zero), [I::ENTIRE, I::EMPTY]);
     /// ```
     #[must_use]
     pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
@@ -571,12 +582,10 @@ impl Interval {
 impl DecInterval {
     /// The decorated version of [`Interval::mul_rev_to_pair`].
     ///
-    /// The array `[Self::NAI, Self::NAI]` is returned if `self` or
-    /// `numerator` is NaI.  When neither `self` nor `numerator` are
-    /// empty and $0 ∉ \self ,$ `[z,`[`Self::EMPTY`]`]` is returned
-    /// with `z` being the same as `numerator / self` and is decorated
-    /// the same way.  In all other cases, both output are decorated
-    /// with [`Trv`](Decoration::Trv).
+    /// `[`[`DecInterval::NAI`]`; 2]` is returned if `self` or `numerator` is NaI.
+    /// When $0 ∉ \self ≠ ∅ ∧ \numerator ≠ ∅$, `[z,`[`DecInterval::EMPTY`]`]` is returned
+    /// with `z` being the same as `numerator / self` and decorated the same way.
+    /// In all other cases, both outputs are decorated with [`Decoration::Trv`].
     #[must_use]
     pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
         if self.is_nai() || numerator.is_nai() {
