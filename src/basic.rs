@@ -4,6 +4,192 @@ use std::{cmp::Ordering, unreachable};
 // NOTE: `neg`, `add`, `sub`, `mul` and `div` are implemented in arith.rs
 
 impl Interval {
+    // Division functions [a, b] / [c, d] for various cases, shared
+    // between `mul_rev_to_pair` (below) and `Div` (in arith.rs).
+    #[inline]
+    pub(crate) fn div_m_n1(self, rhs: Self) -> Self {
+        // M / N1 => [b/d, a/d] = [-b/d; a/d] = [b/-d; -a/-d] = [b; -a] ./ [-d; -d]
+        let x = swap(self.rep); // [b; -a]
+        let y = swap(rhs.rep); // [d; -c]
+        let y = neg0(y); // [-d; -c]
+        let y = shuffle02(y, y); // [-d; -d]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_m_p1(self, rhs: Self) -> Self {
+        // M / P1 => [a/c, b/c] = [-a/c; b/c] = [-a; b] ./ [c; c]
+        let x = self.rep; // [-a; b]
+        let y = neg0(rhs.rep); // [c; d]
+        let y = shuffle02(y, y); // [c; c]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_n_n0(self, rhs: Self) -> Self {
+        // N / N0 => [b/c, +∞] = [-b/c; +∞] = [b/-c; +∞]
+        let x = swap(self.rep); // [b; -a]
+        let y = rhs.rep; // [-c; d]
+        Self {
+            rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn div_n_n1(self, rhs: Self) -> Self {
+        // N / N1 => [b/c, a/d] = [-b/c; a/d] = [b/-c; a/d] = [b; a] ./ [-c; d]
+        let x = neg0(self.rep); // [a; b]
+        let x = swap(x); // [b; a]
+        let y = rhs.rep; // [-c; d]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_n_p0(self, rhs: Self) -> Self {
+        // N / P0 => [-∞, b/d] = [+∞; b/d]
+        let x = self.rep; // [-a; b]
+        let y = rhs.rep; // [-c; d]
+        Self {
+            rep: shuffle03(splat(f64::INFINITY), div_ru(x, y)),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn div_n_p1(self, rhs: Self) -> Self {
+        // N / P1 => [a/c, b/d] = [-a/c; b/d] = [-a; b] ./ [c; d]
+        let x = self.rep; // [-a; b]
+        let y = neg0(rhs.rep); // [c; d]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_p_n0(self, rhs: Self) -> Self {
+        // P / N0 => [-∞, a/c] = [+∞; a/c] = [+∞; -a/-c]
+        let x = self.rep; // [-a; b]
+        let y = rhs.rep; // [-c; d]
+        Self {
+            rep: shuffle02(splat(f64::INFINITY), div_ru(x, y)),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn div_p_n1(self, rhs: Self) -> Self {
+        // P / N1 => [b/d, a/c] = [-b/d; a/c] = [-b/d; -a/-c] = [-b; -a] ./ [d; -c]
+        let x = swap(self.rep); // [b; -a]
+        let x = neg0(x); // [-b; -a]
+        let y = swap(rhs.rep); // [d; -c]
+        Self { rep: div_ru(x, y) }
+    }
+
+    #[inline]
+    pub(crate) fn div_p_p0(self, rhs: Self) -> Self {
+        // P / P0 => [a/d, +∞] = [-a/d; +∞]
+        let x = self.rep; // [-a; b]
+        let y = swap(rhs.rep); // [d; -c]
+        Self {
+            rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn div_p_p1(self, rhs: Self) -> Self {
+        // P / P1 => [a/d, b/c] = [-a/d; b/c] = [-a; b] ./ [d; c]
+        let x = self.rep; // [-a; b]
+        let y = neg0(rhs.rep); // [c; d]
+        let y = swap(y); // [d; c]
+        Self { rep: div_ru(x, y) }
+    }
+
+    /// Return the two-output reverse multiplication:
+    /// `numerator`$\setdiv \self$ (also called *two-output division*
+    /// in the IEEE 1788 standard).
+    ///
+    /// The set-division of two intervals $𝒙$ and $𝒚$ is defined as
+    /// $$𝒙 \setdiv 𝒚 := \set{z ∈ \R ∣ ∃y ∈ 𝒚,\ zy ∈ 𝒙}.$$
+    /// Let us distinguish several cases.
+    /// - If $𝒙$ or $𝒚$ is empty, $𝒙 \setdiv 𝒚 = ∅$.  Thus if `self`
+    ///   or `numerator` is empty, this function returns `[EMPTY, EMPTY]`.
+    /// - If $0 ∉ 𝒚$, $𝒙 \setdiv 𝒚$ is a single interval $𝒛$ which
+    ///   coincides with the standard interval division $𝒙 / 𝒚$.  Then
+    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) returns `[z, EMPTY]` where `z` is
+    ///   an encosure of $𝒛$.
+    /// - If $0 ∈ 𝒚$ and $0 ∉ 𝒙$, $𝒙 \setdiv 𝒚$ is a made of two
+    ///   intervals $𝒛₁ ∪ 𝒛₂$.  The standard division $𝒙 / 𝒚$ returns
+    ///   the interval enclosure of the result, namely $ℝ$.  Here,
+    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) returns $[𝒛₁, 𝒛₂]$ ordered such
+    ///   that $𝒛₁ < 𝒛₂$.
+    /// - If $0 ∈ 𝒚$ and $0 ∈ 𝒙$, $𝒙 \setdiv 𝒚 = ℝ$.  Accordingly,
+    ///   $𝒚$`.mul_rev_to_pair`($𝒙$) return `[ENTIRE, EMPTY]`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use inari::{Interval as I, const_interval as c};
+    /// let zero = c!(0., 0.);
+    /// assert_eq!(zero.mul_rev_to_pair(c!(1., 2.)), [I::EMPTY; 2]);
+    /// assert_eq!(zero.mul_rev_to_pair(c!(0., 2.)), [I::ENTIRE, I::EMPTY]);
+    /// assert_eq!(zero.mul_rev_to_pair(zero), [I::ENTIRE, I::EMPTY]);
+    /// let x = c!(1., 2.);
+    /// assert_eq!(I::ENTIRE.mul_rev_to_pair(x), [c!(f64::NEG_INFINITY, 0.0), c!(0.0, f64::INFINITY)]);
+    /// assert_eq!(c!(1., 1.).mul_rev_to_pair(x), [x, I::EMPTY]);
+    /// assert_eq!(c!(1., f64::INFINITY).mul_rev_to_pair(c!(1., 1.)),
+    ///            [c!(0., 1.), I::EMPTY]);
+    /// assert_eq!(c!(-1., 1.).mul_rev_to_pair(c!(1., 2.)),
+    ///            [c!(f64::NEG_INFINITY, -1.), c!(1., f64::INFINITY)]);
+    /// assert_eq!(c!(-1., 1.).mul_rev_to_pair(zero), [I::ENTIRE, I::EMPTY]);
+    /// ```
+    #[must_use]
+    pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
+        use IntervalClass2::*;
+        match numerator.classify2(self) {
+            E_E | E_M | E_N0 | E_N1 | E_P0 | E_P1 | E_Z | M_E | N0_E | N1_E | N1_Z | P0_E
+            | P1_E | P1_Z | Z_E => [Self::EMPTY; 2],
+            M_Z | N0_Z | P0_Z | Z_Z | M_M | M_N0 | M_P0 | N0_M | P0_M | Z_M | Z_N0 | Z_P0
+            | N0_N0 | N0_P0 | P0_N0 | P0_P0 => [Self::ENTIRE, Self::EMPTY],
+            Z_N1 | Z_P1 => [Self::zero(), Self::EMPTY],
+            N1_M => {
+                // N1 / M => [-∞, b/d] ∪ [b/c, +∞] = [+∞; b/d] ∪ [-b/c; +∞]
+                // [-b/c, b/d] = [b; b] ./ [-c; d]
+                let x = numerator.rep; // [-a; b]
+                let x = shuffle13(x, x); // [b; b]
+                let q = div_ru(x, self.rep); // [b/(-c); b/d]
+                [
+                    Self {
+                        rep: shuffle13(splat(f64::INFINITY), q),
+                    },
+                    Self {
+                        rep: shuffle02(q, splat(f64::INFINITY)),
+                    },
+                ]
+            }
+            P1_M => {
+                // P1 / M => [-∞, a/c] ∪ [a/d, +∞] = [+∞; a/c] ∪ [-a/d; +∞]
+                // [a/c; -a/d] = [-a; -a] ./ [-c; d]
+                let x = numerator.rep; // [-a; b]
+                let x = shuffle02(x, x); // [-a; -a]
+                let q = div_ru(x, self.rep); // [a/c; -a/d]
+                [
+                    Self {
+                        rep: shuffle02(splat(f64::INFINITY), q),
+                    },
+                    Self {
+                        rep: shuffle13(q, splat(f64::INFINITY)),
+                    },
+                ]
+            }
+            M_N1 => [numerator.div_m_n1(self), Self::EMPTY],
+            M_P1 => [numerator.div_m_p1(self), Self::EMPTY],
+            N1_N0 => [numerator.div_n_n0(self), Self::EMPTY],
+            N0_N1 | N1_N1 => [numerator.div_n_n1(self), Self::EMPTY],
+            N1_P0 => [numerator.div_n_p0(self), Self::EMPTY],
+            N0_P1 | N1_P1 => [numerator.div_n_p1(self), Self::EMPTY],
+            P1_N0 => [numerator.div_p_n0(self), Self::EMPTY],
+            P0_N1 | P1_N1 => [numerator.div_p_n1(self), Self::EMPTY],
+            P1_P0 => [numerator.div_p_p0(self), Self::EMPTY],
+            P0_P1 | P1_P1 => [numerator.div_p_p1(self), Self::EMPTY],
+        }
+    }
+
     /// Returns the tightest interval `z` such that `rhs` $+$ `z` $⊇$ `self`,
     /// if both `self` and `rhs` are bounded and the width of `self` is greater than or equal to
     /// that of `rhs`. Otherwise, returns [`Interval::ENTIRE`].
@@ -383,6 +569,28 @@ impl Interval {
 }
 
 impl DecInterval {
+    /// The decorated version of [`Interval::mul_rev_to_pair`].
+    ///
+    /// The array `[Self::NAI, Self::NAI]` is returned if `self` or
+    /// `numerator` is NaI.  When neither `self` nor `numerator` are
+    /// empty and $0 ∉ \self ,$ `[z,`[`Self::EMPTY`]`]` is returned
+    /// with `z` being the same as `numerator / self` and is decorated
+    /// the same way.  In all other cases, both output are decorated
+    /// with [`Trv`](Decoration::Trv).
+    #[must_use]
+    pub fn mul_rev_to_pair(self, numerator: Self) -> [Self; 2] {
+        if self.is_nai() || numerator.is_nai() {
+            return [Self::NAI; 2];
+        }
+        let [u, v] = self.x.mul_rev_to_pair(numerator.x);
+        let d = if self.x.contains(0.0) {
+            Decoration::Trv
+        } else {
+            self.d.min(numerator.d)
+        };
+        [Self::set_dec(u, d), Self::set_dec(v, Decoration::Trv)]
+    }
+
     /// The decorated version of [`Interval::cancel_minus`].
     ///
     /// A NaI is returned if `self` or `rhs` is NaI.
@@ -501,6 +709,20 @@ mod tests {
         assert!(DI::NAI.recip().is_nai());
         assert!(DI::NAI.sqrt().is_nai());
         assert!(DI::NAI.sqr().is_nai());
+    }
+
+    #[test]
+    fn mul_rev_to_pair() {
+        let zero = const_interval!(0., 0.);
+        assert_eq!(zero.mul_rev_to_pair(const_interval!(1., 2.)), [I::EMPTY; 2]);
+        let pos = const_interval!(0., f64::INFINITY);
+        let neg = const_interval!(f64::NEG_INFINITY, 0.);
+        assert_eq!(
+            I::ENTIRE.mul_rev_to_pair(const_interval!(1., 1.)),
+            [neg, pos]
+        );
+        assert_eq!(pos.mul_rev_to_pair(pos), [I::ENTIRE, I::EMPTY]);
+        assert_eq!(neg.mul_rev_to_pair(pos), [I::ENTIRE, I::EMPTY]);
     }
 
     #[test]

@@ -154,80 +154,16 @@ impl Div for Interval {
             | P0_E | P0_Z | P1_E | P1_Z | Z_E | Z_Z => Self::EMPTY,
             M_M | M_N0 | M_P0 | N0_M | N1_M | P0_M | P1_M => Self::ENTIRE,
             Z_M | Z_N0 | Z_N1 | Z_P0 | Z_P1 => Self::zero(),
-            M_N1 => {
-                // M / N1 => [b/d, a/d] = [-b/d; a/d] = [b/-d; -a/-d]  = [b; -a] ./ [-d; -d]
-                let x = swap(self.rep); // [b; -a]
-                let y = swap(rhs.rep); // [d; -c]
-                let y = neg0(y); // [-d; -c]
-                let y = shuffle02(y, y); // [-d; -d]
-                Self { rep: div_ru(x, y) }
-            }
-            M_P1 => {
-                // M / P1 => [a/c, b/c] = [-a/c; b/c] = [-a; b] ./ [c; c]
-                let x = self.rep; // [-a; b]
-                let y = neg0(rhs.rep); // [c; d]
-                let y = shuffle02(y, y); // [c; c]
-                Self { rep: div_ru(x, y) }
-            }
-            N0_N0 | N1_N0 => {
-                // N / N0 => [b/c, +∞] = [-b/c; +∞] = [b/-c; +∞]
-                let x = swap(self.rep); // [b; -a]
-                let y = rhs.rep; // [-c; d]
-                Self {
-                    rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)),
-                }
-            }
-            N0_N1 | N1_N1 => {
-                // N / N1 => [b/c, a/d] = [-b/c; a/d] = [b/-c; a/d] = [b; a] ./ [-c; d]
-                let x = neg0(self.rep); // [a; b]
-                let x = swap(x); // [b; a]
-                let y = rhs.rep; // [-c; d]
-                Self { rep: div_ru(x, y) }
-            }
-            N0_P0 | N1_P0 => {
-                // N / P0 => [-∞, b/d] = [+∞; b/d]
-                let x = self.rep; // [-a; b]
-                let y = rhs.rep; // [-c; d]
-                Self {
-                    rep: shuffle03(splat(f64::INFINITY), div_ru(x, y)),
-                }
-            }
-            N0_P1 | N1_P1 => {
-                // N / P1 => [a/c, b/d] = [-a/c; b/d] = [-a; b] ./ [c; d]
-                let x = self.rep; // [-a; b]
-                let y = neg0(rhs.rep); // [c; d]
-                Self { rep: div_ru(x, y) }
-            }
-            P0_N0 | P1_N0 => {
-                // P / N0 => [-∞, a/c] = [+∞; a/c] = [+∞; -a/-c]
-                let x = self.rep; // [-a; b]
-                let y = rhs.rep; // [-c; d]
-                Self {
-                    rep: shuffle02(splat(f64::INFINITY), div_ru(x, y)),
-                }
-            }
-            P0_N1 | P1_N1 => {
-                // P / N1 => [b/d, a/c] = [-b/d; a/c] = [-b/d; -a/-c] = [-b; -a] ./ [d; -c]
-                let x = swap(self.rep); // [b; -a]
-                let x = neg0(x); // [-b; -a]
-                let y = swap(rhs.rep); // [d; -c]
-                Self { rep: div_ru(x, y) }
-            }
-            P0_P0 | P1_P0 => {
-                // P / P0 => [a/d, +∞] = [-a/d; +∞]
-                let x = self.rep; // [-a; b]
-                let y = swap(rhs.rep); // [d; -c]
-                Self {
-                    rep: shuffle02(div_ru(x, y), splat(f64::INFINITY)),
-                }
-            }
-            P0_P1 | P1_P1 => {
-                // P / P1 => [a/d, b/c] = [-a/d; b/c] = [-a; b] ./ [d; c]
-                let x = self.rep; // [-a; b]
-                let y = neg0(rhs.rep); // [c; d]
-                let y = swap(y); // [d; c]
-                Self { rep: div_ru(x, y) }
-            }
+            M_N1 => self.div_m_n1(rhs),
+            M_P1 => self.div_m_p1(rhs),
+            N0_N0 | N1_N0 => self.div_n_n0(rhs),
+            N0_N1 | N1_N1 => self.div_n_n1(rhs),
+            N0_P0 | N1_P0 => self.div_n_p0(rhs),
+            N0_P1 | N1_P1 => self.div_n_p1(rhs),
+            P0_N0 | P1_N0 => self.div_p_n0(rhs),
+            P0_N1 | P1_N1 => self.div_p_n1(rhs),
+            P0_P0 | P1_P0 => self.div_p_p0(rhs),
+            P0_P1 | P1_P1 => self.div_p_p1(rhs),
         }
     }
 }

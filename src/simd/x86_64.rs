@@ -154,7 +154,7 @@ pub(crate) fn trunc(x: F64X2) -> F64X2 {
     unsafe { _mm_round_pd(x, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC) }
 }
 
-/// `shuffle13([x0, x1], [x2, x3]) = [x1, x2]`
+/// `shuffle12([x0, x1], [x2, x3]) = [x1, x2]`
 fn shuffle12(x: F64X2, y: F64X2) -> F64X2 {
     unsafe { _mm_shuffle_pd(x, y, 1) }
 }
