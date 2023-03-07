@@ -130,6 +130,7 @@ impl Interval {
     /// assert_eq!(zero.mul_rev_to_pair(c!(0., 2.)), [I::ENTIRE, I::EMPTY]);
     /// assert_eq!(zero.mul_rev_to_pair(zero), [I::ENTIRE, I::EMPTY]);
     /// let x = c!(1., 2.);
+    /// assert_eq!(I::ENTIRE.mul_rev_to_pair(x), [c!(f64::NEG_INFINITY, 0.0), c!(0.0, f64::INFINITY)]);
     /// assert_eq!(c!(1., 1.).mul_rev_to_pair(x), [x, I::EMPTY]);
     /// assert_eq!(c!(1., f64::INFINITY).mul_rev_to_pair(c!(1., 1.)),
     ///            [c!(0., 1.), I::EMPTY]);
