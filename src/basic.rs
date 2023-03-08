@@ -122,12 +122,12 @@ impl Interval {
     ///
     /// The function returns:
     ///
-    /// - `[`[`Interval::EMPTY`]`; 2]`, if $\numerator \setdiv′ \self$ is empty;
-    /// - `[z, `[`Interval::EMPTY`]`]`, if $\numerator \setdiv′ \self$ has one component $𝒛$;
-    /// - `[z1, z2]`, if $\numerator \setdiv′ \self$ has two components $𝒛₁$ and $𝒛₂$,
-    ///   ordered so that $\sup 𝒛₁ ≤ \inf 𝒛₂$;
-    ///
-    /// where `z` is the tightest enclosure of $𝒛$, and so on.
+    /// - `[`[`Interval::EMPTY`]`; 2]` if $\numerator \setdiv′ \self$ is empty;
+    /// - `[z, `[`Interval::EMPTY`]`]` if $\numerator \setdiv′ \self$ has one component $𝒛$,
+    ///   where `z` is the tightest enclosure of $𝒛$;
+    /// - `[z1, z2]` if $\numerator \setdiv′ \self$ has two components $𝒛₁$ and $𝒛₂$
+    ///   ordered so that $\sup 𝒛₁ ≤ \inf 𝒛₂$,
+    ///   where `z1` and `z2` are the tightest enclosures of $𝒛₁$ and $𝒛₂$, respectively.
     ///
     /// When $\self ≠ ∅ ∧ \numerator ≠ ∅$, the number of components $\numerator \setdiv′ \self$ has
     /// are summarized as:
