@@ -67,7 +67,9 @@ Not implemented.
 
 #### Two-output division
 
-Not implemented.
+| Operation              | Implementation                | Requires `gmp` |
+| ---------------------- | ----------------------------- | -------------- |
+| mulRevToPair(_x_, _y_) | [`Interval::mul_rev_to_pair`] | -              |
 
 #### Cancellative addition and subtraction
 
