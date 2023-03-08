@@ -129,13 +129,13 @@ impl Interval {
     ///
     /// where `z` is the tightest enclosure of $𝒛$, and so on.
     ///
-    /// When $\numerator ≠ ∅ ∧ \self ≠ ∅$, the number of components $\numerator \setdiv′ \self$ has
+    /// When $\self ≠ ∅ ∧ \numerator ≠ ∅$, the number of components $\numerator \setdiv′ \self$ has
     /// are summarized as:
     ///
-    /// |                  | $0 ∈ \self$ | $0 ∉ \self$ |
-    /// | :--------------: | :---------: | :---------: |
-    /// | $0 ∈ \numerator$ |      1      |      1      |
-    /// | $0 ∉ \numerator$ |   0 or 2    |      1      |
+    /// |             | $0 ∈ \numerator$ | $0 ∉ \numerator$ |
+    /// | :---------: | :--------------: | :--------------: |
+    /// | $0 ∈ \self$ |        1         |      0 or 2      |
+    /// | $0 ∉ \self$ |        1         |        1         |
     ///
     /// # Examples
     ///
