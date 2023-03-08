@@ -102,7 +102,7 @@ impl Interval {
 
     /// Returns the reverse multiplication $\numerator \setdiv′ \self$
     /// (beware the order of the arguments) as an array of two intervals.
-    /// The operation is also called *two-output division* in IEEE Std 1788-2015.
+    /// The operation is also known as *two-output division* in IEEE Std 1788-2015.
     ///
     /// For intervals $𝒙$ and $𝒚$, the reverse multiplication is defined as:
     ///
@@ -117,20 +117,25 @@ impl Interval {
     /// $$
     ///
     /// The interval division $𝒙 / 𝒚$ is an enclosure of $𝒙 \setdiv 𝒚$.
-    /// As a significant difference between two definitions, when $𝒙 = 𝒚 = \set 0$,
+    /// A notable difference between two definitions is that when $𝒙 = 𝒚 = \set 0$,
     /// $𝒙 \setdiv 𝒚 = ∅$, while $𝒙 \setdiv′ 𝒚 = \R$.
     ///
-    /// Let $𝒙 = \numerator$ and $𝒚 = \self$. The function returns an array of two intervals as follows:
+    /// The function returns:
     ///
-    /// - If $𝒙 = ∅ ∨ 𝒚 = ∅$, $𝒙 \setdiv′ 𝒚 = ∅$ and returned as `[`[`Interval::EMPTY`]`; 2]`.
-    ///   In the following cases, $𝒙 ≠ ∅ ∧ 𝒚 ≠ ∅$.
-    /// - If $0 ∉ 𝒚$, $𝒙 \setdiv′ 𝒚$ is a single interval $𝒛$ and returned as `[z, `[`Interval::EMPTY`]`]`,
-    ///   where `z` is the tightest enclosure of $𝒛$, and so on.
-    ///   In this case, $𝒙 \setdiv′ 𝒚 = 𝒙 \setdiv 𝒚 = 𝒙 / 𝒚$.
-    /// - If $0 ∈ 𝒚 ∧ 0 ∉ 𝒙$, $𝒙 \setdiv′ 𝒚$ is made of two intervals $𝒛₁ ∪ 𝒛₂$ ($𝒛₁ ≺ 𝒛₂$)
-    ///   and returned as `[z1, z2]`.
-    ///   In this case, $𝒙 \setdiv′ 𝒚 = 𝒙 \setdiv 𝒚$ too, but $𝒙 / 𝒚 = \R$.
-    /// - If $0 ∈ 𝒚 ∧ 0 ∈ 𝒙$, $𝒙 \setdiv′ 𝒚 = ℝ$ and returned as `[`[`Interval::ENTIRE`]`, `[`Interval::EMPTY`]`]`.
+    /// - `[`[`Interval::EMPTY`]`; 2]`, if $\numerator \setdiv′ \self$ is empty;
+    /// - `[z, `[`Interval::EMPTY`]`]`, if $\numerator \setdiv′ \self$ has one component $𝒛$;
+    /// - `[z1, z2]`, if $\numerator \setdiv′ \self$ has two components $𝒛₁$ and $𝒛₂$,
+    ///   ordered so that $\sup 𝒛₁ ≤ \inf 𝒛₂$;
+    ///
+    /// where `z` is the tightest enclosure of $𝒛$, and so on.
+    ///
+    /// When $\numerator ≠ ∅ ∧ \self ≠ ∅$, the number of components $\numerator \setdiv′ \self$ has
+    /// are summarized as:
+    ///
+    /// |                  | $0 ∈ \self$ | $0 ∉ \self$ |
+    /// | :--------------: | :---------: | :---------: |
+    /// | $0 ∈ \numerator$ |      1      |      1      |
+    /// | $0 ∉ \numerator$ |   0 or 2    |      1      |
     ///
     /// # Examples
     ///
