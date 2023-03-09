@@ -107,13 +107,16 @@ impl Interval {
     /// For intervals $𝒙$ and $𝒚$, the reverse multiplication is defined as:
     ///
     /// $$
-    /// 𝒙 \setdiv′ 𝒚 := \set{z ∈ \R ∣ ∃y ∈ 𝒚 : zy ∈ 𝒙}.
+    /// 𝒙 \setdiv′ 𝒚 = \set{z ∈ \R ∣ ∃y ∈ 𝒚 : zy ∈ 𝒙}.
     /// $$
     ///
     /// For comparison, the standard division is defined as:
     ///
     /// $$
-    /// 𝒙 \setdiv 𝒚 := \set{x / y ∣ (x, y) ∈ 𝒙 × 𝒚 ∖ \set 0}.
+    /// \begin{align*}
+    ///  𝒙 \setdiv 𝒚 &= \set{x / y ∣ (x, y) ∈ 𝒙 × 𝒚 ∖ \set 0} \\\\
+    ///   &= \set{z ∈ \R ∣ ∃y ∈ 𝒚 ∖ \set 0 : zy ∈ 𝒙}.
+    /// \end{align*}
     /// $$
     ///
     /// The interval division $𝒙 / 𝒚$ is an enclosure of $𝒙 \setdiv 𝒚$.
