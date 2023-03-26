@@ -3,7 +3,7 @@ name = "inari"
 version = "1.0.0"
 authors = ["Masashi Mizuno"]
 edition = "2021"
-rust-version = "1.61.0"
+rust-version = "1.65.0"
 description = "A Rust implementation of interval arithmetic"
 documentation = "https://docs.rs/inari"
 readme = "README.md"
@@ -36,7 +36,7 @@ cfg-if = "1.0"
 forward_ref = "1.0.0"
 
 [dependencies.gmp-mpfr-sys]
-version = "~1.4"
+version = "1.5"
 default-features = false
 features = ["mpfr"]
 optional = true
@@ -52,7 +52,7 @@ features = ["std"]
 optional = true
 
 [dependencies.rug]
-version = "1.11"
+version = "1.19"
 default-features = false
 features = ["float", "integer", "rational"]
 optional = true
