@@ -97,9 +97,7 @@ jobs:
         env:
           RUSTFLAGS: ${{ env.RUSTFLAGS }} -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
           RUSTDOCFLAGS: ${{ env.RUSTDOCFLAGS }} -Zprofile -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests
-        run: |
-          cargo clean
-          cargo test
+        run: cargo test
 
       - name: Gather coverage data
         id: coverage
@@ -127,7 +125,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.61.0
+          toolchain: 1.65.0
           override: true
           profile: minimal
 
