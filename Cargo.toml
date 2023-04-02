@@ -20,7 +20,6 @@ include = [
   "/CHANGELOG.md",
   "/LICENSE",
   "/README.md",
-  "/rust-toolchain",
 ]
 
 [package.metadata.docs.rs]
