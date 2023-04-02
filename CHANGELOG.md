@@ -2,11 +2,24 @@
 
 Items marked with ⚠️ are breaking changes.
 
+## v1.1.0 - 2023-04-02
+
+### Added
+
+- Implemented `(Dec)Interval::mul_rev_to_pair`.
+
+### Changed
+
+- ⚠️ Bumped the minimum supported Rust version to 1.65.0.
+- ⚠️ Updated the following dependencies:
+  - `gmp-mpfr-sys` from 1.4 to 1.5.
+  - `rug` from 1.11 to 1.19.
+
 ## v1.0.0 - 2022-07-09
 
 ### Changed
 
-- ⚠️ Changed the minimum supported Rust version to v1.61.0.
+- ⚠️ Bumped the minimum supported Rust version to 1.61.0.
 
 ### Removed
 
