@@ -1,6 +1,5 @@
 use crate::simd::*;
 use std::{
-    convert::TryFrom,
     error::Error,
     fmt,
     hash::{Hash, Hasher},

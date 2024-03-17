@@ -9,7 +9,7 @@ use nom::{
     IResult,
 };
 use rug::{Float, Integer, Rational};
-use std::{cmp::Ordering, convert::TryFrom, result, str::FromStr};
+use std::{cmp::Ordering, result, str::FromStr};
 
 #[derive(Clone, Debug)]
 struct ParseNumberError;
