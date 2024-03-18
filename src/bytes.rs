@@ -1,5 +1,4 @@
 use crate::interval::*;
-use std::convert::TryFrom;
 
 macro_rules! impl_to_bytes {
     ($(#[$meta:meta])* $to_bytes:ident) => {
