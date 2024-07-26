@@ -55,7 +55,7 @@ Some operations are only available when the crate is built with the conditional 
 | ceil(_x_)            | [`x.ceil()`](`Interval::ceil`)                             | -              |
 | floor(_x_)           | [`x.floor()`](`Interval::floor`)                           | -              |
 | trunc(_x_)           | [`x.trunc()`](`Interval::trunc`)                           | -              |
-| roundTiesToEven(_x_) | [`x.round_ties_to_even()`](`Interval::round_ties_to_even`) | -              |
+| roundTiesToEven(_x_) | [`x.round_ties_even()`](`Interval::round_ties_even`) | -              |
 | roundTiesToAway(_x_) | [`x.round()`](`Interval::round`)                           | -              |
 | abs(_x_)             | [`x.abs()`](`Interval::abs`)                               | -              |
 | min(_x_, _y_)        | [`x.min(y)`](`Interval::min`)                              | -              |

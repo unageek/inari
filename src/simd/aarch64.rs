@@ -112,7 +112,7 @@ pub(crate) fn round(x: F64X2) -> F64X2 {
     unsafe { vrndaq_f64(x) }
 }
 
-pub(crate) fn round_ties_to_even(x: F64X2) -> F64X2 {
+pub(crate) fn round_ties_even(x: F64X2) -> F64X2 {
     unsafe { vrndnq_f64(x) }
 }
 
