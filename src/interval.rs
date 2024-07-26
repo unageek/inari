@@ -61,6 +61,9 @@ pub struct Interval {
     pub(crate) rep: F64X2,
 }
 
+unsafe impl Send for Interval {}
+unsafe impl Sync for Interval {}
+
 impl Interval {
     pub(crate) fn inf_raw(self) -> f64 {
         -extract0(self.rep)
@@ -144,6 +147,9 @@ pub struct DecInterval {
     pub(crate) x: Interval,
     pub(crate) d: Decoration,
 }
+
+unsafe impl Send for DecInterval {}
+unsafe impl Sync for DecInterval {}
 
 impl DecInterval {
     /// Creates a [`DecInterval`] from the given interval and the decoration below:
