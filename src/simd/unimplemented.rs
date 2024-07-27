@@ -122,7 +122,7 @@ pub(crate) fn round(_: F64X2) -> F64X2 {
     unimplemented!()
 }
 
-pub(crate) fn round_ties_to_even(_: F64X2) -> F64X2 {
+pub(crate) fn round_ties_even(_: F64X2) -> F64X2 {
     unimplemented!()
 }
 

@@ -118,7 +118,7 @@ pub(crate) fn round(x: F64X2) -> F64X2 {
     constant(extract0(x).round(), extract1(x).round())
 }
 
-pub(crate) fn round_ties_to_even(x: F64X2) -> F64X2 {
+pub(crate) fn round_ties_even(x: F64X2) -> F64X2 {
     unsafe { _mm_round_pd(x, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC) }
 }
 
