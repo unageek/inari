@@ -43,16 +43,16 @@ pub(crate) fn eq(x: F64X2, y: F64X2) -> F64X2 {
 }
 
 pub(crate) fn extract(x: F64X2) -> [f64; 2] {
-    unsafe { transmute::<_, [f64; 2]>(x) }
+    unsafe { transmute::<F64X2, [f64; 2]>(x) }
 }
 
 pub(crate) fn extract0(x: F64X2) -> f64 {
-    unsafe { transmute::<_, [f64; 2]>(x)[0] }
+    unsafe { transmute::<F64X2, [f64; 2]>(x)[0] }
 }
 
 // This is slower than extract0, which usually turns into a no-op.
 pub(crate) fn extract1(x: F64X2) -> f64 {
-    unsafe { transmute::<_, [f64; 2]>(x)[1] }
+    unsafe { transmute::<F64X2, [f64; 2]>(x)[1] }
 }
 
 pub(crate) fn floor(x: F64X2) -> F64X2 {

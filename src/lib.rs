@@ -13,7 +13,7 @@
 //!
 //! See [Conformance to the standard][`_docs::conformance`] for details.
 
-#![allow(clippy::float_cmp)]
+#![allow(clippy::float_cmp, clippy::needless_doctest_main)]
 
 pub use self::{
     interval::{DecInterval, Decoration, Interval, IntervalError, IntervalErrorKind, Result},
