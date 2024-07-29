@@ -423,7 +423,7 @@ macro_rules! const_interval {
         #[allow(unused_unsafe)]
         unsafe {
             // Parentheses are used to avoid `clippy::double_neg`.
-            transmute::<_, $crate::Interval>([-($a), $b])
+            transmute::<[f64; 2], $crate::Interval>([-($a), $b])
         }
     }};
 }
@@ -450,7 +450,7 @@ macro_rules! const_dec_interval {
 
         #[allow(unused_unsafe)]
         unsafe {
-            transmute::<_, $crate::DecInterval>(_DecInterval {
+            transmute::<_DecInterval, $crate::DecInterval>(_DecInterval {
                 x: $crate::const_interval!($a, $b),
                 d: if $a == f64::NEG_INFINITY || $b == f64::INFINITY {
                     $crate::Decoration::Dac

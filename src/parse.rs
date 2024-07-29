@@ -276,10 +276,7 @@ fn parse_hex_float(mant: &str, exp: &str) -> result::Result<Rational, ParseNumbe
     let e = exp.parse::<i32>()?;
     let mut parts = mant.split('.');
     let int_part = parts.next().unwrap();
-    let frac_part = match parts.next() {
-        Some(s) => s,
-        _ => "",
-    };
+    let frac_part = parts.next().unwrap_or_default();
 
     // 1 hex digit encodes 4 bin digits.
     let frac_bits = i32::try_from(frac_part.len())?
@@ -300,10 +297,7 @@ fn parse_dec_float_with_ulp(
     let e = exp.parse::<i32>()?;
     let mut parts = mant.split('.');
     let int_part = parts.next().unwrap();
-    let frac_part = match parts.next() {
-        Some(s) => s,
-        _ => "",
-    };
+    let frac_part = parts.next().unwrap_or_default();
 
     // 123.456e7 -> 123456e4 (ulp == 1e4)
     let frac_digits = i32::try_from(frac_part.len())?;
