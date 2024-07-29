@@ -16,19 +16,24 @@ pub(crate) fn add_rn(x: F64X2, y: F64X2) -> F64X2 {
 }
 
 pub(crate) fn all(x: F64X2) -> bool {
-    unsafe { transmute::<uint32x2_t, u64>(vmovn_u64(transmute(x))) == !0u64 }
+    unsafe { transmute::<uint32x2_t, u64>(vmovn_u64(transmute::<F64X2, uint64x2_t>(x))) == !0u64 }
 }
 
 pub(crate) fn and(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { transmute(vandq_u64(transmute(x), transmute(y))) }
+    unsafe {
+        transmute(vandq_u64(
+            transmute::<F64X2, uint64x2_t>(x),
+            transmute::<F64X2, uint64x2_t>(y),
+        ))
+    }
 }
 
 pub(crate) fn any(x: F64X2) -> bool {
-    unsafe { transmute::<uint32x2_t, u64>(vmovn_u64(transmute(x))) != 0u64 }
+    unsafe { transmute::<uint32x2_t, u64>(vmovn_u64(transmute::<F64X2, uint64x2_t>(x))) != 0u64 }
 }
 
 pub(crate) fn bitmask(x: F64X2) -> u32 {
-    let [a, b] = unsafe { transmute::<_, [u64; 2]>(x) };
+    let [a, b] = unsafe { transmute::<F64X2, [u64; 2]>(x) };
     (b as u32) & 0x2 | (a as u32) & 0x1
 }
 
@@ -45,15 +50,15 @@ pub(crate) fn eq(x: F64X2, y: F64X2) -> F64X2 {
 }
 
 pub(crate) fn extract(x: F64X2) -> [f64; 2] {
-    unsafe { transmute::<_, [f64; 2]>(x) }
+    unsafe { transmute::<F64X2, [f64; 2]>(x) }
 }
 
 pub(crate) fn extract0(x: F64X2) -> f64 {
-    unsafe { transmute::<_, [f64; 2]>(x)[0] }
+    unsafe { transmute::<F64X2, [f64; 2]>(x)[0] }
 }
 
 pub(crate) fn extract1(x: F64X2) -> f64 {
-    unsafe { transmute::<_, [f64; 2]>(x)[1] }
+    unsafe { transmute::<F64X2, [f64; 2]>(x)[1] }
 }
 
 pub(crate) fn floor(x: F64X2) -> F64X2 {
@@ -105,7 +110,12 @@ pub(crate) fn neg0(x: F64X2) -> F64X2 {
 }
 
 pub(crate) fn or(x: F64X2, y: F64X2) -> F64X2 {
-    unsafe { transmute(vorrq_u64(transmute(x), transmute(y))) }
+    unsafe {
+        transmute(vorrq_u64(
+            transmute::<F64X2, uint64x2_t>(x),
+            transmute::<F64X2, uint64x2_t>(y),
+        ))
+    }
 }
 
 pub(crate) fn round(x: F64X2) -> F64X2 {
