@@ -19,47 +19,47 @@ Some operations are only available when the crate is built with the conditional 
 
 #### Forward-mode elementary functions
 
-| Operation            | Implementation                                             | Requires `gmp` |
-| -------------------- | ---------------------------------------------------------- | -------------- |
-| neg(_x_)             | `-x`                                                       | -              |
-| add(_x_, _y_)        | `x + y`                                                    | -              |
-| sub(_x_, _y_)        | `x - y`                                                    | -              |
-| mul(_x_, _y_)        | `x * y`                                                    | -              |
-| div(_x_, _y_)        | `x / y`                                                    | -              |
-| recip(_x_)           | [`x.recip()`](`Interval::recip`)                           | -              |
-| sqr(_x_)             | [`x.sqr()`](`Interval::sqr`)                               | -              |
-| sqrt(_x_)            | [`x.sqrt()`](`Interval::sqrt`)                             | -              |
-| fma(_x_, _y_, _z_)   | [`x.mul_add(y, z)`](`Interval::mul_add`)                   | -              |
-| pown(_x_, _n_)       | [`x.powi(n)`](`Interval::powi`)                            | Yes            |
-| pow(_x_, _y_)        | [`x.pow(y)`](`Interval::pow`)                              | Yes            |
-| exp(_x_)             | [`x.exp()`](`Interval::exp`)                               | Yes            |
-| exp2(_x_)            | [`x.exp2()`](`Interval::exp2`)                             | Yes            |
-| exp10(_x_)           | [`x.exp10()`](`Interval::exp10`)                           | Yes            |
-| log(_x_)             | [`x.ln()`](`Interval::ln`)                                 | Yes            |
-| log2(_x_)            | [`x.log2()`](`Interval::log2`)                             | Yes            |
-| log10(_x_)           | [`x.log10()`](`Interval::log10`)                           | Yes            |
-| sin(_x_)             | [`x.sin()`](`Interval::sin`)                               | Yes            |
-| cos(_x_)             | [`x.cos()`](`Interval::cos`)                               | Yes            |
-| tan(_x_)             | [`x.tan()`](`Interval::tan`)                               | Yes            |
-| asin(_x_)            | [`x.asin()`](`Interval::asin`)                             | Yes            |
-| acos(_x_)            | [`x.acos()`](`Interval::acos`)                             | Yes            |
-| atan(_x_)            | [`x.atan()`](`Interval::atan`)                             | Yes            |
-| atan2(_y_, _x_)      | [`y.atan2(x)`](`Interval::atan2`)                          | Yes            |
-| sinh(_x_)            | [`x.sinh()`](`Interval::sinh`)                             | Yes            |
-| cosh(_x_)            | [`x.cosh()`](`Interval::cosh`)                             | Yes            |
-| tanh(_x_)            | [`x.tanh()`](`Interval::tanh`)                             | Yes            |
-| asinh(_x_)           | [`x.asinh()`](`Interval::asinh`)                           | Yes            |
-| acosh(_x_)           | [`x.acosh()`](`Interval::acosh`)                           | Yes            |
-| atanh(_x_)           | [`x.atanh()`](`Interval::atanh`)                           | Yes            |
-| sign(_x_)            | [`x.sign()`](`Interval::sign`)                             | -              |
-| ceil(_x_)            | [`x.ceil()`](`Interval::ceil`)                             | -              |
-| floor(_x_)           | [`x.floor()`](`Interval::floor`)                           | -              |
-| trunc(_x_)           | [`x.trunc()`](`Interval::trunc`)                           | -              |
+| Operation            | Implementation                                       | Requires `gmp` |
+| -------------------- | ---------------------------------------------------- | -------------- |
+| neg(_x_)             | `-x`                                                 | -              |
+| add(_x_, _y_)        | `x + y`                                              | -              |
+| sub(_x_, _y_)        | `x - y`                                              | -              |
+| mul(_x_, _y_)        | `x * y`                                              | -              |
+| div(_x_, _y_)        | `x / y`                                              | -              |
+| recip(_x_)           | [`x.recip()`](`Interval::recip`)                     | -              |
+| sqr(_x_)             | [`x.sqr()`](`Interval::sqr`)                         | -              |
+| sqrt(_x_)            | [`x.sqrt()`](`Interval::sqrt`)                       | -              |
+| fma(_x_, _y_, _z_)   | [`x.mul_add(y, z)`](`Interval::mul_add`)             | -              |
+| pown(_x_, _n_)       | [`x.powi(n)`](`Interval::powi`)                      | Yes            |
+| pow(_x_, _y_)        | [`x.pow(y)`](`Interval::pow`)                        | Yes            |
+| exp(_x_)             | [`x.exp()`](`Interval::exp`)                         | Yes            |
+| exp2(_x_)            | [`x.exp2()`](`Interval::exp2`)                       | Yes            |
+| exp10(_x_)           | [`x.exp10()`](`Interval::exp10`)                     | Yes            |
+| log(_x_)             | [`x.ln()`](`Interval::ln`)                           | Yes            |
+| log2(_x_)            | [`x.log2()`](`Interval::log2`)                       | Yes            |
+| log10(_x_)           | [`x.log10()`](`Interval::log10`)                     | Yes            |
+| sin(_x_)             | [`x.sin()`](`Interval::sin`)                         | Yes            |
+| cos(_x_)             | [`x.cos()`](`Interval::cos`)                         | Yes            |
+| tan(_x_)             | [`x.tan()`](`Interval::tan`)                         | Yes            |
+| asin(_x_)            | [`x.asin()`](`Interval::asin`)                       | Yes            |
+| acos(_x_)            | [`x.acos()`](`Interval::acos`)                       | Yes            |
+| atan(_x_)            | [`x.atan()`](`Interval::atan`)                       | Yes            |
+| atan2(_y_, _x_)      | [`y.atan2(x)`](`Interval::atan2`)                    | Yes            |
+| sinh(_x_)            | [`x.sinh()`](`Interval::sinh`)                       | Yes            |
+| cosh(_x_)            | [`x.cosh()`](`Interval::cosh`)                       | Yes            |
+| tanh(_x_)            | [`x.tanh()`](`Interval::tanh`)                       | Yes            |
+| asinh(_x_)           | [`x.asinh()`](`Interval::asinh`)                     | Yes            |
+| acosh(_x_)           | [`x.acosh()`](`Interval::acosh`)                     | Yes            |
+| atanh(_x_)           | [`x.atanh()`](`Interval::atanh`)                     | Yes            |
+| sign(_x_)            | [`x.sign()`](`Interval::sign`)                       | -              |
+| ceil(_x_)            | [`x.ceil()`](`Interval::ceil`)                       | -              |
+| floor(_x_)           | [`x.floor()`](`Interval::floor`)                     | -              |
+| trunc(_x_)           | [`x.trunc()`](`Interval::trunc`)                     | -              |
 | roundTiesToEven(_x_) | [`x.round_ties_even()`](`Interval::round_ties_even`) | -              |
-| roundTiesToAway(_x_) | [`x.round()`](`Interval::round`)                           | -              |
-| abs(_x_)             | [`x.abs()`](`Interval::abs`)                               | -              |
-| min(_x_, _y_)        | [`x.min(y)`](`Interval::min`)                              | -              |
-| max(_x_, _y_)        | [`x.max(y)`](`Interval::max`)                              | -              |
+| roundTiesToAway(_x_) | [`x.round()`](`Interval::round`)                     | -              |
+| abs(_x_)             | [`x.abs()`](`Interval::abs`)                         | -              |
+| min(_x_, _y_)        | [`x.min(y)`](`Interval::min`)                        | -              |
+| max(_x_, _y_)        | [`x.max(y)`](`Interval::max`)                        | -              |
 
 #### Reverse-mode elementary functions
 
