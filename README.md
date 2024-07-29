@@ -22,8 +22,6 @@ The following CPUs are supported:
 
 - **AArch64 (ARM64)**
 
-  Should be usable, but is not tested continuously.
-
 When using the Cargo feature `gmp` (see below), target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate. For example, MSVC is not supported.
 
 ## Cargo Features

@@ -1,0 +1,53 @@
+name: ci-aarch64
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+  RUSTDOCFLAGS: -Dwarnings
+  RUSTFLAGS: -Dwarnings
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/gmp-mpfr-sys
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: minimal
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Test
+        run: cargo test --release
+
+      - name: Test (--no-default-features)
+        run: cargo test --release --no-default-features --lib --tests
+
+      - name: Clippy
+        run: cargo clippy --all-targets
+
+      - name: Check format
+        run: cargo fmt -- --check
+
+      - name: Check docs
+        run: cargo rustdoc
