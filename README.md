@@ -11,21 +11,21 @@ It [conforms](https://docs.rs/inari/latest/inari/_docs/conformance/index.html) t
 
 ## Supported Platforms
 
-The following CPUs are supported:
+The following CPUs are supported and continuously tested:
 
 - **x86-64**
 
   Haswell-based and newer processors are supported.
 
-  You need to specify the target CPU when building a crate that depends on inari. One way to do that is using a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your project (see [example](https://github.com/unageek/graphest/blob/main/.cargo/config.toml); you may want to change `native` to `haswell` for the best compatibility if you are going to distribute binaries).
+  You need to specify the target CPU when building a crate that depends on inari. One way to do that is by using a [configuration file](https://doc.rust-lang.org/cargo/reference/config.html) in your project (see [example](https://github.com/unageek/graphest/blob/main/.cargo/config.toml); you may want to change `native` to `haswell` for the best compatibility if you are going to distribute binaries).
 
 - **AArch64 (ARM64)**
 
-When using the Cargo feature `gmp` (see below), target platforms are limited to the ones that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate. For example, MSVC is not supported.
+When using the Cargo feature `gmp` (see below), target platforms are limited to those that are supported by the [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) crate. For example, MSVC is not supported.
 
 ## Cargo Features
 
-- `gmp` (enabled by default) - Enables [operations](https://docs.rs/inari/latest/inari/_docs/conformance/) that depend on GMP and MPFR. You can opt out the feature to reduce dependencies. Even in that case, you still have access to all operations required by certain kind of tasks, such as making fast robust predicates for computational geometry.
+- `gmp` (enabled by default) - Enables [operations](https://docs.rs/inari/latest/inari/_docs/conformance/) that depend on GMP and MPFR. You can opt out of the feature to reduce dependencies. Even in that case, you still have access to all operations required by certain kinds of tasks, such as making fast robust predicates for computational geometry.
 
 ## [Changelog](CHANGELOG.md)
 
@@ -35,13 +35,13 @@ When using the Cargo feature `gmp` (see below), target platforms are limited to 
 RUSTDOCFLAGS="--cfg docsrs --html-in-header /path/to/inari/src/_docs/header.html" cargo doc --open
 ```
 
-The absolute path to [`header.html`](src/_docs/header.html) must be specified.
+Ensure that the absolute path to [`header.html`](src/_docs/header.html) is specified.
 
 ## Related Project
 
-- [Graphest](https://github.com/unageek/graphest) - A faithful graphing calculator
+- [Graphest](https://github.com/unageek/graphest) - A faithful graphing calculator.
 
 ## References
 
-- IEEE Std 1788-2015 - IEEE Standard for Interval Arithmetic. https://doi.org/10.1109/IEEESTD.2015.7140721
-- IEEE Std 1788.1-2017 - IEEE Standard for Interval Arithmetic (Simplified). https://doi.org/10.1109/IEEESTD.2018.8277144
+- IEEE Std 1788-2015 - IEEE Standard for Interval Arithmetic. [DOI: 10.1109/IEEESTD.2015.7140721](https://doi.org/10.1109/IEEESTD.2015.7140721)
+- IEEE Std 1788.1-2017 - IEEE Standard for Interval Arithmetic (Simplified). [DOI: 10.1109/IEEESTD.2018.8277144](https://doi.org/10.1109/IEEESTD.2018.8277144)
