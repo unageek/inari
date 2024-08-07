@@ -2,6 +2,16 @@
 
 Items marked with ⚠️ are breaking changes.
 
+## v2.0.0 - 2024-08-07
+
+### Added
+
+- Implemented the traits `Send`, `Sync`, and `Unpin` for `(Dec)Interval`.
+
+### Changed
+
+- ⚠️ Renamed `(Dec)Interval::round_ties_to_even` to `(DecInterval)::round_ties_even`.
+
 ## v1.1.0 - 2023-04-02
 
 ### Added
@@ -75,7 +85,7 @@ The crate requires a nightly toolchain >= `nightly-2021-10-05`.
 
 ### Added
 
-- Implemented the trait `Hash` for `Interval`, `Decoration` and `Overlap`.
+- Implemented the trait `Hash` for `Interval`, `Decoration`, and `Overlap`.
 
 ### Removed
 
